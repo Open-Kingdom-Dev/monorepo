@@ -1,9 +1,9 @@
 import { configureStore } from '@reduxjs/toolkit';
-// import { loggerReducer } from '@ynaa/shared-util-logger';
+import { loggerReducer } from '@ynaa/shared-util-logger';
 
 export const store = configureStore({
   reducer: {
-    // logger: loggerReducer,
+    logger: loggerReducer,
     // Add other reducers here as needed
   },
   middleware: (getDefaultMiddleware) =>
