@@ -9,12 +9,10 @@ export interface LogEntry {
 
 export interface LoggerState {
   logs: LogEntry[];
-  isVisible: boolean;
 }
 
 const initialState: LoggerState = {
   logs: [],
-  isVisible: false,
 };
 
 export const loggerSlice = createSlice({

@@ -1,9 +1,14 @@
-import NxWelcome from './nx-welcome';
+import { logInfo, selectLogs } from '@ynaa/shared-util-logger';
+import { useSelector, useDispatch } from 'react-redux';
 
 export function App() {
+  const logs = useSelector(selectLogs);
+  const dispatch = useDispatch();
   return (
     <div>
-      <NxWelcome title="@ynaa/demo-scaffold" />
+      <h1>Hello World</h1>
+      <p>Logs: {logs.length}</p>
+      <button onClick={() => dispatch(logInfo('Hello World'))}>Log Info</button>
     </div>
   );
 }
