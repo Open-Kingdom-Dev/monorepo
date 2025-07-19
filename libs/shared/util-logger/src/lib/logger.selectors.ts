@@ -1,8 +1,9 @@
 import { createSelector } from '@reduxjs/toolkit';
 import { LoggerState } from './logger.slice';
 
-// TODO figure out how to get the root state without a circular dependency
-export const selectLoggerState = (state: {logger: LoggerState}) => state.logger;
+// Generic selector that works with any root state containing logger
+export const LoggerKey = 'logger';
+export const selectLoggerState = <T extends { [LoggerKey]: LoggerState }>(state: T) => state[LoggerKey];
 
 export const selectLogs = createSelector(
   [selectLoggerState],

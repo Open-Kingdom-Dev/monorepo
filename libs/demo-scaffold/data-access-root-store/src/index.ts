@@ -1,9 +1,9 @@
 import { configureStore } from '@reduxjs/toolkit';
-import { loggerReducer } from '@ynaa/shared-util-logger';
+import { LoggerKey, loggerReducer } from '@ynaa/shared-util-logger';
 
 export const store = configureStore({
   reducer: {
-    logger: loggerReducer,
+    [LoggerKey]: loggerReducer,
     // Add other reducers here as needed
   },
   middleware: (getDefaultMiddleware) =>
@@ -14,6 +14,3 @@ export const store = configureStore({
       },
     }),
 });
-
-export type RootState = ReturnType<typeof store.getState>;
-export type AppDispatch = typeof store.dispatch;
