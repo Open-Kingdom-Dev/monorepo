@@ -1,4 +1,4 @@
-import { logInfo, selectLogs } from '@ynaa/shared-util-logger';
+import { logInfo, selectLogs } from '@ynaa/shared-feature-logger';
 import { useSelector, useDispatch } from 'react-redux';
 
 export function App() {

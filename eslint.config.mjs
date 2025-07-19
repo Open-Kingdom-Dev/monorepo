@@ -28,6 +28,22 @@ export default [
               onlyDependOnLibsWithTags: ['scope:demo-scaffold', 'scope:shared'],
             },
             {
+              sourceTag: 'scope:shared',
+              onlyDependOnLibsWithTags: ['scope:shared'],
+            },
+            {
+              sourceTag: 'type:data-access',
+              onlyDependOnLibsWithTags: ['type:util'],
+            },
+            {
+              sourceTag: 'type:ui',
+              onlyDependOnLibsWithTags: ['type:util'],
+            },
+            {
+              sourceTag: 'type:feature',
+              onlyDependOnLibsWithTags: ['type:util', 'type:data-access', 'type:ui'],
+            },
+            {
               sourceTag: 'type:util',
               onlyDependOnLibsWithTags: ['type:util'],
             },

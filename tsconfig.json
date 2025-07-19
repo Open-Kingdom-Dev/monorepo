@@ -13,7 +13,7 @@
       "path": "./libs/demo-scaffold/data-access-root-store"
     },
     {
-      "path": "./libs/shared/util-logger"
+      "path": "./libs/shared/feature-logger"
     }
   ]
 }

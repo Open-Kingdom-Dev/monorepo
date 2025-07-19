@@ -1,5 +1,5 @@
 import { configureStore } from '@reduxjs/toolkit';
-import { LoggerKey, loggerReducer } from '@ynaa/shared-util-logger';
+import { LoggerKey, loggerReducer } from '@ynaa/shared-feature-logger';
 
 export const store = configureStore({
   reducer: {
