@@ -10,10 +10,10 @@
       "path": "./apps/demo-scaffold"
     },
     {
-      "path": "./libs/shared/logger"
+      "path": "./libs/demo-scaffold/data-access-root-store"
     },
     {
-      "path": "./libs/demo-scaffold/data-access-root-store"
+      "path": "./libs/shared/util-logger"
     }
   ]
 }

@@ -3,6 +3,9 @@
   "include": [],
   "references": [
     {
+      "path": "../../libs/demo-scaffold/data-access-root-store"
+    },
+    {
       "path": "./tsconfig.app.json"
     },
     {

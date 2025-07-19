@@ -7,6 +7,8 @@ import {
   type MetaFunction,
   type LinksFunction,
 } from 'react-router';
+import { Provider } from 'react-redux';
+import { store } from '@ynaa/demo-scaffold-data-access-root-store';
 
 import { AppNav } from './app-nav';
 
@@ -39,10 +41,12 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <Links />
       </head>
       <body>
-        <AppNav />
-        {children}
-        <ScrollRestoration />
-        <Scripts />
+        <Provider store={store}>
+          <AppNav />
+          {children}
+          <ScrollRestoration />
+          <Scripts />
+        </Provider>
       </body>
     </html>
   );

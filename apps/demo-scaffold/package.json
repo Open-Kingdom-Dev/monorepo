@@ -17,5 +17,11 @@
     "@types/node": "^20.0.0",
     "@types/react": "19.0.0",
     "@types/react-dom": "19.0.0"
+  },
+  "nx": {
+    "tags": [
+      "scope:demo-scaffold",
+      "type:app"
+    ]
   }
 }

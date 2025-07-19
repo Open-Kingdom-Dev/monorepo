@@ -24,8 +24,8 @@ export default [
           allow: ['^.*/eslint(\\.base)?\\.config\\.[cm]?[jt]s$'],
           depConstraints: [
             {
-              sourceTag: 'scope:ynaa',
-              onlyDependOnLibsWithTags: ['scope:ynaa', 'scope:shared'],
+              sourceTag: 'scope:demo-scaffold',
+              onlyDependOnLibsWithTags: ['scope:demo-scaffold', 'scope:shared'],
             },
             {
               sourceTag: 'type:util',
