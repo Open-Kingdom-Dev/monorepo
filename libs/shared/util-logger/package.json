@@ -1,5 +1,5 @@
 {
-  "name": "@ynaa/lib",
+  "name": "@ynaa/shared-util-logger",
   "version": "0.0.1",
   "main": "./src/index.ts",
   "types": "./src/index.ts",
@@ -12,7 +12,7 @@
     "./package.json": "./package.json"
   },
   "nx": {
-    "name": "logger",
+    "name": "@ynaa/shared-util-logger",
     "tags": [
       "type:util",
       "scope:shared"
