@@ -11,6 +11,9 @@
     },
     {
       "path": "./libs/shared/logger"
+    },
+    {
+      "path": "./libs/demo-scaffold/data-access-root-store"
     }
   ]
 }
