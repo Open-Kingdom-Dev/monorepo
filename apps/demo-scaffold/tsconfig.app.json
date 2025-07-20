@@ -35,6 +35,8 @@
     "tests/**/*.test.jsx",
     "jest.config.ts",
     "src/**/*.spec.ts",
+    "app/**/*.spec.ts",
+    "app/**/*.spec.tsx",
     "src/**/*.test.ts",
     "eslint.config.js",
     "eslint.config.cjs",

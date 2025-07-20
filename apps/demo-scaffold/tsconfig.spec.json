@@ -10,18 +10,20 @@
       "@nx/react/typings/image.d.ts"
     ]
   },
-  "files": ["src/test-setup.ts"],
+  "files": [
+    "app/test-setup.ts"
+  ],
   "include": [
     "jest.config.ts",
-    "src/**/*.test.ts",
-    "src/**/*.spec.ts",
-    "src/**/*.test.tsx",
-    "src/**/*.spec.tsx",
-    "src/**/*.test.js",
-    "src/**/*.spec.js",
-    "src/**/*.test.jsx",
-    "src/**/*.spec.jsx",
-    "src/**/*.d.ts",
+    "app/**/*.test.ts",
+    "app/**/*.spec.ts",
+    "app/**/*.test.tsx",
+    "app/**/*.spec.tsx",
+    "app/**/*.test.js",
+    "app/**/*.spec.js",
+    "app/**/*.test.jsx",
+    "app/**/*.spec.jsx",
+    "app/**/*.d.ts",
     "test/**/*.spec.tsx",
     "test/**/*.spec.ts",
     "test/**/*.test.tsx",

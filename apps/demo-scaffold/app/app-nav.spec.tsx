@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router';
-import { AppNav } from '../app/app-nav';
+import { AppNav } from './app-nav';
 
 describe('AppNav Component', () => {
   const renderAppNav = (initialEntries = ['/']) => {

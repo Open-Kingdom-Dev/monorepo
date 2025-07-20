@@ -1,7 +1,7 @@
 import { render, screen, fireEvent, act } from '@testing-library/react';
 import { Provider } from 'react-redux';
 import { configureStore } from '@reduxjs/toolkit';
-import { App } from '../app/app';
+import { App } from './app';
 import { LoggerKey, loggerReducer, createLoggerMiddleware, LoggerConfig, LoggerState } from '@ynaa/shared-data-access-logger';
 
 describe('App Component', () => {

@@ -4,7 +4,7 @@ import {
   getAppTitle,
   getFontConfig,
   validateAppConfig,
-} from '../app/app.config';
+} from './app.config';
 
 describe('App Configuration', () => {
   describe('getAppMeta', () => {

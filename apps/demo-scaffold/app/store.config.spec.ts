@@ -1,4 +1,4 @@
-import { createAppStore, getLoggerConfig } from '../app/store.config';
+import { createAppStore, getLoggerConfig } from './store.config';
 import { LoggerKey } from '@ynaa/shared-data-access-logger';
 
 describe('Store Configuration', () => {
