@@ -1,7 +1,8 @@
 import { createSelector } from '@reduxjs/toolkit';
 import { LoggerKey, RootStateContainingLogger } from './logger.types';
 
-export const selectLoggerState = (state: RootStateContainingLogger) => state[LoggerKey];
+export const selectLoggerState = (state: RootStateContainingLogger) =>
+  state[LoggerKey];
 
 export const selectLogs = createSelector(
   [selectLoggerState],
@@ -10,7 +11,7 @@ export const selectLogs = createSelector(
 
 export const selectLogsByLevel = createSelector(
   [selectLogs, (_, level: 'info' | 'warn' | 'error') => level],
-  (logs, level) => logs.filter(log => log.level === level)
+  (logs, level) => logs.filter((log) => log.level === level)
 );
 
 export const selectRecentLogs = createSelector(

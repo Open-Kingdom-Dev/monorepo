@@ -24,3 +24,5 @@ loggerListenerMiddleware.startListening({
     }
   },
 });
+
+export const loggerMiddleware = loggerListenerMiddleware.middleware;

@@ -8,7 +8,7 @@ import {
   type LinksFunction,
 } from 'react-router';
 import { Provider } from 'react-redux';
-import { store } from '@ynaa/demo-scaffold-data-access-root-store';
+import { store } from '@ynaa/demo-scaffold-feature-root-store';
 
 import { AppNav } from './app-nav';
 

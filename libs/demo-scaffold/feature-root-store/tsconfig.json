@@ -3,6 +3,9 @@
   "include": [],
   "references": [
     {
+      "path": "../../shared/feature-logger"
+    },
+    {
       "path": "./tsconfig.lib.json"
     },
     {

@@ -42,7 +42,10 @@
   ],
   "references": [
     {
-      "path": "../../libs/demo-scaffold/data-access-root-store/tsconfig.lib.json"
+      "path": "../../libs/demo-scaffold/feature-root-store/tsconfig.lib.json"
+    },
+    {
+      "path": "../../libs/shared/feature-logger/tsconfig.lib.json"
     }
   ]
 }

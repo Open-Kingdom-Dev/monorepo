@@ -32,6 +32,15 @@ export default [
               onlyDependOnLibsWithTags: ['scope:shared'],
             },
             {
+              sourceTag: 'type:app',
+              onlyDependOnLibsWithTags: [
+                'type:feature',
+                'type:util',
+                'type:data-access',
+                'type:ui',
+              ],
+            },
+            {
               sourceTag: 'type:data-access',
               onlyDependOnLibsWithTags: ['type:util'],
             },
@@ -41,7 +50,12 @@ export default [
             },
             {
               sourceTag: 'type:feature',
-              onlyDependOnLibsWithTags: ['type:util', 'type:data-access', 'type:ui'],
+              onlyDependOnLibsWithTags: [
+                'type:feature',
+                'type:util',
+                'type:data-access',
+                'type:ui',
+              ],
             },
             {
               sourceTag: 'type:util',

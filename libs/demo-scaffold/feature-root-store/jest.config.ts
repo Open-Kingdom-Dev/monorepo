@@ -1,5 +1,5 @@
 export default {
-  displayName: '@ynaa/demo-scaffold-data-access-root-store',
+  displayName: '@ynaa/demo-scaffold-feature-root-store',
   preset: '../../../jest.preset.js',
   transform: {
     '^(?!.*\\.(js|jsx|ts|tsx|css|json)$)': '@nx/react/plugins/jest',

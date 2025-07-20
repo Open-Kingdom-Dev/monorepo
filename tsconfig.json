@@ -10,7 +10,7 @@
       "path": "./apps/demo-scaffold"
     },
     {
-      "path": "./libs/demo-scaffold/data-access-root-store"
+      "path": "./libs/demo-scaffold/feature-root-store"
     },
     {
       "path": "./libs/shared/feature-logger"
