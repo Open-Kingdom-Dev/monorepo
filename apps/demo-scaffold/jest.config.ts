@@ -8,4 +8,13 @@ export default {
   },
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx'],
   coverageDirectory: 'test-output/jest/coverage',
+  collectCoverageFrom: [
+    'app/**/*.{ts,tsx}',
+    '!app/entry.server.tsx',
+    '!app/entry.client.tsx', 
+    '!app/root.tsx',
+    '!app/routes.tsx',
+    '!**/*.d.ts',
+    '!**/.react-router/**',
+  ],
 };

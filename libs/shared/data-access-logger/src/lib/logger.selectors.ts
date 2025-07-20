@@ -16,5 +16,5 @@ export const selectLogsByLevel = createSelector(
 
 export const selectRecentLogs = createSelector(
   [selectLogs, (_, count: number) => count],
-  (logs, count) => logs.slice(-count)
+  (logs, count) => count === 0 ? [] : logs.slice(-count)
 );
