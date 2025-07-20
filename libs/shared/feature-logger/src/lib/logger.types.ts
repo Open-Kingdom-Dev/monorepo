@@ -1,5 +1,9 @@
 export const LoggerKey = 'logger';
 
+export interface LoggerConfig {
+  destination: 'console'
+}
+
 export interface LogEntry {
   id: string;
   message: string;

@@ -1,23 +1,26 @@
 import { configureStore } from '@reduxjs/toolkit';
 import {
+  LoggerConfig,
   LoggerKey,
-  loggerMiddleware,
+  createLoggerMiddleware,
   loggerReducer,
 } from '@ynaa/shared-feature-logger';
 
-export const store = configureStore({
-  reducer: {
-    [LoggerKey]: loggerReducer,
-    // Add other reducers here as needed
-  },
-  middleware: (getDefaultMiddleware) => {
-    const defaultMiddleware = getDefaultMiddleware({
-      serializableCheck: {
-        // Ignore these action types
-        ignoredActions: ['persist/PERSIST'],
-      },
-    });
+export const createRootStore = (config: LoggerConfig) => {
+  return configureStore({
+    reducer: {
+      [LoggerKey]: loggerReducer,
+      // Add other reducers here as needed
+    },
+    middleware: (getDefaultMiddleware) => {
+      const defaultMiddleware = getDefaultMiddleware({
+        serializableCheck: {
+          // Ignore these action types
+          ignoredActions: ['persist/PERSIST'],
+        },
+      });
 
-    return defaultMiddleware.prepend(loggerMiddleware);
-  },
-});
+      return defaultMiddleware.prepend(createLoggerMiddleware(config));
+    },
+  });
+};

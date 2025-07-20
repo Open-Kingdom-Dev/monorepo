@@ -8,7 +8,7 @@ import {
   type LinksFunction,
 } from 'react-router';
 import { Provider } from 'react-redux';
-import { store } from '@ynaa/demo-scaffold-feature-root-store';
+import { createRootStore } from '@ynaa/demo-scaffold-feature-root-store';
 
 import { AppNav } from './app-nav';
 
@@ -30,6 +30,8 @@ export const links: LinksFunction = () => [
     href: 'https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap',
   },
 ];
+
+const store = createRootStore({ destination: 'console' });
 
 export function Layout({ children }: { children: React.ReactNode }) {
   return (
