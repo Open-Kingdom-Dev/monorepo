@@ -3,7 +3,7 @@
   "include": [],
   "references": [
     {
-      "path": "../../shared/feature-logger"
+      "path": "../../shared/data-access-logger"
     },
     {
       "path": "./tsconfig.lib.json"

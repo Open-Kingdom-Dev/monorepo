@@ -4,7 +4,7 @@ import {
   LoggerKey,
   createLoggerMiddleware,
   loggerReducer,
-} from '@ynaa/shared-feature-logger';
+} from '@ynaa/shared-data-access-logger';
 
 export const createRootStore = (config: LoggerConfig) => {
   return configureStore({

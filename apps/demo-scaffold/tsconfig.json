@@ -6,7 +6,7 @@
       "path": "../../libs/demo-scaffold/feature-root-store"
     },
     {
-      "path": "../../libs/shared/feature-logger"
+      "path": "../../libs/shared/data-access-logger"
     },
     {
       "path": "./tsconfig.app.json"

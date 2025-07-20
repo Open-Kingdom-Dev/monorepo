@@ -45,7 +45,7 @@
       "path": "../../libs/demo-scaffold/feature-root-store/tsconfig.lib.json"
     },
     {
-      "path": "../../libs/shared/feature-logger/tsconfig.lib.json"
+      "path": "../../libs/shared/data-access-logger/tsconfig.lib.json"
     }
   ]
 }
