@@ -4,9 +4,9 @@
   "license": "MIT",
   "scripts": {
     "dev": "nx run @ynaa/demo-scaffold:dev",
-    "test": "nx run-many --target=test --all",
-    "test:affected": "nx affected --target=test",
-    "test:watch": "nx run-many --target=test --all --watch"
+    "test": "nx run-many --target=test --all --coverage",
+    "test:affected": "nx affected --target=test --coverage",
+    "test:watch": "nx run-many --target=test --all --watch --coverage"
   },
   "private": true,
   "dependencies": {
