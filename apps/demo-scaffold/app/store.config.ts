@@ -22,11 +22,3 @@ export function getLoggerConfig(): LoggerConfig {
     destination: 'console'
   };
 }
-
-/**
- * Validate logger configuration
- * Business logic to ensure valid logger setup
- */
-export function validateLoggerConfig(config: LoggerConfig): boolean {
-  return config.destination === 'console';
-} 

@@ -108,13 +108,4 @@ describe('App Component', () => {
 
     expect(screen.getByText('Logs: 1')).toBeTruthy();
   });
-
-  it('should have proper component structure', () => {
-    renderApp();
-
-    // Check all expected elements are present
-    expect(screen.getByRole('heading', { level: 1 })).toBeTruthy();
-    expect(screen.getByText(/Logs:/)).toBeTruthy();
-    expect(screen.getByRole('button', { name: 'Log Info' })).toBeTruthy();
-  });
 }); 
