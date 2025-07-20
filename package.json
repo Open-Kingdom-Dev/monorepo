@@ -3,7 +3,10 @@
   "version": "0.0.0",
   "license": "MIT",
   "scripts": {
-    "dev": "nx run @ynaa/demo-scaffold:dev"
+    "dev": "nx run @ynaa/demo-scaffold:dev",
+    "test": "nx run-many --target=test --all",
+    "test:affected": "nx affected --target=test",
+    "test:watch": "nx run-many --target=test --all --watch"
   },
   "private": true,
   "dependencies": {
