@@ -1,9 +1,7 @@
 import { createSelector } from '@reduxjs/toolkit';
-import { LoggerState } from './logger.slice';
+import { LoggerKey, RootStateContainingLogger } from './logger.types';
 
-// Generic selector that works with any root state containing logger
-export const LoggerKey = 'logger';
-export const selectLoggerState = <T extends { [LoggerKey]: LoggerState }>(state: T) => state[LoggerKey];
+export const selectLoggerState = (state: RootStateContainingLogger) => state[LoggerKey];
 
 export const selectLogs = createSelector(
   [selectLoggerState],

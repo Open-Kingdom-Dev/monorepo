@@ -1,15 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-
-export interface LogEntry {
-  id: string;
-  message: string;
-  level: 'info' | 'warn' | 'error';
-  timestamp: number;
-}
-
-export interface LoggerState {
-  logs: LogEntry[];
-}
+import { LoggerState, LogEntry } from './logger.types';
 
 const initialState: LoggerState = {
   logs: [],
@@ -19,7 +9,10 @@ export const loggerSlice = createSlice({
   name: 'logger',
   initialState,
   reducers: {
-    addLog: (state, action: PayloadAction<Omit<LogEntry, 'id' | 'timestamp'>>) => {
+    addLog: (
+      state,
+      action: PayloadAction<Omit<LogEntry, 'id' | 'timestamp'>>
+    ) => {
       const log: LogEntry = {
         ...action.payload,
         id: Date.now().toString(),
@@ -29,7 +22,7 @@ export const loggerSlice = createSlice({
     },
     clearLogs: (state) => {
       state.logs = [];
-    }
+    },
   },
 });
 
