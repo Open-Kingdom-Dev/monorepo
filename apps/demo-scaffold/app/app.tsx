@@ -7,8 +7,8 @@ export function App() {
   return (
     <div>
       <h1>Hello World</h1>
-      <p>Logs: {logs.length}</p>
-      <button onClick={() => dispatch(logInfo('Hello World'))}>Log Info</button>
+      <p data-testid="logs-count">Logs: {logs.length}</p>
+      <button data-testid="log-info-btn" onClick={() => dispatch(logInfo('Hello World'))}>Log Info</button>
     </div>
   );
 }

@@ -6,7 +6,9 @@
     "dev": "nx run @ynaa/demo-scaffold:dev",
     "test": "nx run-many --target=test --all --coverage",
     "test:affected": "nx affected --target=test --coverage",
-    "test:watch": "nx run-many --target=test --all --watch --coverage"
+    "test:watch": "nx run-many --target=test --all --watch --coverage",
+    "e2e": "nx run demo-scaffold-e2e:e2e",
+    "e2e:open": "nx run demo-scaffold-e2e:e2e --ui"
   },
   "private": true,
   "dependencies": {
