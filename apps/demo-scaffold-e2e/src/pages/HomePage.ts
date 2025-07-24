@@ -16,4 +16,12 @@ export class HomePage {
   async incrementLogCount() {
     await this.page.locator(byTestId('log-info-btn')).click();
   }
+
+  async triggerNotification() {
+    await this.page.locator(byTestId('trigger-notification-btn')).click();
+  }
+
+  async getNotification() {
+    return this.page.locator(byTestId('notification')).textContent();
+  }
 }
