@@ -13,5 +13,9 @@
   },
   "nx": {
     "name": "shared-ui-theme"
+  },
+  "peerDependencies": {
+    "tailwindcss": "^3.4.0",
+    "react": "^19.0.0"
   }
 }

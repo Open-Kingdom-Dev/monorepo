@@ -6,6 +6,7 @@ import {
   ScrollRestoration,
 } from 'react-router';
 import { Provider } from 'react-redux';
+import { ThemeProvider } from '@ynaa/shared-ui-theme';
 
 import { AppNav } from './app-nav';
 import { createAppStore } from './store.config';
@@ -29,10 +30,12 @@ export function Layout({ children }: { children: React.ReactNode }) {
       </head>
       <body>
         <Provider store={store}>
-          <AppNav />
-          {children}
-          <ScrollRestoration />
-          <Scripts />
+          <ThemeProvider>
+            <AppNav />
+            {children}
+            <ScrollRestoration />
+            <Scripts />
+          </ThemeProvider>
         </Provider>
       </body>
     </html>
