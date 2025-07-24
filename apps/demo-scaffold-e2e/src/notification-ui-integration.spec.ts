@@ -13,4 +13,12 @@ test.describe('the notification UI integration', () => {
     await home.triggerNotification();
     expect(home.getNotification()).toContain('Notification triggered!');
   });
+
+  test('should allow configuration of placement', async () => {
+    await home.setNotificationPlacement('top');
+    await home.triggerNotification();
+    // Check for a made-up class name indicating top placement
+    const notification = home.getNotificationLocator();
+    await expect(notification).toHaveClass(/notification--top/);
+  });
 });
