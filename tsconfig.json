@@ -17,6 +17,9 @@
     },
     {
       "path": "./libs/shared/ui-notifications"
+    },
+    {
+      "path": "./libs/shared/ui-theme"
     }
   ]
 }
