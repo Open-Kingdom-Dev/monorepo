@@ -1,4 +1,4 @@
-import { Theme, ColorPalette } from './theme.types';
+import { Theme } from './theme.types';
 
 /**
  * Generates CSS custom properties from a theme object
@@ -95,27 +95,6 @@ export const mergeThemes = (baseTheme: Theme, overrideTheme: Partial<Theme>): Th
       ...baseTheme.boxShadow,
       ...overrideTheme.boxShadow,
     },
-  };
-};
-
-/**
- * Generates a color palette from a base color
- */
-export const generateColorPalette = (baseColor: string): ColorPalette => {
-  // This is a simplified color palette generator
-  // In a real implementation, you might want to use a color manipulation library
-  return {
-    50: baseColor,
-    100: baseColor,
-    200: baseColor,
-    300: baseColor,
-    400: baseColor,
-    500: baseColor,
-    600: baseColor,
-    700: baseColor,
-    800: baseColor,
-    900: baseColor,
-    950: baseColor,
   };
 };
 
