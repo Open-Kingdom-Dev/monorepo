@@ -24,6 +24,8 @@
     "src/**/*.test.js",
     "src/**/*.spec.jsx",
     "src/**/*.test.jsx",
+    "src/lib/test-setup.ts",
+    "src/lib/test-utils.ts",
     "eslint.config.js",
     "eslint.config.cjs",
     "eslint.config.mjs"

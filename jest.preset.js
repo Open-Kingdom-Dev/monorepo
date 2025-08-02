@@ -17,7 +17,9 @@ module.exports = {
     '!**/*.d.ts',
     '!**/jest.config.{js,ts}',
     '!**/test-setup.{js,ts}',
-    '!**/index.spec.{js,ts}'
+    '!**/index.spec.{js,ts}',
+    '!**/test-utils.{js,ts}',
+    '!**/test-setup.{js,ts}'
   ],
   coverageThreshold: {
     global: {

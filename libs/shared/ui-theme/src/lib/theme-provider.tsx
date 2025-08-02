@@ -1,7 +1,12 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { Theme, ThemeContextValue, ThemeMode } from './theme.types';
 import { defaultLightTheme, defaultDarkTheme } from './default-theme';
-import { applyThemeToDOM, loadThemeMode, saveThemeMode } from './theme-utils';
+import {
+  applyThemeToDOM,
+  loadThemeMode,
+  mergeThemes,
+  saveThemeMode,
+} from './theme-utils';
 
 const ThemeContext = createContext<ThemeContextValue | undefined>(undefined);
 
@@ -27,18 +32,17 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({
   const [theme, setThemeState] = useState<Theme>(initialTheme);
   const [mode, setModeState] = useState<ThemeMode>(initialMode);
 
-  // Apply theme to CSS custom properties
   useEffect(() => {
     applyThemeToDOM(theme);
   }, [theme]);
 
-  // Handle mode changes
   useEffect(() => {
-    const newTheme = mode === 'dark' ? defaultDarkTheme : defaultLightTheme;
-    setThemeState(newTheme);
-  }, [mode]);
+    if (!initialTheme || initialTheme === defaultLightTheme) {
+      const newTheme = mode === 'dark' ? defaultDarkTheme : defaultLightTheme;
+      setThemeState(newTheme);
+    }
+  }, [mode, initialTheme]);
 
-  // Load saved theme mode from localStorage
   useEffect(() => {
     const savedMode = loadThemeMode();
     if (savedMode) {
@@ -52,7 +56,7 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({
   };
 
   const setTheme = (newTheme: Partial<Theme>) => {
-    setThemeState((prev) => ({ ...prev, ...newTheme }));
+    setThemeState((prev) => mergeThemes(prev, newTheme));
   };
 
   const value: ThemeContextValue = {

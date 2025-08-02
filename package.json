@@ -6,7 +6,6 @@
     "dev": "nx run @ynaa/demo-scaffold:dev",
     "test": "nx run-many --target=test --all --coverage",
     "test:affected": "nx affected --target=test --coverage",
-    "test:watch": "nx run-many --target=test --all --watch --coverage",
     "e2e": "nx run demo-scaffold-e2e:e2e",
     "e2e:open": "nx run demo-scaffold-e2e:e2e --ui"
   },
@@ -15,6 +14,7 @@
     "@react-router/node": "^7.2.0",
     "@react-router/serve": "^7.2.0",
     "@reduxjs/toolkit": "^2.8.2",
+    "@testing-library/jest-dom": "^6.6.4",
     "isbot": "^4.4.0",
     "react": "19.0.0",
     "react-dom": "19.0.0",

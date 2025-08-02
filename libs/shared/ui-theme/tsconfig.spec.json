@@ -15,7 +15,9 @@
     "src/**/*.spec.js",
     "src/**/*.test.jsx",
     "src/**/*.spec.jsx",
-    "src/**/*.d.ts"
+    "src/**/*.d.ts",
+    "src/lib/test-setup.ts",
+    "src/lib/test-utils.ts"
   ],
   "references": [
     {

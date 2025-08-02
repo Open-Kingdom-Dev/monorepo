@@ -11,7 +11,7 @@ export const getAppMeta: MetaFunction = () => [
 ];
 
 /**
- * Application resource links configuration  
+ * Application resource links configuration
  * Business logic for fonts, stylesheets, and preconnections
  */
 export const getAppLinks: LinksFunction = () => [
@@ -28,7 +28,7 @@ export const getAppLinks: LinksFunction = () => [
   {
     rel: 'stylesheet',
     href: '/styles.css',
-  }
+  },
 ];
 
 /**
@@ -38,33 +38,3 @@ export const getAppLinks: LinksFunction = () => [
 export function getAppTitle(): string {
   return 'New Nx React Router App';
 }
-
-/**
- * Get font configuration
- * Business logic for typography choices
- */
-export function getFontConfig() {
-  return {
-    fontFamily: 'Inter',
-    weights: '100..900',
-    supports: {
-      italic: true,
-      optical: true,
-    }
-  };
-}
-
-/**
- * Validate application configuration
- * Business logic to ensure proper app setup
- */
-export function validateAppConfig(): boolean {
-  const title = getAppTitle();
-  const fontConfig = getFontConfig();
-  
-  return (
-    title.length > 0 &&
-    fontConfig.fontFamily === 'Inter' &&
-    fontConfig.supports.italic === true
-  );
-} 

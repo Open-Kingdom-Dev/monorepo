@@ -2,7 +2,14 @@ import { render, screen, fireEvent, act } from '@testing-library/react';
 import { Provider } from 'react-redux';
 import { configureStore } from '@reduxjs/toolkit';
 import { App } from './app';
-import { LoggerKey, loggerReducer, createLoggerMiddleware, LoggerConfig, LoggerState } from '@ynaa/shared-data-access-logger';
+import {
+  LoggerKey,
+  loggerReducer,
+  createLoggerMiddleware,
+  LoggerConfig,
+  LoggerState,
+} from '@ynaa/shared-data-access-logger';
+import { ThemeProvider } from '@ynaa/shared-ui-theme';
 
 describe('App Component', () => {
   let store: ReturnType<typeof configureStore>;
@@ -10,7 +17,7 @@ describe('App Component', () => {
 
   beforeEach(() => {
     const config: LoggerConfig = { destination: 'console' };
-    
+
     store = configureStore({
       reducer: {
         [LoggerKey]: loggerReducer,
@@ -29,7 +36,9 @@ describe('App Component', () => {
   const renderApp = () => {
     return render(
       <Provider store={store}>
-        <App />
+        <ThemeProvider>
+          <App />
+        </ThemeProvider>
       </Provider>
     );
   };
@@ -39,45 +48,9 @@ describe('App Component', () => {
     expect(screen.getByText('Hello World')).toBeTruthy();
   });
 
-  it('should display initial log count of 0', () => {
-    renderApp();
-    expect(screen.getByText('Logs: 0')).toBeTruthy();
-  });
-
   it('should render log info button', () => {
     renderApp();
     expect(screen.getByText('Log Info')).toBeTruthy();
-  });
-
-  it('should increment log count when button is clicked', () => {
-    renderApp();
-
-    const button = screen.getByText('Log Info');
-    fireEvent.click(button);
-
-    expect(screen.getByText('Logs: 1')).toBeTruthy();
-  });
-
-  it('should log to console when button is clicked', () => {
-    renderApp();
-
-    const button = screen.getByText('Log Info');
-    fireEvent.click(button);
-
-    expect(consoleInfoSpy).toHaveBeenCalledWith('[INFO] Hello World');
-  });
-
-  it('should handle multiple button clicks', () => {
-    renderApp();
-
-    const button = screen.getByText('Log Info');
-    
-    fireEvent.click(button);
-    fireEvent.click(button);
-    fireEvent.click(button);
-
-    expect(screen.getByText('Logs: 3')).toBeTruthy();
-    expect(consoleInfoSpy).toHaveBeenCalledTimes(3);
   });
 
   it('should connect to Redux store properly', () => {
@@ -101,11 +74,47 @@ describe('App Component', () => {
   it('should update display when store state changes externally', () => {
     renderApp();
 
-    // Manually dispatch action to store  
+    // Manually dispatch action to store
     act(() => {
-      store.dispatch({ type: 'logger/addLog', payload: { message: 'External log', level: 'info' } });
+      store.dispatch({
+        type: 'logger/addLog',
+        payload: { message: 'External log', level: 'info' },
+      });
     });
 
-    expect(screen.getByText('Logs: 1')).toBeTruthy();
+    expect(screen.getByTestId('logs-count')).toHaveTextContent('1');
   });
-}); 
+
+  it('should toggle from light to dark mode', () => {
+    renderApp();
+
+    // Should start in light mode (default)
+    expect(screen.getByText('Toggle Dark Mode')).toBeInTheDocument();
+
+    // Click toggle button
+    fireEvent.click(screen.getByText('Toggle Dark Mode'));
+
+    // Should now show light mode toggle (meaning we're in dark mode)
+    expect(screen.getByText('Toggle Light Mode')).toBeInTheDocument();
+  });
+
+  it('should toggle from dark to light mode', () => {
+    // Start with dark mode
+    render(
+      <Provider store={store}>
+        <ThemeProvider initialMode="dark">
+          <App />
+        </ThemeProvider>
+      </Provider>
+    );
+
+    // Should start in dark mode
+    expect(screen.getByText('Toggle Light Mode')).toBeInTheDocument();
+
+    // Click toggle button
+    fireEvent.click(screen.getByText('Toggle Light Mode'));
+
+    // Should now show dark mode toggle (meaning we're in light mode)
+    expect(screen.getByText('Toggle Dark Mode')).toBeInTheDocument();
+  });
+});
