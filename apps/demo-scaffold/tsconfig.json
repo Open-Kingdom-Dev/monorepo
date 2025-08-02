@@ -6,6 +6,9 @@
       "path": "../../libs/demo-scaffold/feature-root-store"
     },
     {
+      "path": "../../libs/shared/ui-theme"
+    },
+    {
       "path": "../../libs/shared/data-access-logger"
     },
     {
