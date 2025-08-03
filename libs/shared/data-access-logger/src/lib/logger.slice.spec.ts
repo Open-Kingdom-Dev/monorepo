@@ -1,5 +1,5 @@
 import { loggerReducer, addLog, clearLogs } from './logger.slice';
-import { LoggerState, LogEntry } from './logger.types';
+import { LoggerState } from './logger.types';
 
 describe('Logger Slice', () => {
   const initialState: LoggerState = {
@@ -41,7 +41,7 @@ describe('Logger Slice', () => {
         message: 'First message',
         level: 'info' as const,
       };
-      
+
       const secondLog = {
         message: 'Second message',
         level: 'warn' as const,
@@ -107,7 +107,7 @@ describe('Logger Slice', () => {
     it('should create addLog action with correct type', () => {
       const payload = { message: 'test', level: 'info' as const };
       const action = addLog(payload);
-      
+
       expect(action.type).toBe('logger/addLog');
       expect(action.payload).toEqual(payload);
     });
@@ -118,4 +118,4 @@ describe('Logger Slice', () => {
       expect(action.payload).toBeUndefined();
     });
   });
-}); 
+});

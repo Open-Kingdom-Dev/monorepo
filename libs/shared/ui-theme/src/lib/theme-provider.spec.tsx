@@ -30,7 +30,11 @@ const FullThemeTestComponent: React.FC = () => {
       <div data-testid="font-sans">
         {theme?.typography?.fontFamily?.sans?.join(', ')}
       </div>
-      <div data-testid="text-base">{theme?.typography?.fontSize?.base}</div>
+      <div data-testid="text-base">
+        {typeof theme?.typography?.fontSize?.base === 'string'
+          ? theme.typography.fontSize.base
+          : theme?.typography?.fontSize?.base?.[0]}
+      </div>
       <div data-testid="spacing-md">{theme?.spacing?.md}</div>
       <div data-testid="radius-lg">{theme?.borderRadius?.lg}</div>
       <div data-testid="shadow-md">{theme?.boxShadow?.md}</div>

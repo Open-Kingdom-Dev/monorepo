@@ -1,9 +1,9 @@
-import { 
-  generateCSSVariables, 
-  applyThemeToDOM, 
-  mergeThemes, 
-  saveThemeMode, 
-  loadThemeMode 
+import {
+  generateCSSVariables,
+  applyThemeToDOM,
+  mergeThemes,
+  saveThemeMode,
+  loadThemeMode,
 } from './theme-utils';
 import { Theme } from './theme.types';
 import { defaultLightTheme, defaultDarkTheme } from './default-theme';
@@ -139,12 +139,12 @@ describe('theme-utils', () => {
   describe('generateCSSVariables', () => {
     it('should generate CSS variables for all color palettes', () => {
       const variables = generateCSSVariables(mockTheme);
-      
+
       // Test primary color variables
       expect(variables['--color-primary-50']).toBe('#eff6ff');
       expect(variables['--color-primary-500']).toBe('#3b82f6');
       expect(variables['--color-primary-950']).toBe('#172554');
-      
+
       // Test other color palettes exist
       expect(variables['--color-secondary-500']).toBe('#64748b');
       expect(variables['--color-neutral-500']).toBe('#737373');
@@ -155,7 +155,7 @@ describe('theme-utils', () => {
 
     it('should generate CSS variables for font families', () => {
       const variables = generateCSSVariables(mockTheme);
-      
+
       expect(variables['--font-family-sans']).toBe('Inter, system-ui');
       expect(variables['--font-family-serif']).toBe('Georgia, serif');
       expect(variables['--font-family-mono']).toBe('JetBrains Mono, monospace');
@@ -163,7 +163,7 @@ describe('theme-utils', () => {
 
     it('should generate CSS variables for font sizes with line heights', () => {
       const variables = generateCSSVariables(mockTheme);
-      
+
       expect(variables['--text-xs']).toBe('0.75rem');
       expect(variables['--leading-xs']).toBe('1.5');
       expect(variables['--text-base']).toBe('1rem');
@@ -176,23 +176,26 @@ describe('theme-utils', () => {
       const themeWithComplexFontSize: Theme = {
         ...mockTheme,
         typography: {
-          ...mockTheme.typography,
+          ...mockTheme.typography!,
           fontSize: {
-            ...mockTheme.typography.fontSize,
-            lg: ['1.125rem', { lineHeight: '1.75' }] as [string, { lineHeight: string }],
+            ...mockTheme.typography!.fontSize!,
+            lg: ['1.125rem', { lineHeight: '1.75' }] as [
+              string,
+              { lineHeight: string }
+            ],
           },
         },
       };
-      
+
       const variables = generateCSSVariables(themeWithComplexFontSize);
-      
+
       expect(variables['--text-lg']).toBe('1.125rem');
       expect(variables['--leading-lg']).toBe('1.75');
     });
 
     it('should generate CSS variables for spacing', () => {
       const variables = generateCSSVariables(mockTheme);
-      
+
       expect(variables['--spacing-xs']).toBe('0.25rem');
       expect(variables['--spacing-md']).toBe('1rem');
       expect(variables['--spacing-3xl']).toBe('4rem');
@@ -200,7 +203,7 @@ describe('theme-utils', () => {
 
     it('should generate CSS variables for border radius', () => {
       const variables = generateCSSVariables(mockTheme);
-      
+
       expect(variables['--radius-none']).toBe('0');
       expect(variables['--radius-sm']).toBe('0.125rem');
       expect(variables['--radius-full']).toBe('9999px');
@@ -208,33 +211,49 @@ describe('theme-utils', () => {
 
     it('should generate CSS variables for box shadows', () => {
       const variables = generateCSSVariables(mockTheme);
-      
+
       expect(variables['--shadow-sm']).toBe('0 1px 2px 0 rgb(0 0 0 / 0.05)');
-      expect(variables['--shadow-2xl']).toBe('0 25px 50px -12px rgb(0 0 0 / 0.25)');
+      expect(variables['--shadow-2xl']).toBe(
+        '0 25px 50px -12px rgb(0 0 0 / 0.25)'
+      );
     });
 
     it('should generate all expected variable keys', () => {
       const variables = generateCSSVariables(mockTheme);
       const variableKeys = Object.keys(variables);
-      
+
       // Color variables (6 palettes × 11 shades = 66)
-      expect(variableKeys.filter(key => key.startsWith('--color-')).length).toBe(66);
-      
+      expect(
+        variableKeys.filter((key) => key.startsWith('--color-')).length
+      ).toBe(66);
+
       // Font family variables (3)
-      expect(variableKeys.filter(key => key.startsWith('--font-family-')).length).toBe(3);
-      
+      expect(
+        variableKeys.filter((key) => key.startsWith('--font-family-')).length
+      ).toBe(3);
+
       // Font size and line height variables (10 × 2 = 20)
-      expect(variableKeys.filter(key => key.startsWith('--text-')).length).toBe(10);
-      expect(variableKeys.filter(key => key.startsWith('--leading-')).length).toBe(10);
-      
+      expect(
+        variableKeys.filter((key) => key.startsWith('--text-')).length
+      ).toBe(10);
+      expect(
+        variableKeys.filter((key) => key.startsWith('--leading-')).length
+      ).toBe(10);
+
       // Spacing variables (7)
-      expect(variableKeys.filter(key => key.startsWith('--spacing-')).length).toBe(7);
-      
+      expect(
+        variableKeys.filter((key) => key.startsWith('--spacing-')).length
+      ).toBe(7);
+
       // Border radius variables (6)
-      expect(variableKeys.filter(key => key.startsWith('--radius-')).length).toBe(6);
-      
+      expect(
+        variableKeys.filter((key) => key.startsWith('--radius-')).length
+      ).toBe(6);
+
       // Box shadow variables (5)
-      expect(variableKeys.filter(key => key.startsWith('--shadow-')).length).toBe(5);
+      expect(
+        variableKeys.filter((key) => key.startsWith('--shadow-')).length
+      ).toBe(5);
     });
   });
 
@@ -251,7 +270,7 @@ describe('theme-utils', () => {
           setProperty: jest.fn(),
         },
       };
-      
+
       // Mock document.documentElement
       Object.defineProperty(global.document, 'documentElement', {
         value: mockDocumentElement,
@@ -265,35 +284,55 @@ describe('theme-utils', () => {
 
     it('should apply all CSS variables to document root', () => {
       applyThemeToDOM(mockTheme);
-      
+
       // Should have called setProperty for each variable
-      expect(mockDocumentElement.style.setProperty).toHaveBeenCalledWith('--color-primary-500', '#3b82f6');
-      expect(mockDocumentElement.style.setProperty).toHaveBeenCalledWith('--font-family-sans', 'Inter, system-ui');
-      expect(mockDocumentElement.style.setProperty).toHaveBeenCalledWith('--text-base', '1rem');
-      expect(mockDocumentElement.style.setProperty).toHaveBeenCalledWith('--spacing-md', '1rem');
-      expect(mockDocumentElement.style.setProperty).toHaveBeenCalledWith('--radius-md', '0.375rem');
-      expect(mockDocumentElement.style.setProperty).toHaveBeenCalledWith('--shadow-md', '0 4px 6px -1px rgb(0 0 0 / 0.1)');
+      expect(mockDocumentElement.style.setProperty).toHaveBeenCalledWith(
+        '--color-primary-500',
+        '#3b82f6'
+      );
+      expect(mockDocumentElement.style.setProperty).toHaveBeenCalledWith(
+        '--font-family-sans',
+        'Inter, system-ui'
+      );
+      expect(mockDocumentElement.style.setProperty).toHaveBeenCalledWith(
+        '--text-base',
+        '1rem'
+      );
+      expect(mockDocumentElement.style.setProperty).toHaveBeenCalledWith(
+        '--spacing-md',
+        '1rem'
+      );
+      expect(mockDocumentElement.style.setProperty).toHaveBeenCalledWith(
+        '--radius-md',
+        '0.375rem'
+      );
+      expect(mockDocumentElement.style.setProperty).toHaveBeenCalledWith(
+        '--shadow-md',
+        '0 4px 6px -1px rgb(0 0 0 / 0.1)'
+      );
     });
 
     it('should handle SSR environment (no document)', () => {
       const originalDocument = global.document;
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       delete (global as any).document;
-      
+
       // Should not throw error
       expect(() => applyThemeToDOM(mockTheme)).not.toThrow();
-      
+
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (global as any).document = originalDocument;
     });
 
     it('should call setProperty correct number of times', () => {
       applyThemeToDOM(mockTheme);
-      
+
       const variables = generateCSSVariables(mockTheme);
       const expectedCallCount = Object.keys(variables).length;
-      
-      expect(mockDocumentElement.style.setProperty).toHaveBeenCalledTimes(expectedCallCount);
+
+      expect(mockDocumentElement.style.setProperty).toHaveBeenCalledTimes(
+        expectedCallCount
+      );
     });
   });
 
@@ -309,15 +348,15 @@ describe('theme-utils', () => {
           md: '2rem', // Override spacing-md
         },
       } as Partial<Theme>;
-      
+
       const merged = mergeThemes(mockTheme, override);
-      
-      expect(merged.colors.primary[500]).toBe('#ff0000');
-      expect(merged.spacing.md).toBe('2rem');
-      
+
+      expect(merged.colors!.primary![500]).toBe('#ff0000');
+      expect(merged.spacing!.md).toBe('2rem');
+
       // Other values should remain from base theme
-      expect(merged.colors.primary[400]).toBe('#60a5fa');
-      expect(merged.spacing.sm).toBe('0.5rem');
+      expect(merged.colors!.primary![400]).toBe('#60a5fa');
+      expect(merged.spacing!.sm).toBe('0.5rem');
     });
 
     it('should handle partial typography override', () => {
@@ -328,17 +367,23 @@ describe('theme-utils', () => {
           },
         },
       } as Partial<Theme>;
-      
+
       const merged = mergeThemes(mockTheme, override);
-      
-      expect(merged.typography.fontFamily.sans).toEqual(['Custom Font', 'sans-serif']);
-      expect(merged.typography.fontFamily.serif).toEqual(['Georgia', 'serif']); // Unchanged
-      expect(merged.typography.fontSize.base).toBe('1rem'); // Unchanged
+
+      expect(merged.typography!.fontFamily!.sans).toEqual([
+        'Custom Font',
+        'sans-serif',
+      ]);
+      expect(merged.typography!.fontFamily!.serif).toEqual([
+        'Georgia',
+        'serif',
+      ]); // Unchanged
+      expect(merged.typography!.fontSize!.base).toBe('1rem'); // Unchanged
     });
 
     it('should handle empty override', () => {
       const merged = mergeThemes(mockTheme, {});
-      
+
       expect(merged).toEqual(mockTheme);
     });
 
@@ -355,13 +400,13 @@ describe('theme-utils', () => {
           },
         },
       } as Partial<Theme>;
-      
+
       const merged = mergeThemes(mockTheme, override);
-      
-      expect(merged.colors.primary[500]).toBe('#custom');
-      expect(merged.colors.primary[400]).toBe('#60a5fa'); // Unchanged
-      expect(merged.typography.fontSize.base).toBe('1.2rem');
-      expect(merged.typography.fontSize.sm).toBe('0.875rem'); // Unchanged
+
+      expect(merged.colors!.primary![500]).toBe('#custom');
+      expect(merged.colors!.primary![400]).toBe('#60a5fa'); // Unchanged
+      expect(merged.typography!.fontSize!.base).toBe('1.2rem');
+      expect(merged.typography!.fontSize!.sm).toBe('0.875rem'); // Unchanged
     });
   });
 
@@ -376,7 +421,7 @@ describe('theme-utils', () => {
         getItem: jest.fn(),
         setItem: jest.fn(),
       };
-      
+
       Object.defineProperty(global.window, 'localStorage', {
         value: mockLocalStorage,
         writable: true,
@@ -390,23 +435,29 @@ describe('theme-utils', () => {
     describe('saveThemeMode', () => {
       it('should save light mode to localStorage', () => {
         saveThemeMode('light');
-        
-        expect(mockLocalStorage.setItem).toHaveBeenCalledWith('theme-mode', 'light');
+
+        expect(mockLocalStorage.setItem).toHaveBeenCalledWith(
+          'theme-mode',
+          'light'
+        );
       });
 
       it('should save dark mode to localStorage', () => {
         saveThemeMode('dark');
-        
-        expect(mockLocalStorage.setItem).toHaveBeenCalledWith('theme-mode', 'dark');
+
+        expect(mockLocalStorage.setItem).toHaveBeenCalledWith(
+          'theme-mode',
+          'dark'
+        );
       });
 
       it('should handle SSR environment (no window)', () => {
         const originalWindow = global.window;
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         delete (global as any).window;
-        
+
         expect(() => saveThemeMode('light')).not.toThrow();
-        
+
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         (global as any).window = originalWindow;
       });
@@ -415,34 +466,34 @@ describe('theme-utils', () => {
     describe('loadThemeMode', () => {
       it('should load light mode from localStorage', () => {
         mockLocalStorage.getItem.mockReturnValue('light');
-        
+
         const result = loadThemeMode();
-        
+
         expect(mockLocalStorage.getItem).toHaveBeenCalledWith('theme-mode');
         expect(result).toBe('light');
       });
 
       it('should load dark mode from localStorage', () => {
         mockLocalStorage.getItem.mockReturnValue('dark');
-        
+
         const result = loadThemeMode();
-        
+
         expect(result).toBe('dark');
       });
 
       it('should return null for invalid values', () => {
         mockLocalStorage.getItem.mockReturnValue('invalid');
-        
+
         const result = loadThemeMode();
-        
+
         expect(result).toBe(null);
       });
 
       it('should return null when no value exists', () => {
         mockLocalStorage.getItem.mockReturnValue(null);
-        
+
         const result = loadThemeMode();
-        
+
         expect(result).toBe(null);
       });
 
@@ -450,11 +501,11 @@ describe('theme-utils', () => {
         const originalWindow = global.window;
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         delete (global as any).window;
-        
+
         const result = loadThemeMode();
-        
+
         expect(result).toBe(null);
-        
+
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         (global as any).window = originalWindow;
       });
@@ -464,23 +515,29 @@ describe('theme-utils', () => {
   describe('integration with default themes', () => {
     it('should work with defaultLightTheme', () => {
       const variables = generateCSSVariables(defaultLightTheme);
-      
+
       expect(variables['--color-primary-500']).toBe('#3b82f6');
       expect(variables['--color-neutral-500']).toBe('#737373');
     });
 
     it('should work with defaultDarkTheme', () => {
       const variables = generateCSSVariables(defaultDarkTheme);
-      
+
       expect(variables['--color-primary-500']).toBe('#3b82f6');
       expect(variables['--color-neutral-500']).toBe('#737373'); // Dark theme inverts neutrals
     });
 
     it('should merge light and dark themes correctly', () => {
-      const merged = mergeThemes(defaultLightTheme, { colors: defaultDarkTheme.colors } as Partial<Theme>);
-      
-      expect(merged.colors.neutral[500]).toBe('#737373'); // From dark theme
-      expect(merged.typography.fontFamily.sans).toEqual(['Inter', 'system-ui', 'sans-serif']); // From light theme
+      const merged = mergeThemes(defaultLightTheme, {
+        colors: defaultDarkTheme.colors,
+      } as Partial<Theme>);
+
+      expect(merged.colors!.neutral![500]).toBe('#737373'); // From dark theme
+      expect(merged.typography!.fontFamily!.sans).toEqual([
+        'Inter',
+        'system-ui',
+        'sans-serif',
+      ]); // From light theme
     });
   });
 });

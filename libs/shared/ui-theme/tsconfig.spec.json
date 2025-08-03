@@ -3,7 +3,8 @@
   "compilerOptions": {
     "outDir": "./out-tsc/jest",
     "jsx": "react-jsx",
-    "types": ["jest", "node"]
+    "types": ["jest", "node"],
+    "lib": ["dom", "dom.iterable", "es2022"]
   },
   "include": [
     "jest.config.ts",

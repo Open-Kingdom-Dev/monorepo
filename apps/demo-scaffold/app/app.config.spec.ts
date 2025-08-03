@@ -3,6 +3,8 @@ import { getAppLinks, getAppMeta, getAppTitle } from './app.config';
 describe('App Configuration', () => {
   describe('getAppMeta', () => {
     it('should return meta configuration with title', () => {
+      // Deal with the underlying react-ism of the getAppMeta invocation
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const mockArgs = {} as any;
       const meta = getAppMeta(mockArgs);
 

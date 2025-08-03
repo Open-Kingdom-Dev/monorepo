@@ -12,7 +12,11 @@
     "./package.json": "./package.json"
   },
   "nx": {
-    "name": "@ynaa/shared-ui-theme"
+    "name": "@ynaa/shared-ui-theme",
+    "tags": [
+      "scope:shared",
+      "type:ui"
+    ]
   },
   "peerDependencies": {
     "tailwindcss": "^3.4.0",

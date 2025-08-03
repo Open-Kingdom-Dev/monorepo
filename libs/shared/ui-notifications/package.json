@@ -12,7 +12,11 @@
     "./package.json": "./package.json"
   },
   "nx": {
-    "name": "@ynaa/shared-ui-notifications"
+    "name": "@ynaa/shared-ui-notifications",
+    "tags": [
+      "scope:shared",
+      "type:ui"
+    ]
   },
   "peerDependencies": {
     "tailwindcss": "^3.4.0",

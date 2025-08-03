@@ -13,16 +13,16 @@ export interface ColorPalette {
 }
 
 export interface TypographyScale {
-  xs?: string;
-  sm?: string;
-  base?: string;
-  lg?: string;
-  xl?: string;
-  '2xl'?: string;
-  '3xl'?: string;
-  '4xl'?: string;
-  '5xl'?: string;
-  '6xl'?: string;
+  xs?: string | [string, { lineHeight: string }];
+  sm?: string | [string, { lineHeight: string }];
+  base?: string | [string, { lineHeight: string }];
+  lg?: string | [string, { lineHeight: string }];
+  xl?: string | [string, { lineHeight: string }];
+  '2xl'?: string | [string, { lineHeight: string }];
+  '3xl'?: string | [string, { lineHeight: string }];
+  '4xl'?: string | [string, { lineHeight: string }];
+  '5xl'?: string | [string, { lineHeight: string }];
+  '6xl'?: string | [string, { lineHeight: string }];
 }
 
 export interface SpacingScale {

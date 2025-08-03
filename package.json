@@ -6,8 +6,13 @@
     "dev": "nx run @ynaa/demo-scaffold:dev",
     "test": "nx run-many --target=test --all --coverage",
     "test:affected": "nx affected --target=test --coverage",
+    "typecheck": "nx run-many --target=typecheck --all",
+    "typecheck:affected": "nx affected --target=typecheck",
     "e2e": "nx run demo-scaffold-e2e:e2e",
-    "e2e:open": "nx run demo-scaffold-e2e:e2e --ui"
+    "e2e:open": "nx run demo-scaffold-e2e:e2e --ui",
+    "lint": "nx run-many --target=lint --all",
+    "lint:fix": "nx run-many --target=lint --all --fix",
+    "format:fix": "nx format"
   },
   "private": true,
   "dependencies": {
