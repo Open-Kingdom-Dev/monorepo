@@ -10,6 +10,11 @@ import {
   LoggerState,
 } from '@ynaa/shared-data-access-logger';
 import { ThemeProvider } from '@ynaa/shared-ui-theme';
+import {
+  NotificationKey,
+  notificationReducer,
+} from '@ynaa/shared-data-access-notifications';
+import { SharedFeatureNotifications } from '@ynaa/shared-feature-notifications';
 
 describe('App Component', () => {
   let store: ReturnType<typeof configureStore>;
@@ -21,6 +26,7 @@ describe('App Component', () => {
     store = configureStore({
       reducer: {
         [LoggerKey]: loggerReducer,
+        [NotificationKey]: notificationReducer,
       },
       middleware: (getDefaultMiddleware) =>
         getDefaultMiddleware().concat(createLoggerMiddleware(config)),
@@ -38,6 +44,7 @@ describe('App Component', () => {
       <Provider store={store}>
         <ThemeProvider>
           <App />
+          <SharedFeatureNotifications />
         </ThemeProvider>
       </Provider>
     );
@@ -116,5 +123,23 @@ describe('App Component', () => {
 
     // Should now show dark mode toggle (meaning we're in light mode)
     expect(screen.getByText('Toggle Dark Mode')).toBeInTheDocument();
+  });
+  it('should connect to the notification store', () => {
+    renderApp();
+    let button = screen.getByText('Success');
+    fireEvent.click(button);
+    expect(
+      screen.getByText('Operation completed successfully!')
+    ).toBeInTheDocument();
+    button = screen.getByText('Warning');
+    fireEvent.click(button);
+    expect(
+      screen.getByText('Please review your input before proceeding.')
+    ).toBeInTheDocument();
+    button = screen.getByText('Error');
+    fireEvent.click(button);
+    expect(
+      screen.getByText('An error occurred while processing your request.')
+    ).toBeInTheDocument();
   });
 });

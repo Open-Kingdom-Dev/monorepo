@@ -18,18 +18,18 @@ export class HomePage {
   }
 
   async triggerNotification() {
-    await this.page.locator(byTestId('trigger-notification-btn')).click();
+    await this.getSuccessNotificationButton().click();
   }
 
   async getNotification() {
     return this.page.locator(byTestId('notification')).textContent();
   }
 
-  async setNotificationPlacement(placement: 'top' | 'bottom') {
-    await this.page.locator(byTestId('notification-placement-select')).selectOption(placement);
+  getNotificationLocator() {
+    return this.page.locator(byTestId('notification'));
   }
 
-  getNotificationLocator() {
-    return this.page.locator('[data-testid="notification"]');
+  getSuccessNotificationButton() {
+    return this.page.locator(byTestId('show-success-btn'));
   }
 }

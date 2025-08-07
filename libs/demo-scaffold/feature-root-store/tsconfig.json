@@ -3,6 +3,9 @@
   "include": [],
   "references": [
     {
+      "path": "../../shared/data-access-notifications"
+    },
+    {
       "path": "../../shared/data-access-logger"
     },
     {

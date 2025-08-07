@@ -1,1 +1,1 @@
-export * from './lib/shared-ui-notifications';
+export * from './lib/notification-toast';

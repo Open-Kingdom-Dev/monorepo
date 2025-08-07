@@ -30,7 +30,7 @@
   "include": ["src/**/*.js", "src/**/*.jsx", "src/**/*.ts", "src/**/*.tsx"],
   "references": [
     {
-      "path": "../ui-theme/tsconfig.lib.json"
+      "path": "../util-types/tsconfig.lib.json"
     }
   ]
 }

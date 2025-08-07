@@ -16,10 +16,19 @@
       "path": "./libs/shared/data-access-logger"
     },
     {
-      "path": "./libs/shared/ui-notifications"
+      "path": "./libs/shared/feature-notifications"
     },
     {
       "path": "./libs/shared/ui-theme"
+    },
+    {
+      "path": "./libs/shared/data-access-notifications"
+    },
+    {
+      "path": "./libs/shared/ui-notifications"
+    },
+    {
+      "path": "./libs/shared/util-types"
     }
   ]
 }

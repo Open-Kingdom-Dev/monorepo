@@ -6,6 +6,12 @@
       "path": "../../libs/demo-scaffold/feature-root-store"
     },
     {
+      "path": "../../libs/shared/feature-notifications"
+    },
+    {
+      "path": "../../libs/shared/data-access-notifications"
+    },
+    {
       "path": "../../libs/shared/ui-theme"
     },
     {

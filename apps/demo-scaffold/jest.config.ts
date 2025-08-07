@@ -16,10 +16,19 @@ export default {
     'app/**/*.{ts,tsx}',
     '!app/**/*.spec.{ts,tsx}',
     '!app/entry.server.tsx',
-    '!app/entry.client.tsx', 
+    '!app/entry.client.tsx',
     '!app/root.tsx',
     '!app/routes.tsx',
     '!**/*.d.ts',
     '!**/.react-router/**',
+  ],
+  reporters: [
+    'default',
+    [
+      '../../node_modules/jest-html-reporter',
+      {
+        pageTitle: 'Test Report',
+      },
+    ],
   ],
 };

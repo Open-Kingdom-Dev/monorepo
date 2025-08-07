@@ -5,11 +5,16 @@ import {
   createLoggerMiddleware,
   loggerReducer,
 } from '@ynaa/shared-data-access-logger';
+import {
+  NotificationKey,
+  notificationReducer,
+} from '@ynaa/shared-data-access-notifications';
 
 export const createRootStore = (config: LoggerConfig) => {
   return configureStore({
     reducer: {
       [LoggerKey]: loggerReducer,
+      [NotificationKey]: notificationReducer,
       // Add other reducers here as needed
     },
     middleware: (getDefaultMiddleware) => {

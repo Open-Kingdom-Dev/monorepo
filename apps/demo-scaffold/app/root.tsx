@@ -1,6 +1,7 @@
 import { Links, Meta, Outlet, Scripts, ScrollRestoration } from 'react-router';
 import { Provider } from 'react-redux';
 import { ThemeProvider } from '@ynaa/shared-ui-theme';
+import { SharedFeatureNotifications } from '@ynaa/shared-feature-notifications';
 
 import { AppNav } from './app-nav';
 import { createAppStore } from './store.config';
@@ -27,6 +28,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
             <Meta />
             <AppNav />
             {children}
+            <SharedFeatureNotifications />
             <ScrollRestoration />
             <Scripts />
           </ThemeProvider>

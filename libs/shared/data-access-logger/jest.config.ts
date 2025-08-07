@@ -7,4 +7,13 @@ export default {
   },
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx'],
   coverageDirectory: 'test-output/jest/coverage',
+  reporters: [
+    'default',
+    [
+      '../../../node_modules/jest-html-reporter',
+      {
+        pageTitle: 'Test Report',
+      },
+    ],
+  ],
 };
