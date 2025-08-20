@@ -355,6 +355,8 @@ export const testScenarios = {
       name: 'null values',
       override: {
         spacing: {
+          // Setting up for testing purposes
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           md: null as any,
         },
       },

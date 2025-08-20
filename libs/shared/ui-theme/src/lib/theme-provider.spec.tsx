@@ -353,7 +353,9 @@ describe('Theme System Integration', () => {
       const originalDocument = global.document;
       const originalWindow = global.window;
 
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       delete (global as any).document;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       delete (global as any).window;
 
       expect(() => {
@@ -375,6 +377,7 @@ describe('Theme System Integration', () => {
             500: '#test',
           },
         },
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } as any;
 
       expect(() => {
@@ -387,6 +390,7 @@ describe('Theme System Integration', () => {
   describe('scenario testing', () => {
     testScenarios.themeOverrides.forEach(({ name, override }) => {
       it(`should handle ${name} correctly`, () => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const mergedTheme = mergeThemes(defaultLightTheme, override as any);
         const variables = generateCSSVariables(mergedTheme);
 
@@ -401,6 +405,7 @@ describe('Theme System Integration', () => {
     testScenarios.edgeCases.forEach(({ name, override }) => {
       it(`should handle edge case: ${name}`, () => {
         expect(() => {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           const mergedTheme = mergeThemes(defaultLightTheme, override as any);
           const variables = generateCSSVariables(mergedTheme);
           expect(variables).toBeDefined();
