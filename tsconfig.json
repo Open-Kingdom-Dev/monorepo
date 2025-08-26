@@ -29,6 +29,24 @@
     },
     {
       "path": "./libs/shared/util-types"
+    },
+    {
+      "path": "./apps/demo-scaffold-backend"
+    },
+    {
+      "path": "./libs/shared/feature-backend-auth"
+    },
+    {
+      "path": "./libs/shared/data-access-backend-users"
+    },
+    {
+      "path": "./libs/shared/data-access-database-setup"
+    },
+    {
+      "path": "./libs/demo-scaffold-backend/feature-root-schema"
+    },
+    {
+      "path": "./libs/shared/util-constants"
     }
   ]
 }

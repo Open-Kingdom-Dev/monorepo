@@ -1,5 +1,0 @@
-onlyBuiltDependencies:
-  - '@swc/core'
-  - esbuild
-  - nx
-  - unrs-resolver

@@ -25,6 +25,13 @@ export default [
           allow: ['^.*/eslint(\\.base)?\\.config\\.[cm]?[jt]s$'],
           depConstraints: [
             {
+              sourceTag: 'scope:demo-scaffold-backend',
+              onlyDependOnLibsWithTags: [
+                'scope:demo-scaffold-backend',
+                'scope:shared',
+              ],
+            },
+            {
               sourceTag: 'scope:demo-scaffold',
               onlyDependOnLibsWithTags: ['scope:demo-scaffold', 'scope:shared'],
             },
@@ -79,6 +86,15 @@ export default [
       '**/*.mjs',
     ],
     // Override or add rules here
-    rules: {},
+    rules: {
+      '@typescript-eslint/no-unused-vars': [
+        'error',
+        {
+          argsIgnorePattern: '^_',
+          varsIgnorePattern: '^_',
+          caughtErrorsIgnorePattern: '^_',
+        },
+      ],
+    },
   },
 ];

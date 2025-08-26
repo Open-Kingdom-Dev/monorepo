@@ -28,7 +28,12 @@
           "buildDepsName": "build-deps",
           "watchDepsName": "watch-deps"
         }
-      }
+      },
+      "exclude": [
+        "libs/shared/data-access-database-setup/*",
+        "libs/demo-scaffold-backend/feature-root-schema/*",
+        "libs/shared/util-constants/*"
+      ]
     },
     {
       "plugin": "@nx/react/router-plugin",
@@ -71,6 +76,29 @@
       "plugin": "@nx/jest/plugin",
       "options": {
         "targetName": "test"
+      }
+    },
+    {
+      "plugin": "@nx/webpack/plugin",
+      "options": {
+        "buildTargetName": "build",
+        "serveTargetName": "serve",
+        "previewTargetName": "preview",
+        "buildDepsTargetName": "build-deps",
+        "watchDepsTargetName": "watch-deps"
+      }
+    },
+    {
+      "plugin": "@nx/js/typescript",
+      "include": [
+        "libs/shared/data-access-database-setup/*",
+        "libs/demo-scaffold-backend/feature-root-schema/*",
+        "libs/shared/util-constants/*"
+      ],
+      "options": {
+        "typecheck": {
+          "targetName": "typecheck"
+        }
       }
     }
   ],
