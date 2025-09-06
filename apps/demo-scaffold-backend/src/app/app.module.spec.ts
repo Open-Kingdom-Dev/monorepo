@@ -8,7 +8,7 @@ jest.mock('@ynaa/demo-scaffold-backend-feature-root-schema', () => ({
   YnaaFeatureRootSchemaModule: class MockFeatureRootSchemaModule {},
 }));
 
-jest.mock('@ynaa/shared-feature-backend-auth', () => ({
+jest.mock('@ynaa/shared-backend-feature-authentication', () => ({
   YnaaFeatureBackendAuthModule: {
     forRoot: jest.fn().mockReturnValue({
       module: class MockFeatureBackendAuthModule {},
@@ -68,7 +68,7 @@ describe('AppModule', () => {
     // Get the mocked module from the jest mock
     const {
       YnaaFeatureBackendAuthModule,
-    } = require('@ynaa/shared-feature-backend-auth');
+    } = require('@ynaa/shared-backend-feature-authentication');
 
     // Verify that forRoot was called
     expect(YnaaFeatureBackendAuthModule.forRoot).toHaveBeenCalledWith({

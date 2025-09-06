@@ -1,5 +1,5 @@
-import { createRootStore } from '@ynaa/demo-scaffold-feature-root-store';
-import type { LoggerConfig } from '@ynaa/shared-data-access-logger';
+import { createRootStore } from '@ynaa/demo-scaffold-frontend-feature-root-store';
+import type { LoggerConfig } from '@ynaa/shared-frontend-data-access-logger';
 
 /**
  * Application store configuration
@@ -7,9 +7,9 @@ import type { LoggerConfig } from '@ynaa/shared-data-access-logger';
  */
 export function createAppStore() {
   const config: LoggerConfig = {
-    destination: 'console'
+    destination: 'console',
   };
-  
+
   return createRootStore(config);
 }
 
@@ -19,6 +19,6 @@ export function createAppStore() {
  */
 export function getLoggerConfig(): LoggerConfig {
   return {
-    destination: 'console'
+    destination: 'console',
   };
 }

@@ -4,10 +4,10 @@
   "include": [],
   "references": [
     {
-      "path": "../../libs/shared/feature-backend-auth"
+      "path": "../../libs/demo-scaffold/backend/feature-root-schema"
     },
     {
-      "path": "../../libs/demo-scaffold-backend/feature-root-schema"
+      "path": "../../libs/shared/backend/feature-authentication"
     },
     {
       "path": "./tsconfig.app.json"

@@ -1,0 +1,22 @@
+{
+  "extends": "../../../../tsconfig.base.json",
+  "files": [],
+  "include": [],
+  "references": [
+    {
+      "path": "../../../shared/backend/data-access-users"
+    },
+    {
+      "path": "../../../shared/backend/data-access-database-setup"
+    },
+    {
+      "path": "../../../shared/poly/util-constants"
+    },
+    {
+      "path": "./tsconfig.lib.json"
+    },
+    {
+      "path": "./tsconfig.spec.json"
+    }
+  ]
+}

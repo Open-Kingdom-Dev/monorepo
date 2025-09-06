@@ -3,19 +3,19 @@
   "include": [],
   "references": [
     {
-      "path": "../../libs/demo-scaffold/feature-root-store"
+      "path": "../../libs/demo-scaffold/frontend/feature-root-store"
     },
     {
-      "path": "../../libs/shared/feature-notifications"
+      "path": "../../libs/shared/frontend/data-access-notifications"
     },
     {
-      "path": "../../libs/shared/data-access-notifications"
+      "path": "../../libs/shared/frontend/data-access-logger"
     },
     {
-      "path": "../../libs/shared/ui-theme"
+      "path": "../../libs/shared/frontend/feature-notifications"
     },
     {
-      "path": "../../libs/shared/data-access-logger"
+      "path": "../../libs/shared/frontend/ui-theme"
     },
     {
       "path": "./tsconfig.app.json"

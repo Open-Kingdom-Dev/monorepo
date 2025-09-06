@@ -25,11 +25,22 @@ export default [
           allow: ['^.*/eslint(\\.base)?\\.config\\.[cm]?[jt]s$'],
           depConstraints: [
             {
-              sourceTag: 'scope:demo-scaffold-backend',
+              sourceTag: 'environment:frontend',
               onlyDependOnLibsWithTags: [
-                'scope:demo-scaffold-backend',
-                'scope:shared',
+                'environment:frontend',
+                'environment:poly',
               ],
+            },
+            {
+              sourceTag: 'environment:backend',
+              onlyDependOnLibsWithTags: [
+                'environment:backend',
+                'environment:poly',
+              ],
+            },
+            {
+              sourceTag: 'environment:poly',
+              onlyDependOnLibsWithTags: ['environment:poly'],
             },
             {
               sourceTag: 'scope:demo-scaffold',

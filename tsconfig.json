@@ -10,43 +10,43 @@
       "path": "./apps/demo-scaffold"
     },
     {
-      "path": "./libs/demo-scaffold/feature-root-store"
+      "path": "./libs/demo-scaffold/frontend/feature-root-store"
     },
     {
-      "path": "./libs/shared/data-access-logger"
+      "path": "./libs/shared/frontend/data-access-logger"
     },
     {
-      "path": "./libs/shared/feature-notifications"
+      "path": "./libs/shared/frontend/feature-notifications"
     },
     {
-      "path": "./libs/shared/ui-theme"
+      "path": "./libs/shared/frontend/ui-theme"
     },
     {
-      "path": "./libs/shared/data-access-notifications"
+      "path": "./libs/shared/frontend/data-access-notifications"
     },
     {
-      "path": "./libs/shared/ui-notifications"
+      "path": "./libs/shared/frontend/ui-notifications"
     },
     {
-      "path": "./libs/shared/util-types"
+      "path": "./libs/shared/poly/util-types"
     },
     {
       "path": "./apps/demo-scaffold-backend"
     },
     {
-      "path": "./libs/shared/feature-backend-auth"
+      "path": "./libs/shared/backend/feature-authentication"
     },
     {
-      "path": "./libs/shared/data-access-backend-users"
+      "path": "./libs/shared/backend/data-access-users"
     },
     {
-      "path": "./libs/shared/data-access-database-setup"
+      "path": "./libs/shared/backend/data-access-database-setup"
     },
     {
-      "path": "./libs/demo-scaffold-backend/feature-root-schema"
+      "path": "./libs/demo-scaffold/backend/feature-root-schema"
     },
     {
-      "path": "./libs/shared/util-constants"
+      "path": "./libs/shared/poly/util-constants"
     }
   ]
 }

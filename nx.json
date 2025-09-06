@@ -30,9 +30,9 @@
         }
       },
       "exclude": [
-        "libs/shared/data-access-database-setup/*",
-        "libs/demo-scaffold-backend/feature-root-schema/*",
-        "libs/shared/util-constants/*"
+        "libs/shared/backend/data-access-database-setup/*",
+        "libs/demo-scaffold/backend/demo-scaffold-backend/feature-root-schema/*",
+        "libs/shared/poly/util-constants/*"
       ]
     },
     {
@@ -91,9 +91,9 @@
     {
       "plugin": "@nx/js/typescript",
       "include": [
-        "libs/shared/data-access-database-setup/*",
-        "libs/demo-scaffold-backend/feature-root-schema/*",
-        "libs/shared/util-constants/*"
+        "libs/shared/backend/data-access-database-setup/*",
+        "libs/demo-scaffold/backend/feature-root-schema/*",
+        "libs/shared/poly/util-constants/*"
       ],
       "options": {
         "typecheck": {

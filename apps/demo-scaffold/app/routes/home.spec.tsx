@@ -8,12 +8,12 @@ import {
   createLoggerMiddleware,
   LoggerConfig,
   LoggerState,
-} from '@ynaa/shared-data-access-logger';
-import { ThemeProvider } from '@ynaa/shared-ui-theme';
+} from '@ynaa/shared-frontend-data-access-logger';
+import { ThemeProvider } from '@ynaa/shared-frontend-ui-theme';
 import {
   NotificationKey,
   notificationReducer,
-} from '@ynaa/shared-data-access-notifications';
+} from '@ynaa/shared-frontend-data-access-notifications';
 import { SharedFeatureNotifications } from '@ynaa/shared-feature-notifications';
 
 describe('App Component', () => {

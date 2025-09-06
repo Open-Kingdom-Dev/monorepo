@@ -2,7 +2,7 @@ import { RouterProvider } from 'react-router';
 import { Provider } from 'react-redux';
 import { createRoot } from 'react-dom/client';
 
-import { ThemeProvider } from '@ynaa/shared-ui-theme';
+import { ThemeProvider } from '@ynaa/shared-frontend-ui-theme';
 import { SharedFeatureNotifications } from '@ynaa/shared-feature-notifications';
 
 import { router } from './routes';

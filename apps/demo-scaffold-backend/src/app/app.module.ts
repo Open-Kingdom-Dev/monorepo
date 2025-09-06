@@ -8,7 +8,7 @@ import { AppService } from './app.service';
 @Module({
   imports: [
     YnaaFeatureRootSchemaModule,
-    import('@ynaa/shared-feature-backend-auth').then((m) =>
+    import('@ynaa/shared-backend-feature-authentication').then((m) =>
       m.YnaaFeatureBackendAuthModule.forRoot({
         jwtSecret: process.env.JWT_SECRET || 'your-secret-key-here',
         jwtExpiresIn: '1h',

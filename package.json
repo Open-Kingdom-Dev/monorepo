@@ -115,8 +115,11 @@
   },
   "workspaces": [
     "apps/*",
-    "libs/shared/*",
-    "libs/demo-scaffold/*",
-    "libs/demo-scaffold-backend/*"
+    "libs/shared/frontend/*",
+    "libs/shared/backend/*",
+    "libs/shared/poly/*",
+    "libs/demo-scaffold/frontend/*",
+    "libs/demo-scaffold/backend/*",
+    "libs/demo-scaffold/poly/*"
   ]
 }
