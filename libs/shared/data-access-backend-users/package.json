@@ -15,7 +15,8 @@
   "dependencies": {
     "@nestjs/common": "11.1.6",
     "tslib": "2.8.1",
-    "drizzle-orm": "^0.44.5"
+    "drizzle-orm": "^0.44.5",
+    "bcrypt": "^5.1.1"
   },
   "nx": {
     "name": "@ynaa/shared-data-access-backend-users",

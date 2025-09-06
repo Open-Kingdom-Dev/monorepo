@@ -16,7 +16,13 @@
   },
   "dependencies": {
     "@nestjs/common": "11.1.6",
-    "tslib": "2.8.1"
+    "tslib": "2.8.1",
+    "@nestjs/passport": "11.0.5",
+    "@ynaa/shared-data-access-backend-users": "workspace:*",
+    "@nestjs/jwt": "11.0.0",
+    "bcrypt": "^5.1.1",
+    "passport-jwt": "^4.0.1",
+    "passport-local": "^1.0.0"
   },
   "nx": {
     "name": "@ynaa/shared-feature-backend-auth",
