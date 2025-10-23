@@ -13,7 +13,7 @@ This library provides data access infrastructure for logging functionality. It h
 ## Usage
 
 ```typescript
-import { logInfo, logWarn, logError, selectLogs } from '@ynaa/shared-frontend-data-access-logger';
+import { logInfo, logWarn, logError, selectLogs } from '@open-kingdom/shared-frontend-data-access-logger';
 
 // Dispatch log actions
 dispatch(logInfo('User logged in'));

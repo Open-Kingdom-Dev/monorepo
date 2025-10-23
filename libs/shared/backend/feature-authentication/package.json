@@ -1,5 +1,5 @@
 {
-  "name": "@ynaa/shared-backend-feature-authentication",
+  "name": "@open-kingdom/shared-backend-feature-authentication",
   "version": "0.0.1",
   "private": true,
   "main": "./src/index.ts",
@@ -24,7 +24,7 @@
     "passport-local": "^1.0.0"
   },
   "nx": {
-    "name": "@ynaa/shared-backend-feature-authentication",
+    "name": "@open-kingdom/shared-backend-feature-authentication",
     "tags": [
       "type:feature",
       "scope:shared",

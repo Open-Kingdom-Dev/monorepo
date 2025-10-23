@@ -1,5 +1,5 @@
 {
-  "name": "@ynaa/demo-scaffold-frontend-feature-root-store",
+  "name": "@open-kingdom/demo-scaffold-frontend-feature-root-store",
   "version": "0.0.1",
   "main": "./src/index.ts",
   "types": "./src/index.ts",

@@ -1,5 +1,5 @@
 {
-  "name": "@ynaa/demo-scaffold-backend-feature-root-schema",
+  "name": "@open-kingdom/demo-scaffold-backend-feature-root-schema",
   "version": "0.0.1",
   "private": true,
   "main": "./src/index.ts",
@@ -14,7 +14,7 @@
   },
   "dependencies": {},
   "nx": {
-    "name": "@ynaa/demo-scaffold-backend-feature-root-schema",
+    "name": "@open-kingdom/demo-scaffold-backend-feature-root-schema",
     "tags": [
       "scope:demo-scaffold",
       "type:feature",

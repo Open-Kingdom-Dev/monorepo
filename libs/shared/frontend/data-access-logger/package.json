@@ -1,5 +1,5 @@
 {
-  "name": "@ynaa/shared-frontend-data-access-logger",
+  "name": "@open-kingdom/shared-frontend-data-access-logger",
   "version": "0.0.1",
   "private": true,
   "main": "./src/index.ts",
@@ -13,7 +13,7 @@
     "./package.json": "./package.json"
   },
   "nx": {
-    "name": "@ynaa/shared-frontend-data-access-logger",
+    "name": "@open-kingdom/shared-frontend-data-access-logger",
     "tags": [
       "type:data-access",
       "scope:shared",

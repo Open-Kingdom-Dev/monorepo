@@ -1,5 +1,5 @@
 {
-  "name": "@ynaa/shared-backend-data-access-database-setup",
+  "name": "@open-kingdom/shared-backend-data-access-database-setup",
   "version": "0.0.1",
   "private": true,
   "main": "./src/index.ts",
@@ -17,7 +17,7 @@
     "drizzle-orm": "^0.44.5"
   },
   "nx": {
-    "name": "@ynaa/shared-backend-data-access-database-setup",
+    "name": "@open-kingdom/shared-backend-data-access-database-setup",
     "tags": [
       "type:data-access",
       "scope:shared",

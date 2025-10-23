@@ -1,10 +1,10 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { DrizzleBetterSQLiteModule } from '@knaadh/nestjs-drizzle-better-sqlite3';
 
-import { DB_TAG } from '@ynaa/shared-poly-util-constants';
-import { YnaaFeatureRootSchemaModule } from './feature-root-schema.module';
+import { DB_TAG } from '@open-kingdom/shared-poly-util-constants';
+import { OpenKingdomFeatureRootSchemaModule } from './feature-root-schema.module';
 
-describe('YnaaFeatureRootSchemaModule', () => {
+describe('OpenKingdomFeatureRootSchemaModule', () => {
   let module: TestingModule;
 
   beforeEach(async () => {
@@ -17,7 +17,7 @@ describe('YnaaFeatureRootSchemaModule', () => {
           },
           config: { schema: {} },
         }),
-        YnaaFeatureRootSchemaModule,
+        OpenKingdomFeatureRootSchemaModule,
       ],
     }).compile();
   });
@@ -28,11 +28,11 @@ describe('YnaaFeatureRootSchemaModule', () => {
 
   describe('module configuration', () => {
     it('should be defined', () => {
-      expect(YnaaFeatureRootSchemaModule).toBeDefined();
+      expect(OpenKingdomFeatureRootSchemaModule).toBeDefined();
     });
 
     it('should have no controllers', () => {
-      const moduleRef = module.get(YnaaFeatureRootSchemaModule);
+      const moduleRef = module.get(OpenKingdomFeatureRootSchemaModule);
       expect(moduleRef).toBeDefined();
     });
   });

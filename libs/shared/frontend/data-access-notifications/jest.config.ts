@@ -9,7 +9,7 @@ const swcJestConfig = JSON.parse(
 swcJestConfig.swcrc = false;
 
 export default {
-  displayName: '@ynaa/shared-frontend-data-access-notifications',
+  displayName: '@open-kingdom/shared-frontend-data-access-notifications',
   preset: '../../../../jest.preset.js',
   testEnvironment: 'node',
   transform: {

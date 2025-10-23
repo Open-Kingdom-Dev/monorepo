@@ -1,7 +1,10 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { UnauthorizedException } from '@nestjs/common';
 
-import { UsersService, User } from '@ynaa/shared-backend-data-access-users';
+import {
+  UsersService,
+  User,
+} from '@open-kingdom/shared-backend-data-access-users';
 
 import { JwtStrategy, JWT_CONSTANTS } from './passport-jwt-strategy';
 

@@ -4,12 +4,12 @@ import { AppModule } from './app.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 
-jest.mock('@ynaa/demo-scaffold-backend-feature-root-schema', () => ({
-  YnaaFeatureRootSchemaModule: class MockFeatureRootSchemaModule {},
+jest.mock('@open-kingdom/demo-scaffold-backend-feature-root-schema', () => ({
+  OpenKingdomFeatureRootSchemaModule: class MockFeatureRootSchemaModule {},
 }));
 
-jest.mock('@ynaa/shared-backend-feature-authentication', () => ({
-  YnaaFeatureBackendAuthModule: {
+jest.mock('@open-kingdom/shared-backend-feature-authentication', () => ({
+  OpenKingdomFeatureBackendAuthModule: {
     forRoot: jest.fn().mockReturnValue({
       module: class MockFeatureBackendAuthModule {},
       imports: [],
@@ -67,11 +67,11 @@ describe('AppModule', () => {
   it('should configure auth module with forRoot', () => {
     // Get the mocked module from the jest mock
     const {
-      YnaaFeatureBackendAuthModule,
-    } = require('@ynaa/shared-backend-feature-authentication');
+      OpenKingdomFeatureBackendAuthModule,
+    } = require('@open-kingdom/shared-backend-feature-authentication');
 
     // Verify that forRoot was called
-    expect(YnaaFeatureBackendAuthModule.forRoot).toHaveBeenCalledWith({
+    expect(OpenKingdomFeatureBackendAuthModule.forRoot).toHaveBeenCalledWith({
       jwtSecret: process.env.JWT_SECRET || 'your-secret-key-here',
       jwtExpiresIn: '1h',
     });

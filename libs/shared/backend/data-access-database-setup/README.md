@@ -15,7 +15,7 @@ This library provides a configurable database setup module for NestJS applicatio
 
 ```typescript
 import { Module } from '@nestjs/common';
-import { DatabaseSetupModule } from '@ynaa/shared-backend-data-access-database-setup';
+import { DatabaseSetupModule } from '@open-kingdom/shared-backend-data-access-database-setup';
 import { mySchema } from './my-schema';
 
 @Module({
@@ -34,7 +34,7 @@ export class AppModule {}
 
 ```typescript
 import { Module } from '@nestjs/common';
-import { DatabaseSetupModule, exampleSchema } from '@ynaa/shared-backend-data-access-database-setup';
+import { DatabaseSetupModule, exampleSchema } from '@open-kingdom/shared-backend-data-access-database-setup';
 
 @Module({
   imports: [

@@ -2,7 +2,7 @@ import { ExtractJwt, Strategy } from 'passport-jwt';
 import { PassportStrategy } from '@nestjs/passport';
 import { Injectable, UnauthorizedException, Inject } from '@nestjs/common';
 
-import { UsersService } from '@ynaa/shared-backend-data-access-users';
+import { UsersService } from '@open-kingdom/shared-backend-data-access-users';
 
 export const JWT_CONSTANTS = 'JWT_CONSTANTS';
 

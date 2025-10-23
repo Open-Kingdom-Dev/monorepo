@@ -1,5 +1,5 @@
 {
-  "name": "@ynaa/demo-scaffold-backend",
+  "name": "@open-kingdom/demo-scaffold-backend",
   "version": "0.0.1",
   "private": true,
   "nx": {
@@ -32,15 +32,15 @@
           "build"
         ],
         "options": {
-          "buildTarget": "@ynaa/demo-scaffold-backend:build",
+          "buildTarget": "@open-kingdom/demo-scaffold-backend:build",
           "runBuildTargetDependencies": false
         },
         "configurations": {
           "development": {
-            "buildTarget": "@ynaa/demo-scaffold-backend:build:development"
+            "buildTarget": "@open-kingdom/demo-scaffold-backend:build:development"
           },
           "production": {
-            "buildTarget": "@ynaa/demo-scaffold-backend:build:production"
+            "buildTarget": "@open-kingdom/demo-scaffold-backend:build:production"
           }
         }
       },

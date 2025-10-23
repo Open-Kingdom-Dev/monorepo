@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { UnauthorizedException } from '@nestjs/common';
 
-import { User } from '@ynaa/shared-backend-data-access-users';
+import { User } from '@open-kingdom/shared-backend-data-access-users';
 
 import { LocalStrategy } from './passport-local-strategy';
 import { AuthenticationService } from './authentication.service';

@@ -2,7 +2,7 @@ import { createSelector } from '@reduxjs/toolkit';
 import {
   NotificationState,
   RootStateContaining,
-} from '@ynaa/shared-poly-util-types';
+} from '@open-kingdom/shared-poly-util-types';
 
 export const NotificationKey = 'notifications';
 export type RootStateContainingNotifications = RootStateContaining<

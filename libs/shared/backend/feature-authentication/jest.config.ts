@@ -9,7 +9,7 @@ const swcJestConfig = JSON.parse(
 swcJestConfig.swcrc = false;
 
 export default {
-  displayName: '@ynaa/shared-backend-feature-authentication',
+  displayName: '@open-kingdom/shared-backend-feature-authentication',
   preset: '../../../../jest.preset.js',
   testEnvironment: 'node',
   transform: {

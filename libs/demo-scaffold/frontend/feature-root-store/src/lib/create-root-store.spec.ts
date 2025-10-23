@@ -4,7 +4,7 @@ import {
   LoggerKey,
   logInfo,
   selectLogs,
-} from '@ynaa/shared-frontend-data-access-logger';
+} from '@open-kingdom/shared-frontend-data-access-logger';
 
 describe('createRootStore', () => {
   const mockConfig: LoggerConfig = {

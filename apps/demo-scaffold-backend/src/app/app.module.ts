@@ -1,15 +1,15 @@
 import { Module } from '@nestjs/common';
 
-import { YnaaFeatureRootSchemaModule } from '@ynaa/demo-scaffold-backend-feature-root-schema';
+import { OpenKingdomFeatureRootSchemaModule } from '@open-kingdom/demo-scaffold-backend-feature-root-schema';
 
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 
 @Module({
   imports: [
-    YnaaFeatureRootSchemaModule,
-    import('@ynaa/shared-backend-feature-authentication').then((m) =>
-      m.YnaaFeatureBackendAuthModule.forRoot({
+    OpenKingdomFeatureRootSchemaModule,
+    import('@open-kingdom/shared-backend-feature-authentication').then((m) =>
+      m.OpenKingdomFeatureBackendAuthModule.forRoot({
         jwtSecret: process.env.JWT_SECRET || 'your-secret-key-here',
         jwtExpiresIn: '1h',
       })

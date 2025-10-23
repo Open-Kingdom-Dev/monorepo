@@ -6,8 +6,8 @@ import {
   selectNotificationConfig,
   dismissNotification,
   removeNotification,
-} from '@ynaa/shared-frontend-data-access-notifications';
-import { NotificationToast } from '@ynaa/shared-frontend-ui-notifications';
+} from '@open-kingdom/shared-frontend-data-access-notifications';
+import { NotificationToast } from '@open-kingdom/shared-frontend-ui-notifications';
 
 export function NotificationToastContainer() {
   const notifications = useSelector(selectActiveNotifications);

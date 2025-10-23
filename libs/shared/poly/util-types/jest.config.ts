@@ -9,7 +9,7 @@ const swcJestConfig = JSON.parse(
 swcJestConfig.swcrc = false;
 
 export default {
-  displayName: '@ynaa/shared-poly-util-types',
+  displayName: '@open-kingdom/shared-poly-util-types',
   preset: '../../../../jest.preset.js',
   testEnvironment: 'node',
   transform: {

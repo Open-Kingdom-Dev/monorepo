@@ -1,7 +1,10 @@
 import { Module } from '@nestjs/common';
 
-import { DatabaseSetupModule } from '@ynaa/shared-backend-data-access-database-setup';
-import { users, UserTableName } from '@ynaa/shared-backend-data-access-users';
+import { DatabaseSetupModule } from '@open-kingdom/shared-backend-data-access-database-setup';
+import {
+  users,
+  UserTableName,
+} from '@open-kingdom/shared-backend-data-access-users';
 
 const schema = {
   [UserTableName]: users,
@@ -13,4 +16,4 @@ const schema = {
   providers: [],
   exports: [],
 })
-export class YnaaFeatureRootSchemaModule {}
+export class OpenKingdomFeatureRootSchemaModule {}

@@ -4,11 +4,11 @@ import {
   LoggerKey,
   createLoggerMiddleware,
   loggerReducer,
-} from '@ynaa/shared-frontend-data-access-logger';
+} from '@open-kingdom/shared-frontend-data-access-logger';
 import {
   NotificationKey,
   notificationReducer,
-} from '@ynaa/shared-frontend-data-access-notifications';
+} from '@open-kingdom/shared-frontend-data-access-notifications';
 
 export const createRootStore = (config: LoggerConfig) => {
   return configureStore({

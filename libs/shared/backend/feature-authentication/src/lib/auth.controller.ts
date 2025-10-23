@@ -1,7 +1,7 @@
 import { Controller, Request, Post, UseGuards, Get } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 
-import { User } from '@ynaa/shared-backend-data-access-users';
+import { User } from '@open-kingdom/shared-backend-data-access-users';
 
 import { AuthenticationService } from './authentication.service';
 

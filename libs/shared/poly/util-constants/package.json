@@ -1,5 +1,5 @@
 {
-  "name": "@ynaa/shared-poly-util-constants",
+  "name": "@open-kingdom/shared-poly-util-constants",
   "version": "0.0.1",
   "private": true,
   "main": "./src/index.ts",
@@ -14,7 +14,7 @@
   },
   "dependencies": {},
   "nx": {
-    "name": "@ynaa/shared-poly-util-constants",
+    "name": "@open-kingdom/shared-poly-util-constants",
     "tags": [
       "scope:shared",
       "type:util",

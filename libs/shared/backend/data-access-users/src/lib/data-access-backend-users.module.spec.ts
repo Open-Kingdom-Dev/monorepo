@@ -1,12 +1,12 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { DrizzleBetterSQLiteModule } from '@knaadh/nestjs-drizzle-better-sqlite3';
 
-import { DB_TAG } from '@ynaa/shared-poly-util-constants';
-import { YnaaDataAccessBackendUsersModule } from './data-access-backend-users.module';
+import { DB_TAG } from '@open-kingdom/shared-poly-util-constants';
+import { OpenKingdomDataAccessBackendUsersModule } from './data-access-backend-users.module';
 import { UsersService } from './users.service';
 import { users } from './schema';
 
-describe('YnaaDataAccessBackendUsersModule', () => {
+describe('OpenKingdomDataAccessBackendUsersModule', () => {
   let module: TestingModule;
 
   beforeEach(async () => {
@@ -19,7 +19,7 @@ describe('YnaaDataAccessBackendUsersModule', () => {
           },
           config: { schema: users },
         }),
-        YnaaDataAccessBackendUsersModule,
+        OpenKingdomDataAccessBackendUsersModule,
       ],
     }).compile();
   });
@@ -30,12 +30,12 @@ describe('YnaaDataAccessBackendUsersModule', () => {
 
   describe('module configuration', () => {
     it('should be defined', () => {
-      expect(YnaaDataAccessBackendUsersModule).toBeDefined();
+      expect(OpenKingdomDataAccessBackendUsersModule).toBeDefined();
     });
 
     it('should have no controllers', () => {
       // This module is a data access module, so it shouldn't have controllers
-      const moduleRef = module.get(YnaaDataAccessBackendUsersModule);
+      const moduleRef = module.get(OpenKingdomDataAccessBackendUsersModule);
       expect(moduleRef).toBeDefined();
       // Controllers array should be empty as defined in the module
     });

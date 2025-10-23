@@ -1,5 +1,5 @@
 export default {
-  displayName: '@ynaa/shared-frontend-ui-theme',
+  displayName: '@open-kingdom/shared-frontend-ui-theme',
   preset: '../../../../jest.preset.js',
   transform: {
     '^(?!.*\\.(js|jsx|ts|tsx|css|json)$)': '@nx/react/plugins/jest',

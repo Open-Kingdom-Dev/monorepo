@@ -1,5 +1,5 @@
 export default {
-  displayName: '@ynaa/demo-scaffold-frontend-feature-root-store',
+  displayName: '@open-kingdom/demo-scaffold-frontend-feature-root-store',
   preset: '../../../../jest.preset.js',
   transform: {
     '^(?!.*\\.(js|jsx|ts|tsx|css|json)$)': '@nx/react/plugins/jest',

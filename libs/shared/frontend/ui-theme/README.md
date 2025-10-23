@@ -18,7 +18,7 @@ This library provides a comprehensive theming system for the Nx workspace, inclu
 1. **Import the ThemeProvider** in your app's root component:
 
 ```tsx
-import { ThemeProvider } from '@ynaa/shared-frontend-ui-theme';
+import { ThemeProvider } from '@open-kingdom/shared-frontend-ui-theme';
 
 export function App() {
   return <ThemeProvider>{/* Your app content */}</ThemeProvider>;
@@ -28,7 +28,7 @@ export function App() {
 2. **Use the theme hook** in your components:
 
 ```tsx
-import { useTheme } from '@ynaa/shared-frontend-ui-theme';
+import { useTheme } from '@open-kingdom/shared-frontend-ui-theme';
 
 export function MyComponent() {
   const { theme, mode, setMode } = useTheme();
@@ -47,7 +47,7 @@ The library provides a base Tailwind configuration that can be extended by appli
 
 ```javascript
 // tailwind.config.js
-const baseConfig = require('@ynaa/shared-frontend-ui-theme/src/tailwind.config.js');
+const baseConfig = require('@open-kingdom/shared-frontend-ui-theme/src/tailwind.config.js');
 
 module.exports = {
   presets: [baseConfig],
@@ -94,7 +94,7 @@ module.exports = {
 You can customize themes by passing them to the ThemeProvider:
 
 ```tsx
-import { ThemeProvider, defaultLightTheme } from '@ynaa/shared-frontend-ui-theme';
+import { ThemeProvider, defaultLightTheme } from '@open-kingdom/shared-frontend-ui-theme';
 
 const customTheme = {
   ...defaultLightTheme,
@@ -127,7 +127,7 @@ The theme system automatically generates CSS custom properties that can be used 
 The library provides utility functions for theme management:
 
 ```tsx
-import { generateCSSVariables, applyThemeToDOM, mergeThemes, saveThemeMode, loadThemeMode } from '@ynaa/shared-frontend-ui-theme';
+import { generateCSSVariables, applyThemeToDOM, mergeThemes, saveThemeMode, loadThemeMode } from '@open-kingdom/shared-frontend-ui-theme';
 
 // Generate CSS variables from a theme
 const variables = generateCSSVariables(theme);

@@ -3,7 +3,7 @@ import { BetterSQLite3Database } from 'drizzle-orm/better-sqlite3';
 import { eq } from 'drizzle-orm';
 import * as bcrypt from 'bcrypt';
 
-import { DB_TAG } from '@ynaa/shared-poly-util-constants';
+import { DB_TAG } from '@open-kingdom/shared-poly-util-constants';
 
 import { User, users, UserTableName } from './schema';
 

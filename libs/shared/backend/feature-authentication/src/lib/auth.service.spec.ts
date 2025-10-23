@@ -3,7 +3,10 @@ import { JwtService } from '@nestjs/jwt';
 import { UnauthorizedException } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 
-import { UsersService, User } from '@ynaa/shared-backend-data-access-users';
+import {
+  UsersService,
+  User,
+} from '@open-kingdom/shared-backend-data-access-users';
 
 import { AuthenticationService } from './authentication.service';
 

@@ -8,13 +8,13 @@ import {
   createLoggerMiddleware,
   LoggerConfig,
   LoggerState,
-} from '@ynaa/shared-frontend-data-access-logger';
-import { ThemeProvider } from '@ynaa/shared-frontend-ui-theme';
+} from '@open-kingdom/shared-frontend-data-access-logger';
+import { ThemeProvider } from '@open-kingdom/shared-frontend-ui-theme';
 import {
   NotificationKey,
   notificationReducer,
-} from '@ynaa/shared-frontend-data-access-notifications';
-import { SharedFeatureNotifications } from '@ynaa/shared-feature-notifications';
+} from '@open-kingdom/shared-frontend-data-access-notifications';
+import { SharedFeatureNotifications } from '@open-kingdom/shared-feature-notifications';
 
 describe('App Component', () => {
   let store: ReturnType<typeof configureStore>;

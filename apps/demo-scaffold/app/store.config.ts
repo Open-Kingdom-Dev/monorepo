@@ -1,5 +1,5 @@
-import { createRootStore } from '@ynaa/demo-scaffold-frontend-feature-root-store';
-import type { LoggerConfig } from '@ynaa/shared-frontend-data-access-logger';
+import { createRootStore } from '@open-kingdom/demo-scaffold-frontend-feature-root-store';
+import type { LoggerConfig } from '@open-kingdom/shared-frontend-data-access-logger';
 
 /**
  * Application store configuration

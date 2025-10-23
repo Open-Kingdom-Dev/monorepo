@@ -10,7 +10,7 @@ const swcJestConfig = JSON.parse(
 swcJestConfig.swcrc = false;
 
 export default {
-  displayName: '@ynaa/demo-scaffold-backend-feature-root-schema',
+  displayName: '@open-kingdom/demo-scaffold-backend-feature-root-schema',
   preset: '../../../../jest.preset.js',
   testEnvironment: 'node',
   transform: {

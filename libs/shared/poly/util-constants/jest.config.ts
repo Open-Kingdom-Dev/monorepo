@@ -10,7 +10,7 @@ const swcJestConfig = JSON.parse(
 swcJestConfig.swcrc = false;
 
 export default {
-  displayName: '@ynaa/util-constants',
+  displayName: '@open-kingdom/util-constants',
   preset: '../../../../jest.preset.js',
   testEnvironment: 'node',
   transform: {

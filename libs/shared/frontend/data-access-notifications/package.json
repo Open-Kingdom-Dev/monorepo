@@ -1,5 +1,5 @@
 {
-  "name": "@ynaa/shared-frontend-data-access-notifications",
+  "name": "@open-kingdom/shared-frontend-data-access-notifications",
   "version": "0.0.1",
   "private": true,
   "main": "./src/index.ts",
@@ -14,7 +14,7 @@
   },
   "dependencies": {},
   "nx": {
-    "name": "@ynaa/shared-frontend-data-access-notifications",
+    "name": "@open-kingdom/shared-frontend-data-access-notifications",
     "tags": [
       "type:data-access",
       "scope:shared",

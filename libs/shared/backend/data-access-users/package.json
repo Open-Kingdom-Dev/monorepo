@@ -1,5 +1,5 @@
 {
-  "name": "@ynaa/shared-backend-data-access-users",
+  "name": "@open-kingdom/shared-backend-data-access-users",
   "version": "0.0.1",
   "private": true,
   "main": "./src/index.ts",
@@ -19,7 +19,7 @@
     "bcrypt": "^5.1.1"
   },
   "nx": {
-    "name": "@ynaa/shared-backend-data-access-users",
+    "name": "@open-kingdom/shared-backend-data-access-users",
     "tags": [
       "type:data-access",
       "scope:shared",

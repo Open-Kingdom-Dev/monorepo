@@ -1,5 +1,5 @@
 export default {
-  displayName: '@ynaa/demo-scaffold',
+  displayName: '@open-kingdom/demo-scaffold',
   preset: '../../jest.preset.js',
   setupFilesAfterEnv: ['<rootDir>/app/test-setup.ts'],
   transform: {

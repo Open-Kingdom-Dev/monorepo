@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { Request } from 'express';
 
-import { User } from '@ynaa/shared-backend-data-access-users';
+import { User } from '@open-kingdom/shared-backend-data-access-users';
 
 import { AuthController, RequestWithUser } from './auth.controller';
 import { AuthenticationService } from './authentication.service';

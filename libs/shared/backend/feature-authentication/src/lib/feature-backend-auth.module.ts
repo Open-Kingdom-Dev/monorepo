@@ -2,7 +2,7 @@ import { Module, DynamicModule } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 
-import { YnaaDataAccessBackendUsersModule } from '@ynaa/shared-backend-data-access-users';
+import { OpenKingdomDataAccessBackendUsersModule } from '@open-kingdom/shared-backend-data-access-users';
 
 import { AuthenticationService } from './authentication.service';
 import { LocalStrategy } from './passport-local-strategy';
@@ -15,12 +15,12 @@ export interface AuthModuleOptions {
 }
 
 @Module({})
-export class YnaaFeatureBackendAuthModule {
+export class OpenKingdomFeatureBackendAuthModule {
   static forRoot(options: AuthModuleOptions): DynamicModule {
     return {
-      module: YnaaFeatureBackendAuthModule,
+      module: OpenKingdomFeatureBackendAuthModule,
       imports: [
-        YnaaDataAccessBackendUsersModule,
+        OpenKingdomDataAccessBackendUsersModule,
         PassportModule,
         JwtModule.register({
           secret: options.jwtSecret,

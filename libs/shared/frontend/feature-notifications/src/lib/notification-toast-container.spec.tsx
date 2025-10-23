@@ -9,7 +9,7 @@ import { Provider } from 'react-redux';
 import { configureStore } from '@reduxjs/toolkit';
 import '@testing-library/jest-dom';
 
-import { notificationReducer } from '@ynaa/shared-frontend-data-access-notifications';
+import { notificationReducer } from '@open-kingdom/shared-frontend-data-access-notifications';
 
 import { NotificationToastContainer } from './notification-toast-container';
 

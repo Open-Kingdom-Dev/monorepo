@@ -1,5 +1,5 @@
 export default {
-  displayName: '@ynaa/shared-frontend-ui-notifications',
+  displayName: '@open-kingdom/shared-frontend-ui-notifications',
   preset: '../../../../jest.preset.js',
   transform: {
     '^(?!.*\\.(js|jsx|ts|tsx|css|json)$)': '@nx/react/plugins/jest',

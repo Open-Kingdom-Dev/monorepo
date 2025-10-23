@@ -2,7 +2,7 @@ import { Strategy } from 'passport-local';
 import { PassportStrategy } from '@nestjs/passport';
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 
-import { User } from '@ynaa/shared-backend-data-access-users';
+import { User } from '@open-kingdom/shared-backend-data-access-users';
 
 import { AuthenticationService } from './authentication.service';
 

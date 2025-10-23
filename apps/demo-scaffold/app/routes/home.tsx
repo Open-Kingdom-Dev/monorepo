@@ -1,13 +1,16 @@
 import { useSelector, useDispatch } from 'react-redux';
 
-import { logInfo, selectLogs } from '@ynaa/shared-frontend-data-access-logger';
-import { useTheme } from '@ynaa/shared-frontend-ui-theme';
+import {
+  logInfo,
+  selectLogs,
+} from '@open-kingdom/shared-frontend-data-access-logger';
+import { useTheme } from '@open-kingdom/shared-frontend-ui-theme';
 import {
   selectActiveNotificationCount,
   showErrorNotification,
   showSuccessNotification,
   showWarningNotification,
-} from '@ynaa/shared-frontend-data-access-notifications';
+} from '@open-kingdom/shared-frontend-data-access-notifications';
 export function Home() {
   const logs = useSelector(selectLogs);
   const notificationCount = useSelector(selectActiveNotificationCount);

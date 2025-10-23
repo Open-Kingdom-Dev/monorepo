@@ -9,7 +9,7 @@ import {
   updateConfig,
   updateConfigReducer,
 } from './notification.slice';
-import { NotificationEntry } from '@ynaa/shared-poly-util-types';
+import { NotificationEntry } from '@open-kingdom/shared-poly-util-types';
 
 describe('the notification slice', () => {
   it('queues notifications', () => {

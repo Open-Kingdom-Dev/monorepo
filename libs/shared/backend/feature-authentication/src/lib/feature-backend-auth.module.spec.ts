@@ -1,5 +1,5 @@
 import {
-  YnaaFeatureBackendAuthModule,
+  OpenKingdomFeatureBackendAuthModule,
   AuthModuleOptions,
 } from './feature-backend-auth.module';
 import { JWT_CONSTANTS } from './passport-jwt-strategy';
@@ -8,21 +8,22 @@ import { LocalStrategy } from './passport-local-strategy';
 import { JwtStrategy } from './passport-jwt-strategy';
 import { AuthController } from './auth.controller';
 
-describe('YnaaFeatureBackendAuthModule', () => {
+describe('OpenKingdomFeatureBackendAuthModule', () => {
   const mockOptions: AuthModuleOptions = {
     jwtSecret: 'test-secret',
     jwtExpiresIn: '1h',
   };
 
   it('should be defined', () => {
-    expect(YnaaFeatureBackendAuthModule).toBeDefined();
+    expect(OpenKingdomFeatureBackendAuthModule).toBeDefined();
   });
 
   it('should create a dynamic module with forRoot', () => {
-    const dynamicModule = YnaaFeatureBackendAuthModule.forRoot(mockOptions);
+    const dynamicModule =
+      OpenKingdomFeatureBackendAuthModule.forRoot(mockOptions);
 
     expect(dynamicModule).toBeDefined();
-    expect(dynamicModule.module).toBe(YnaaFeatureBackendAuthModule);
+    expect(dynamicModule.module).toBe(OpenKingdomFeatureBackendAuthModule);
     expect(dynamicModule.imports).toBeDefined();
     expect(dynamicModule.providers).toBeDefined();
     expect(dynamicModule.controllers).toBeDefined();
@@ -30,7 +31,8 @@ describe('YnaaFeatureBackendAuthModule', () => {
   });
 
   it('should include JWT constants provider', () => {
-    const dynamicModule = YnaaFeatureBackendAuthModule.forRoot(mockOptions);
+    const dynamicModule =
+      OpenKingdomFeatureBackendAuthModule.forRoot(mockOptions);
 
     const jwtConstantsProvider = dynamicModule.providers?.find(
       (provider) =>
@@ -47,7 +49,8 @@ describe('YnaaFeatureBackendAuthModule', () => {
   });
 
   it('should include all required providers', () => {
-    const dynamicModule = YnaaFeatureBackendAuthModule.forRoot(mockOptions);
+    const dynamicModule =
+      OpenKingdomFeatureBackendAuthModule.forRoot(mockOptions);
 
     expect(dynamicModule.providers).toContain(AuthenticationService);
     expect(dynamicModule.providers).toContain(LocalStrategy);
@@ -55,20 +58,23 @@ describe('YnaaFeatureBackendAuthModule', () => {
   });
 
   it('should include all required imports', () => {
-    const dynamicModule = YnaaFeatureBackendAuthModule.forRoot(mockOptions);
+    const dynamicModule =
+      OpenKingdomFeatureBackendAuthModule.forRoot(mockOptions);
 
     expect(dynamicModule.imports).toBeDefined();
     expect(dynamicModule.imports?.length).toBeGreaterThan(0);
   });
 
   it('should include all required controllers', () => {
-    const dynamicModule = YnaaFeatureBackendAuthModule.forRoot(mockOptions);
+    const dynamicModule =
+      OpenKingdomFeatureBackendAuthModule.forRoot(mockOptions);
 
     expect(dynamicModule.controllers).toContain(AuthController);
   });
 
   it('should include all required exports', () => {
-    const dynamicModule = YnaaFeatureBackendAuthModule.forRoot(mockOptions);
+    const dynamicModule =
+      OpenKingdomFeatureBackendAuthModule.forRoot(mockOptions);
 
     expect(dynamicModule.exports).toContain(AuthenticationService);
     expect(dynamicModule.exports).toContain(JwtStrategy);
@@ -79,7 +85,7 @@ describe('YnaaFeatureBackendAuthModule', () => {
       jwtSecret: 'test-secret',
     };
 
-    const dynamicModule = YnaaFeatureBackendAuthModule.forRoot(
+    const dynamicModule = OpenKingdomFeatureBackendAuthModule.forRoot(
       optionsWithoutExpiresIn
     );
     expect(dynamicModule).toBeDefined();

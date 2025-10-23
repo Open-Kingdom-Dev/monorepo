@@ -3,7 +3,7 @@ import {
   NotificationState,
   NotificationEntry,
   NotificationConfig,
-} from '@ynaa/shared-poly-util-types';
+} from '@open-kingdom/shared-poly-util-types';
 
 const defaultConfig: NotificationConfig = {
   maxNotifications: 5,

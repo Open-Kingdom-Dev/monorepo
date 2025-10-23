@@ -1,10 +1,10 @@
 {
-  "name": "@ynaa/source",
+  "name": "@open-kingdom/source",
   "version": "0.0.0",
   "license": "MIT",
   "scripts": {
-    "dev": "nx run @ynaa/demo-scaffold:dev",
-    "dev:backend": "nx run @ynaa/demo-scaffold-backend:serve",
+    "dev": "nx run @open-kingdom/demo-scaffold:dev",
+    "dev:backend": "nx run @open-kingdom/demo-scaffold-backend:serve",
     "test": "nx run-many --target=test --all --coverage",
     "test:affected": "nx affected --target=test --coverage",
     "typecheck": "nx run-many --target=typecheck --all",

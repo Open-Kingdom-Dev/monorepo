@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 
-import { NotificationEntry } from '@ynaa/shared-poly-util-types';
+import { NotificationEntry } from '@open-kingdom/shared-poly-util-types';
 
 interface NotificationToastProps {
   notification: NotificationEntry;

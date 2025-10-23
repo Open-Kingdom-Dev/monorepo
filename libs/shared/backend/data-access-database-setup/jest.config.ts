@@ -9,7 +9,7 @@ const swcJestConfig = JSON.parse(
 swcJestConfig.swcrc = false;
 
 export default {
-  displayName: '@ynaa/shared-backend-data-access-database-setup',
+  displayName: '@open-kingdom/shared-backend-data-access-database-setup',
   preset: '../../../../jest.preset.js',
   testEnvironment: 'node',
   transform: {

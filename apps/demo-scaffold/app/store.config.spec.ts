@@ -1,5 +1,5 @@
 import { createAppStore, getLoggerConfig } from './store.config';
-import { LoggerKey } from '@ynaa/shared-frontend-data-access-logger';
+import { LoggerKey } from '@open-kingdom/shared-frontend-data-access-logger';
 
 describe('Store Configuration', () => {
   describe('createAppStore', () => {
