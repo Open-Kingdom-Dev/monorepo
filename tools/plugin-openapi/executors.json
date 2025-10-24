@@ -1,0 +1,9 @@
+{
+  "executors": {
+    "swagger-generate-all": {
+      "implementation": "./dist/executors/swagger-generate-all/swagger-generate-all",
+      "schema": "./dist/executors/swagger-generate-all/schema.json",
+      "description": "Generate all OpenAPI schemas"
+    }
+  }
+}

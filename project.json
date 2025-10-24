@@ -1,0 +1,9 @@
+{
+  "name": "workspace-tools",
+  "targets": {
+    "generate-openapi-all": {
+      "executor": "@open-kingdom/plugin-openapi:swagger-generate-all"
+    }
+  }
+}
+
