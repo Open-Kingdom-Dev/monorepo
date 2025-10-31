@@ -9,3 +9,4 @@
 **/*.d.ts
 **/openapi.json
 apps/demo-scaffold-e2e/test-output/
+**/test-report.html

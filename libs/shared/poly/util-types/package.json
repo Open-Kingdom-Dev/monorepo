@@ -1,7 +1,7 @@
 {
   "name": "@open-kingdom/shared-poly-util-types",
   "version": "0.0.1",
-  "private": true,
+  "type": "module",
   "main": "./dist/index.js",
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -15,8 +15,14 @@
     }
   },
   "dependencies": {
-    "tslib": "^2.3.0"
+    "vite": "^7.2.2",
+    "@vitejs/plugin-react": "^4.3.4",
+    "vite-plugin-dts": "^4.5.4"
   },
+  "files": [
+    "dist",
+    "!**/*.tsbuildinfo"
+  ],
   "nx": {
     "name": "@open-kingdom/shared-poly-util-types",
     "tags": [
