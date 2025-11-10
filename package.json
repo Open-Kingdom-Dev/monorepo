@@ -126,6 +126,7 @@
     "libs/shared/poly/*",
     "libs/demo-scaffold/frontend/*",
     "libs/demo-scaffold/backend/*",
-    "libs/demo-scaffold/poly/*"
+    "libs/demo-scaffold/poly/*",
+    "libs/ui/shared/frontend/*"
   ]
 }
