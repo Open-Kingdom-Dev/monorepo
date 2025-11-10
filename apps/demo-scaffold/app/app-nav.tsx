@@ -2,12 +2,15 @@ import { NavLink } from 'react-router';
 
 export function AppNav() {
   return (
-    <nav>
+    <nav className='flex gap-4'>
       <NavLink to="/" end>
         Home
       </NavLink>
       <NavLink to="/about" end>
         About
+      </NavLink>
+      <NavLink to="/data-grid" end>
+        Data Grid
       </NavLink>
     </nav>
   );
