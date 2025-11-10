@@ -11,11 +11,13 @@ import {
   showSuccessNotification,
   showWarningNotification,
 } from '@open-kingdom/shared-frontend-data-access-notifications';
+
 export function Home() {
   const logs = useSelector(selectLogs);
   const notificationCount = useSelector(selectActiveNotificationCount);
   const dispatch = useDispatch();
   const { mode, setMode } = useTheme();
+
 
   return (
     <>
@@ -106,7 +108,7 @@ export function Home() {
           </div>
         </div>
       </div>
-
+    
       <div className="bg-white dark:bg-neutral-800 rounded-lg shadow-lg p-6">
         <h2 className="text-2xl font-semibold mb-4 text-neutral-800 dark:text-neutral-200">
           Color Palette Demo

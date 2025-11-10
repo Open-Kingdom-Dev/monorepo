@@ -47,6 +47,9 @@
     },
     {
       "path": "./libs/shared/poly/util-constants"
+    },
+    {
+      "path": "./libs/shared/frontend/ui-grid"
     }
   ]
 }
