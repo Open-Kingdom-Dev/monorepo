@@ -1,1 +1,1 @@
-export * from './lib/ui-datagrid';
+export * from './lib/datagrid';
