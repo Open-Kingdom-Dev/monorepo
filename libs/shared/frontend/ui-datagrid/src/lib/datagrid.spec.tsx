@@ -17,7 +17,7 @@ describe('DataGrid', () => {
     { field: 'electric' },
   ];
 
-  it('should render successfully', async () => {
+  it('should display a functional grid with the provided data', async () => {
     const { container } = render(
       <DataGrid rowData={mockRowData} columnDefs={mockColDefs} />
     );
@@ -27,7 +27,7 @@ describe('DataGrid', () => {
     });
   });
 
-  it('should apply custom className', async () => {
+  it('should allow external theming through custom class names', async () => {
     const { container } = render(
       <DataGrid
         rowData={mockRowData}
@@ -42,7 +42,7 @@ describe('DataGrid', () => {
     });
   });
 
-  it('should render with empty data', () => {
+  it('should display an empty grid when no data is supplied', () => {
     const { container } = render(
       <DataGrid rowData={[]} columnDefs={mockColDefs} />
     );
@@ -50,7 +50,7 @@ describe('DataGrid', () => {
     expect(container.querySelector('.ag-root-wrapper')).toBeInTheDocument();
   });
 
-  it('should render column headers correctly', async () => {
+  it('should display column headers based on the column definitions', async () => {
     render(<DataGrid rowData={mockRowData} columnDefs={mockColDefs} />);
 
     await waitFor(() => {
@@ -61,7 +61,7 @@ describe('DataGrid', () => {
     });
   });
 
-  it('should render row data correctly', async () => {
+  it('should display all provided row data in the grid', async () => {
     render(<DataGrid rowData={mockRowData} columnDefs={mockColDefs} />);
 
     await waitFor(() => {
@@ -82,7 +82,7 @@ describe('DataGrid', () => {
     });
   });
 
-  it('should render correct number of rows', async () => {
+  it('should display the exact number of rows matching the data supplied', async () => {
     const { container } = render(
       <DataGrid rowData={mockRowData} columnDefs={mockColDefs} />
     );
