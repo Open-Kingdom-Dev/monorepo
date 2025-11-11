@@ -5,8 +5,14 @@ ModuleRegistry.registerModules([AllCommunityModule]);
 
 export interface DataGridProps extends AgGridReactProps {
   className?: string;
+  containerStyle?: React.CSSProperties;
 }
 
-export const DataGrid = ({ className, ...props }: DataGridProps) => (
-  <AgGridReact {...props} className={className} />
+export const DataGrid = ({ className, containerStyle = containerDefaults, ...props }: DataGridProps) => (
+  <AgGridReact
+    {...gridDefaults}
+    {...props}
+    className={className}
+    containerStyle={containerStyle}
+  />
 );

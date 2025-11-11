@@ -6,15 +6,19 @@
 /**
  * Default grid configuration values
  */
-export const DEFAULT_GRID_PAGE_SIZE = 100;
+export const DEFAULT_GRID_PAGE_SIZE = 20;
+export const DEFAULT_GRID_PAGE_SIZE_OPTIONS = [10, 20, 50, 100];
 export const DEFAULT_GRID_ROW_HEIGHT = 42;
 export const DEFAULT_GRID_HEADER_HEIGHT = 42;
+export const DEFAULT_COLUMN_MIN_WIDTH = 100;
+export const DEFAULT_TOOLTIP_SHOW_DELAY = 500;
+export const DEFAULT_CHECKBOX_COLUMN_WIDTH = 50;
 
 /**
  * Grid selection modes
  */
-export const GRID_SELECTION_MODE_SINGLE = 'single';
-export const GRID_SELECTION_MODE_MULTIPLE = 'multiple';
+export const GRID_SELECTION_MODE_SINGLE = 'single' as const;
+export const GRID_SELECTION_MODE_MULTIPLE = 'multiple' as const;
 
 /**
  * Grid selection types
@@ -52,6 +56,7 @@ export const GRID_SORT_DESC = 'desc';
 export const GRID_THEME_LIGHT = 'light';
 export const GRID_THEME_DARK = 'dark';
 export const GRID_THEME_AUTO = 'auto';
+export const GRID_DOM_LAYOUT = 'autoHeight' as const;
 
 /**
  * Grid pinning positions
