@@ -1,3 +1,3 @@
-export * from './lib/constants';
 export * from './lib/datagrid';
-export * from './lib/types';
+export * from './lib/datagrid.constants';
+export * from './lib/datagrid.types';

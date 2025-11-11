@@ -7,6 +7,11 @@ export default {
   },
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx'],
   coverageDirectory: 'test-output/jest/coverage',
+  coveragePathIgnorePatterns: [
+    '/node_modules/',
+    'datagrid.constants.ts',
+    'datagrid.types.ts',
+  ],
   reporters: [
     'default',
     [
