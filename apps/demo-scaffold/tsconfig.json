@@ -6,9 +6,6 @@
       "path": "../../libs/demo-scaffold/frontend/feature-root-store"
     },
     {
-      "path": "../../libs/shared/poly/util-types"
-    },
-    {
       "path": "../../libs/shared/frontend/data-access-notifications"
     },
     {
@@ -19,6 +16,9 @@
     },
     {
       "path": "../../libs/shared/frontend/ui-theme"
+    },
+    {
+      "path": "../../libs/shared/frontend/ui-datagrid"
     },
     {
       "path": "./tsconfig.app.json"
