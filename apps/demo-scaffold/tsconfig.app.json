@@ -50,9 +50,6 @@
       "path": "../../libs/shared/poly/util-types/tsconfig.lib.json"
     },
     {
-      "path": "../../libs/shared/frontend/ui-grid/tsconfig.lib.json"
-    },
-    {
       "path": "../../libs/shared/frontend/data-access-notifications/tsconfig.lib.json"
     },
     {
