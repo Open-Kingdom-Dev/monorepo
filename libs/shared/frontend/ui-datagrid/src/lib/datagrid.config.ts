@@ -1,13 +1,11 @@
-import { type FirstDataRenderedEvent } from "ag-grid-community";
+import { type FirstDataRenderedEvent, RowSelectionOptions } from "ag-grid-community";
 import {
-  DEFAULT_GRID_PAGE_SIZE,
-  DEFAULT_GRID_PAGE_SIZE_OPTIONS,
-  DEFAULT_COLUMN_MIN_WIDTH,
-  DEFAULT_TOOLTIP_SHOW_DELAY,
-  DEFAULT_CHECKBOX_COLUMN_WIDTH,
-  GRID_SELECTION_MODE_MULTIPLE,
-  GRID_PIN_LEFT,
-  GRID_DOM_LAYOUT,
+  DEFAULT_PAGE_SIZE,
+  DEFAULT_PAGE_SIZE_OPTIONS,
+  DEFAULT_MIN_WIDTH,
+  DEFAULT_TOOLTIP_DELAY,
+  DOM_LAYOUT_AUTO_HEIGHT,
+  ROW_SELECTION_MULTI,
 } from "./datagrid.constants";
 
 export const gridDefaults = {
@@ -17,43 +15,50 @@ export const gridDefaults = {
     filter: true,
     resizable: true,
     floatingFilter: true,
-    minWidth: DEFAULT_COLUMN_MIN_WIDTH,
+    minWidth: DEFAULT_MIN_WIDTH,
   },
 
   // Pagination
   pagination: true,
-  paginationPageSize: DEFAULT_GRID_PAGE_SIZE,
-  paginationPageSizeSelector: DEFAULT_GRID_PAGE_SIZE_OPTIONS,
+  paginationPageSize: DEFAULT_PAGE_SIZE,
+  paginationPageSizeSelector: DEFAULT_PAGE_SIZE_OPTIONS,
 
   // Row selection
-  rowSelection: GRID_SELECTION_MODE_MULTIPLE,
   suppressRowClickSelection: true,
 
   // UX
   animateRows: true,
   enableCellTextSelection: true,
   ensureDomOrder: true,
-  tooltipShowDelay: DEFAULT_TOOLTIP_SHOW_DELAY,
+  tooltipShowDelay: DEFAULT_TOOLTIP_DELAY,
   suppressDragLeaveHidesColumns: true,
-  domLayout: GRID_DOM_LAYOUT,
+  domLayout: DOM_LAYOUT_AUTO_HEIGHT,
 
   // Auto-size
   onFirstDataRendered: (params: FirstDataRenderedEvent) => params.api.sizeColumnsToFit(),
 
   // Loading states
-  overlayLoadingTemplate: '<span>Loading data...</span>',
-  overlayNoRowsTemplate: '<span>No data to display</span>',
+  overlayLoadingTemplate: `
+    <div class="ag-custom-loading">
+      <div class="ag-spinner"></div>
+      <span>Loading data...</span>
+    </div>
+  `,
+
+  overlayNoRowsTemplate: `
+    <div class="ag-custom-no-rows">
+      <span>No data to display</span>
+    </div>
+  `,
 };
 
-export const checkboxColumn = {
-  headerCheckboxSelection: true,
-  checkboxSelection: true,
-  width: DEFAULT_CHECKBOX_COLUMN_WIDTH,
-  maxWidth: DEFAULT_CHECKBOX_COLUMN_WIDTH,
-  suppressMenu: true,
-  suppressMovable: true,
-  lockPosition: GRID_PIN_LEFT,
-};
+export const rowSelectionColumn: RowSelectionOptions = {
+  mode: ROW_SELECTION_MULTI,
+  checkboxes: true,
+  headerCheckbox: true,
+  selectAll: 'currentPage',
+  enableClickSelection: false,
+}
 
 export const containerDefaults = {
   height: 'auto',

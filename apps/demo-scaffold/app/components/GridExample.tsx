@@ -24,6 +24,7 @@ export const GridExample = () => {
     <DataGrid
       rowData={rowData}
       columnDefs={colDefs}
+      enableRowSelection={true}
     />
   );
 };
