@@ -1,4 +1,4 @@
-import { type FirstDataRenderedEvent, RowSelectionOptions } from "ag-grid-community";
+import { RowSelectionOptions, type FirstDataRenderedEvent } from "./datagrid.types";
 import {
   DEFAULT_PAGE_SIZE,
   DEFAULT_PAGE_SIZE_OPTIONS,
@@ -6,6 +6,7 @@ import {
   DEFAULT_TOOLTIP_DELAY,
   DOM_LAYOUT_AUTO_HEIGHT,
   ROW_SELECTION_MULTI,
+  ROW_SELECTION_SINGLE,
 } from "./datagrid.constants";
 
 export const gridDefaults = {
@@ -22,9 +23,6 @@ export const gridDefaults = {
   pagination: true,
   paginationPageSize: DEFAULT_PAGE_SIZE,
   paginationPageSizeSelector: DEFAULT_PAGE_SIZE_OPTIONS,
-
-  // Row selection
-  suppressRowClickSelection: true,
 
   // UX
   animateRows: true,
@@ -52,13 +50,20 @@ export const gridDefaults = {
   `,
 };
 
-export const rowSelectionColumn: RowSelectionOptions = {
+export const multiRowSelectionDefaults: RowSelectionOptions = {
   mode: ROW_SELECTION_MULTI,
   checkboxes: true,
   headerCheckbox: true,
   selectAll: 'currentPage',
   enableClickSelection: false,
 }
+
+export const singleRowSelectionDefaults: RowSelectionOptions = {
+  mode: ROW_SELECTION_SINGLE,
+  checkboxes: false,
+  enableSelectionWithoutKeys: true,
+  hideDisabledCheckboxes: true,
+};
 
 export const containerDefaults = {
   height: 'auto',

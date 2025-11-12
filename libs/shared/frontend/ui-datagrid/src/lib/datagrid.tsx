@@ -1,18 +1,15 @@
-import { type CSSProperties } from "react";
-import { AllCommunityModule, ModuleRegistry } from "ag-grid-community";
-import { AgGridReact, type AgGridReactProps } from "ag-grid-react";
-import { gridDefaults, containerDefaults, rowSelectionColumn } from "./datagrid.config";
+import { AgGridReact } from "ag-grid-react";
+import { gridDefaults, containerDefaults, multiRowSelectionDefaults, singleRowSelectionDefaults } from "./datagrid.config";
+import { AllCommunityModule, ModuleRegistry, DataGridProps } from "./datagrid.types";
 
 ModuleRegistry.registerModules([AllCommunityModule]);
 
-export interface DataGridProps extends AgGridReactProps {
-  className?: string;
-  containerStyle?: CSSProperties;
-  enableRowSelection?: boolean;
-}
-
 export const DataGrid = ({ className, rowSelection, containerStyle = containerDefaults, enableRowSelection = false, ...props }: DataGridProps) => {
-  const rowSelectionOptions = rowSelection || enableRowSelection ? rowSelectionColumn : undefined;
+  const rowSelectionOptions = rowSelection || (
+    enableRowSelection
+    ? multiRowSelectionDefaults
+    : singleRowSelectionDefaults
+  );
 
   return (
     <AgGridReact

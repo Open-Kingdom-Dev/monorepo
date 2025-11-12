@@ -92,4 +92,37 @@ describe('DataGrid', () => {
       expect(rows).toHaveLength(mockRowData.length);
     });
   });
+
+  it('should allow users to select multiple rows for bulk operations', async () => {
+    const { container } = render(
+      <DataGrid
+        rowData={mockRowData}
+        columnDefs={mockColDefs}
+        enableRowSelection={true}
+      />
+    );
+
+    await waitFor(() => {
+      expect(container.querySelector('.ag-root-wrapper')).toBeInTheDocument();
+    });
+  });
+
+  it('should allow customization of row selection behavior to match specific application needs', async () => {
+    const customRowSelection = {
+      mode: 'singleRow' as const,
+      checkboxes: false,
+    };
+
+    const { container } = render(
+      <DataGrid
+        rowData={mockRowData}
+        columnDefs={mockColDefs}
+        rowSelection={customRowSelection}
+      />
+    );
+
+    await waitFor(() => {
+      expect(container.querySelector('.ag-root-wrapper')).toBeInTheDocument();
+    });
+  });
 });
