@@ -4,7 +4,13 @@ import { AllCommunityModule, ModuleRegistry, DataGridProps } from "./datagrid.ty
 
 ModuleRegistry.registerModules([AllCommunityModule]);
 
-export const DataGrid = ({ className, rowSelection, containerStyle = containerDefaults, enableRowSelection = false, ...props }: DataGridProps) => {
+export const DataGrid = ({
+  className,
+  rowSelection,
+  containerStyle = containerDefaults,
+  enableRowSelection = false,
+  ...props
+}: DataGridProps) => {
   const rowSelectionOptions = rowSelection || (
     enableRowSelection
     ? multiRowSelectionDefaults
