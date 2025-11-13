@@ -111,6 +111,12 @@
     },
     "build": {
       "dependsOn": ["^typecheck"]
+    },
+    "lint": {
+      "executor": "nx:run-commands",
+      "options": {
+        "args": ["--max-warnings=0"]
+      }
     }
   },
   "generators": {
