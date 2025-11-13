@@ -65,4 +65,3 @@ export const GRID_PIN_RIGHT = 'right';
 export const GRID_GROUP_DISPLAY_SINGLE_COLUMN = 'singleColumn';
 export const GRID_GROUP_DISPLAY_MULTIPLE_COLUMNS = 'multipleColumns';
 export const GRID_GROUP_DISPLAY_GROUP_ROWS = 'groupRows';
-

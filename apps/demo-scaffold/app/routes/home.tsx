@@ -19,7 +19,6 @@ export function Home() {
   const dispatch = useDispatch();
   const { mode, setMode } = useTheme();
 
-
   return (
     <>
       <div className="flex justify-between items-center mb-8">
