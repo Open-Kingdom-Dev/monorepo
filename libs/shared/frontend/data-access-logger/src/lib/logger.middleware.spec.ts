@@ -29,7 +29,7 @@ describe('Logger Middleware', () => {
     it('should throw error for unsupported destination', () => {
       const config = {
         destination: 'file',
-      } as any;
+      } as unknown as LoggerConfig;
 
       expect(() => createLoggerMiddleware(config)).toThrow(
         'Unsupported logger destination: file'
@@ -39,7 +39,7 @@ describe('Logger Middleware', () => {
     it('should throw error for undefined destination', () => {
       const config = {
         destination: undefined,
-      } as any;
+      } as unknown as LoggerConfig;
 
       expect(() => createLoggerMiddleware(config)).toThrow(
         'Unsupported logger destination: undefined'
@@ -49,7 +49,7 @@ describe('Logger Middleware', () => {
     it('should throw error for null destination', () => {
       const config = {
         destination: null,
-      } as any;
+      } as unknown as LoggerConfig;
 
       expect(() => createLoggerMiddleware(config)).toThrow(
         'Unsupported logger destination: null'

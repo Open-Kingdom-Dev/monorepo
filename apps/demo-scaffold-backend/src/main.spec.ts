@@ -16,8 +16,13 @@ jest.mock('./app/app.module', () => ({
 }));
 
 describe('Main Module', () => {
-  let mockApp: any;
-  let NestFactory: any;
+  let mockApp: {
+    setGlobalPrefix: jest.Mock;
+    listen: jest.Mock<Promise<void>>;
+  };
+  let NestFactory: {
+    create: jest.Mock;
+  };
 
   beforeEach(async () => {
     jest.clearAllMocks();
