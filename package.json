@@ -17,7 +17,8 @@
     "lint": "nx run-many --target=lint --all",
     "lint:fix": "nx run-many --target=lint --all --fix",
     "format:fix": "nx format",
-    "check-all": "npm run typecheck && npm run lint && npm run format:fix && npm run test && npm run e2e"
+    "format:check": "nx format:check",
+    "check-all": "npm run typecheck && npm run lint && npm run format:check && npm run test && npm run e2e"
   },
   "private": true,
   "dependencies": {
