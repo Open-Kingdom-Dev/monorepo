@@ -51,12 +51,18 @@ describe('datagrid.config', () => {
       });
 
       it('should allow users to choose how many rows to display per page', () => {
-        expect(gridDefaults.paginationPageSizeSelector).toEqual(DEFAULT_PAGE_SIZE_OPTIONS);
-        expect(gridDefaults.paginationPageSizeSelector).toEqual([10, 20, 50, 100]);
+        expect(gridDefaults.paginationPageSizeSelector).toEqual(
+          DEFAULT_PAGE_SIZE_OPTIONS
+        );
+        expect(gridDefaults.paginationPageSizeSelector).toEqual([
+          10, 20, 50, 100,
+        ]);
       });
 
       it('should use the same page size options throughout the application', () => {
-        expect(gridDefaults.paginationPageSizeSelector).toBe(DEFAULT_PAGE_SIZE_OPTIONS);
+        expect(gridDefaults.paginationPageSizeSelector).toBe(
+          DEFAULT_PAGE_SIZE_OPTIONS
+        );
       });
     });
 
@@ -118,11 +124,15 @@ describe('datagrid.config', () => {
       });
 
       it('should inform users that data is loading', () => {
-        expect(gridDefaults.overlayLoadingTemplate).toContain('Loading data...');
+        expect(gridDefaults.overlayLoadingTemplate).toContain(
+          'Loading data...'
+        );
       });
 
       it('should allow custom styling of the loading overlay', () => {
-        expect(gridDefaults.overlayLoadingTemplate).toContain('ag-custom-loading');
+        expect(gridDefaults.overlayLoadingTemplate).toContain(
+          'ag-custom-loading'
+        );
       });
 
       it('should display a helpful message when no data is available', () => {
@@ -131,11 +141,15 @@ describe('datagrid.config', () => {
       });
 
       it('should inform users when there is no data to display', () => {
-        expect(gridDefaults.overlayNoRowsTemplate).toContain('No data to display');
+        expect(gridDefaults.overlayNoRowsTemplate).toContain(
+          'No data to display'
+        );
       });
 
       it('should allow custom styling of the empty state message', () => {
-        expect(gridDefaults.overlayNoRowsTemplate).toContain('ag-custom-no-rows');
+        expect(gridDefaults.overlayNoRowsTemplate).toContain(
+          'ag-custom-no-rows'
+        );
       });
     });
   });
@@ -184,8 +198,12 @@ describe('datagrid.config', () => {
     it('should include all necessary properties for single-row selection', () => {
       expect(singleRowSelectionDefaults).toHaveProperty('mode');
       expect(singleRowSelectionDefaults).toHaveProperty('checkboxes');
-      expect(singleRowSelectionDefaults).toHaveProperty('enableSelectionWithoutKeys');
-      expect(singleRowSelectionDefaults).toHaveProperty('hideDisabledCheckboxes');
+      expect(singleRowSelectionDefaults).toHaveProperty(
+        'enableSelectionWithoutKeys'
+      );
+      expect(singleRowSelectionDefaults).toHaveProperty(
+        'hideDisabledCheckboxes'
+      );
     });
   });
 
@@ -245,8 +263,12 @@ describe('datagrid.config', () => {
     });
 
     it('should provide distinct selection modes for different use cases', () => {
-      expect(multiRowSelectionDefaults.mode).not.toBe(singleRowSelectionDefaults.mode);
-      expect(multiRowSelectionDefaults.checkboxes).not.toBe(singleRowSelectionDefaults.checkboxes);
+      expect(multiRowSelectionDefaults.mode).not.toBe(
+        singleRowSelectionDefaults.mode
+      );
+      expect(multiRowSelectionDefaults.checkboxes).not.toBe(
+        singleRowSelectionDefaults.checkboxes
+      );
     });
   });
 });

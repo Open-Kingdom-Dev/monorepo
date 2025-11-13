@@ -1,4 +1,7 @@
-import { RowSelectionOptions, type FirstDataRenderedEvent } from "./datagrid.types";
+import {
+  RowSelectionOptions,
+  type FirstDataRenderedEvent,
+} from './datagrid.types';
 import {
   DEFAULT_PAGE_SIZE,
   DEFAULT_PAGE_SIZE_OPTIONS,
@@ -7,7 +10,7 @@ import {
   DOM_LAYOUT_AUTO_HEIGHT,
   ROW_SELECTION_MULTI,
   ROW_SELECTION_SINGLE,
-} from "./datagrid.constants";
+} from './datagrid.constants';
 
 export const gridDefaults = {
   // Column defaults
@@ -33,7 +36,8 @@ export const gridDefaults = {
   domLayout: DOM_LAYOUT_AUTO_HEIGHT,
 
   // Auto-size
-  onFirstDataRendered: (params: FirstDataRenderedEvent) => params.api.sizeColumnsToFit(),
+  onFirstDataRendered: (params: FirstDataRenderedEvent) =>
+    params.api.sizeColumnsToFit(),
 
   // Loading states
   overlayLoadingTemplate: `
@@ -56,7 +60,7 @@ export const multiRowSelectionDefaults: RowSelectionOptions = {
   headerCheckbox: true,
   selectAll: 'currentPage',
   enableClickSelection: false,
-}
+};
 
 export const singleRowSelectionDefaults: RowSelectionOptions = {
   mode: ROW_SELECTION_SINGLE,
@@ -67,4 +71,4 @@ export const singleRowSelectionDefaults: RowSelectionOptions = {
 
 export const containerDefaults = {
   height: 'auto',
-}
+};
