@@ -3,7 +3,7 @@ import { DataGrid } from '@open-kingdom/shared-frontend-ui-datagrid';
 
 export const GridExample = () => {
   // Row Data: The data to be displayed.
-  const [rowData, _setRowData] = useState([
+  const [rowData] = useState([
     { make: 'Tesla', model: 'Model Y', price: 64950, electric: true },
     { make: 'Ford', model: 'F-Series', price: 33850, electric: false },
     { make: 'Toyota', model: 'Corolla', price: 29600, electric: false },
@@ -13,7 +13,7 @@ export const GridExample = () => {
   ]);
 
   // Column Definitions: Defines & controls grid columns.
-  const [colDefs, _setColDefs] = useState([
+  const [colDefs] = useState([
     { field: 'make' },
     { field: 'model' },
     { field: 'price' },
