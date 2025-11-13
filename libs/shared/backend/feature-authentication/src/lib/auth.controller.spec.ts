@@ -54,10 +54,8 @@ describe('AuthController', () => {
       const expectedToken = { access_token: 'jwt-token' };
       authService.login.mockResolvedValue(expectedToken);
 
-      // Using a simplified object type for testing
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const result = await controller.login(
-        mockRequest as any as RequestWithUser
+        mockRequest as unknown as RequestWithUser
       );
 
       // Assert
@@ -87,10 +85,8 @@ describe('AuthController', () => {
       const expectedToken = { access_token: 'different-jwt-token' };
       authService.login.mockResolvedValue(expectedToken);
 
-      // Using a simplified object type for testing
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const result = await controller.login(
-        mockRequest as any as RequestWithUser
+        mockRequest as unknown as RequestWithUser
       );
 
       // Assert
@@ -110,10 +106,8 @@ describe('AuthController', () => {
         logout: () => void;
       };
 
-      // Using a simplified object type for testing
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const result = controller.getProfile(
-        mockRequest as any as RequestWithUser
+        mockRequest as unknown as RequestWithUser
       );
 
       // Assert
@@ -139,10 +133,8 @@ describe('AuthController', () => {
         logout: () => void;
       };
 
-      // Using a simplified object type for testing
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const result = controller.getProfile(
-        mockRequest as any as RequestWithUser
+        mockRequest as unknown as RequestWithUser
       );
 
       // Assert

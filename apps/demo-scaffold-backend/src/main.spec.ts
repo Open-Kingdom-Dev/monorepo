@@ -16,8 +16,13 @@ jest.mock('./app/app.module', () => ({
 }));
 
 describe('Main Module', () => {
-  let mockApp: any;
-  let NestFactory: any;
+  let mockApp: {
+    setGlobalPrefix: jest.Mock;
+    listen: jest.Mock<Promise<void>>;
+  };
+  let NestFactory: {
+    create: jest.Mock;
+  };
 
   beforeEach(async () => {
     jest.clearAllMocks();
@@ -25,7 +30,9 @@ describe('Main Module', () => {
     // Import mocked modules
     const nestCore = await import('@nestjs/core');
 
-    NestFactory = nestCore.NestFactory;
+    NestFactory = nestCore.NestFactory as unknown as {
+      create: jest.Mock;
+    };
 
     // Create mock app
     mockApp = {
