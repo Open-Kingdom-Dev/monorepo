@@ -54,7 +54,9 @@ describe('AuthController', () => {
       const expectedToken = { access_token: 'jwt-token' };
       authService.login.mockResolvedValue(expectedToken);
 
-      const result = await controller.login(mockRequest as RequestWithUser);
+      const result = await controller.login(
+        mockRequest as unknown as RequestWithUser
+      );
 
       // Assert
       expect(result).toEqual(expectedToken);
@@ -83,7 +85,9 @@ describe('AuthController', () => {
       const expectedToken = { access_token: 'different-jwt-token' };
       authService.login.mockResolvedValue(expectedToken);
 
-      const result = await controller.login(mockRequest as RequestWithUser);
+      const result = await controller.login(
+        mockRequest as unknown as RequestWithUser
+      );
 
       // Assert
       expect(result).toEqual(expectedToken);
@@ -102,7 +106,9 @@ describe('AuthController', () => {
         logout: () => void;
       };
 
-      const result = controller.getProfile(mockRequest as RequestWithUser);
+      const result = controller.getProfile(
+        mockRequest as unknown as RequestWithUser
+      );
 
       // Assert
       expect(result).toEqual(mockUser);
@@ -127,7 +133,9 @@ describe('AuthController', () => {
         logout: () => void;
       };
 
-      const result = controller.getProfile(mockRequest as RequestWithUser);
+      const result = controller.getProfile(
+        mockRequest as unknown as RequestWithUser
+      );
 
       // Assert
       expect(result).toEqual(differentUser);

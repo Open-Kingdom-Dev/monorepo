@@ -30,7 +30,9 @@ describe('Main Module', () => {
     // Import mocked modules
     const nestCore = await import('@nestjs/core');
 
-    NestFactory = nestCore.NestFactory;
+    NestFactory = nestCore.NestFactory as unknown as {
+      create: jest.Mock;
+    };
 
     // Create mock app
     mockApp = {
