@@ -40,8 +40,8 @@
     "passport": "^0.7.0",
     "passport-jwt": "^4.0.1",
     "passport-local": "^1.0.0",
-    "react": "19.0.0",
-    "react-dom": "19.0.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
     "react-redux": "^9.2.0",
     "react-router": "^7.2.0",
     "reflect-metadata": "^0.1.13",
@@ -124,6 +124,7 @@
     "libs/shared/poly/*",
     "libs/demo-scaffold/frontend/*",
     "libs/demo-scaffold/backend/*",
-    "libs/demo-scaffold/poly/*"
+    "libs/demo-scaffold/poly/*",
+    "libs/ui/shared/frontend/*"
   ]
 }

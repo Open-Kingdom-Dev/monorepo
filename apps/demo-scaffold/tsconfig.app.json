@@ -57,6 +57,9 @@
     },
     {
       "path": "../../libs/shared/frontend/ui-theme/tsconfig.lib.json"
+    },
+    {
+      "path": "../../libs/shared/frontend/ui-datagrid/tsconfig.lib.json"
     }
   ]
 }

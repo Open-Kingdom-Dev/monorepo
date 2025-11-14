@@ -2,7 +2,7 @@ import { NavLink } from 'react-router';
 
 export function AppNav() {
   return (
-    <nav>
+    <nav className="flex gap-4">
       <NavLink to="/" end>
         Home
       </NavLink>

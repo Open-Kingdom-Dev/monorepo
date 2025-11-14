@@ -18,6 +18,9 @@
       "path": "../../libs/shared/frontend/ui-theme"
     },
     {
+      "path": "../../libs/shared/frontend/ui-datagrid"
+    },
+    {
       "path": "./tsconfig.app.json"
     },
     {
