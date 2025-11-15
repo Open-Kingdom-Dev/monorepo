@@ -40,6 +40,9 @@
             }
           ]
         }
+      },
+      "generate-openapi-all": {
+        "executor": "@open-kingdom/plugin-openapi:swagger-generate-all"
       }
     }
   },
