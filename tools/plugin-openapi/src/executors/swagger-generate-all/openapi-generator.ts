@@ -26,4 +26,3 @@ export async function generateOpenApi(
   console.log(`Generated: ${outputPath}`);
   await app.close();
 }
-

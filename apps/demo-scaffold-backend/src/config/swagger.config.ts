@@ -20,4 +20,3 @@ export function createSwaggerConfig(): DocumentBuilder {
       'JWT-auth' // This name is used as reference in @ApiBearerAuth('JWT-auth')
     );
 }
-

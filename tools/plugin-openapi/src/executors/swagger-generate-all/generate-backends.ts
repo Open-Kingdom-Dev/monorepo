@@ -104,7 +104,10 @@ async function generateAllBackends() {
       let createSwaggerConfig: () => DocumentBuilder;
 
       try {
-        const swaggerConfigPath = join(backend.root, 'src/config/swagger.config');
+        const swaggerConfigPath = join(
+          backend.root,
+          'src/config/swagger.config'
+        );
         const swaggerModule = await import(swaggerConfigPath);
 
         if (swaggerModule.globalPrefix && swaggerModule.createSwaggerConfig) {
@@ -118,7 +121,10 @@ async function generateAllBackends() {
       } catch {
         // Fallback: create a basic config if swagger.config.ts doesn't exist or is invalid
         console.warn(
-          `⚠ Warning: Could not load swagger config from ${join(backend.root, 'src/config/swagger.config.ts')}, using default config`
+          `⚠ Warning: Could not load swagger config from ${join(
+            backend.root,
+            'src/config/swagger.config.ts'
+          )}, using default config`
         );
         globalPrefix = 'api';
         createSwaggerConfig = () =>

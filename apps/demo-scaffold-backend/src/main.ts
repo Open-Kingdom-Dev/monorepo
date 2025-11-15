@@ -6,10 +6,7 @@
 import { Logger } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { SwaggerModule } from '@nestjs/swagger';
-import {
-  createSwaggerConfig,
-  globalPrefix,
-} from './config/swagger.config';
+import { createSwaggerConfig, globalPrefix } from './config/swagger.config';
 
 import { AppModule } from './app/app.module';
 
@@ -33,4 +30,3 @@ export async function bootstrap() {
 }
 
 void bootstrap();
-

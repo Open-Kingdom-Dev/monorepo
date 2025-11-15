@@ -13,4 +13,3 @@ describe('swagger.config', () => {
     expect(built.info.version).toBe('1.0');
   });
 });
-
