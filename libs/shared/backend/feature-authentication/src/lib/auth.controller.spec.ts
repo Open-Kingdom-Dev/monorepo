@@ -3,8 +3,9 @@ import { Request } from 'express';
 
 import { User } from '@open-kingdom/shared-backend-data-access-users';
 
-import { AuthController, RequestWithUser } from './auth.controller';
+import { AuthController } from './auth.controller';
 import { AuthenticationService } from './authentication.service';
+import type { RequestWithUser } from './auth.types';
 
 describe('AuthController', () => {
   let controller: AuthController;

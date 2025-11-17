@@ -2,6 +2,7 @@
   "name": "@open-kingdom/demo-scaffold-backend",
   "version": "0.0.1",
   "private": true,
+  "openapi": true,
   "nx": {
     "tags": [
       "scope:demo-scaffold-backend",

@@ -10,15 +10,18 @@ import {
 
 import { AuthenticationService } from './authentication.service';
 
+jest.mock('bcrypt');
+
 describe('AuthService', () => {
   let service: AuthenticationService;
   let usersService: jest.Mocked<UsersService>;
   let jwtService: jest.Mocked<JwtService>;
+  const mockedBcrypt = bcrypt as jest.Mocked<typeof bcrypt>;
 
   const mockUser: User = {
     id: 1,
     email: 'test@example.com',
-    password: bcrypt.hashSync('password', 12),
+    password: 'hashed-password',
     firstName: 'John',
     lastName: 'Doe',
     invitee: 1,
@@ -54,19 +57,30 @@ describe('AuthService', () => {
   describe('validateUser', () => {
     it('should authenticate user with valid credentials', async () => {
       usersService.findOne.mockResolvedValue(mockUser);
+      mockedBcrypt.compare.mockResolvedValue(true as never);
 
       const result = await service.validateUser(mockUser.email, 'password');
       const { password: _, ...userWithoutPassword } = mockUser;
       expect(result).toEqual(userWithoutPassword);
       expect(usersService.findOne).toHaveBeenCalledWith(mockUser.email);
+      expect(mockedBcrypt.compare).toHaveBeenCalledWith(
+        'password',
+        mockUser.password
+      );
     });
 
     it('should reject authentication for invalid credentials', async () => {
       usersService.findOne.mockResolvedValue(mockUser);
+      mockedBcrypt.compare.mockResolvedValue(false as never);
+
       await expect(
         service.validateUser(mockUser.email, 'invalid-password')
       ).rejects.toThrow(UnauthorizedException);
       expect(usersService.findOne).toHaveBeenCalledWith(mockUser.email);
+      expect(mockedBcrypt.compare).toHaveBeenCalledWith(
+        'invalid-password',
+        mockUser.password
+      );
     });
 
     it('should reject authentication for non-existing user', async () => {

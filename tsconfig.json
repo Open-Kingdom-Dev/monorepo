@@ -49,6 +49,9 @@
       "path": "./libs/shared/poly/util-constants"
     },
     {
+      "path": "./tools/plugin-openapi"
+    },
+    {
       "path": "./libs/shared/frontend/ui-datagrid"
     }
   ]

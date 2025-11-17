@@ -11,6 +11,24 @@ jest.mock('@nestjs/common', () => ({
   },
 }));
 
+const mockSwaggerModule = {
+  createDocument: jest.fn(),
+  setup: jest.fn(),
+};
+
+const mockDocumentBuilderInstance = {
+  build: jest.fn().mockReturnValue({}),
+};
+
+jest.mock('@nestjs/swagger', () => ({
+  SwaggerModule: mockSwaggerModule,
+}));
+
+jest.mock('./config/swagger.config', () => ({
+  globalPrefix: 'api',
+  createSwaggerConfig: jest.fn(() => mockDocumentBuilderInstance),
+}));
+
 jest.mock('./app/app.module', () => ({
   AppModule: class MockAppModule {},
 }));
@@ -23,38 +41,52 @@ describe('Main Module', () => {
   let NestFactory: {
     create: jest.Mock;
   };
+  let bootstrap: () => Promise<void>;
 
   beforeEach(async () => {
     jest.clearAllMocks();
 
-    // Import mocked modules
     const nestCore = await import('@nestjs/core');
-
     NestFactory = nestCore.NestFactory as unknown as {
       create: jest.Mock;
     };
 
-    // Create mock app
     mockApp = {
       setGlobalPrefix: jest.fn(),
       listen: jest.fn().mockResolvedValue(undefined),
     };
-
     NestFactory.create.mockResolvedValue(mockApp);
+
+    mockSwaggerModule.createDocument.mockReturnValue({});
+
+    const mainModule = await import('./main.js');
+    bootstrap = mainModule.bootstrap;
   });
 
   it('should be importable', async () => {
-    // Test that the main module can be imported without errors
     await expect(import('./main.js')).resolves.toBeDefined();
   });
 
-  it('should execute bootstrap function when imported', async () => {
-    // Import the main module (this will execute the bootstrap function)
-    await import('./main.js');
+  it('should execute bootstrap function successfully', async () => {
+    await bootstrap();
 
-    // The bootstrap function should have been called
-    // We can't easily test the exact behavior due to the async nature
-    // but we can verify the module imports without errors
-    expect(true).toBe(true); // This test passes if import succeeds
+    expect(NestFactory.create).toHaveBeenCalledTimes(1);
+    expect(mockApp.setGlobalPrefix).toHaveBeenCalledWith('api');
+    expect(mockDocumentBuilderInstance.build).toHaveBeenCalledTimes(1);
+    expect(mockSwaggerModule.setup).toHaveBeenCalledWith(
+      'swagger',
+      mockApp,
+      expect.any(Function),
+      expect.objectContaining({
+        swaggerOptions: { persistAuthorization: true },
+      })
+    );
+    const [, , documentFactory] = mockSwaggerModule.setup.mock.calls[0];
+    documentFactory();
+    expect(mockSwaggerModule.createDocument).toHaveBeenCalledWith(
+      mockApp,
+      expect.any(Object)
+    );
+    expect(mockApp.listen).toHaveBeenCalled();
   });
 });
