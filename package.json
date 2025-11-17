@@ -8,6 +8,7 @@
   "scripts": {
     "dev": "nx run @open-kingdom/demo-scaffold:dev",
     "dev:backend": "nx run @open-kingdom/demo-scaffold-backend:serve",
+    "swagger:generate-all": "nx run @open-kingdom/plugin-openapi:generate-openapi-all",
     "test": "nx run-many --target=test --all --coverage",
     "test:affected": "nx affected --target=test --coverage",
     "typecheck": "nx run-many --target=typecheck --all",
@@ -16,9 +17,9 @@
     "e2e:open": "nx run demo-scaffold-e2e:e2e --ui",
     "lint": "nx run-many --target=lint --all",
     "lint:fix": "nx run-many --target=lint --all --fix",
-    "format:fix": "nx format",
-    "swagger:generate-all": "nx run @open-kingdom/plugin-openapi:generate-openapi-all",
-    "check-all": "npm run typecheck && npm run lint && npm run format:fix && npm run test && npm run e2e"
+    "format:fix": "nx format --all",
+    "format:check": "nx format:check --all",
+    "check-all": "npm run typecheck && npm run lint && npm run format:check && npm run test && npm run e2e"
   },
   "private": true,
   "dependencies": {
