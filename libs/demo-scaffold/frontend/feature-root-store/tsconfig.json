@@ -3,6 +3,9 @@
   "include": [],
   "references": [
     {
+      "path": "../../../shared/frontend/ui-datagrid"
+    },
+    {
       "path": "../../../shared/frontend/data-access-api-client"
     },
     {

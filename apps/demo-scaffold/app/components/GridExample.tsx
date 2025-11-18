@@ -1,31 +1,59 @@
+import { useDispatch, useSelector } from 'react-redux';
+import { useCallback, useMemo } from 'react';
 import {
   DataGrid,
   type DataGridTheme,
+  setGridState,
+  selectGridInstance,
+  type StorageProvider,
+  type StateUpdatedEvent,
+  type GridState,
 } from '@open-kingdom/shared-frontend-ui-datagrid';
 import { useTheme } from '@open-kingdom/shared-frontend-ui-theme';
+import carsData from '../data/cars.json';
+
+// Create a storage provider that uses localStorage
+const localStorageProvider: StorageProvider = {
+  get: async (key) => localStorage.getItem(key),
+  set: async (key, value) => localStorage.setItem(key, value),
+  remove: async (key) => localStorage.removeItem(key),
+};
 
 export const GridExample = () => {
   const { theme, mode } = useTheme();
+  const dispatch = useDispatch();
 
-  // Row Data: The data to be displayed.
-  const rowData = [
-    { make: 'Tesla', model: 'Model Y', price: 64950, electric: true },
-    { make: 'Ford', model: 'F-Series', price: 33850, electric: false },
-    { make: 'Toyota', model: 'Corolla', price: 29600, electric: false },
-    { make: 'Mercedes', model: 'EQA', price: 48890, electric: true },
-    { make: 'Fiat', model: '500', price: 15774, electric: false },
-    { make: 'Nissan', model: 'Juke', price: 20675, electric: false },
-  ];
+  // Get saved state from Redux for this specific grid
+  const savedState = useSelector(selectGridInstance('car-grid'));
 
-  // Column Definitions: Defines & controls grid columns.
-  const colDefs = [
-    { field: 'make' },
-    { field: 'model' },
-    { field: 'price' },
-    { field: 'electric' },
-  ];
+  // Row Data: The data to be displayed from JSON file
+  // IMPORTANT: Memoize to prevent re-creating on every render
+  const rowData = useMemo(() => carsData.data, []);
 
-  // Container: Defines the grid's theme & dimensions.
+  // Column Definitions: Loaded from JSON file
+  // IMPORTANT: Memoize to prevent re-creating on every render
+  const colDefs = useMemo(() => carsData.columns, []);
+
+  // Handle state updates - sync with Redux
+  const handleStateUpdated = useCallback(
+    (event: StateUpdatedEvent) => {
+      const gridId = 'car-grid';
+      const gridState = event.state;
+
+      dispatch(setGridState({ id: gridId, gridState }));
+    },
+    [dispatch]
+  );
+
+  // Handle state loaded from storage - sync with Redux
+  const handleStateLoaded = useCallback(
+    (gridState: GridState) => {
+      dispatch(setGridState({ id: 'car-grid', gridState }));
+    },
+    [dispatch]
+  );
+
+  // Container: Grid with state persistence and Redux integration
   return (
     <DataGrid
       rowData={rowData}
@@ -33,6 +61,14 @@ export const GridExample = () => {
       mode={mode}
       theme={theme as DataGridTheme}
       enableRowSelection={true}
+      // State persistence configuration
+      enableStatePersistence={true}
+      storageProvider={localStorageProvider}
+      storageKey="car-grid-state"
+      // Redux integration
+      initialState={savedState}
+      onStateUpdated={handleStateUpdated}
+      onStateLoaded={handleStateLoaded}
     />
   );
 };

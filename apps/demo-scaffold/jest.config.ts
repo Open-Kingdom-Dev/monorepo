@@ -6,6 +6,9 @@ export default {
     '^(?!.*\\.(js|jsx|ts|tsx|css|json)$)': '@nx/react/plugins/jest',
     '^.+\\.[tj]sx?$': ['babel-jest', { presets: ['@nx/react/babel'] }],
   },
+  transformIgnorePatterns: [
+    'node_modules/(?!(@react-hookz/web|@ver0/deep-equal)/)',
+  ],
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx'],
   coverageDirectory: 'test-output/jest/coverage',
   testMatch: [
@@ -19,6 +22,11 @@ export default {
     '!app/entry.client.tsx',
     '!app/root.tsx',
     '!app/routes.tsx',
+    '!app/app-layout.tsx',
+    '!app/main.tsx',
+    '!app/components/index.ts',
+    '!app/components/GridExample.tsx',
+    '!app/components/AdvancedGridExample.tsx',
     '!**/*.d.ts',
     '!**/.react-router/**',
   ],

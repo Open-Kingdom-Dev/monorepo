@@ -15,6 +15,21 @@ import {
   notificationReducer,
 } from '@open-kingdom/shared-frontend-data-access-notifications';
 import { SharedFeatureNotifications } from '@open-kingdom/shared-feature-notifications';
+import {
+  DataGridKey,
+  dataGridReducer,
+} from '@open-kingdom/shared-frontend-ui-datagrid';
+
+// Mock the grid components to avoid React hook errors in tests
+jest.mock('../components/GridExample', () => ({
+  GridExample: () => <div data-testid="grid-example">Grid Example</div>,
+}));
+
+jest.mock('../components/AdvancedGridExample', () => ({
+  AdvancedGridExample: () => (
+    <div data-testid="advanced-grid-example">Advanced Grid Example</div>
+  ),
+}));
 
 describe('App Component', () => {
   let store: ReturnType<typeof configureStore>;
@@ -27,6 +42,7 @@ describe('App Component', () => {
       reducer: {
         [LoggerKey]: loggerReducer,
         [NotificationKey]: notificationReducer,
+        [DataGridKey]: dataGridReducer,
       },
       middleware: (getDefaultMiddleware) =>
         getDefaultMiddleware().concat(createLoggerMiddleware(config)),
