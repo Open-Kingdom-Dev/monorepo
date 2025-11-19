@@ -12,6 +12,9 @@
       "path": "../../libs/shared/frontend/data-access-logger"
     },
     {
+      "path": "../../libs/shared/frontend/data-access-api-client"
+    },
+    {
       "path": "../../libs/shared/frontend/feature-notifications"
     },
     {

@@ -43,12 +43,20 @@
       },
       "generate-openapi-all": {
         "executor": "@open-kingdom/plugin-openapi:swagger-generate-all"
+      },
+      "generate-client-all": {
+        "executor": "@open-kingdom/plugin-openapi:generate-all-client",
+        "dependsOn": [
+          "generate-openapi-all"
+        ]
       }
     }
   },
   "dependencies": {
+    "@nx/devkit": "22.0.3",
     "@nestjs/swagger": "^11.0.0",
     "@nx/devkit": "22.0.3",
+    "openapi-typescript": "^7.5.0",
     "tslib": "^2.3.0"
   },
   "devDependencies": {

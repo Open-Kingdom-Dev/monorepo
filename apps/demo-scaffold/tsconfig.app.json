@@ -60,6 +60,9 @@
     },
     {
       "path": "../../libs/shared/frontend/ui-datagrid/tsconfig.lib.json"
+    },
+    {
+      "path": "../../libs/shared/frontend/data-access-api-client/tsconfig.lib.json"
     }
   ]
 }

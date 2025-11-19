@@ -9,12 +9,18 @@ import {
   NotificationKey,
   notificationReducer,
 } from '@open-kingdom/shared-frontend-data-access-notifications';
+import {
+  ApiKey,
+  apiReducer,
+  apiMiddleware,
+} from '@open-kingdom/shared-frontend-data-access-api-client';
 
 export const createRootStore = (config: LoggerConfig) => {
   return configureStore({
     reducer: {
       [LoggerKey]: loggerReducer,
       [NotificationKey]: notificationReducer,
+      [ApiKey]: apiReducer,
       // Add other reducers here as needed
     },
     middleware: (getDefaultMiddleware) => {
@@ -25,7 +31,9 @@ export const createRootStore = (config: LoggerConfig) => {
         },
       });
 
-      return defaultMiddleware.prepend(createLoggerMiddleware(config));
+      return defaultMiddleware
+        .prepend(createLoggerMiddleware(config))
+        .concat(apiMiddleware);
     },
   });
 };
