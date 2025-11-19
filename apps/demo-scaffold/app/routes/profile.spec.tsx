@@ -4,6 +4,8 @@ import {
   configureStore,
   type Middleware,
   type Reducer,
+  type EnhancedStore,
+  type UnknownAction,
 } from '@reduxjs/toolkit';
 import type { Action } from '@reduxjs/toolkit';
 import {
@@ -16,7 +18,12 @@ import {
   NotificationKey,
   notificationReducer,
 } from '@open-kingdom/shared-frontend-data-access-notifications';
-import { baseApi } from '@open-kingdom/shared-frontend-data-access-api-client';
+import {
+  baseApi,
+  AuthKey,
+  authReducer,
+  setToken,
+} from '@open-kingdom/shared-frontend-data-access-api-client';
 import Profile from './profile';
 
 jest.mock('@open-kingdom/shared-frontend-data-access-api-client', () => {
@@ -26,6 +33,29 @@ jest.mock('@open-kingdom/shared-frontend-data-access-api-client', () => {
   const loginMock = jest.fn();
   const profileMock = jest.fn();
 
+  // Auth slice exports
+  const AuthKey = 'auth';
+  const selectIsAuthenticated = (state: {
+    [AuthKey]?: { token: string | null };
+  }) => !!(state[AuthKey] && state[AuthKey].token);
+  const setToken = (token: string | null) => ({
+    type: `${AuthKey}/setToken`,
+    payload: token,
+  });
+  const logout = () => ({ type: `${AuthKey}/logout` });
+  const authReducer = (
+    state: { token: string | null } = { token: null },
+    action: { type: string; payload?: string | null }
+  ) => {
+    if (action.type === `${AuthKey}/setToken`) {
+      return { ...state, token: action.payload ?? null };
+    }
+    if (action.type === `${AuthKey}/logout`) {
+      return { ...state, token: null };
+    }
+    return state;
+  };
+
   return {
     baseApi: {
       reducerPath: 'api',
@@ -34,6 +64,12 @@ jest.mock('@open-kingdom/shared-frontend-data-access-api-client', () => {
     },
     useAuthControllerLoginMutation: loginMock,
     useAuthControllerGetProfileQuery: profileMock,
+    // Auth slice exports
+    AuthKey,
+    authReducer,
+    selectIsAuthenticated,
+    setToken,
+    logout,
     __mockedHooks: {
       loginMock,
       profileMock,
@@ -72,8 +108,13 @@ Object.defineProperty(window, 'localStorage', {
   value: localStorageMock,
 });
 
+interface TestState {
+  auth: { token: string | null };
+  [key: string]: unknown;
+}
+
 describe('Profile Component', () => {
-  let store: ReturnType<typeof configureStore>;
+  let store: EnhancedStore<TestState, UnknownAction>;
 
   beforeEach(() => {
     localStorage.clear();
@@ -92,13 +133,14 @@ describe('Profile Component', () => {
       reducer: {
         [LoggerKey]: loggerReducer,
         [NotificationKey]: notificationReducer,
+        [AuthKey]: authReducer,
         [api.reducerPath]: api.reducer,
       } as Parameters<typeof configureStore>[0]['reducer'],
       middleware: (getDefaultMiddleware) =>
         getDefaultMiddleware()
           .concat(createLoggerMiddleware(config))
           .concat(api.middleware),
-    });
+    }) as unknown as EnhancedStore<TestState, UnknownAction>;
 
     const defaultTrigger = jest.fn().mockReturnValue({
       unwrap: jest.fn().mockResolvedValue({}),
@@ -115,7 +157,10 @@ describe('Profile Component', () => {
     });
   });
 
-  const renderProfile = () => {
+  const renderProfile = (options?: { token?: string }) => {
+    if (options && options.token) {
+      store.dispatch(setToken(options.token));
+    }
     return render(
       <Provider store={store}>
         <Profile />
@@ -175,7 +220,7 @@ describe('Profile Component', () => {
       expect(screen.getByRole('heading', { name: 'Profile' })).toBeTruthy()
     );
 
-    expect(localStorage.getItem('token')).toBe('token-123');
+    expect(store.getState().auth.token).toBe('token-123');
     expect(screen.getByText('user@example.com')).toBeTruthy();
     expect(unwrap).toHaveBeenCalled();
   });
@@ -204,31 +249,28 @@ describe('Profile Component', () => {
   });
 
   it('renders profile loading state', () => {
-    localStorage.setItem('token', 'test-token');
     mockProfileHook.mockReturnValue({
       data: null,
       isLoading: true,
       error: null,
     });
 
-    renderProfile();
+    renderProfile({ token: 'test-token' });
     expect(screen.getByText('Loading...')).toBeTruthy();
   });
 
   it('renders profile error state', () => {
-    localStorage.setItem('token', 'test-token');
     mockProfileHook.mockReturnValue({
       data: null,
       isLoading: false,
       error: { status: 500 },
     });
 
-    renderProfile();
+    renderProfile({ token: 'test-token' });
     expect(screen.getByText('Error loading profile')).toBeTruthy();
   });
 
   it('renders profile data and handles logout', () => {
-    localStorage.setItem('token', 'test-token');
     mockProfileHook.mockReturnValue({
       data: {
         id: 2,
@@ -241,16 +283,15 @@ describe('Profile Component', () => {
       error: null,
     });
 
-    renderProfile();
+    renderProfile({ token: 'test-token' });
     expect(screen.getByText('logout@example.com')).toBeTruthy();
 
     fireEvent.click(screen.getByRole('button', { name: 'Logout' }));
-    expect(localStorage.getItem('token')).toBeNull();
+    expect(store.getState().auth.token).toBeNull();
     expect(screen.getByRole('heading', { name: 'Login' })).toBeTruthy();
   });
 
   it('shows N/A when profile names are missing', () => {
-    localStorage.setItem('token', 'test-token');
     mockProfileHook.mockReturnValue({
       data: {
         id: 3,
@@ -263,7 +304,7 @@ describe('Profile Component', () => {
       error: null,
     });
 
-    renderProfile();
+    renderProfile({ token: 'test-token' });
     const fallbackValues = screen.getAllByText('N/A');
     expect(fallbackValues.length).toBeGreaterThanOrEqual(2);
   });

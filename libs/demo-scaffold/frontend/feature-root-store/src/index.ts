@@ -17,6 +17,10 @@ import {
   ApiKey,
   apiReducer,
   apiMiddleware,
+  AuthKey,
+  authReducer,
+  createAuthListenerMiddleware,
+  createAuthHydrationMiddleware,
 } from '@open-kingdom/shared-frontend-data-access-api-client';
 
 export const createRootStore = (config: LoggerConfig) => {
@@ -26,7 +30,7 @@ export const createRootStore = (config: LoggerConfig) => {
       [NotificationKey]: notificationReducer,
       [DataGridKey]: dataGridReducer,
       [ApiKey]: apiReducer,
-      // Add other reducers here as needed
+      [AuthKey]: authReducer,
     },
     middleware: (getDefaultMiddleware) => {
       const defaultMiddleware = getDefaultMiddleware({
@@ -38,7 +42,9 @@ export const createRootStore = (config: LoggerConfig) => {
 
       return defaultMiddleware
         .prepend(createLoggerMiddleware(config))
-        .concat(apiMiddleware);
+        .prepend(createAuthHydrationMiddleware())
+        .concat(apiMiddleware)
+        .concat(createAuthListenerMiddleware());
     },
   });
 };
