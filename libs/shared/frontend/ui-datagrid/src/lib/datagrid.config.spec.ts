@@ -28,7 +28,9 @@ describe('datagrid.config', () => {
     it('should apply pagination configuration using defined constants', () => {
       expect(gridDefaults.pagination).toBe(true);
       expect(gridDefaults.paginationPageSize).toBe(DEFAULT_PAGE_SIZE);
-      expect(gridDefaults.paginationPageSizeSelector).toBe(DEFAULT_PAGE_SIZE_OPTIONS);
+      expect(gridDefaults.paginationPageSizeSelector).toBe(
+        DEFAULT_PAGE_SIZE_OPTIONS
+      );
     });
 
     it('should apply user experience configuration using defined constants', () => {
@@ -56,11 +58,15 @@ describe('datagrid.config', () => {
     it('should include custom loading overlay template with required elements', () => {
       expect(gridDefaults.overlayLoadingTemplate).toContain('ag-spinner');
       expect(gridDefaults.overlayLoadingTemplate).toContain('Loading data...');
-      expect(gridDefaults.overlayLoadingTemplate).toContain('ag-custom-loading');
+      expect(gridDefaults.overlayLoadingTemplate).toContain(
+        'ag-custom-loading'
+      );
     });
 
     it('should include custom empty state overlay template with required elements', () => {
-      expect(gridDefaults.overlayNoRowsTemplate).toContain('No data to display');
+      expect(gridDefaults.overlayNoRowsTemplate).toContain(
+        'No data to display'
+      );
       expect(gridDefaults.overlayNoRowsTemplate).toContain('ag-custom-no-rows');
     });
   });
