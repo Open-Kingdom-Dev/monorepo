@@ -27,7 +27,9 @@ describe('datagrid.config', () => {
     it('should configure pagination with appropriate defaults', () => {
       expect(gridDefaults.pagination).toBe(true);
       expect(gridDefaults.paginationPageSize).toBe(DEFAULT_PAGE_SIZE);
-      expect(gridDefaults.paginationPageSizeSelector).toBe(DEFAULT_PAGE_SIZE_OPTIONS);
+      expect(gridDefaults.paginationPageSizeSelector).toBe(
+        DEFAULT_PAGE_SIZE_OPTIONS
+      );
     });
 
     it('should auto-size columns when data first renders', () => {
