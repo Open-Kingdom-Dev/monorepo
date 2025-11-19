@@ -2,9 +2,6 @@ import { Module } from '@nestjs/common';
 
 import { OpenKingdomFeatureRootSchemaModule } from '@open-kingdom/demo-scaffold-backend-feature-root-schema';
 
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
-
 @Module({
   imports: [
     OpenKingdomFeatureRootSchemaModule,
@@ -15,7 +12,7 @@ import { AppService } from './app.service';
       })
     ),
   ],
-  controllers: [AppController],
-  providers: [AppService],
+  controllers: [],
+  providers: [],
 })
 export class AppModule {}

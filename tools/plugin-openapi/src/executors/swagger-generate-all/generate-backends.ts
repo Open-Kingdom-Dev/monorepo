@@ -18,6 +18,13 @@ interface Backend {
 
 const workspaceRoot = process.argv[2] || process.cwd();
 
+function nameToSlug(name: string): string {
+  return (name.startsWith('@') ? name.split('/').pop() ?? name : name)
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+}
+
 function findBackends(): Backend[] {
   const backends: Backend[] = [];
   const appsDir = join(workspaceRoot, 'apps');
@@ -133,12 +140,19 @@ async function generateAllBackends() {
             .setVersion(backend.version || '1.0');
       }
 
-      const configuredOutputPath = backend.openApiConfig?.outputPath;
-      const outputPath = configuredOutputPath
-        ? configuredOutputPath.startsWith('/')
-          ? configuredOutputPath
-          : join(backend.root, configuredOutputPath)
-        : join(backend.root, 'openapi.json');
+      // Convert backend name to slug for directory naming
+      const backendSlug = nameToSlug(
+        backend.name || backend.root.split('/').pop() || 'backend'
+      );
+
+      // Write openapi.json to data-access-api-client/src/lib/{backend-slug}/openapi.json
+      const apiClientLibDir = join(
+        workspaceRoot,
+        'libs/shared/frontend/data-access-api-client/src/lib',
+        backendSlug
+      );
+      const outputPath = join(apiClientLibDir, 'openapi.json');
+
       await generateOpenApi({
         appModule: mod.AppModule,
         globalPrefix,

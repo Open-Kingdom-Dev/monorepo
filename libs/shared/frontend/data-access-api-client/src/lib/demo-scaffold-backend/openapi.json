@@ -160,13 +160,13 @@
         "type": "object",
         "properties": {
           "email": {
-            "type": "object",
+            "type": "string",
             "description": "User email address",
             "example": "admin@admin.com",
             "format": "email"
           },
           "password": {
-            "type": "object",
+            "type": "string",
             "description": "User password",
             "example": "admin",
             "minLength": 1

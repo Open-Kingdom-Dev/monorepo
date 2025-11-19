@@ -53,6 +53,9 @@
     },
     {
       "path": "./libs/shared/frontend/ui-datagrid"
+    },
+    {
+      "path": "./libs/shared/frontend/data-access-api-client"
     }
   ]
 }

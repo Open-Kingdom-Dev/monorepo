@@ -5,15 +5,16 @@ export class LoginDto {
     description: 'User email address',
     example: 'admin@admin.com',
     format: 'email',
+    type: 'string',
   })
-  email = '';
+  email: string | undefined;
 
   @ApiProperty({
     description: 'User password',
     example: 'admin',
     minLength: 1,
   })
-  password = '';
+  password: string | undefined;
 }
 
 export class LoginResponseDto {

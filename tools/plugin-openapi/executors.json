@@ -4,6 +4,11 @@
       "implementation": "./dist/executors/swagger-generate-all/swagger-generate-all",
       "schema": "./dist/executors/swagger-generate-all/schema.json",
       "description": "Generate all OpenAPI schemas"
+    },
+    "generate-all-client": {
+      "implementation": "./dist/executors/generate-all-client/generate-all-client",
+      "schema": "./dist/executors/generate-all-client/schema.json",
+      "description": "Generate TypeScript clients for all OpenAPI-enabled backends"
     }
   }
 }

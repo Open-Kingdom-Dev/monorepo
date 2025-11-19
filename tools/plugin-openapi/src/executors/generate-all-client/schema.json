@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json-schema.org/schema",
+  "version": 2,
+  "title": "GenerateAllClient executor",
+  "description": "Generate API clients for all backends with OpenAPI enabled.",
+  "type": "object",
+  "properties": {
+    "outputRoot": {
+      "type": "string",
+      "description": "Relative path where generated clients should be written.",
+      "default": "libs/shared/frontend/data-access-api-client/src/lib"
+    }
+  },
+  "required": []
+}
