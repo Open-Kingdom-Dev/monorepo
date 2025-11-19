@@ -1,6 +1,12 @@
-import { DataGrid } from '@open-kingdom/shared-frontend-ui-datagrid';
+import {
+  DataGrid,
+  type DataGridTheme,
+} from '@open-kingdom/shared-frontend-ui-datagrid';
+import { useTheme } from '@open-kingdom/shared-frontend-ui-theme';
 
 export const GridExample = () => {
+  const { theme, mode } = useTheme();
+
   // Row Data: The data to be displayed.
   const rowData = [
     { make: 'Tesla', model: 'Model Y', price: 64950, electric: true },
@@ -24,6 +30,8 @@ export const GridExample = () => {
     <DataGrid
       rowData={rowData}
       columnDefs={colDefs}
+      mode={mode}
+      theme={theme as DataGridTheme}
       enableRowSelection={true}
     />
   );
