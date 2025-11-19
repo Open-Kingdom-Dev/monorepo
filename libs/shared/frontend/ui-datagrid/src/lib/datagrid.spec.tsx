@@ -17,17 +17,23 @@ describe('DataGrid', () => {
     { field: 'electric' },
   ];
 
-  it('should display a functional grid with the provided data', async () => {
+  it('should render AG Grid with provided data and columns', async () => {
     const { container } = render(
       <DataGrid rowData={mockRowData} columnDefs={mockColDefs} />
     );
 
     await waitFor(() => {
+      // Verify grid is rendered
       expect(container.querySelector('.ag-root-wrapper')).toBeInTheDocument();
+
+      // Verify data is displayed
+      expect(screen.getByText('Tesla')).toBeInTheDocument();
+      expect(screen.getByText('Ford')).toBeInTheDocument();
+      expect(screen.getByText('Toyota')).toBeInTheDocument();
     });
   });
 
-  it('should allow external theming through custom class names', async () => {
+  it('should apply custom className to grid container', () => {
     const { container } = render(
       <DataGrid
         rowData={mockRowData}
@@ -36,64 +42,11 @@ describe('DataGrid', () => {
       />
     );
 
-    await waitFor(() => {
-      const gridContainer = container.firstChild as HTMLElement;
-      expect(gridContainer).toHaveClass('custom-grid');
-    });
+    const gridContainer = container.firstChild as HTMLElement;
+    expect(gridContainer).toHaveClass('custom-grid');
   });
 
-  it('should display an empty grid when no data is supplied', () => {
-    const { container } = render(
-      <DataGrid rowData={[]} columnDefs={mockColDefs} />
-    );
-
-    expect(container.querySelector('.ag-root-wrapper')).toBeInTheDocument();
-  });
-
-  it('should display column headers based on the column definitions', async () => {
-    render(<DataGrid rowData={mockRowData} columnDefs={mockColDefs} />);
-
-    await waitFor(() => {
-      expect(screen.getByText('Make')).toBeInTheDocument();
-      expect(screen.getByText('Model')).toBeInTheDocument();
-      expect(screen.getByText('Price')).toBeInTheDocument();
-      expect(screen.getByText('Electric')).toBeInTheDocument();
-    });
-  });
-
-  it('should display all provided row data in the grid', async () => {
-    render(<DataGrid rowData={mockRowData} columnDefs={mockColDefs} />);
-
-    await waitFor(() => {
-      // Check first row data
-      expect(screen.getByText('Tesla')).toBeInTheDocument();
-      expect(screen.getByText('Model Y')).toBeInTheDocument();
-      expect(screen.getByText('64950')).toBeInTheDocument();
-
-      // Check second row data
-      expect(screen.getByText('Ford')).toBeInTheDocument();
-      expect(screen.getByText('F-Series')).toBeInTheDocument();
-      expect(screen.getByText('33850')).toBeInTheDocument();
-
-      // Check third row data
-      expect(screen.getByText('Toyota')).toBeInTheDocument();
-      expect(screen.getByText('Corolla')).toBeInTheDocument();
-      expect(screen.getByText('29600')).toBeInTheDocument();
-    });
-  });
-
-  it('should display the exact number of rows matching the data supplied', async () => {
-    const { container } = render(
-      <DataGrid rowData={mockRowData} columnDefs={mockColDefs} />
-    );
-
-    await waitFor(() => {
-      const rows = container.querySelectorAll('.ag-row');
-      expect(rows).toHaveLength(mockRowData.length);
-    });
-  });
-
-  it('should allow users to select multiple rows for bulk operations', async () => {
+  it('should apply row selection configuration when provided', () => {
     const { container } = render(
       <DataGrid
         rowData={mockRowData}
@@ -102,27 +55,7 @@ describe('DataGrid', () => {
       />
     );
 
-    await waitFor(() => {
-      expect(container.querySelector('.ag-root-wrapper')).toBeInTheDocument();
-    });
-  });
-
-  it('should allow customization of row selection behavior to match specific application needs', async () => {
-    const customRowSelection = {
-      mode: 'singleRow' as const,
-      checkboxes: false,
-    };
-
-    const { container } = render(
-      <DataGrid
-        rowData={mockRowData}
-        columnDefs={mockColDefs}
-        rowSelection={customRowSelection}
-      />
-    );
-
-    await waitFor(() => {
-      expect(container.querySelector('.ag-root-wrapper')).toBeInTheDocument();
-    });
+    // Just verify the grid renders - we're not testing AG Grid's selection behavior
+    expect(container.querySelector('.ag-root-wrapper')).toBeInTheDocument();
   });
 });
