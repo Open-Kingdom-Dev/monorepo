@@ -21,7 +21,7 @@
     "tslib": "^2.3.0",
     "@nestjs/testing": "^11.0.0",
     "@knaadh/nestjs-drizzle-better-sqlite3": "^1.2.0",
-    "@open-kingdom/shared-poly-util-constants": "workspace:*",
+    "@open-kingdom/shared-poly-util-constants": "0.0.1",
     "@nestjs/common": "^11.0.0",
     "drizzle-orm": "^0.44.5",
     "bcrypt": "^5.1.1"
