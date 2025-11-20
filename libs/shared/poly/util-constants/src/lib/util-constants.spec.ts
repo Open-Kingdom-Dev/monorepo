@@ -1,4 +1,4 @@
-import { DB_TAG } from './util-constants';
+import { DB_TAG } from './util-constants.js';
 
 describe('utilConstants', () => {
   it('should work', () => {
