@@ -31,8 +31,7 @@
       },
       "exclude": [
         "libs/shared/backend/data-access-database-setup/*",
-        "libs/demo-scaffold/backend/demo-scaffold-backend/feature-root-schema/*",
-        "libs/shared/poly/util-constants/*"
+        "libs/demo-scaffold/backend/demo-scaffold-backend/feature-root-schema/*"
       ]
     },
     {
@@ -92,8 +91,7 @@
       "plugin": "@nx/js/typescript",
       "include": [
         "libs/shared/backend/data-access-database-setup/*",
-        "libs/demo-scaffold/backend/feature-root-schema/*",
-        "libs/shared/poly/util-constants/*"
+        "libs/demo-scaffold/backend/feature-root-schema/*"
       ],
       "options": {
         "typecheck": {
@@ -136,5 +134,16 @@
         "unitTestRunner": "jest"
       }
     }
-  }
+  },
+  "release": {
+    "projects": [
+      "libs/shared/frontend/*",
+      "libs/shared/backend/*",
+      "libs/shared/poly/*"
+    ],
+    "version": {
+      "preVersionCommand": "npx nx run-many -t build"
+    }
+  },
+  "nxCloudId": "691e9b2ee857f506676606a7"
 }

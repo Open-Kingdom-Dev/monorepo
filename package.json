@@ -78,7 +78,7 @@
     "@swc/jest": "~0.2.38",
     "@testing-library/dom": "10.4.0",
     "@testing-library/jest-dom": "^6.6.4",
-    "@testing-library/react": "16.1.0",
+    "@testing-library/react": "16.3.0",
     "@types/bcrypt": "^6.0.0",
     "@types/jest": "^30.0.0",
     "@types/node": "20.19.9",
@@ -88,6 +88,7 @@
     "@types/react-dom": "19.0.0",
     "@vitejs/plugin-react": "^4.2.0",
     "@vitest/ui": "^3.0.0",
+    "ajv": "^8.0.0",
     "autoprefixer": "10.4.13",
     "babel-jest": "^30.0.2",
     "drizzle-kit": "^0.31.4",
@@ -116,7 +117,9 @@
     "tsx": "^4.20.5",
     "typescript": "~5.8.2",
     "typescript-eslint": "^8.29.0",
-    "vite": "^6.0.0",
+    "verdaccio": "^6.0.5",
+    "vite": "^7.0.0",
+    "vite-plugin-dts": "~4.5.0",
     "vitest": "^3.0.0",
     "webpack-cli": "^5.1.4"
   },
@@ -130,5 +133,18 @@
     "libs/demo-scaffold/poly/*",
     "tools/plugin-openapi",
     "libs/ui/shared/frontend/*"
-  ]
+  ],
+  "nx": {
+    "includedScripts": [],
+    "targets": {
+      "local-registry": {
+        "executor": "@nx/js:verdaccio",
+        "options": {
+          "port": 4873,
+          "config": ".verdaccio/config.yml",
+          "storage": "tmp/local-registry/storage"
+        }
+      }
+    }
+  }
 }
