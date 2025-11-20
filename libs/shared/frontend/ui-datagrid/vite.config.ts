@@ -49,7 +49,7 @@ export default defineConfig(() => ({
         '@reduxjs/toolkit',
         'react-redux',
         'lodash-es',
-        /^lodash-es\/.*/
+        /^lodash-es\/.*/,
       ],
     },
   },
