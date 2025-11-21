@@ -19,16 +19,12 @@ export const GridExample = () => {
     { field: 'electric' },
   ];
 
-  const defaultColDef = {
-    flex: 1,
-  };
-
   // Container: Defines the grid's theme & dimensions.
   return (
     <DataGrid
       rowData={rowData}
       columnDefs={colDefs}
-      defaultColDef={defaultColDef}
+      enableRowSelection={true}
     />
   );
 };
