@@ -10,6 +10,7 @@ import {
   ModuleRegistry,
   DataGridProps,
 } from './datagrid.types';
+import { DataGridThemeAdapter } from './theme';
 
 ModuleRegistry.registerModules([AllCommunityModule]);
 
@@ -18,6 +19,8 @@ export const DataGrid = ({
   rowSelection,
   containerStyle = containerDefaults,
   enableRowSelection = false,
+  mode,
+  theme,
   ...props
 }: DataGridProps) => {
   const rowSelectionOptions =
@@ -26,10 +29,13 @@ export const DataGrid = ({
       ? multiRowSelectionDefaults
       : singleRowSelectionDefaults);
 
+  const currentTheme = DataGridThemeAdapter.adapt(theme, mode);
+
   return (
     <AgGridReact
       {...gridDefaults}
       {...props}
+      theme={currentTheme}
       className={className}
       containerStyle={containerStyle}
       rowSelection={rowSelectionOptions}
