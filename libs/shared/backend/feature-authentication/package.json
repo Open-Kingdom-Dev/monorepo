@@ -17,6 +17,9 @@
     "dist",
     "!**/*.tsbuildinfo"
   ],
+  "publishConfig": {
+    "access": "public"
+  },
   "dependencies": {
     "@nestjs/common": "11.1.6",
     "tslib": "2.8.1",

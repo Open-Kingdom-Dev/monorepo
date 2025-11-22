@@ -17,6 +17,9 @@
     "dist",
     "!**/*.tsbuildinfo"
   ],
+  "publishConfig": {
+    "access": "public"
+  },
   "dependencies": {
     "tslib": "^2.3.0",
     "@knaadh/nestjs-drizzle-better-sqlite3": "^1.2.0",

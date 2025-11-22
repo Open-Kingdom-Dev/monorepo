@@ -18,6 +18,9 @@
     "dist",
     "!**/*.tsbuildinfo"
   ],
+  "publishConfig": {
+    "access": "public"
+  },
   "nx": {
     "name": "@open-kingdom/shared-frontend-data-access-logger",
     "tags": [
