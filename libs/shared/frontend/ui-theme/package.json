@@ -12,6 +12,7 @@
       "development": "./src/index.ts",
       "default": "./dist/index.js"
     },
+    "./tailwind.config.js": "./dist/tailwind.config.js",
     "./package.json": "./package.json"
   },
   "files": [

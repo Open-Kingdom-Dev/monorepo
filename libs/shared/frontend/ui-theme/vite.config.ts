@@ -3,6 +3,7 @@ import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import dts from 'vite-plugin-dts';
 import * as path from 'path';
+import { copyFileSync } from 'fs';
 
 export default defineConfig(() => ({
   root: __dirname,
@@ -13,6 +14,16 @@ export default defineConfig(() => ({
       entryRoot: 'src',
       tsconfigPath: path.join(__dirname, 'tsconfig.lib.json'),
     }),
+    // Plugin to copy tailwind.config.js to dist
+    {
+      name: 'copy-tailwind-config',
+      closeBundle() {
+        copyFileSync(
+          path.join(__dirname, 'src/tailwind.config.js'),
+          path.join(__dirname, 'dist/tailwind.config.js')
+        );
+      },
+    },
   ],
   // Uncomment this if you are using workers.
   // worker: {

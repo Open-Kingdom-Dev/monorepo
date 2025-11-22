@@ -47,7 +47,7 @@ The library provides a base Tailwind configuration that can be extended by appli
 
 ```javascript
 // tailwind.config.js
-const baseConfig = require('@open-kingdom/shared-frontend-ui-theme/src/tailwind.config.js');
+const baseConfig = require('@open-kingdom/shared-frontend-ui-theme/tailwind.config.js');
 
 module.exports = {
   presets: [baseConfig],
