@@ -142,6 +142,7 @@
       "libs/shared/poly/*"
     ],
     "version": {
+      "conventionalCommits": true,
       "preVersionCommand": "npx nx run-many -t build"
     }
   },
