@@ -27,6 +27,9 @@
       "path": "../../libs/demo-scaffold/backend/feature-root-schema/tsconfig.lib.json"
     },
     {
+      "path": "../../libs/shared/poly/util-env-config/tsconfig.lib.json"
+    },
+    {
       "path": "../../libs/shared/backend/feature-authentication/tsconfig.lib.json"
     }
   ]
