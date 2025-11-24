@@ -1,26 +1,21 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
+import { AuthAdapter } from './adapters/adapters.types';
 
 export const ApiKey = 'api';
 
-const getToken = (): string | null => {
-  if (typeof window === 'undefined') {
-    return null;
-  }
-  try {
-    return window.localStorage.getItem('token');
-  } catch {
-    return null;
-  }
-};
+let globalAdapter: AuthAdapter | null = null;
+
+export function configureApiClient(config: { authAdapter: AuthAdapter }) {
+  globalAdapter = config.authAdapter;
+}
 
 export const baseApi = createApi({
   reducerPath: ApiKey,
   baseQuery: fetchBaseQuery({
     baseUrl: process.env.VITE_API_BASE_URL || '',
     prepareHeaders: (headers) => {
-      const token = getToken();
-      if (token) {
-        headers.set('Authorization', `Bearer ${token}`);
+      if (globalAdapter) {
+        globalAdapter.prepareHeaders(headers);
       }
       return headers;
     },
