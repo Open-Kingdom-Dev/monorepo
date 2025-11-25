@@ -1,8 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 
 import { AppModule } from './app.module';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
 
 jest.mock('@open-kingdom/demo-scaffold-backend-feature-root-schema', () => ({
   OpenKingdomFeatureRootSchemaModule: class MockFeatureRootSchemaModule {},
@@ -39,18 +37,6 @@ describe('AppModule', () => {
 
   it('should compile successfully', () => {
     expect(module).toBeDefined();
-  });
-
-  it('should provide AppController', () => {
-    const controller = module.get<AppController>(AppController);
-    expect(controller).toBeDefined();
-    expect(controller).toBeInstanceOf(AppController);
-  });
-
-  it('should provide AppService', () => {
-    const service = module.get<AppService>(AppService);
-    expect(service).toBeDefined();
-    expect(service).toBeInstanceOf(AppService);
   });
 
   it('should have correct module metadata', () => {

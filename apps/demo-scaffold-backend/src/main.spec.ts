@@ -36,6 +36,7 @@ jest.mock('./app/app.module', () => ({
 describe('Main Module', () => {
   let mockApp: {
     setGlobalPrefix: jest.Mock;
+    enableCors: jest.Mock;
     listen: jest.Mock<Promise<void>>;
   };
   let NestFactory: {
@@ -53,6 +54,7 @@ describe('Main Module', () => {
 
     mockApp = {
       setGlobalPrefix: jest.fn(),
+      enableCors: jest.fn(),
       listen: jest.fn().mockResolvedValue(undefined),
     };
     NestFactory.create.mockResolvedValue(mockApp);

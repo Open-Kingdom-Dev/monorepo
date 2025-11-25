@@ -8,7 +8,6 @@
   "scripts": {
     "dev": "nx run @open-kingdom/demo-scaffold:dev",
     "dev:backend": "nx run @open-kingdom/demo-scaffold-backend:serve",
-    "swagger:generate-all": "nx run @open-kingdom/plugin-openapi:generate-openapi-all",
     "test": "nx run-many --target=test --all --coverage",
     "test:affected": "nx affected --target=test --coverage",
     "typecheck": "nx run-many --target=typecheck --all",
@@ -19,7 +18,9 @@
     "lint:fix": "nx run-many --target=lint --all --fix",
     "format:fix": "nx format --all",
     "format:check": "nx format:check --all",
-    "check-all": "npm run typecheck && npm run lint && npm run format:check && npm run test && npm run e2e"
+    "check-all": "npm run typecheck && npm run lint && npm run format:check && npm run test && npm run e2e",
+    "swagger:generate-all": "nx run @open-kingdom/plugin-openapi:generate-openapi-all",
+    "client:generate-all": "nx run @open-kingdom/plugin-openapi:generate-client-all"
   },
   "private": true,
   "dependencies": {
@@ -71,6 +72,7 @@
     "@nx/workspace": "22.0.3",
     "@playwright/test": "^1.36.0",
     "@react-router/dev": "^7.2.0",
+    "@rtk-query/codegen-openapi": "^2.1.0",
     "@swc-node/register": "~1.9.1",
     "@swc/cli": "~0.6.0",
     "@swc/core": "~1.5.7",

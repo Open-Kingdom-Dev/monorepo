@@ -22,7 +22,6 @@ export async function bootstrap() {
       persistAuthorization: true, // Persist authorization across page refreshes
     },
   });
-
   await app.listen(port);
   Logger.log(
     `🚀 Application is running on: http://localhost:${port}/${globalPrefix}`

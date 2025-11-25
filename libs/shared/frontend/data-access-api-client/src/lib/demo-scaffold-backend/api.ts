@@ -1,0 +1,79 @@
+// AUTO-GENERATED FILE. DO NOT EDIT.
+// Run "nx run @open-kingdom/plugin-openapi:generate-client-all" to regenerate.
+import { baseApi as api } from '../baseApi';
+export const addTagTypes = ['App', 'Authentication'] as const;
+const injectedRtkApi = api
+  .enhanceEndpoints({
+    addTagTypes,
+  })
+  .injectEndpoints({
+    endpoints: (build) => ({
+      appControllerGetData: build.query<
+        AppControllerGetDataApiResponse,
+        AppControllerGetDataApiArg
+      >({
+        query: () => ({ url: `/api` }),
+        providesTags: ['App'],
+      }),
+      authControllerLogin: build.mutation<
+        AuthControllerLoginApiResponse,
+        AuthControllerLoginApiArg
+      >({
+        query: (queryArg) => ({
+          url: `/api/auth/login`,
+          method: 'POST',
+          body: queryArg.loginDto,
+        }),
+        invalidatesTags: ['Authentication'],
+      }),
+      authControllerGetProfile: build.query<
+        AuthControllerGetProfileApiResponse,
+        AuthControllerGetProfileApiArg
+      >({
+        query: () => ({ url: `/api/profile` }),
+        providesTags: ['Authentication'],
+      }),
+    }),
+    overrideExisting: false,
+  });
+export { injectedRtkApi as api };
+export type AppControllerGetDataApiResponse = unknown;
+export type AppControllerGetDataApiArg = void;
+export type AuthControllerLoginApiResponse =
+  /** status 200 Login successful */ LoginResponseDto;
+export type AuthControllerLoginApiArg = {
+  /** User login credentials */
+  loginDto: LoginDto;
+};
+export type AuthControllerGetProfileApiResponse =
+  /** status 200 User profile retrieved successfully */ ProfileResponseDto;
+export type AuthControllerGetProfileApiArg = void;
+export type LoginResponseDto = {
+  /** JWT access token */
+  access_token: string;
+};
+export type LoginDto = {
+  /** User email address */
+  email: string;
+  /** User password */
+  password: string;
+};
+export type ProfileResponseDto = {
+  /** User ID */
+  id: number;
+  /** User first name */
+  firstName: string | null;
+  /** User last name */
+  lastName: string | null;
+  /** User email address */
+  email: string;
+  /** ID of user who invited this user */
+  invitee: number | null;
+  /** User role */
+  role: 'guest' | 'user' | 'admin';
+};
+export const {
+  useAppControllerGetDataQuery,
+  useAuthControllerLoginMutation,
+  useAuthControllerGetProfileQuery,
+} = injectedRtkApi;
