@@ -11,7 +11,7 @@ import {
   showSuccessNotification,
   showWarningNotification,
 } from '@open-kingdom/shared-frontend-data-access-notifications';
-import { GridExample } from '../components';
+import { AdvancedGridExample, GridExample } from '../components';
 
 export function Home() {
   const logs = useSelector(selectLogs);
@@ -149,6 +149,12 @@ export function Home() {
         </h2>
 
         <GridExample />
+
+        <h2 className="text-2xl font-semibold mb-4 text-neutral-800 dark:text-neutral-200 mt-6">
+          Advanced Data Grid Demo
+        </h2>
+
+        <AdvancedGridExample />
       </div>
     </>
   );

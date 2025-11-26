@@ -11,3 +11,4 @@
 apps/demo-scaffold-e2e/test-output/
 **/test-report.html
 CHANGELOG.md
+libs/shared/frontend/data-access-api-client/src/lib/demo-scaffold-backend/api.ts

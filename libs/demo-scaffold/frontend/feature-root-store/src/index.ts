@@ -10,6 +10,10 @@ import {
   notificationReducer,
 } from '@open-kingdom/shared-frontend-data-access-notifications';
 import {
+  DataGridKey,
+  dataGridReducer,
+} from '@open-kingdom/shared-frontend-ui-datagrid';
+import {
   ApiKey,
   apiReducer,
   apiMiddleware,
@@ -20,6 +24,7 @@ export const createRootStore = (config: LoggerConfig) => {
     reducer: {
       [LoggerKey]: loggerReducer,
       [NotificationKey]: notificationReducer,
+      [DataGridKey]: dataGridReducer,
       [ApiKey]: apiReducer,
       // Add other reducers here as needed
     },
