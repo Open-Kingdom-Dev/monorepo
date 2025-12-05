@@ -28,6 +28,7 @@ export default {
     '!app/components/GridExample.tsx',
     '!app/components/AdvancedGridExample.tsx',
     '!app/components/Profile.tsx',
+    '!app/components/ErrorAutologgerExample.tsx',
     '!**/*.d.ts',
     '!**/.react-router/**',
   ],
