@@ -1,4 +1,4 @@
-import { createAppStore, getLoggerConfig } from './store.config';
+import { createAppStore } from './store.config';
 import { LoggerKey } from '@open-kingdom/shared-frontend-data-access-logger';
 
 describe('Store Configuration', () => {
@@ -36,23 +36,6 @@ describe('Store Configuration', () => {
       expect(consoleSpy).toHaveBeenCalledWith('[INFO] Test message');
 
       consoleSpy.mockRestore();
-    });
-  });
-
-  describe('getLoggerConfig', () => {
-    it('should return console logger configuration', () => {
-      const config = getLoggerConfig();
-
-      expect(config).toEqual({
-        destination: 'console',
-      });
-    });
-
-    it('should have correct destination type', () => {
-      const config = getLoggerConfig();
-
-      expect(config.destination).toBe('console');
-      expect(typeof config.destination).toBe('string');
     });
   });
 });

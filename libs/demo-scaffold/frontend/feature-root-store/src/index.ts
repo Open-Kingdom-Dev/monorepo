@@ -1,8 +1,8 @@
 import { configureStore } from '@reduxjs/toolkit';
 import {
-  LoggerConfig,
   LoggerKey,
-  createLoggerMiddleware,
+  createConsoleLoggerMiddleware,
+  createHttpLoggerMiddleware,
   loggerReducer,
   addLog,
 } from '@open-kingdom/shared-frontend-data-access-logger';
@@ -26,7 +26,7 @@ import {
 } from '@open-kingdom/shared-frontend-data-access-api-client';
 import { createReduxRTKErrorMiddleware } from '@open-kingdom/shared-frontend-feature-error-autologger';
 
-export const createRootStore = (config: LoggerConfig) => {
+export const createRootStore = () => {
   const rtkErrorMiddleware = createReduxRTKErrorMiddleware({
     logAction: addLog,
     notifyAction: showErrorNotification,
@@ -47,7 +47,8 @@ export const createRootStore = (config: LoggerConfig) => {
           ignoredActions: ['persist/PERSIST'],
         },
       })
-        .prepend(createLoggerMiddleware(config))
+        .prepend(createConsoleLoggerMiddleware())
+        .prepend(createHttpLoggerMiddleware())
         .prepend(createAuthHydrationMiddleware())
         .concat(apiMiddleware)
         .concat(createAuthListenerMiddleware())

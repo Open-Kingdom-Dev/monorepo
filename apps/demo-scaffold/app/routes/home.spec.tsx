@@ -5,8 +5,7 @@ import { Home } from './home';
 import {
   LoggerKey,
   loggerReducer,
-  createLoggerMiddleware,
-  LoggerConfig,
+  createConsoleLoggerMiddleware,
   LoggerState,
 } from '@open-kingdom/shared-frontend-data-access-logger';
 import { ThemeProvider } from '@open-kingdom/shared-frontend-ui-theme';
@@ -36,8 +35,6 @@ describe('App Component', () => {
   let consoleInfoSpy: jest.SpyInstance;
 
   beforeEach(() => {
-    const config: LoggerConfig = { destination: 'console' };
-
     store = configureStore({
       reducer: {
         [LoggerKey]: loggerReducer,
@@ -45,7 +42,7 @@ describe('App Component', () => {
         [DataGridKey]: dataGridReducer,
       },
       middleware: (getDefaultMiddleware) =>
-        getDefaultMiddleware().concat(createLoggerMiddleware(config)),
+        getDefaultMiddleware().concat(createConsoleLoggerMiddleware()),
     });
 
     consoleInfoSpy = jest.spyOn(console, 'info').mockImplementation();

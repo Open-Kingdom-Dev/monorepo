@@ -11,8 +11,7 @@ import type { Action } from '@reduxjs/toolkit';
 import {
   LoggerKey,
   loggerReducer,
-  createLoggerMiddleware,
-  LoggerConfig,
+  createConsoleLoggerMiddleware,
 } from '@open-kingdom/shared-frontend-data-access-logger';
 import {
   NotificationKey,
@@ -120,8 +119,6 @@ describe('Profile Component', () => {
     localStorage.clear();
     jest.clearAllMocks();
 
-    const config: LoggerConfig = { destination: 'console' };
-
     type MockApi = {
       reducerPath: string;
       reducer: Reducer<unknown, Action>;
@@ -138,7 +135,7 @@ describe('Profile Component', () => {
       } as Parameters<typeof configureStore>[0]['reducer'],
       middleware: (getDefaultMiddleware) =>
         getDefaultMiddleware()
-          .concat(createLoggerMiddleware(config))
+          .concat(createConsoleLoggerMiddleware())
           .concat(api.middleware),
     }) as unknown as EnhancedStore<TestState, UnknownAction>;
 

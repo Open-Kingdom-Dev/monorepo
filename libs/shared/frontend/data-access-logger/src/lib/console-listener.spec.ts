@@ -1,4 +1,4 @@
-import { createConsoleListenerMiddleware } from './console-listener';
+import { createConsoleLoggerMiddleware } from './console-listener';
 import { configureStore } from '@reduxjs/toolkit';
 import { loggerReducer, addLog } from './logger.slice';
 import { logInfo, logWarn, logError } from './logger.actions';
@@ -15,7 +15,7 @@ describe('Console Listener', () => {
         logger: loggerReducer,
       },
       middleware: (getDefaultMiddleware) =>
-        getDefaultMiddleware().concat(createConsoleListenerMiddleware()),
+        getDefaultMiddleware().concat(createConsoleLoggerMiddleware()),
     });
 
     consoleInfoSpy = jest.spyOn(console, 'info').mockImplementation();
@@ -30,11 +30,11 @@ describe('Console Listener', () => {
   });
 
   it('should be defined', () => {
-    expect(createConsoleListenerMiddleware).toBeDefined();
+    expect(createConsoleLoggerMiddleware).toBeDefined();
   });
 
   it('should create middleware function', () => {
-    const middleware = createConsoleListenerMiddleware();
+    const middleware = createConsoleLoggerMiddleware();
     expect(typeof middleware).toBe('function');
   });
 
