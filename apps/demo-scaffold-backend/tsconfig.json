@@ -7,6 +7,9 @@
       "path": "../../libs/demo-scaffold/backend/feature-root-schema"
     },
     {
+      "path": "../../libs/shared/poly/util-env-config"
+    },
+    {
       "path": "../../libs/shared/backend/feature-authentication"
     },
     {

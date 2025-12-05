@@ -1,6 +1,13 @@
 import { Test, TestingModule } from '@nestjs/testing';
+import {
+  createConfigService,
+  nodeEnvAdapter,
+} from '@open-kingdom/shared-poly-util-env-config';
 
 import { AppModule } from './app.module';
+
+const envKeys = ['JWT_SECRET', 'JWT_EXPIRES_IN'] as const;
+const configService = createConfigService(envKeys, nodeEnvAdapter);
 
 jest.mock('@open-kingdom/demo-scaffold-backend-feature-root-schema', () => ({
   OpenKingdomFeatureRootSchemaModule: class MockFeatureRootSchemaModule {},
@@ -58,8 +65,8 @@ describe('AppModule', () => {
 
     // Verify that forRoot was called
     expect(OpenKingdomFeatureBackendAuthModule.forRoot).toHaveBeenCalledWith({
-      jwtSecret: process.env.JWT_SECRET || 'your-secret-key-here',
-      jwtExpiresIn: '1h',
+      jwtSecret: configService.get('JWT_SECRET', 'your-secret-key-here'),
+      jwtExpiresIn: configService.get('JWT_EXPIRES_IN', '1h'),
     });
   });
 });

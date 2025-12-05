@@ -56,6 +56,9 @@
     },
     {
       "path": "./libs/shared/frontend/data-access-api-client"
+    },
+    {
+      "path": "./libs/shared/poly/util-env-config"
     }
   ]
 }
