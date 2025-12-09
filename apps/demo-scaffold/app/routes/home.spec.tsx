@@ -18,6 +18,11 @@ import {
   DataGridKey,
   dataGridReducer,
 } from '@open-kingdom/shared-frontend-ui-datagrid';
+import {
+  CatFactsApiKey,
+  catFactsApiReducer,
+  catFactsApiMiddleware,
+} from '@open-kingdom/shared-frontend-data-access-external-api';
 
 // Mock the grid components to avoid React hook errors in tests
 jest.mock('../components/GridExample', () => ({
@@ -30,6 +35,19 @@ jest.mock('../components/AdvancedGridExample', () => ({
   ),
 }));
 
+// Mock the external API hook
+jest.mock('@open-kingdom/shared-frontend-data-access-external-api', () => ({
+  ...jest.requireActual(
+    '@open-kingdom/shared-frontend-data-access-external-api'
+  ),
+  useGetFactQuery: () => ({
+    data: { fact: 'Cats sleep 70% of their lives.', length: 32 },
+    isLoading: false,
+    isFetching: false,
+    refetch: jest.fn(),
+  }),
+}));
+
 describe('App Component', () => {
   let store: ReturnType<typeof configureStore>;
   let consoleInfoSpy: jest.SpyInstance;
@@ -40,9 +58,12 @@ describe('App Component', () => {
         [LoggerKey]: loggerReducer,
         [NotificationKey]: notificationReducer,
         [DataGridKey]: dataGridReducer,
+        [CatFactsApiKey]: catFactsApiReducer,
       },
       middleware: (getDefaultMiddleware) =>
-        getDefaultMiddleware().concat(createConsoleLoggerMiddleware()),
+        getDefaultMiddleware()
+          .concat(createConsoleLoggerMiddleware())
+          .concat(catFactsApiMiddleware),
     });
 
     consoleInfoSpy = jest.spyOn(console, 'info').mockImplementation();

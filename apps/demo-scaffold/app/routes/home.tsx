@@ -11,6 +11,7 @@ import {
   showSuccessNotification,
   showWarningNotification,
 } from '@open-kingdom/shared-frontend-data-access-notifications';
+import { useGetFactQuery } from '@open-kingdom/shared-frontend-data-access-external-api';
 import {
   AdvancedGridExample,
   ErrorAutologgerExample,
@@ -22,6 +23,7 @@ export function Home() {
   const notificationCount = useSelector(selectActiveNotificationCount);
   const dispatch = useDispatch();
   const { mode, setMode } = useTheme();
+  const { data: catFact, isLoading, isFetching, refetch } = useGetFactQuery();
 
   return (
     <>
@@ -161,6 +163,35 @@ export function Home() {
         </h2>
 
         <AdvancedGridExample />
+      </div>
+
+      <div className="bg-white dark:bg-neutral-800 rounded-lg shadow-lg p-6 mb-6">
+        <h2 className="text-2xl font-semibold mb-4 text-neutral-800 dark:text-neutral-200">
+          External API Demo
+        </h2>
+        <p className="text-neutral-600 dark:text-neutral-400 mb-4">
+          Demonstrates RTK Query with Axios for third-party API integration.
+        </p>
+        <div className="bg-neutral-50 dark:bg-neutral-700 rounded-lg p-4 mb-4 min-h-[80px]">
+          {isLoading ? (
+            <p className="text-neutral-500 dark:text-neutral-400">Loading...</p>
+          ) : (
+            <p
+              data-testid="cat-fact"
+              className="text-neutral-800 dark:text-neutral-200"
+            >
+              {catFact?.fact}
+            </p>
+          )}
+        </div>
+        <button
+          data-testid="fetch-cat-fact-btn"
+          onClick={() => refetch()}
+          disabled={isFetching}
+          className="px-4 py-2 bg-primary-500 hover:bg-primary-600 disabled:bg-primary-300 text-white rounded-md transition-colors"
+        >
+          {isFetching ? 'Fetching...' : 'Get New Fact'}
+        </button>
       </div>
     </>
   );

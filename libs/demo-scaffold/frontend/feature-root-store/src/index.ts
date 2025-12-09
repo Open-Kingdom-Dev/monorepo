@@ -25,6 +25,11 @@ import {
   createAuthHydrationMiddleware,
 } from '@open-kingdom/shared-frontend-data-access-api-client';
 import { createReduxRTKErrorMiddleware } from '@open-kingdom/shared-frontend-feature-error-autologger';
+import {
+  CatFactsApiKey,
+  catFactsApiReducer,
+  catFactsApiMiddleware,
+} from '@open-kingdom/shared-frontend-data-access-external-api';
 
 export const createRootStore = () => {
   const rtkErrorMiddleware = createReduxRTKErrorMiddleware({
@@ -40,6 +45,7 @@ export const createRootStore = () => {
       [DataGridKey]: dataGridReducer,
       [ApiKey]: apiReducer,
       [AuthKey]: authReducer,
+      [CatFactsApiKey]: catFactsApiReducer,
     },
     middleware: (getDefaultMiddleware) =>
       getDefaultMiddleware({
@@ -51,6 +57,7 @@ export const createRootStore = () => {
         .prepend(createHttpLoggerMiddleware())
         .prepend(createAuthHydrationMiddleware())
         .concat(apiMiddleware)
+        .concat(catFactsApiMiddleware)
         .concat(createAuthListenerMiddleware())
         .concat(rtkErrorMiddleware),
   });

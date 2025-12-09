@@ -6,6 +6,9 @@
       "path": "../../../shared/frontend/feature-error-autologger"
     },
     {
+      "path": "../../../shared/frontend/data-access-external-api"
+    },
+    {
       "path": "../../../shared/frontend/data-access-api-client"
     },
     {
