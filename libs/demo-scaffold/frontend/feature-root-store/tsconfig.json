@@ -3,10 +3,13 @@
   "include": [],
   "references": [
     {
-      "path": "../../../shared/frontend/ui-datagrid"
+      "path": "../../../shared/frontend/feature-error-autologger"
     },
     {
       "path": "../../../shared/frontend/data-access-api-client"
+    },
+    {
+      "path": "../../../shared/frontend/ui-datagrid"
     },
     {
       "path": "../../../shared/frontend/data-access-notifications"

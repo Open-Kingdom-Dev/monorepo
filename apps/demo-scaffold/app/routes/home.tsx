@@ -11,7 +11,11 @@ import {
   showSuccessNotification,
   showWarningNotification,
 } from '@open-kingdom/shared-frontend-data-access-notifications';
-import { AdvancedGridExample, GridExample } from '../components';
+import {
+  AdvancedGridExample,
+  ErrorAutologgerExample,
+  GridExample,
+} from '../components';
 
 export function Home() {
   const logs = useSelector(selectLogs);
@@ -108,6 +112,8 @@ export function Home() {
           </div>
         </div>
       </div>
+
+      <ErrorAutologgerExample />
 
       <div className="bg-white dark:bg-neutral-800 rounded-lg shadow-lg p-6 mb-6">
         <h2 className="text-2xl font-semibold mb-4 text-neutral-800 dark:text-neutral-200">

@@ -30,10 +30,13 @@
   "include": ["src/**/*.js", "src/**/*.jsx", "src/**/*.ts", "src/**/*.tsx"],
   "references": [
     {
-      "path": "../../../shared/frontend/ui-datagrid/tsconfig.lib.json"
+      "path": "../../../shared/frontend/feature-error-autologger/tsconfig.lib.json"
     },
     {
       "path": "../../../shared/frontend/data-access-api-client/tsconfig.lib.json"
+    },
+    {
+      "path": "../../../shared/frontend/ui-datagrid/tsconfig.lib.json"
     },
     {
       "path": "../../../shared/frontend/data-access-notifications/tsconfig.lib.json"

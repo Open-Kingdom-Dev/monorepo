@@ -59,6 +59,9 @@
     },
     {
       "path": "./libs/shared/poly/util-env-config"
+    },
+    {
+      "path": "./libs/shared/frontend/feature-error-autologger"
     }
   ]
 }
