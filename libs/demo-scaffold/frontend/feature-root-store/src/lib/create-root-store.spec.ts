@@ -1,16 +1,11 @@
 import { createRootStore } from '../index';
 import {
-  LoggerConfig,
   LoggerKey,
   logInfo,
   selectLogs,
 } from '@open-kingdom/shared-frontend-data-access-logger';
 
 describe('createRootStore', () => {
-  const mockConfig: LoggerConfig = {
-    destination: 'console',
-  };
-
   let consoleInfoSpy: jest.SpyInstance;
 
   beforeEach(() => {
@@ -22,7 +17,7 @@ describe('createRootStore', () => {
   });
 
   it('should create a store with logger reducer', () => {
-    const store = createRootStore(mockConfig);
+    const store = createRootStore();
 
     expect(store).toBeDefined();
     expect(typeof store.dispatch).toBe('function');
@@ -31,7 +26,7 @@ describe('createRootStore', () => {
   });
 
   it('should include logger state in the store', () => {
-    const store = createRootStore(mockConfig);
+    const store = createRootStore();
     const state = store.getState();
 
     expect(state).toHaveProperty(LoggerKey);
@@ -41,7 +36,7 @@ describe('createRootStore', () => {
   });
 
   it('should handle logger actions properly', () => {
-    const store = createRootStore(mockConfig);
+    const store = createRootStore();
 
     // Dispatch a log action
     store.dispatch(logInfo('Test message'));
@@ -55,7 +50,7 @@ describe('createRootStore', () => {
   });
 
   it('should have logger middleware configured', () => {
-    const store = createRootStore(mockConfig);
+    const store = createRootStore();
 
     // Dispatch a log action to test middleware
     store.dispatch(logInfo('Middleware test'));
@@ -66,26 +61,15 @@ describe('createRootStore', () => {
 
   it('should configure serializable check to ignore persist actions', () => {
     // This tests that the middleware configuration includes the persist ignore
-    const store = createRootStore(mockConfig);
+    const store = createRootStore();
 
     // Dispatch an action that would normally trigger serializable check warning
     // The fact that we can create the store without warnings means the config is correct
     expect(store).toBeDefined();
   });
 
-  it('should work with different logger configs', () => {
-    const config: LoggerConfig = {
-      destination: 'console',
-    };
-
-    const store = createRootStore(config);
-
-    expect(store).toBeDefined();
-    expect(store.getState()).toHaveProperty(LoggerKey);
-  });
-
   it('should maintain state immutability', () => {
-    const store = createRootStore(mockConfig);
+    const store = createRootStore();
 
     const initialState = store.getState();
     store.dispatch(logInfo('Test message'));
@@ -99,7 +83,7 @@ describe('createRootStore', () => {
 
   it('should allow store extension with additional reducers', () => {
     // Test that the structure allows for additional reducers
-    const store = createRootStore(mockConfig);
+    const store = createRootStore();
     const state = store.getState();
 
     // The store structure should support additional reducers

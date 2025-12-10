@@ -1,7 +1,7 @@
 import { createListenerMiddleware } from '@reduxjs/toolkit';
 import { addLog } from './logger.slice';
 
-export const createConsoleListenerMiddleware = () => {
+export const createConsoleLoggerMiddleware = () => {
   const loggerListenerMiddleware = createListenerMiddleware();
   // Listen for when logs are added
   loggerListenerMiddleware.startListening({
