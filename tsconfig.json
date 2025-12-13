@@ -64,6 +64,9 @@
       "path": "./libs/shared/frontend/feature-error-autologger"
     },
     {
+      "path": "./libs/shared/backend/feature-email"
+    },
+    {
       "path": "./libs/shared/frontend/data-access-external-api"
     }
   ]

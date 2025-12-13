@@ -24,6 +24,7 @@
   },
   "private": true,
   "dependencies": {
+    "@googleapis/gmail": "^16.1.1",
     "@knaadh/nestjs-drizzle-better-sqlite3": "^1.2.0",
     "@nestjs/common": "^11.0.0",
     "@nestjs/core": "^11.0.0",
@@ -149,5 +150,6 @@
         }
       }
     }
-  }
+  },
+  "packageManager": "pnpm@10.8.1+sha1.a4eff733d0c4ccc179997f0ef4986f6e92427781"
 }

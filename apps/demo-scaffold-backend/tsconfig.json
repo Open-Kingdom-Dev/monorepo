@@ -4,13 +4,16 @@
   "include": [],
   "references": [
     {
+      "path": "../../libs/shared/backend/feature-email"
+    },
+    {
       "path": "../../libs/demo-scaffold/backend/feature-root-schema"
     },
     {
-      "path": "../../libs/shared/poly/util-env-config"
+      "path": "../../libs/shared/backend/feature-authentication"
     },
     {
-      "path": "../../libs/shared/backend/feature-authentication"
+      "path": "../../libs/shared/poly/util-env-config"
     },
     {
       "path": "./tsconfig.app.json"
