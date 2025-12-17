@@ -1,0 +1,31 @@
+{
+  "name": "@open-kingdom/shared-frontend-data-access-external-api",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    "./package.json": "./package.json",
+    ".": {
+      "development": "./src/index.ts",
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    }
+  },
+  "nx": {
+    "name": "@open-kingdom/shared-frontend-data-access-external-api",
+    "tags": [
+      "type:data-access",
+      "scope:shared",
+      "environment:frontend"
+    ]
+  },
+  "dependencies": {
+    "tslib": "^2.3.0",
+    "axios": "^1.7.9",
+    "@reduxjs/toolkit": "^2.8.2"
+  }
+}

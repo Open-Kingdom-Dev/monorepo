@@ -54,6 +54,9 @@
       "path": "../../libs/shared/frontend/feature-error-autologger/tsconfig.lib.json"
     },
     {
+      "path": "../../libs/shared/frontend/data-access-external-api/tsconfig.lib.json"
+    },
+    {
       "path": "../../libs/shared/frontend/data-access-notifications/tsconfig.lib.json"
     },
     {

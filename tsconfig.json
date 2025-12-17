@@ -62,6 +62,9 @@
     },
     {
       "path": "./libs/shared/frontend/feature-error-autologger"
+    },
+    {
+      "path": "./libs/shared/frontend/data-access-external-api"
     }
   ]
 }
