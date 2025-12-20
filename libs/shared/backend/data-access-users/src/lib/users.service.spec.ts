@@ -17,6 +17,10 @@ describe('UsersService', () => {
   let mockDb: jest.Mocked<BetterSQLite3Database<any>>;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let mockQuery: any;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let mockSelect: any;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let mockDelete: any;
 
   beforeEach(async () => {
     // Reset mocks
@@ -30,11 +34,21 @@ describe('UsersService', () => {
       },
     };
 
+    mockSelect = jest.fn().mockReturnValue({
+      from: jest.fn().mockResolvedValue([]),
+    });
+
+    mockDelete = jest.fn().mockReturnValue({
+      where: jest.fn().mockResolvedValue(undefined),
+    });
+
     mockDb = {
       query: mockQuery,
       insert: jest.fn().mockReturnValue({
         values: jest.fn().mockResolvedValue(undefined),
       }),
+      select: mockSelect,
+      delete: mockDelete,
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } as any;
 
@@ -127,6 +141,108 @@ describe('UsersService', () => {
       expect(mockQuery.users.findFirst).toHaveBeenCalledWith({
         where: eq(users.email, 'nonexistent@example.com'),
       });
+    });
+  });
+
+  describe('findById', () => {
+    it('should find user by id', async () => {
+      const mockUser: User = {
+        id: 1,
+        firstName: 'John',
+        lastName: 'Doe',
+        email: 'john@example.com',
+        role: 'user',
+        password: 'hashed-password',
+        invitee: null,
+      };
+
+      mockQuery.users.findFirst.mockResolvedValue(mockUser);
+
+      const result = await service.findById(1);
+
+      expect(result).toEqual(mockUser);
+      expect(mockQuery.users.findFirst).toHaveBeenCalledWith({
+        where: eq(users.id, 1),
+      });
+    });
+
+    it('should return undefined when user not found', async () => {
+      mockQuery.users.findFirst.mockResolvedValue(undefined);
+
+      const result = await service.findById(999);
+
+      expect(result).toBeUndefined();
+      expect(mockQuery.users.findFirst).toHaveBeenCalledWith({
+        where: eq(users.id, 999),
+      });
+    });
+  });
+
+  describe('findAll', () => {
+    it('should return all users', async () => {
+      const mockUsers: User[] = [
+        {
+          id: 1,
+          firstName: 'John',
+          lastName: 'Doe',
+          email: 'john@example.com',
+          role: 'user',
+          password: 'hashed-password',
+          invitee: null,
+        },
+        {
+          id: 2,
+          firstName: 'Jane',
+          lastName: 'Smith',
+          email: 'jane@example.com',
+          role: 'admin',
+          password: 'hashed-password',
+          invitee: null,
+        },
+      ];
+
+      mockSelect.mockReturnValue({
+        from: jest.fn().mockResolvedValue(mockUsers),
+      });
+
+      const result = await service.findAll();
+
+      expect(result).toEqual(mockUsers);
+      expect(mockSelect).toHaveBeenCalled();
+      expect(mockSelect().from).toHaveBeenCalledWith(users);
+    });
+
+    it('should return empty array when no users exist', async () => {
+      mockSelect.mockReturnValue({
+        from: jest.fn().mockResolvedValue([]),
+      });
+
+      const result = await service.findAll();
+
+      expect(result).toEqual([]);
+      expect(mockSelect).toHaveBeenCalled();
+    });
+  });
+
+  describe('delete', () => {
+    it('should delete user by id', async () => {
+      mockDelete.mockReturnValue({
+        where: jest.fn().mockResolvedValue(undefined),
+      });
+
+      await service.delete(1);
+
+      expect(mockDelete).toHaveBeenCalledWith(users);
+      expect(mockDelete(users).where).toHaveBeenCalledWith(eq(users.id, 1));
+    });
+
+    it('should not throw when deleting non-existent user', async () => {
+      mockDelete.mockReturnValue({
+        where: jest.fn().mockResolvedValue(undefined),
+      });
+
+      await expect(service.delete(999)).resolves.not.toThrow();
+      expect(mockDelete).toHaveBeenCalledWith(users);
     });
   });
 

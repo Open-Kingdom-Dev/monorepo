@@ -25,13 +25,11 @@ function EmailForm() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    try {
-      await sendEmail({ sendEmailDto: { to, subject, body } }).unwrap();
+    const result = await sendEmail({ sendEmailDto: { to, subject, body } });
+    if ('data' in result) {
       setTo('');
       setSubject('');
       setBody('');
-    } catch {
-      // Error state handled by RTK Query
     }
   };
 
@@ -113,13 +111,9 @@ function LoginForm() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    try {
-      const result = await login({ loginDto: { email, password } }).unwrap();
-      if (result.access_token) {
-        dispatch(setToken(result.access_token));
-      }
-    } catch {
-      // Error state handled by RTK Query
+    const result = await login({ loginDto: { email, password } });
+    if ('data' in result && result.data?.access_token) {
+      dispatch(setToken(result.data.access_token));
     }
   };
 

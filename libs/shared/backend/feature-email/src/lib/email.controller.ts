@@ -6,7 +6,6 @@ import { SendEmailDto, SendEmailResponseDto } from './email.dto.js';
 @ApiTags('Email')
 @Controller('email')
 export class EmailController {
-  /* c8 ignore next */
   constructor(private emailService: EmailService) {}
 
   @ApiOperation({
@@ -33,7 +32,6 @@ export class EmailController {
     type: SendEmailResponseDto,
   })
   @Post('send')
-  /* c8 ignore next */
   async sendEmail(@Body() dto: SendEmailDto): Promise<SendEmailResponseDto> {
     return this.emailService.send(dto);
   }

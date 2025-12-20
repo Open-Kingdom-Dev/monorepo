@@ -48,22 +48,25 @@
       "path": "../../libs/demo-scaffold/frontend/feature-root-store/tsconfig.lib.json"
     },
     {
+      "path": "../../libs/shared/frontend/data-access-external-api/tsconfig.lib.json"
+    },
+    {
+      "path": "../../libs/shared/frontend/feature-user-management/tsconfig.lib.json"
+    },
+    {
+      "path": "../../libs/shared/frontend/feature-notifications/tsconfig.lib.json"
+    },
+    {
       "path": "../../libs/shared/frontend/data-access-api-client/tsconfig.lib.json"
     },
     {
       "path": "../../libs/shared/frontend/feature-error-autologger/tsconfig.lib.json"
     },
     {
-      "path": "../../libs/shared/frontend/data-access-external-api/tsconfig.lib.json"
-    },
-    {
       "path": "../../libs/shared/frontend/data-access-notifications/tsconfig.lib.json"
     },
     {
       "path": "../../libs/shared/frontend/data-access-logger/tsconfig.lib.json"
-    },
-    {
-      "path": "../../libs/shared/frontend/feature-notifications/tsconfig.lib.json"
     },
     {
       "path": "../../libs/shared/frontend/ui-theme/tsconfig.lib.json"

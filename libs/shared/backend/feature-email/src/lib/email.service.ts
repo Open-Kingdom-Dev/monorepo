@@ -18,7 +18,8 @@ export class EmailService {
       });
       return { success: true, messageId: result.messageId };
     } catch (error) {
-      return { success: false, error: (error as Error).message };
+      const message = error instanceof Error ? error.message : String(error);
+      return { success: false, error: message };
     }
   }
 }

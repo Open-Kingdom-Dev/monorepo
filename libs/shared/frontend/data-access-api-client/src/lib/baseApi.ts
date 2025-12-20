@@ -5,6 +5,7 @@ export const ApiKey = 'api';
 
 export const baseApi = createApi({
   reducerPath: ApiKey,
+  tagTypes: [],
   baseQuery: fetchBaseQuery({
     baseUrl: process.env.VITE_API_BASE_URL || '',
     prepareHeaders: (headers, { getState }) => {

@@ -1,7 +1,7 @@
 import { Module, DynamicModule } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
-
+import { StringValue } from 'ms';
 import { OpenKingdomDataAccessBackendUsersModule } from '@open-kingdom/shared-backend-data-access-users';
 
 import { AuthenticationService } from './authentication.service';
@@ -11,7 +11,7 @@ import { JwtStrategy, JWT_CONSTANTS } from './passport-jwt-strategy';
 
 export interface AuthModuleOptions {
   jwtSecret: string;
-  jwtExpiresIn?: string;
+  jwtExpiresIn?: number | StringValue;
 }
 
 @Module({})

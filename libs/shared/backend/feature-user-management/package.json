@@ -1,0 +1,35 @@
+{
+  "name": "@open-kingdom/shared-backend-feature-user-management",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    "./package.json": "./package.json",
+    ".": {
+      "development": "./src/index.ts",
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    }
+  },
+  "dependencies": {
+    "tslib": "^2.3.0"
+  },
+  "peerDependencies": {
+    "@nestjs/common": "^11.0.0",
+    "@nestjs/swagger": "^11.0.0",
+    "drizzle-orm": ">=0.39.0",
+    "bcrypt": "^5.1.0"
+  },
+  "nx": {
+    "name": "@open-kingdom/shared-backend-feature-user-management",
+    "tags": [
+      "type:feature",
+      "scope:shared",
+      "environment:backend"
+    ]
+  }
+}

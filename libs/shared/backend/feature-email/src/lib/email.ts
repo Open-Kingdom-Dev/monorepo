@@ -1,4 +1,4 @@
-import { Module, DynamicModule } from '@nestjs/common';
+import { Module, Global, DynamicModule } from '@nestjs/common';
 import {
   GmailProvider,
   GmailProviderConfig,
@@ -20,7 +20,14 @@ export type EmailModuleOptions = {
   config: GmailProviderConfig;
 };
 
-// Module
+function createEmailProvider(options: EmailModuleOptions) {
+  if (options.provider === 'gmail') {
+    return new GmailProvider(options.config);
+  }
+  throw new Error(`Unsupported email provider: ${options.provider}`);
+}
+
+@Global()
 @Module({})
 export class EmailModule {
   static forRoot(options: EmailModuleOptions): DynamicModule {
@@ -30,12 +37,7 @@ export class EmailModule {
       providers: [
         {
           provide: EMAIL_PROVIDER,
-          useFactory: () => {
-            switch (options.provider) {
-              case 'gmail':
-                return new GmailProvider(options.config);
-            }
-          },
+          useFactory: () => createEmailProvider(options),
         },
         EmailService,
       ],

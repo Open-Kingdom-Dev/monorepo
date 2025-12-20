@@ -3,6 +3,10 @@ import { AppLayout } from './app-layout';
 import AboutComponent from './routes/about';
 import { Home } from './routes/home';
 import Profile from './routes/profile';
+import {
+  UserManagementRoute,
+  AcceptInvitationRoute,
+} from './routes/user-management';
 
 export const router = createBrowserRouter([
   {
@@ -12,6 +16,11 @@ export const router = createBrowserRouter([
       { path: '', Component: Home },
       { path: 'about', Component: AboutComponent },
       { path: 'profile', Component: Profile },
+      { path: 'admin/users', Component: UserManagementRoute },
     ],
+  },
+  {
+    path: '/accept-invitation',
+    Component: AcceptInvitationRoute,
   },
 ]);

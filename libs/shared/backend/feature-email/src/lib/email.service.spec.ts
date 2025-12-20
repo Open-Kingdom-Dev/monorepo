@@ -49,4 +49,17 @@ describe('EmailService', () => {
     expect(result.success).toBe(false);
     expect(result.error).toBe('SMTP connection failed');
   });
+
+  it('handles non-Error exceptions gracefully', async () => {
+    mockProvider.send.mockRejectedValue('Connection refused');
+
+    const result = await service.send({
+      to: 'recipient@example.com',
+      subject: 'Test',
+      body: 'Test body',
+    });
+
+    expect(result.success).toBe(false);
+    expect(result.error).toBe('Connection refused');
+  });
 });

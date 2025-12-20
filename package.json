@@ -25,6 +25,7 @@
   "private": true,
   "dependencies": {
     "@googleapis/gmail": "^16.1.1",
+    "@hookform/resolvers": "^5.2.2",
     "@knaadh/nestjs-drizzle-better-sqlite3": "^1.2.0",
     "@nestjs/common": "^11.0.0",
     "@nestjs/core": "^11.0.0",
@@ -47,10 +48,12 @@
     "passport-local": "^1.0.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
+    "react-hook-form": "^7.68.0",
     "react-redux": "^9.2.0",
     "react-router": "^7.2.0",
     "reflect-metadata": "^0.1.13",
-    "rxjs": "^7.8.0"
+    "rxjs": "^7.8.0",
+    "zod": "^4.2.1"
   },
   "devDependencies": {
     "@babel/core": "^7.14.5",
@@ -136,7 +139,8 @@
     "libs/demo-scaffold/backend/*",
     "libs/demo-scaffold/poly/*",
     "tools/plugin-openapi",
-    "libs/ui/shared/frontend/*"
+    "libs/ui/shared/frontend/*",
+    "libs/shared/*"
   ],
   "nx": {
     "includedScripts": [],

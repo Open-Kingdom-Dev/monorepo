@@ -16,5 +16,5 @@ export interface EmailProvider {
   send(message: EmailMessage): Promise<EmailResult>;
 }
 
-// DI token
+// DI tokens
 export const EMAIL_PROVIDER = Symbol('EMAIL_PROVIDER');

@@ -193,8 +193,9 @@ describe('Profile Component', () => {
   });
 
   it('submits login form and shows profile on success', async () => {
-    const unwrap = jest.fn().mockResolvedValue({ access_token: 'token-123' });
-    const loginTrigger = jest.fn().mockReturnValue({ unwrap });
+    const loginTrigger = jest
+      .fn()
+      .mockResolvedValue({ data: { access_token: 'token-123' } });
     mockLoginHook.mockReturnValue([
       loginTrigger,
       { isLoading: false, error: null },

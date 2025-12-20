@@ -6,22 +6,25 @@
       "path": "../../libs/demo-scaffold/frontend/feature-root-store"
     },
     {
+      "path": "../../libs/shared/frontend/data-access-external-api"
+    },
+    {
+      "path": "../../libs/shared/frontend/feature-user-management"
+    },
+    {
+      "path": "../../libs/shared/frontend/feature-notifications"
+    },
+    {
       "path": "../../libs/shared/frontend/data-access-api-client"
     },
     {
       "path": "../../libs/shared/frontend/feature-error-autologger"
     },
     {
-      "path": "../../libs/shared/frontend/data-access-external-api"
-    },
-    {
       "path": "../../libs/shared/frontend/data-access-notifications"
     },
     {
       "path": "../../libs/shared/frontend/data-access-logger"
-    },
-    {
-      "path": "../../libs/shared/frontend/feature-notifications"
     },
     {
       "path": "../../libs/shared/frontend/ui-theme"

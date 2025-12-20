@@ -1,0 +1,19 @@
+{
+  "extends": "../../../../tsconfig.base.json",
+  "files": [],
+  "include": [],
+  "references": [
+    {
+      "path": "../feature-email"
+    },
+    {
+      "path": "../data-access-users"
+    },
+    {
+      "path": "../../poly/util-constants"
+    },
+    {
+      "path": "./tsconfig.lib.json"
+    }
+  ]
+}
