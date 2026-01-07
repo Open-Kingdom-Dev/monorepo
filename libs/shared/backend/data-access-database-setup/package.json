@@ -1,6 +1,6 @@
 {
   "name": "@open-kingdom/shared-backend-data-access-database-setup",
-  "version": "0.0.2-0",
+  "version": "0.0.2-3",
   "main": "./dist/index.js",
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",

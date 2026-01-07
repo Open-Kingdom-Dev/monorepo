@@ -1,6 +1,6 @@
 {
   "name": "@open-kingdom/shared-frontend-data-access-logger",
-  "version": "0.0.2-0",
+  "version": "0.0.2-3",
   "type": "module",
   "main": "./dist/index.js",
   "module": "./dist/index.js",

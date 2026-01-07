@@ -1,6 +1,6 @@
 {
   "name": "@open-kingdom/shared-backend-data-access-users",
-  "version": "0.0.2-0",
+  "version": "0.0.2-3",
   "main": "./dist/index.js",
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -24,7 +24,7 @@
     "tslib": "^2.3.0",
     "@nestjs/testing": "^11.0.0",
     "@knaadh/nestjs-drizzle-better-sqlite3": "^1.2.0",
-    "@open-kingdom/shared-poly-util-constants": "0.0.2-0",
+    "@open-kingdom/shared-poly-util-constants": "0.0.2-3",
     "@nestjs/common": "^11.0.0",
     "drizzle-orm": "^0.44.5",
     "bcrypt": "^5.1.1"

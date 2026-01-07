@@ -1,6 +1,6 @@
 {
   "name": "@open-kingdom/shared-frontend-feature-error-autologger",
-  "version": "0.0.1",
+  "version": "0.0.2-3",
   "type": "module",
   "main": "./dist/index.js",
   "module": "./dist/index.js",
@@ -18,6 +18,9 @@
     "dist",
     "!**/*.tsbuildinfo"
   ],
+  "publishConfig": {
+    "access": "public"
+  },
   "nx": {
     "name": "@open-kingdom/shared-frontend-feature-error-autologger",
     "tags": [
