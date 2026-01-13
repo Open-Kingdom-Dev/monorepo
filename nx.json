@@ -30,7 +30,6 @@
         }
       },
       "exclude": [
-        "libs/shared/backend/data-access-database-setup/*",
         "libs/demo-scaffold/backend/demo-scaffold-backend/feature-root-schema/*"
       ]
     },
@@ -90,7 +89,6 @@
     {
       "plugin": "@nx/js/typescript",
       "include": [
-        "libs/shared/backend/data-access-database-setup/*",
         "libs/demo-scaffold/backend/feature-root-schema/*"
       ],
       "options": {

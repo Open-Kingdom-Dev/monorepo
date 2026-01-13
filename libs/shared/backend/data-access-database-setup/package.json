@@ -27,23 +27,6 @@
   },
   "nx": {
     "name": "@open-kingdom/shared-backend-data-access-database-setup",
-    "targets": {
-      "build": {
-        "executor": "@nx/js:tsc",
-        "outputs": [
-          "{options.outputPath}"
-        ],
-        "options": {
-          "outputPath": "dist/libs/shared/backend/data-access-database-setup",
-          "tsConfig": "libs/shared/backend/data-access-database-setup/tsconfig.lib.json",
-          "packageJson": "libs/shared/backend/data-access-database-setup/package.json",
-          "main": "libs/shared/backend/data-access-database-setup/src/index.ts",
-          "assets": [
-            "libs/shared/backend/data-access-database-setup/*.md"
-          ]
-        }
-      }
-    },
     "tags": [
       "type:data-access",
       "scope:shared",
