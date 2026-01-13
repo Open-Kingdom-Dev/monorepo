@@ -88,9 +88,7 @@
     },
     {
       "plugin": "@nx/js/typescript",
-      "include": [
-        "libs/demo-scaffold/backend/feature-root-schema/*"
-      ],
+      "include": ["libs/demo-scaffold/backend/feature-root-schema/*"],
       "options": {
         "typecheck": {
           "targetName": "typecheck"
