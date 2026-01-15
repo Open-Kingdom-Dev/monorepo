@@ -11,7 +11,7 @@ import { JwtStrategy, JWT_CONSTANTS } from './passport-jwt-strategy';
 
 export interface AuthModuleOptions {
   jwtSecret: string;
-  jwtExpiresIn?: string;
+  jwtExpiresIn?: string | number;
 }
 
 @Module({})
@@ -24,7 +24,7 @@ export class OpenKingdomFeatureBackendAuthModule {
         PassportModule,
         JwtModule.register({
           secret: options.jwtSecret,
-          signOptions: { expiresIn: options.jwtExpiresIn || '60s' },
+          signOptions: { expiresIn: (options.jwtExpiresIn ?? 60) as never },
         }),
       ],
       controllers: [AuthController],

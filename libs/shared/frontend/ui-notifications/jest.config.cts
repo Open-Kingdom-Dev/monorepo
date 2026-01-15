@@ -1,4 +1,4 @@
-export default {
+module.exports = {
   displayName: '@open-kingdom/shared-frontend-ui-notifications',
   preset: '../../../../jest.preset.js',
   transform: {

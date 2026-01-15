@@ -1,5 +1,5 @@
-export default {
-  displayName: '@open-kingdom/shared-frontend-feature-error-autologger',
+module.exports = {
+  displayName: '@open-kingdom/shared-frontend-data-access-notifications',
   preset: '../../../../jest.preset.js',
   transform: {
     '^(?!.*\\.(js|jsx|ts|tsx|css|json)$)': '@nx/react/plugins/jest',
@@ -7,11 +7,6 @@ export default {
   },
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx'],
   coverageDirectory: 'test-output/jest/coverage',
-  coveragePathIgnorePatterns: [
-    '/node_modules/',
-    'error-autologger.types.ts',
-    'index.ts',
-  ],
   reporters: [
     'default',
     [

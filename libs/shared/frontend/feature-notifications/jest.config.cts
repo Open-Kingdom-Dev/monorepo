@@ -1,5 +1,5 @@
-export default {
-  displayName: 'data-access-logger',
+module.exports = {
+  displayName: '@open-kingdom/shared-frontend-feature-notifications',
   preset: '../../../../jest.preset.js',
   transform: {
     '^(?!.*\\.(js|jsx|ts|tsx|css|json)$)': '@nx/react/plugins/jest',
@@ -7,6 +7,7 @@ export default {
   },
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx'],
   coverageDirectory: 'test-output/jest/coverage',
+  setupFilesAfterEnv: ['<rootDir>/src/test-setup.ts'],
   reporters: [
     'default',
     [

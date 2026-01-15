@@ -4,13 +4,7 @@
   "include": [],
   "references": [
     {
-      "path": "../../poly/util-constants"
-    },
-    {
       "path": "./tsconfig.lib.json"
-    },
-    {
-      "path": "./tsconfig.spec.json"
     }
   ]
 }

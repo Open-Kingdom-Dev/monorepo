@@ -1,7 +1,6 @@
-export default {
-  displayName: '@open-kingdom/shared-frontend-data-access-notifications',
+module.exports = {
+  displayName: '@open-kingdom/shared-frontend-feature-error-autologger',
   preset: '../../../../jest.preset.js',
-  testEnvironment: 'node',
   transform: {
     '^(?!.*\\.(js|jsx|ts|tsx|css|json)$)': '@nx/react/plugins/jest',
     '^.+\\.[tj]sx?$': ['babel-jest', { presets: ['@nx/react/babel'] }],

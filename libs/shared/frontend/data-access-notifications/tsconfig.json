@@ -1,16 +1,13 @@
 {
-  "extends": "../../../../tsconfig.base.json",
   "files": [],
   "include": [],
   "references": [
-    {
-      "path": "../../poly/util-types"
-    },
     {
       "path": "./tsconfig.lib.json"
     },
     {
       "path": "./tsconfig.spec.json"
     }
-  ]
+  ],
+  "extends": "../../../../tsconfig.base.json"
 }
