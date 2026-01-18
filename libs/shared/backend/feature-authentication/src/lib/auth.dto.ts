@@ -12,6 +12,7 @@ export class LoginDto {
   @ApiProperty({
     description: 'User password',
     example: 'admin',
+    type: 'string',
     minLength: 1,
   })
   password: string | undefined;
@@ -35,6 +36,7 @@ export class ProfileResponseDto {
   @ApiProperty({
     description: 'User first name',
     example: 'John',
+    type: 'string',
     nullable: true,
   })
   firstName!: string | null;
@@ -42,6 +44,7 @@ export class ProfileResponseDto {
   @ApiProperty({
     description: 'User last name',
     example: 'Doe',
+    type: 'string',
     nullable: true,
   })
   lastName!: string | null;
@@ -55,6 +58,7 @@ export class ProfileResponseDto {
   @ApiProperty({
     description: 'ID of user who invited this user',
     example: null,
+    type: 'number',
     nullable: true,
   })
   invitee!: number | null;

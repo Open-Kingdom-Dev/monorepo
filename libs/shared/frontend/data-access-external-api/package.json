@@ -1,7 +1,9 @@
 {
   "name": "@open-kingdom/shared-frontend-data-access-external-api",
-  "version": "0.0.1",
-  "private": true,
+  "version": "0.0.2-6",
+  "publishConfig": {
+    "access": "public"
+  },
   "type": "module",
   "main": "./dist/index.js",
   "module": "./dist/index.js",
@@ -15,17 +17,15 @@
       "default": "./dist/index.js"
     }
   },
+  "files": [
+    "dist",
+    "!**/*.tsbuildinfo"
+  ],
   "nx": {
-    "name": "@open-kingdom/shared-frontend-data-access-external-api",
     "tags": [
-      "type:data-access",
       "scope:shared",
+      "type:data-access",
       "environment:frontend"
     ]
-  },
-  "dependencies": {
-    "tslib": "^2.3.0",
-    "axios": "^1.7.9",
-    "@reduxjs/toolkit": "^2.8.2"
   }
 }

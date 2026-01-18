@@ -1,4 +1,4 @@
-export default {
+module.exports = {
   displayName: '@open-kingdom/demo-scaffold-frontend-feature-root-store',
   preset: '../../../../jest.preset.js',
   transform: {

@@ -4,13 +4,7 @@
   "include": [],
   "references": [
     {
-      "path": "../data-access-users"
-    },
-    {
       "path": "./tsconfig.lib.json"
-    },
-    {
-      "path": "./tsconfig.spec.json"
     }
   ]
 }

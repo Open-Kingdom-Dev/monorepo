@@ -1,6 +1,9 @@
 {
   "name": "@open-kingdom/demo-scaffold-backend-feature-root-schema",
-  "version": "0.0.1",
+  "version": "0.0.2-6",
+  "publishConfig": {
+    "access": "public"
+  },
   "private": true,
   "main": "./src/index.ts",
   "types": "./src/index.ts",
@@ -12,7 +15,6 @@
     },
     "./package.json": "./package.json"
   },
-  "dependencies": {},
   "nx": {
     "name": "@open-kingdom/demo-scaffold-backend-feature-root-schema",
     "tags": [
@@ -20,5 +22,6 @@
       "type:feature",
       "environment:backend"
     ]
-  }
+  },
+  "dependencies": {}
 }

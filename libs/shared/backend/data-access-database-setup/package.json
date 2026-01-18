@@ -1,6 +1,9 @@
 {
   "name": "@open-kingdom/shared-backend-data-access-database-setup",
-  "version": "0.0.2-0",
+  "version": "0.0.2-6",
+  "publishConfig": {
+    "access": "public"
+  },
   "main": "./dist/index.js",
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -17,37 +20,16 @@
     "dist",
     "!**/*.tsbuildinfo"
   ],
-  "publishConfig": {
-    "access": "public"
+  "nx": {
+    "tags": [
+      "scope:shared",
+      "type:data-access",
+      "environment:backend"
+    ]
   },
   "dependencies": {
     "tslib": "^2.3.0",
     "@knaadh/nestjs-drizzle-better-sqlite3": "^1.2.0",
     "drizzle-orm": "^0.44.5"
-  },
-  "nx": {
-    "name": "@open-kingdom/shared-backend-data-access-database-setup",
-    "targets": {
-      "build": {
-        "executor": "@nx/js:tsc",
-        "outputs": [
-          "{options.outputPath}"
-        ],
-        "options": {
-          "outputPath": "dist/libs/shared/backend/data-access-database-setup",
-          "tsConfig": "libs/shared/backend/data-access-database-setup/tsconfig.lib.json",
-          "packageJson": "libs/shared/backend/data-access-database-setup/package.json",
-          "main": "libs/shared/backend/data-access-database-setup/src/index.ts",
-          "assets": [
-            "libs/shared/backend/data-access-database-setup/*.md"
-          ]
-        }
-      }
-    },
-    "tags": [
-      "type:data-access",
-      "scope:shared",
-      "environment:backend"
-    ]
   }
 }

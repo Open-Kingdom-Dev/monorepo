@@ -3,7 +3,7 @@
   "compilerOptions": {
     "outDir": "dist",
     "lib": ["DOM", "DOM.Iterable", "ES2019"],
-    "types": ["@react-router/node", "vite/client", "node"],
+    "types": ["vite/client", "node"],
     "esModuleInterop": true,
     "jsx": "react-jsx",
     "resolveJsonModule": true,
@@ -35,10 +35,9 @@
     "tests/**/*.spec.jsx",
     "tests/**/*.test.jsx",
     "jest.config.ts",
-    "src/**/*.spec.ts",
     "app/**/*.spec.ts",
     "app/**/*.spec.tsx",
-    "src/**/*.test.ts",
+    "app/test-setup.ts",
     "eslint.config.js",
     "eslint.config.cjs",
     "eslint.config.mjs"

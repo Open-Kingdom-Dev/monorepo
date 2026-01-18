@@ -1,6 +1,9 @@
 {
   "name": "@open-kingdom/shared-poly-util-constants",
-  "version": "0.0.2-0",
+  "version": "0.0.2-6",
+  "publishConfig": {
+    "access": "public"
+  },
   "type": "module",
   "main": "./dist/index.js",
   "module": "./dist/index.js",
@@ -18,16 +21,14 @@
     "dist",
     "!**/*.tsbuildinfo"
   ],
-  "publishConfig": {
-    "access": "public"
-  },
-  "dependencies": {},
   "nx": {
-    "name": "@open-kingdom/shared-poly-util-constants",
     "tags": [
       "scope:shared",
       "type:util",
       "environment:poly"
     ]
+  },
+  "dependencies": {
+    "tslib": "^2.3.0"
   }
 }

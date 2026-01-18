@@ -1,5 +1,5 @@
-export default {
-  displayName: 'shared-feature-notifications',
+module.exports = {
+  displayName: '@open-kingdom/shared-frontend-ui-theme',
   preset: '../../../../jest.preset.js',
   transform: {
     '^(?!.*\\.(js|jsx|ts|tsx|css|json)$)': '@nx/react/plugins/jest',
@@ -7,7 +7,7 @@ export default {
   },
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx'],
   coverageDirectory: 'test-output/jest/coverage',
-  setupFilesAfterEnv: ['<rootDir>/src/test-setup.ts'],
+  setupFilesAfterEnv: ['<rootDir>/src/lib/test-setup.ts'],
   reporters: [
     'default',
     [

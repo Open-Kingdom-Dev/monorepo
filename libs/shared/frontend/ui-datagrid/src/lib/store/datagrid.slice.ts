@@ -1,4 +1,4 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { createSlice, PayloadAction, Slice } from '@reduxjs/toolkit';
 import type { GridState } from 'ag-grid-community';
 import type { DataGridState } from '../datagrid.types';
 
@@ -7,7 +7,7 @@ const initialState: DataGridState = {
   views: {},
 };
 
-export const dataGridSlice = createSlice({
+export const dataGridSlice: Slice<DataGridState> = createSlice({
   name: 'dataGrid',
   initialState,
   reducers: {

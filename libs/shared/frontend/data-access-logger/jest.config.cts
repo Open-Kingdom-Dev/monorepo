@@ -1,5 +1,5 @@
-export default {
-  displayName: '@open-kingdom/shared-frontend-ui-theme',
+module.exports = {
+  displayName: '@open-kingdom/shared-frontend-data-access-logger',
   preset: '../../../../jest.preset.js',
   transform: {
     '^(?!.*\\.(js|jsx|ts|tsx|css|json)$)': '@nx/react/plugins/jest',
@@ -7,7 +7,6 @@ export default {
   },
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx'],
   coverageDirectory: 'test-output/jest/coverage',
-  setupFilesAfterEnv: ['<rootDir>/src/lib/test-setup.ts'],
   reporters: [
     'default',
     [

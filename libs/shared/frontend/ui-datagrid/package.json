@@ -1,28 +1,27 @@
 {
   "name": "@open-kingdom/shared-frontend-ui-datagrid",
-  "version": "0.0.2-0",
+  "version": "0.0.2-6",
+  "publishConfig": {
+    "access": "public"
+  },
   "type": "module",
   "main": "./dist/index.js",
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "exports": {
+    "./package.json": "./package.json",
     ".": {
+      "development": "./src/index.ts",
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js",
-      "development": "./src/index.ts",
       "default": "./dist/index.js"
-    },
-    "./package.json": "./package.json"
+    }
   },
   "files": [
     "dist",
     "!**/*.tsbuildinfo"
   ],
-  "publishConfig": {
-    "access": "public"
-  },
   "nx": {
-    "name": "@open-kingdom/shared-frontend-ui-datagrid",
     "tags": [
       "scope:shared",
       "type:ui",

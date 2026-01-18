@@ -8,16 +8,12 @@ const runExecutor: PromiseExecutor<SwaggerGenerateAllExecutorSchema> = async (
   context
 ) => {
   const scriptPath = join(__dirname, 'generate-backends.ts');
-  const tsconfigPath = join(__dirname, 'tsconfig.json');
 
   try {
-    execSync(
-      `npx ts-node  --project "${tsconfigPath}" "${scriptPath}" "${context.root}"`,
-      {
-        cwd: context.root,
-        stdio: 'inherit',
-      }
-    );
+    execSync(`npx tsx "${scriptPath}" "${context.root}"`, {
+      cwd: context.root,
+      stdio: 'inherit',
+    });
     return { success: true };
   } catch (error) {
     logger.error('Failed to generate OpenAPI documentation');

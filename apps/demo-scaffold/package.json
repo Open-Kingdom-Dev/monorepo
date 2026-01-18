@@ -1,25 +1,18 @@
 {
   "name": "@open-kingdom/demo-scaffold",
+  "version": "0.0.1",
   "private": true,
   "type": "module",
-  "scripts": {},
   "sideEffects": false,
-  "dependencies": {
-    "@react-router/node": "^7.2.0",
-    "@react-router/serve": "^7.2.0",
-    "isbot": "^4.4.0",
-    "react-router": "^7.2.0"
-  },
-  "devDependencies": {
-    "@react-router/dev": "^7.2.0",
-    "@types/node": "^20.0.0",
-    "@types/react": "19.0.0",
-    "@types/react-dom": "19.0.0"
-  },
   "nx": {
     "tags": [
       "scope:demo-scaffold",
       "type:app"
     ]
+  },
+  "dependencies": {
+    "react-router": "^7.2.0",
+    "react-redux": "^9.2.0",
+    "@reduxjs/toolkit": "^2.8.2"
   }
 }

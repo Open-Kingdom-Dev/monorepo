@@ -5,15 +5,16 @@
     "default": ["{projectRoot}/**/*", "sharedGlobals"],
     "production": [
       "default",
-      "!{projectRoot}/.eslintrc.json",
-      "!{projectRoot}/eslint.config.mjs",
       "!{projectRoot}/**/?(*.)+(spec|test).[jt]s?(x)?(.snap)",
       "!{projectRoot}/tsconfig.spec.json",
-      "!{projectRoot}/src/test-setup.[jt]s",
       "!{projectRoot}/jest.config.[jt]s",
+      "!{projectRoot}/src/test-setup.[jt]s",
       "!{projectRoot}/test-setup.[jt]s"
     ],
-    "sharedGlobals": []
+    "sharedGlobals": [
+      "{workspaceRoot}/tsconfig.base.json",
+      "{workspaceRoot}/jest.preset.js"
+    ]
   },
   "plugins": [
     {
@@ -24,31 +25,14 @@
         },
         "build": {
           "targetName": "build",
-          "configName": "tsconfig.lib.json",
-          "buildDepsName": "build-deps",
-          "watchDepsName": "watch-deps"
+          "configName": "tsconfig.lib.json"
         }
-      },
-      "exclude": [
-        "libs/shared/backend/data-access-database-setup/*",
-        "libs/demo-scaffold/backend/demo-scaffold-backend/feature-root-schema/*"
-      ]
-    },
-    {
-      "plugin": "@nx/react/router-plugin",
-      "options": {
-        "buildTargetName": "build",
-        "devTargetName": "dev",
-        "startTargetName": "start",
-        "watchDepsTargetName": "watch-deps",
-        "buildDepsTargetName": "build-deps",
-        "typecheckTargetName": "typecheck"
       }
     },
     {
-      "plugin": "@nx/eslint/plugin",
+      "plugin": "@nx/jest/plugin",
       "options": {
-        "targetName": "lint"
+        "targetName": "test"
       }
     },
     {
@@ -72,67 +56,39 @@
       }
     },
     {
-      "plugin": "@nx/jest/plugin",
-      "options": {
-        "targetName": "test"
-      }
-    },
-    {
       "plugin": "@nx/webpack/plugin",
       "options": {
         "buildTargetName": "build",
         "serveTargetName": "serve",
         "previewTargetName": "preview",
         "buildDepsTargetName": "build-deps",
-        "watchDepsTargetName": "watch-deps"
-      }
-    },
-    {
-      "plugin": "@nx/js/typescript",
-      "include": [
-        "libs/shared/backend/data-access-database-setup/*",
-        "libs/demo-scaffold/backend/feature-root-schema/*"
-      ],
-      "options": {
-        "typecheck": {
-          "targetName": "typecheck"
-        }
+        "watchDepsTargetName": "watch-deps",
+        "serveStaticTargetName": "serve-static"
       }
     }
   ],
   "targetDefaults": {
-    "test": {
+    "build": {
+      "dependsOn": ["^build"],
+      "cache": true
+    },
+    "serve": {
       "dependsOn": ["^build"]
     },
-    "typecheck": {
-      "dependsOn": []
-    },
-    "build": {
-      "dependsOn": ["^typecheck"]
+    "test": {
+      "cache": true,
+      "dependsOn": ["^build"]
     },
     "lint": {
-      "executor": "nx:run-commands",
-      "options": {
-        "args": ["--max-warnings=0"]
-      }
-    }
-  },
-  "generators": {
-    "@nx/react": {
-      "application": {
-        "babel": true,
-        "style": "tailwind",
-        "linter": "eslint",
-        "bundler": "vite"
-      },
-      "component": {
-        "style": "tailwind"
-      },
-      "library": {
-        "style": "tailwind",
-        "linter": "eslint",
-        "unitTestRunner": "jest"
-      }
+      "cache": true
+    },
+    "typecheck": {
+      "cache": true
+    },
+    "@nx/js:tsc": {
+      "cache": true,
+      "dependsOn": ["^build"],
+      "inputs": ["production", "^production"]
     }
   },
   "release": {
@@ -142,9 +98,38 @@
       "libs/shared/poly/*"
     ],
     "version": {
-      "conventionalCommits": true,
-      "preVersionCommand": "npx nx run-many -t build"
+      "preVersionCommand": "npx nx run-many -t build",
+      "conventionalCommits": true
+    },
+    "versionPlans": false,
+    "changelog": {
+      "workspaceChangelog": true,
+      "projectChangelogs": false
+    },
+    "git": {
+      "commitMessage": "chore(release): publish {version}"
+    },
+    "publish": {
+      "registry": "https://registry.npmjs.org",
+      "access": "public"
     }
   },
-  "nxCloudId": "691e9b2ee857f506676606a7"
+  "generators": {
+    "@nx/react": {
+      "library": {
+        "style": "tailwind",
+        "linter": "none",
+        "unitTestRunner": "jest"
+      },
+      "application": {
+        "babel": true,
+        "style": "tailwind",
+        "linter": "none",
+        "bundler": "vite"
+      },
+      "component": {
+        "style": "tailwind"
+      }
+    }
+  }
 }

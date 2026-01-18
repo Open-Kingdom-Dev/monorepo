@@ -34,7 +34,7 @@
         ],
         "options": {
           "buildTarget": "@open-kingdom/demo-scaffold-backend:build",
-          "runBuildTargetDependencies": false
+          "runBuildTargetDependencies": true
         },
         "configurations": {
           "development": {

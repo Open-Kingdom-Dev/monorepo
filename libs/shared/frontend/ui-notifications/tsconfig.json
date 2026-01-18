@@ -3,9 +3,6 @@
   "include": [],
   "references": [
     {
-      "path": "../../poly/util-types"
-    },
-    {
       "path": "./tsconfig.lib.json"
     },
     {
