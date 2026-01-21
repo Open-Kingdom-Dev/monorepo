@@ -22,6 +22,9 @@
   "exclude": ["src/**/*.spec.ts", "src/**/*.test.ts"],
   "references": [
     {
+      "path": "../data-access-database-setup/tsconfig.lib.json"
+    },
+    {
       "path": "../data-access-users/tsconfig.lib.json"
     }
   ]

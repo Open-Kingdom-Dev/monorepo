@@ -3,15 +3,15 @@ import { DrizzleBetterSQLiteModule } from '@knaadh/nestjs-drizzle-better-sqlite3
 
 import { DB_TAG } from '@open-kingdom/shared-poly-util-constants';
 
-export type SchemaConfig = Record<string, unknown>;
+import { schema } from './schemas/index.js';
+
 export interface DatabaseSetupModuleOptions {
-  schema: SchemaConfig;
   filename?: string;
 }
 
 @Module({})
 export class DatabaseSetupModule {
-  static register(options: DatabaseSetupModuleOptions): DynamicModule {
+  static register(options: DatabaseSetupModuleOptions = {}): DynamicModule {
     return {
       module: DatabaseSetupModule,
       imports: [
@@ -20,7 +20,7 @@ export class DatabaseSetupModule {
           sqlite3: {
             filename: options.filename || 'demo.db',
           },
-          config: { schema: options.schema },
+          config: { schema },
         }),
       ],
     };

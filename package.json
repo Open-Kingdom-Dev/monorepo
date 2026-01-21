@@ -21,7 +21,11 @@
     "format:check": "nx format:check --all",
     "check-all": "npm run typecheck && npm run lint && npm run format:check && npm run test && npm run e2e",
     "swagger:generate-all": "nx run @open-kingdom/plugin-openapi:generate-openapi-all",
-    "client:generate-all": "nx run @open-kingdom/plugin-openapi:generate-client-all"
+    "client:generate-all": "nx run @open-kingdom/plugin-openapi:generate-client-all",
+    "db:generate": "DATABASE_URL=$PWD/demo.db npm run db:generate --prefix libs/shared/backend/data-access-database-setup",
+    "db:migrate": "DATABASE_URL=$PWD/demo.db npm run db:migrate --prefix libs/shared/backend/data-access-database-setup",
+    "db:push": "DATABASE_URL=$PWD/demo.db npm run db:push --prefix libs/shared/backend/data-access-database-setup",
+    "db:studio": "DATABASE_URL=$PWD/demo.db npm run db:studio --prefix libs/shared/backend/data-access-database-setup"
   },
   "devDependencies": {
     "@babel/core": "^7.14.5",

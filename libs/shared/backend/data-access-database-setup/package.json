@@ -18,8 +18,15 @@
   },
   "files": [
     "dist",
+    "drizzle",
     "!**/*.tsbuildinfo"
   ],
+  "scripts": {
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "drizzle-kit migrate",
+    "db:push": "drizzle-kit push",
+    "db:studio": "drizzle-kit studio"
+  },
   "nx": {
     "tags": [
       "scope:shared",
@@ -31,5 +38,8 @@
     "tslib": "^2.3.0",
     "@knaadh/nestjs-drizzle-better-sqlite3": "^1.2.0",
     "drizzle-orm": "^0.44.5"
+  },
+  "devDependencies": {
+    "drizzle-kit": "^0.31.8"
   }
 }

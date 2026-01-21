@@ -22,9 +22,6 @@
   "exclude": ["src/**/*.spec.ts", "src/**/*.test.ts"],
   "references": [
     {
-      "path": "../../../shared/backend/data-access-users/tsconfig.lib.json"
-    },
-    {
       "path": "../../../shared/backend/data-access-database-setup/tsconfig.lib.json"
     },
     {

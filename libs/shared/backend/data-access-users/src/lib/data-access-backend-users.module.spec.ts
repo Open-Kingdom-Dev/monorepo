@@ -2,9 +2,9 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { DrizzleBetterSQLiteModule } from '@knaadh/nestjs-drizzle-better-sqlite3';
 
 import { DB_TAG } from '@open-kingdom/shared-poly-util-constants';
+import { users } from '@open-kingdom/shared-backend-data-access-database-setup';
 import { OpenKingdomDataAccessBackendUsersModule } from './data-access-backend-users.module';
 import { UsersService } from './users.service';
-import { users } from './schema';
 
 describe('OpenKingdomDataAccessBackendUsersModule', () => {
   let module: TestingModule;
