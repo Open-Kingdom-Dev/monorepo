@@ -3,10 +3,10 @@ import { DrizzleBetterSQLiteModule } from '@knaadh/nestjs-drizzle-better-sqlite3
 
 import { DB_TAG } from '@open-kingdom/shared-poly-util-constants';
 
-export type SchemaConfig = Record<string, unknown>;
 export interface DatabaseSetupModuleOptions {
-  schema: SchemaConfig;
   filename?: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  schema: Record<string, any>;
 }
 
 @Module({})

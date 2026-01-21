@@ -3,8 +3,8 @@ import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 
 import {
-  User,
   UsersService,
+  User,
 } from '@open-kingdom/shared-backend-data-access-users';
 
 @Injectable()

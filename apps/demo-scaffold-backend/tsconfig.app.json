@@ -34,6 +34,12 @@
     },
     {
       "path": "../../libs/shared/poly/util-env-config/tsconfig.lib.json"
+    },
+    {
+      "path": "../../libs/shared/backend/feature-user-management/tsconfig.lib.json"
+    },
+    {
+      "path": "../../libs/shared/backend/data-access-users/tsconfig.lib.json"
     }
   ]
 }

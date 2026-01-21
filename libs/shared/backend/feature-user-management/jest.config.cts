@@ -9,19 +9,18 @@ const swcJestConfig = JSON.parse(
 swcJestConfig.swcrc = false;
 
 module.exports = {
-  displayName: '@open-kingdom/demo-scaffold-backend',
-  preset: '../../jest.preset.js',
+  displayName: '@open-kingdom/shared-backend-feature-user-management',
+  preset: '../../../../jest.preset.js',
   testEnvironment: 'node',
   transform: {
     '^.+\\.[tj]s$': ['@swc/jest', swcJestConfig],
   },
   moduleFileExtensions: ['ts', 'js', 'html'],
   coverageDirectory: 'test-output/jest/coverage',
-  coveragePathIgnorePatterns: ['/node_modules/', '/src/db/'],
   reporters: [
     'default',
     [
-      '../../node_modules/jest-html-reporter',
+      '../../../../node_modules/jest-html-reporter',
       {
         pageTitle: 'Test Report',
       },

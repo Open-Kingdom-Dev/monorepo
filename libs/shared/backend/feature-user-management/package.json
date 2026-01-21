@@ -1,5 +1,5 @@
 {
-  "name": "@open-kingdom/shared-backend-data-access-users",
+  "name": "@open-kingdom/shared-backend-feature-user-management",
   "version": "0.0.2-6",
   "publishConfig": {
     "access": "public"
@@ -23,15 +23,14 @@
   "nx": {
     "tags": [
       "scope:shared",
-      "type:data-access",
+      "type:feature",
       "environment:backend"
     ]
   },
   "dependencies": {
     "tslib": "^2.3.0",
-    "@open-kingdom/shared-poly-util-constants": "*",
     "@nestjs/common": "^11.0.0",
-    "drizzle-orm": "^0.44.5",
-    "bcrypt": "^5.1.1"
+    "@open-kingdom/shared-backend-data-access-users": "*",
+    "drizzle-orm": "^0.44.5"
   }
 }

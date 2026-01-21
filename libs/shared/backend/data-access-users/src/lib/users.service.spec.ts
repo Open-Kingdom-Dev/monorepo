@@ -4,8 +4,8 @@ import { eq } from 'drizzle-orm';
 import * as bcrypt from 'bcrypt';
 
 import { DB_TAG } from '@open-kingdom/shared-poly-util-constants';
+import { users, User } from './schemas';
 import { UsersService } from './users.service';
-import { users, User } from './schema';
 
 // Mock bcrypt
 jest.mock('bcrypt');
@@ -63,7 +63,7 @@ describe('UsersService', () => {
         email: 'admin@admin.com',
         role: 'admin',
         password: 'hashed-password',
-        invitee: null,
+        invitedBy: null,
       });
 
       await service.onModuleInit();
@@ -83,7 +83,7 @@ describe('UsersService', () => {
         email: 'admin@admin.com',
         role: 'admin',
         password: 'existing-hash',
-        invitee: null,
+        invitedBy: null,
       };
       mockQuery.users.findFirst.mockResolvedValue(existingAdmin);
 
@@ -105,7 +105,7 @@ describe('UsersService', () => {
         email: 'john@example.com',
         role: 'user',
         password: 'hashed-password',
-        invitee: null,
+        invitedBy: null,
       };
 
       mockQuery.users.findFirst.mockResolvedValue(mockUser);
@@ -138,7 +138,7 @@ describe('UsersService', () => {
         email: 'jane@example.com',
         password: 'plain-password',
         role: 'user' as const,
-        invitee: null,
+        invitedBy: null,
       };
 
       const createdUser: User = {
@@ -169,7 +169,7 @@ describe('UsersService', () => {
         email: 'john@example.com',
         role: 'user',
         password: 'existing-hash',
-        invitee: null,
+        invitedBy: null,
       };
 
       const userData = {
@@ -178,7 +178,7 @@ describe('UsersService', () => {
         email: 'john@example.com',
         password: 'new-password',
         role: 'user' as const,
-        invitee: null,
+        invitedBy: null,
       };
 
       mockQuery.users.findFirst.mockResolvedValue(existingUser);
@@ -199,7 +199,7 @@ describe('UsersService', () => {
         lastName: 'User',
         email: 'test@example.com',
         password: 'password',
-        invitee: null,
+        invitedBy: null,
       };
 
       const createdUser: User = {
