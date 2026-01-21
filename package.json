@@ -152,5 +152,6 @@
         }
       }
     }
-  }
+  },
+  "packageManager": "pnpm@10.8.1+sha1.a4eff733d0c4ccc179997f0ef4986f6e92427781"
 }
