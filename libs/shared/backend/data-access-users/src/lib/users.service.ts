@@ -36,6 +36,22 @@ export class UsersService implements OnModuleInit {
     return user;
   }
 
+  async findById(id: number): Promise<User | undefined> {
+    const user = await this.db.query.users.findFirst({
+      where: eq(users.id, id),
+    });
+    return user;
+  }
+
+  async findAll(): Promise<User[]> {
+    return this.db.query.users.findMany();
+  }
+
+  async delete(id: number): Promise<boolean> {
+    const result = await this.db.delete(users).where(eq(users.id, id));
+    return result.changes > 0;
+  }
+
   async ensureUser(data: Omit<User, 'id'>) {
     const existing = await this.findOne(data.email);
     if (existing) return existing;
