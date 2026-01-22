@@ -15,10 +15,10 @@
     }
   },
   "nx": {
-    "name": "feature-user-management",
+    "name": "@open-kingdom/shared-backend-feature-user-management",
     "tags": [
       "scope:shared",
-      "env:backend",
+      "environment:backend",
       "type:feature"
     ]
   },
