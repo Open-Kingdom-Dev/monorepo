@@ -94,10 +94,12 @@ export class InvitationsService {
     // Send invitation email
     await this.sendInvitationEmail(dto.email, token);
 
+    // Log token in development for testing
+    this.logger.debug(`Invitation token for ${dto.email}: ${token}`);
+
     return {
       success: true,
       message: 'Invitation sent successfully',
-      token, // Included for testing purposes
     };
   }
 

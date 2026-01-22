@@ -6,7 +6,9 @@ import { UsersController } from './users.controller';
 
 describe('UsersController', () => {
   let controller: UsersController;
-  let usersService: jest.Mocked<Pick<UsersService, 'findAll' | 'findById' | 'delete'>>;
+  let usersService: jest.Mocked<
+    Pick<UsersService, 'findAll' | 'findById' | 'delete'>
+  >;
 
   const mockUsers = [
     {

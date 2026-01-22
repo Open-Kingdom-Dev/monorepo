@@ -79,12 +79,6 @@ describe('InvitationsService', () => {
       expect(mockEmailService.send).toHaveBeenCalled();
     });
 
-    it('includes the invitation token for verification', async () => {
-      const result = await service.invite({ email: 'newuser@example.com' }, 1);
-
-      expect(result.token).toBe('generated-token');
-    });
-
     it('prevents inviting someone who already has an account', async () => {
       mockDb.query.users.findFirst.mockResolvedValue({
         id: 1,

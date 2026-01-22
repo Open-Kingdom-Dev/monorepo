@@ -37,7 +37,6 @@ describe('InvitationsController', () => {
       invitationsService.invite.mockResolvedValue({
         success: true,
         message: 'Invitation sent successfully',
-        token: 'invitation-token',
       });
 
       const result = await controller.invite(
