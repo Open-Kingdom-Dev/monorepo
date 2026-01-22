@@ -8,6 +8,7 @@ import {
   setToken,
   logout,
 } from '@open-kingdom/shared-frontend-data-access-api-client';
+import { showSuccessNotification } from '@open-kingdom/shared-frontend-data-access-notifications';
 
 const inputStyles =
   'w-full px-3 py-2 border border-neutral-300 dark:border-neutral-600 rounded-md bg-white dark:bg-neutral-700 text-neutral-900 dark:text-neutral-100';
@@ -17,6 +18,7 @@ const cardStyles =
   'max-w-md mx-auto mt-8 p-6 bg-white dark:bg-neutral-800 rounded-lg shadow-lg';
 
 function EmailForm() {
+  const dispatch = useDispatch();
   const [to, setTo] = useState('');
   const [subject, setSubject] = useState('');
   const [body, setBody] = useState('');
@@ -27,11 +29,12 @@ function EmailForm() {
     e.preventDefault();
     try {
       await sendEmail({ sendEmailDto: { to, subject, body } }).unwrap();
+      dispatch(showSuccessNotification('Email sent successfully'));
       setTo('');
       setSubject('');
       setBody('');
     } catch {
-      // Error state handled by RTK Query
+      // Error notification handled by RTK middleware
     }
   };
 
