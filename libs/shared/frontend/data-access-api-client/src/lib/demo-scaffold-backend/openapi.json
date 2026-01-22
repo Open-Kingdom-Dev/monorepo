@@ -116,6 +116,242 @@
         ]
       }
     },
+    "/api/users": {
+      "get": {
+        "description": "Get a list of all registered users. Requires authentication.",
+        "operationId": "UsersController_findAll",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "List of users",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/UserDto"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ],
+        "summary": "List all users",
+        "tags": [
+          "Users"
+        ]
+      }
+    },
+    "/api/users/{id}": {
+      "get": {
+        "description": "Get a single user by their ID. Requires authentication.",
+        "operationId": "UsersController_findOne",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "User ID",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "User found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "User not found"
+          }
+        },
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ],
+        "summary": "Get user by ID",
+        "tags": [
+          "Users"
+        ]
+      },
+      "delete": {
+        "description": "Delete a user by their ID. Users cannot delete themselves.",
+        "operationId": "UsersController_delete",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "User ID to delete",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "User deleted successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeleteUserResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Cannot delete own account"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "User not found"
+          }
+        },
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ],
+        "summary": "Delete user",
+        "tags": [
+          "Users"
+        ]
+      }
+    },
+    "/api/invitations/invite": {
+      "post": {
+        "description": "Send an invitation email to a new user. Requires authentication.",
+        "operationId": "InvitationsController_invite",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InviteUserDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Invitation sent successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InviteUserResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "User already exists or invitation already sent"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ],
+        "summary": "Send invitation",
+        "tags": [
+          "Invitations"
+        ]
+      }
+    },
+    "/api/invitations/validate/{token}": {
+      "get": {
+        "description": "Check if an invitation token is valid and not expired.",
+        "operationId": "InvitationsController_validate",
+        "parameters": [
+          {
+            "name": "token",
+            "required": true,
+            "in": "path",
+            "description": "The invitation token to validate",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Token validation result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidateInvitationResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Validate invitation token",
+        "tags": [
+          "Invitations"
+        ]
+      }
+    },
+    "/api/invitations/accept": {
+      "post": {
+        "description": "Accept an invitation and create a new user account.",
+        "operationId": "InvitationsController_accept",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AcceptInvitationDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Account created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AcceptInvitationResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid or expired invitation"
+          }
+        },
+        "summary": "Accept invitation",
+        "tags": [
+          "Invitations"
+        ]
+      }
+    },
     "/api/email/send": {
       "post": {
         "description": "Send a test email via Gmail API",
@@ -269,6 +505,199 @@
           "email",
           "invitee",
           "role"
+        ]
+      },
+      "UserDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number",
+            "description": "User ID",
+            "example": 1
+          },
+          "email": {
+            "type": "string",
+            "description": "User email address",
+            "example": "user@example.com"
+          },
+          "firstName": {
+            "type": "object",
+            "description": "User first name",
+            "example": "John"
+          },
+          "lastName": {
+            "type": "object",
+            "description": "User last name",
+            "example": "Doe"
+          },
+          "role": {
+            "type": "string",
+            "description": "User role",
+            "enum": [
+              "guest",
+              "user",
+              "admin"
+            ],
+            "example": "user"
+          }
+        },
+        "required": [
+          "id",
+          "email",
+          "role"
+        ]
+      },
+      "DeleteUserResponseDto": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "description": "Whether the user was deleted successfully",
+            "example": true
+          },
+          "message": {
+            "type": "string",
+            "description": "Message describing the result",
+            "example": "User deleted successfully"
+          }
+        },
+        "required": [
+          "success",
+          "message"
+        ]
+      },
+      "InviteUserDto": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "description": "Email address to send invitation to",
+            "example": "user@example.com",
+            "format": "email"
+          },
+          "role": {
+            "type": "string",
+            "description": "Role to assign to the invited user",
+            "enum": [
+              "guest",
+              "user",
+              "admin"
+            ],
+            "default": "user"
+          }
+        },
+        "required": [
+          "email"
+        ]
+      },
+      "InviteUserResponseDto": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "description": "Whether the invitation was sent successfully",
+            "example": true
+          },
+          "message": {
+            "type": "string",
+            "description": "Message describing the result",
+            "example": "Invitation sent successfully"
+          },
+          "token": {
+            "type": "string",
+            "description": "The generated invitation token (for testing purposes)",
+            "example": "eyJlbWFpbCI6InVzZXJAZXhhbXBsZS5jb20iLCJleHBpcmVzQXQiOjE3MDk4MjQwMDB9"
+          }
+        },
+        "required": [
+          "success",
+          "message"
+        ]
+      },
+      "ValidateInvitationResponseDto": {
+        "type": "object",
+        "properties": {
+          "valid": {
+            "type": "boolean",
+            "description": "Whether the invitation token is valid",
+            "example": true
+          },
+          "email": {
+            "type": "string",
+            "description": "Email address associated with the invitation",
+            "example": "user@example.com"
+          },
+          "role": {
+            "type": "string",
+            "description": "Role assigned to the invitation",
+            "enum": [
+              "guest",
+              "user",
+              "admin"
+            ]
+          },
+          "error": {
+            "type": "string",
+            "description": "Error message if validation failed",
+            "example": "Invitation has expired"
+          }
+        },
+        "required": [
+          "valid"
+        ]
+      },
+      "AcceptInvitationDto": {
+        "type": "object",
+        "properties": {
+          "token": {
+            "type": "string",
+            "description": "The invitation token received via email",
+            "example": "eyJlbWFpbCI6InVzZXJAZXhhbXBsZS5jb20iLCJleHBpcmVzQXQiOjE3MDk4MjQwMDB9"
+          },
+          "password": {
+            "type": "string",
+            "description": "Password for the new account",
+            "example": "securePassword123",
+            "minLength": 8
+          },
+          "firstName": {
+            "type": "string",
+            "description": "First name of the user",
+            "example": "John"
+          },
+          "lastName": {
+            "type": "string",
+            "description": "Last name of the user",
+            "example": "Doe"
+          }
+        },
+        "required": [
+          "token",
+          "password"
+        ]
+      },
+      "AcceptInvitationResponseDto": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "description": "Whether the account was created successfully",
+            "example": true
+          },
+          "message": {
+            "type": "string",
+            "description": "Message describing the result",
+            "example": "Account created successfully"
+          },
+          "email": {
+            "type": "string",
+            "description": "Email of the created user",
+            "example": "user@example.com"
+          }
+        },
+        "required": [
+          "success",
+          "message"
         ]
       },
       "SendEmailDto": {
