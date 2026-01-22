@@ -19,6 +19,7 @@ export const invitations = table(InvitationsTableName, {
     .text()
     .$type<'pending' | 'accepted' | 'expired'>()
     .default('pending'),
+  role: t.text().$type<'guest' | 'user' | 'admin'>().default('user'),
 });
 
 export type Invitation = typeof invitations.$inferSelect;
