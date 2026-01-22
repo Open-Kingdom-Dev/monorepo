@@ -197,7 +197,9 @@ export class InvitationsService {
       await this.emailService.send({
         to: email,
         subject: 'You have been invited',
-        body: `You have been invited to join the platform.\n\nClick the link below to accept the invitation and create your account:\n\n${inviteUrl}\n\nThis invitation will expire in ${this.options.invitationExpiryDays ?? 7} days.`,
+        body: `You have been invited to join the platform.\n\nClick the link below to accept the invitation and create your account:\n\n${inviteUrl}\n\nThis invitation will expire in ${
+          this.options.invitationExpiryDays ?? 7
+        } days.`,
       });
       this.logger.log(`Invitation email sent to ${email}`);
     } catch (error) {

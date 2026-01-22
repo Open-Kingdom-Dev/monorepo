@@ -33,7 +33,8 @@ export class InviteUserResponseDto {
 
   @ApiProperty({
     description: 'The generated invitation token (for testing purposes)',
-    example: 'eyJlbWFpbCI6InVzZXJAZXhhbXBsZS5jb20iLCJleHBpcmVzQXQiOjE3MDk4MjQwMDB9',
+    example:
+      'eyJlbWFpbCI6InVzZXJAZXhhbXBsZS5jb20iLCJleHBpcmVzQXQiOjE3MDk4MjQwMDB9',
     required: false,
   })
   token?: string;

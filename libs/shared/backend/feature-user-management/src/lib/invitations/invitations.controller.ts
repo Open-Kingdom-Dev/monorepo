@@ -40,7 +40,8 @@ export class InvitationsController {
   @ApiBearerAuth('JWT-auth')
   @ApiOperation({
     summary: 'Send invitation',
-    description: 'Send an invitation email to a new user. Requires authentication.',
+    description:
+      'Send an invitation email to a new user. Requires authentication.',
   })
   @ApiBody({ type: InviteUserDto })
   @ApiResponse({

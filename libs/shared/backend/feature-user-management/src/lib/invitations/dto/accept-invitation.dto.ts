@@ -3,7 +3,8 @@ import { ApiProperty } from '@nestjs/swagger';
 export class AcceptInvitationDto {
   @ApiProperty({
     description: 'The invitation token received via email',
-    example: 'eyJlbWFpbCI6InVzZXJAZXhhbXBsZS5jb20iLCJleHBpcmVzQXQiOjE3MDk4MjQwMDB9',
+    example:
+      'eyJlbWFpbCI6InVzZXJAZXhhbXBsZS5jb20iLCJleHBpcmVzQXQiOjE3MDk4MjQwMDB9',
     type: 'string',
   })
   token!: string;
