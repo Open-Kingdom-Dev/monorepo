@@ -15,6 +15,8 @@ const envKeys = [
   'GMAIL_CLIENT_EMAIL',
   'GMAIL_PRIVATE_KEY',
   'GMAIL_IMPERSONATE_EMAIL',
+  'INVITATION_TOKEN_SECRET',
+  'FRONTEND_BASE_URL',
 ] as const;
 
 // Create typed config service for this app
@@ -29,13 +31,24 @@ const configService = createConfigService(envKeys, nodeEnvAdapter);
         jwtExpiresIn: configService.get('JWT_EXPIRES_IN', '1h'),
       })
     ),
-    import('@open-kingdom/shared-backend-feature-email').then((m) =>
-      m.EmailModule.forRoot({
-        provider: 'gmail',
-        config: {
-          clientEmail: configService.get('GMAIL_CLIENT_EMAIL', ''),
-          privateKey: configService.get('GMAIL_PRIVATE_KEY', ''),
-          impersonateEmail: configService.get('GMAIL_IMPERSONATE_EMAIL', ''),
+    import('@open-kingdom/shared-backend-feature-user-management').then((m) =>
+      m.FeatureUserManagementModule.forRoot({
+        invitationTokenSecret: configService.get(
+          'INVITATION_TOKEN_SECRET',
+          'invitation-secret'
+        ),
+        invitationExpiryDays: 7,
+        frontendBaseUrl: configService.get(
+          'FRONTEND_BASE_URL',
+          'http://localhost:4200'
+        ),
+        emailConfig: {
+          provider: 'gmail',
+          config: {
+            clientEmail: configService.get('GMAIL_CLIENT_EMAIL', ''),
+            privateKey: configService.get('GMAIL_PRIVATE_KEY', ''),
+            impersonateEmail: configService.get('GMAIL_IMPERSONATE_EMAIL', ''),
+          },
         },
       })
     ),
