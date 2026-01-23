@@ -7,7 +7,15 @@ import {
 import { OpenKingdomFeatureRootSchemaModule } from '@open-kingdom/demo-scaffold-backend-feature-root-schema';
 
 // Define the environment keys that this app uses
-const envKeys = ['PORT', 'JWT_SECRET', 'JWT_EXPIRES_IN', 'BASE_URL'] as const;
+const envKeys = [
+  'PORT',
+  'JWT_SECRET',
+  'JWT_EXPIRES_IN',
+  'BASE_URL',
+  'GMAIL_CLIENT_EMAIL',
+  'GMAIL_PRIVATE_KEY',
+  'GMAIL_IMPERSONATE_EMAIL',
+] as const;
 
 // Create typed config service for this app
 const configService = createConfigService(envKeys, nodeEnvAdapter);
@@ -19,6 +27,16 @@ const configService = createConfigService(envKeys, nodeEnvAdapter);
       m.OpenKingdomFeatureBackendAuthModule.forRoot({
         jwtSecret: configService.get('JWT_SECRET', 'your-secret-key-here'),
         jwtExpiresIn: configService.get('JWT_EXPIRES_IN', '1h'),
+      })
+    ),
+    import('@open-kingdom/shared-backend-feature-email').then((m) =>
+      m.EmailModule.forRoot({
+        provider: 'gmail',
+        config: {
+          clientEmail: configService.get('GMAIL_CLIENT_EMAIL', ''),
+          privateKey: configService.get('GMAIL_PRIVATE_KEY', ''),
+          impersonateEmail: configService.get('GMAIL_IMPERSONATE_EMAIL', ''),
+        },
       })
     ),
   ],

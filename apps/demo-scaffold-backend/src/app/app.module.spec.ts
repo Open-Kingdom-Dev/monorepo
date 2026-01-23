@@ -25,6 +25,18 @@ jest.mock('@open-kingdom/shared-backend-feature-authentication', () => ({
   },
 }));
 
+jest.mock('@open-kingdom/shared-backend-feature-email', () => ({
+  EmailModule: {
+    forRoot: jest.fn().mockReturnValue({
+      module: class MockEmailModule {},
+      imports: [],
+      providers: [],
+      controllers: [],
+      exports: [],
+    }),
+  },
+}));
+
 describe('AppModule', () => {
   let module: TestingModule;
 

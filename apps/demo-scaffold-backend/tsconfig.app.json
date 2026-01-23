@@ -24,6 +24,9 @@
   ],
   "references": [
     {
+      "path": "../../libs/shared/backend/feature-email/tsconfig.lib.json"
+    },
+    {
       "path": "../../libs/demo-scaffold/backend/feature-root-schema/tsconfig.lib.json"
     },
     {

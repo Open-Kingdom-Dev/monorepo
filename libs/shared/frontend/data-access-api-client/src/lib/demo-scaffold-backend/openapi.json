@@ -115,6 +115,50 @@
           "Authentication"
         ]
       }
+    },
+    "/api/email/send": {
+      "post": {
+        "description": "Send a test email via Gmail API",
+        "operationId": "EmailController_sendEmail",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "description": "Email details",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SendEmailDto"
+              },
+              "examples": {
+                "test": {
+                  "summary": "Test email",
+                  "value": {
+                    "to": "test@example.com",
+                    "subject": "Test Subject",
+                    "body": "Hello, this is a test email."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Email sent successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SendEmailResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Send test email",
+        "tags": [
+          "Email"
+        ]
+      }
     }
   },
   "info": {
@@ -225,6 +269,55 @@
           "email",
           "invitee",
           "role"
+        ]
+      },
+      "SendEmailDto": {
+        "type": "object",
+        "properties": {
+          "to": {
+            "type": "string",
+            "description": "Recipient email address",
+            "example": "recipient@example.com",
+            "format": "email"
+          },
+          "subject": {
+            "type": "string",
+            "description": "Email subject line",
+            "example": "Test Email Subject"
+          },
+          "body": {
+            "type": "string",
+            "description": "Email body content",
+            "example": "Hello, this is a test email."
+          }
+        },
+        "required": [
+          "to",
+          "subject",
+          "body"
+        ]
+      },
+      "SendEmailResponseDto": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "description": "Whether the email was sent successfully",
+            "example": true
+          },
+          "messageId": {
+            "type": "string",
+            "description": "Gmail message ID if successful",
+            "example": "18c1234567890abc"
+          },
+          "error": {
+            "type": "string",
+            "description": "Error message if failed",
+            "example": "Invalid recipient address"
+          }
+        },
+        "required": [
+          "success"
         ]
       }
     }

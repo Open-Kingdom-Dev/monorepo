@@ -65,6 +65,9 @@
     },
     {
       "path": "./libs/demo-scaffold/backend/feature-root-schema"
+    },
+    {
+      "path": "./libs/shared/backend/feature-email"
     }
   ]
 }

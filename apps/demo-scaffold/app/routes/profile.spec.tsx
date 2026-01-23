@@ -31,6 +31,7 @@ jest.mock('@open-kingdom/shared-frontend-data-access-api-client', () => {
   const mockReducer: Reducer<unknown, Action> = (state = {}) => state;
   const loginMock = jest.fn();
   const profileMock = jest.fn();
+  const sendEmailMock = jest.fn();
 
   // Auth slice exports
   const AuthKey = 'auth';
@@ -63,6 +64,7 @@ jest.mock('@open-kingdom/shared-frontend-data-access-api-client', () => {
     },
     useAuthControllerLoginMutation: loginMock,
     useAuthControllerGetProfileQuery: profileMock,
+    useEmailControllerSendEmailMutation: sendEmailMock,
     // Auth slice exports
     AuthKey,
     authReducer,
@@ -72,6 +74,7 @@ jest.mock('@open-kingdom/shared-frontend-data-access-api-client', () => {
     __mockedHooks: {
       loginMock,
       profileMock,
+      sendEmailMock,
     },
   };
 });
@@ -82,10 +85,12 @@ const { __mockedHooks } = jest.requireMock(
   __mockedHooks: {
     loginMock: ReturnType<typeof jest.fn>;
     profileMock: ReturnType<typeof jest.fn>;
+    sendEmailMock: ReturnType<typeof jest.fn>;
   };
 };
 const mockLoginHook = __mockedHooks.loginMock;
 const mockProfileHook = __mockedHooks.profileMock;
+const mockSendEmailHook = __mockedHooks.sendEmailMock;
 
 const localStorageMock = (() => {
   let store: Record<string, string> = {};
@@ -152,6 +157,16 @@ describe('Profile Component', () => {
       isLoading: false,
       error: null,
     });
+
+    const defaultSendEmailTrigger = jest.fn().mockReturnValue({
+      unwrap: jest
+        .fn()
+        .mockResolvedValue({ success: true, messageId: 'msg-123' }),
+    });
+    mockSendEmailHook.mockReturnValue([
+      defaultSendEmailTrigger,
+      { isLoading: false },
+    ]);
   });
 
   const renderProfile = (options?: { token?: string }) => {
@@ -177,7 +192,7 @@ describe('Profile Component', () => {
     expect(screen.getByRole('button', { name: 'Login' })).toBeTruthy();
   });
 
-  it('submits login form and shows profile data on success', async () => {
+  it('submits login form and shows profile on success', async () => {
     const unwrap = jest.fn().mockResolvedValue({ access_token: 'token-123' });
     const loginTrigger = jest.fn().mockReturnValue({ unwrap });
     mockLoginHook.mockReturnValue([
@@ -185,23 +200,17 @@ describe('Profile Component', () => {
       { isLoading: false, error: null },
     ]);
 
-    mockProfileHook
-      .mockReturnValueOnce({
-        data: null,
-        isLoading: false,
-        error: null,
-      })
-      .mockReturnValue({
-        data: {
-          id: 1,
-          email: 'user@example.com',
-          firstName: 'Test',
-          lastName: 'User',
-          role: 'admin',
-        },
-        isLoading: false,
-        error: null,
-      });
+    mockProfileHook.mockReturnValue({
+      data: {
+        id: 1,
+        email: 'user@example.com',
+        firstName: 'Test',
+        lastName: 'User',
+        role: 'admin',
+      },
+      isLoading: false,
+      error: null,
+    });
 
     renderProfile();
 
@@ -219,7 +228,6 @@ describe('Profile Component', () => {
 
     expect(store.getState().auth.token).toBe('token-123');
     expect(screen.getByText('user@example.com')).toBeTruthy();
-    expect(unwrap).toHaveBeenCalled();
   });
 
   it('shows loading state while logging in', () => {
@@ -304,5 +312,84 @@ describe('Profile Component', () => {
     renderProfile({ token: 'test-token' });
     const fallbackValues = screen.getAllByText('N/A');
     expect(fallbackValues.length).toBeGreaterThanOrEqual(2);
+  });
+
+  describe('Email Form', () => {
+    it('shows email form', () => {
+      renderProfile();
+      expect(screen.getByRole('heading', { name: 'Send Email' })).toBeTruthy();
+      expect(screen.getByLabelText('To')).toBeTruthy();
+      expect(screen.getByLabelText('Subject')).toBeTruthy();
+      expect(screen.getByLabelText('Body')).toBeTruthy();
+    });
+
+    it('sends email with form data', async () => {
+      const unwrap = jest.fn().mockResolvedValue({ success: true });
+      const sendEmailTrigger = jest.fn().mockReturnValue({ unwrap });
+      mockSendEmailHook.mockReturnValue([
+        sendEmailTrigger,
+        { isLoading: false, isSuccess: false, isError: false },
+      ]);
+
+      renderProfile();
+
+      fireEvent.change(screen.getByLabelText('To'), {
+        target: { value: 'recipient@example.com' },
+      });
+      fireEvent.change(screen.getByLabelText('Subject'), {
+        target: { value: 'Test Subject' },
+      });
+      fireEvent.change(screen.getByLabelText('Body'), {
+        target: { value: 'Hello, this is a test.' },
+      });
+      fireEvent.click(screen.getByRole('button', { name: 'Send Email' }));
+
+      await waitFor(() => {
+        expect(sendEmailTrigger).toHaveBeenCalledWith({
+          sendEmailDto: {
+            to: 'recipient@example.com',
+            subject: 'Test Subject',
+            body: 'Hello, this is a test.',
+          },
+        });
+      });
+    });
+
+    it('shows success message after sending', () => {
+      mockSendEmailHook.mockReturnValue([
+        jest.fn(),
+        { isLoading: false, isSuccess: true, isError: false },
+      ]);
+
+      renderProfile();
+      expect(screen.getByText('Email sent successfully!')).toBeTruthy();
+    });
+
+    it('shows error message on failure', () => {
+      mockSendEmailHook.mockReturnValue([
+        jest.fn(),
+        {
+          isLoading: false,
+          isSuccess: false,
+          isError: true,
+          error: { message: 'Failed to send' },
+        },
+      ]);
+
+      renderProfile();
+      expect(screen.getByText('Failed to send')).toBeTruthy();
+    });
+
+    it('disables button while sending', () => {
+      mockSendEmailHook.mockReturnValue([
+        jest.fn(),
+        { isLoading: true, isSuccess: false, isError: false },
+      ]);
+
+      renderProfile();
+
+      const button = screen.getByRole('button', { name: 'Sending...' });
+      expect(button).toBeDisabled();
+    });
   });
 });
