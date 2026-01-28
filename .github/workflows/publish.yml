@@ -3,21 +3,8 @@ name: Publish Packages
 on:
   workflow_dispatch:
     inputs:
-      version:
-        description: 'Version bump type'
-        required: true
-        default: 'patch'
-        type: choice
-        options:
-          - patch
-          - minor
-          - major
-          - premajor
-          - preminor
-          - prepatch
-          - prerelease
       dry_run:
-        description: 'Dry run (preview only, no changes)'
+        description: 'Dry run (preview what Nx will release based on conventional commits)'
         required: false
         default: false
         type: boolean
@@ -83,11 +70,11 @@ jobs:
       - name: Nx Report
         run: npx nx report
 
-      # Dry run - preview only
+      # Dry run - preview only (Nx determines version from conventional commits)
       - name: Preview Release (Dry Run)
         if: ${{ inputs.dry_run == true }}
         run: |
-          npx nx release ${{ inputs.version }} \
+          npx nx release \
             --dry-run \
             ${{ inputs.first_release == true && '--first-release' || '' }}
         env:
@@ -102,8 +89,8 @@ jobs:
           CURRENT_VERSION=$(node -p "require('./package.json').version")
           echo "Current version: $CURRENT_VERSION"
 
-          # Run dry-run to determine what the next version will be
-          OUTPUT=$(npx nx release ${{ inputs.version }} --dry-run ${{ inputs.first_release == true && '--first-release' || '' }} 2>&1 || true)
+          # Run dry-run to determine what the next version will be (from conventional commits)
+          OUTPUT=$(npx nx release --dry-run ${{ inputs.first_release == true && '--first-release' || '' }} 2>&1 || true)
           echo "$OUTPUT"
 
           # Extract the new version from the dry-run output
@@ -131,7 +118,7 @@ jobs:
       - name: Version and Changelog
         if: ${{ inputs.dry_run == false }}
         run: |
-          npx nx release ${{ inputs.version }} \
+          npx nx release \
             --skip-publish \
             ${{ inputs.first_release == true && '--first-release' || '' }} \
             --yes
@@ -148,9 +135,12 @@ jobs:
         if: ${{ inputs.dry_run == false }}
         run: |
           LATEST_TAG=$(git describe --tags --abbrev=0)
+          VERSION="${LATEST_TAG#v}"
+          NOTES=$(sed -n "/^## ${VERSION}/,/^## [0-9]/p" CHANGELOG.md | sed '$d')
+
           gh release create "$LATEST_TAG" \
             --title "$LATEST_TAG" \
-            --generate-notes \
+            --notes "$NOTES" \
             --verify-tag
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
