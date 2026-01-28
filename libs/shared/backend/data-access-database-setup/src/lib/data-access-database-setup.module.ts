@@ -3,15 +3,18 @@ import { DrizzleBetterSQLiteModule } from '@knaadh/nestjs-drizzle-better-sqlite3
 
 import { DB_TAG } from '@open-kingdom/shared-poly-util-constants';
 
-export interface DatabaseSetupModuleOptions {
+export interface DatabaseSetupModuleOptions<
+  TSchema extends Record<string, unknown> = Record<string, unknown>
+> {
   filename?: string;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  schema: Record<string, any>;
+  schema: TSchema;
 }
 
 @Module({})
 export class DatabaseSetupModule {
-  static register(options: DatabaseSetupModuleOptions): DynamicModule {
+  static register<TSchema extends Record<string, unknown>>(
+    options: DatabaseSetupModuleOptions<TSchema>
+  ): DynamicModule {
     return {
       module: DatabaseSetupModule,
       imports: [
