@@ -54,19 +54,4 @@ export class ProfileResponseDto {
     example: 'john@example.com',
   })
   email!: string;
-
-  @ApiProperty({
-    description: 'ID of user who invited this user',
-    example: null,
-    type: 'number',
-    nullable: true,
-  })
-  invitee!: number | null;
-
-  @ApiProperty({
-    description: 'User role',
-    example: 'user',
-    enum: ['guest', 'user', 'admin'],
-  })
-  role!: 'guest' | 'user' | 'admin';
 }

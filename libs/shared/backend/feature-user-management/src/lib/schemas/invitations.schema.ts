@@ -15,6 +15,7 @@ export const invitations = table(InvitationsTableName, {
     .notNull()
     .references(() => users.id),
   invitedAt: t.int('invited_at').notNull(),
+  role: t.text().$type<'guest' | 'user' | 'admin'>().notNull().default('guest'),
   status: t
     .text()
     .$type<'pending' | 'accepted' | 'expired'>()

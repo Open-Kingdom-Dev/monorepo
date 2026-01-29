@@ -16,8 +16,6 @@ describe('AuthController', () => {
     email: 'test@example.com',
     firstName: 'John',
     lastName: 'Doe',
-    invitee: 1,
-    role: 'user',
   };
 
   beforeEach(async () => {
@@ -71,8 +69,6 @@ describe('AuthController', () => {
         email: 'another@example.com',
         firstName: 'Jane',
         lastName: 'Doe',
-        invitee: 2,
-        role: 'user',
       };
 
       const mockRequest = {
@@ -122,8 +118,6 @@ describe('AuthController', () => {
         email: 'third@example.com',
         firstName: 'John',
         lastName: 'Doe',
-        invitee: 3,
-        role: 'user',
       };
 
       const mockRequest = {

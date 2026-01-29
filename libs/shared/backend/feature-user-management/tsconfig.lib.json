@@ -21,6 +21,12 @@
   "include": ["src/**/*.ts"],
   "references": [
     {
+      "path": "../../poly/util-constants/tsconfig.lib.json"
+    },
+    {
+      "path": "../feature-email/tsconfig.lib.json"
+    },
+    {
       "path": "../data-access-users/tsconfig.lib.json"
     }
   ],

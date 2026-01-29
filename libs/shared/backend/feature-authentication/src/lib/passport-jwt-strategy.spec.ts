@@ -18,8 +18,6 @@ describe('JwtStrategy', () => {
     password: 'hashed-password',
     firstName: 'John',
     lastName: 'Doe',
-    invitee: 1,
-    role: 'user',
   };
 
   beforeEach(async () => {
@@ -69,8 +67,6 @@ describe('JwtStrategy', () => {
         email: mockUser.email,
         firstName: mockUser.firstName,
         lastName: mockUser.lastName,
-        invitee: mockUser.invitee,
-        role: mockUser.role,
       });
       expect(usersService.findOne).toHaveBeenCalledWith(payload.username);
     });
@@ -98,8 +94,6 @@ describe('JwtStrategy', () => {
         password: 'different-hashed-password',
         firstName: 'Jane',
         lastName: 'Doe',
-        invitee: 2,
-        role: 'user',
       };
 
       const payload = { username: 'another@example.com', id: 2 };
@@ -114,8 +108,6 @@ describe('JwtStrategy', () => {
         email: differentUser.email,
         firstName: differentUser.firstName,
         lastName: differentUser.lastName,
-        invitee: differentUser.invitee,
-        role: differentUser.role,
       });
       expect(usersService.findOne).toHaveBeenCalledWith(payload.username);
     });
@@ -148,8 +140,6 @@ describe('JwtStrategy', () => {
         email: mockUser.email,
         firstName: mockUser.firstName,
         lastName: mockUser.lastName,
-        invitee: mockUser.invitee,
-        role: mockUser.role,
       });
       expect(usersService.findOne).toHaveBeenCalledWith(payload.username);
     });

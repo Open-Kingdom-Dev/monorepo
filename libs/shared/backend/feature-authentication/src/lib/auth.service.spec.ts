@@ -24,8 +24,6 @@ describe('AuthService', () => {
     password: 'hashed-password',
     firstName: 'John',
     lastName: 'Doe',
-    invitee: 1,
-    role: 'user',
   };
 
   beforeEach(async () => {

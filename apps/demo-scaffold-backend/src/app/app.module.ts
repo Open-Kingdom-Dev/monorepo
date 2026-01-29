@@ -12,6 +12,7 @@ const envKeys = [
   'JWT_SECRET',
   'JWT_EXPIRES_IN',
   'BASE_URL',
+  'INVITATION_TOKEN_SECRET',
   'GMAIL_CLIENT_EMAIL',
   'GMAIL_PRIVATE_KEY',
   'GMAIL_IMPERSONATE_EMAIL',
@@ -37,6 +38,15 @@ const configService = createConfigService(envKeys, nodeEnvAdapter);
           privateKey: configService.get('GMAIL_PRIVATE_KEY', ''),
           impersonateEmail: configService.get('GMAIL_IMPERSONATE_EMAIL', ''),
         },
+      })
+    ),
+    import('@open-kingdom/shared-backend-feature-user-management').then((m) =>
+      m.FeatureUserManagementModule.forRoot({
+        invitationTokenSecret: configService.get(
+          'INVITATION_TOKEN_SECRET',
+          'default-invitation-secret'
+        ),
+        frontendBaseUrl: configService.get('BASE_URL', 'http://localhost:3000'),
       })
     ),
   ],

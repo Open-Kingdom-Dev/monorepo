@@ -208,7 +208,6 @@ function ProfileCard() {
     { label: 'Email', value: profile?.email },
     { label: 'First Name', value: profile?.firstName || 'N/A' },
     { label: 'Last Name', value: profile?.lastName || 'N/A' },
-    { label: 'Role', value: profile?.role },
   ];
 
   return (
