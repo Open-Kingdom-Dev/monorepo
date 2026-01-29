@@ -33,7 +33,9 @@
     "@nestjs/passport": "^11.0.0",
     "@nestjs/jwt": "^11.0.0",
     "@nestjs/swagger": "^11.0.0",
+    "@open-kingdom/shared-backend-data-access-users": "*",
     "bcrypt": "^5.1.1",
+    "express": "^5.1.0",
     "passport-jwt": "^4.0.1",
     "passport-local": "^1.0.0"
   }

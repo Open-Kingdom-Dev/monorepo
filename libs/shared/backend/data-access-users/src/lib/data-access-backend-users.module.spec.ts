@@ -2,9 +2,9 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { DrizzleBetterSQLiteModule } from '@knaadh/nestjs-drizzle-better-sqlite3';
 
 import { DB_TAG } from '@open-kingdom/shared-poly-util-constants';
+import { users } from './schemas';
 import { OpenKingdomDataAccessBackendUsersModule } from './data-access-backend-users.module';
 import { UsersService } from './users.service';
-import { users } from './schema';
 
 describe('OpenKingdomDataAccessBackendUsersModule', () => {
   let module: TestingModule;
@@ -28,36 +28,26 @@ describe('OpenKingdomDataAccessBackendUsersModule', () => {
     await module.close();
   });
 
-  describe('module configuration', () => {
-    it('should be defined', () => {
-      expect(OpenKingdomDataAccessBackendUsersModule).toBeDefined();
-    });
-
-    it('should have no controllers', () => {
-      // This module is a data access module, so it shouldn't have controllers
-      const moduleRef = module.get(OpenKingdomDataAccessBackendUsersModule);
-      expect(moduleRef).toBeDefined();
-      // Controllers array should be empty as defined in the module
+  describe('integration with NestJS', () => {
+    it('can be imported into any NestJS application', () => {
+      expect(module).toBeDefined();
     });
   });
 
-  describe('service availability', () => {
-    it('should make UsersService available for dependency injection', () => {
+  describe('providing user operations', () => {
+    it('exposes a service for finding and creating users', () => {
       const usersService = module.get<UsersService>(UsersService);
+
       expect(usersService).toBeDefined();
       expect(typeof usersService.findOne).toBe('function');
       expect(typeof usersService.ensureUser).toBe('function');
-      expect(typeof usersService.onModuleInit).toBe('function');
     });
 
-    it('should allow multiple instances to access the same service', () => {
+    it('maintains a single shared service instance across the application', () => {
       const service1 = module.get<UsersService>(UsersService);
       const service2 = module.get<UsersService>(UsersService);
 
-      // In a real scenario, these would be the same instance (singleton)
-      expect(service1).toBeDefined();
-      expect(service2).toBeDefined();
-      expect(service1.constructor).toBe(service2.constructor);
+      expect(service1).toBe(service2);
     });
   });
 });

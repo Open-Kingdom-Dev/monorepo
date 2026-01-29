@@ -4,11 +4,10 @@ import { eq } from 'drizzle-orm';
 import * as bcrypt from 'bcrypt';
 
 import { DB_TAG } from '@open-kingdom/shared-poly-util-constants';
-
-import { User, users, UserTableName } from './schema';
+import { User, users, UsersTableName } from './schemas';
 
 type schema = {
-  [UserTableName]: typeof users;
+  [UsersTableName]: typeof users;
 };
 
 @Injectable()
@@ -17,7 +16,7 @@ export class UsersService implements OnModuleInit {
 
   async onModuleInit() {
     await this.ensureUser({
-      invitee: null,
+      invitedBy: null,
       firstName: 'Admin',
       lastName: 'Admin',
       email: 'admin@admin.com',
