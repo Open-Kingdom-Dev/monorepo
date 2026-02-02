@@ -4,6 +4,12 @@
   "publishConfig": {
     "access": "public"
   },
+  "scripts": {
+    "db:generate": "drizzle-kit generate --config=../../../../apps/demo-scaffold-backend/drizzle.config.ts",
+    "db:migrate": "drizzle-kit migrate --config=../../../../apps/demo-scaffold-backend/drizzle.config.ts",
+    "db:push": "drizzle-kit push --config=../../../../apps/demo-scaffold-backend/drizzle.config.ts",
+    "db:studio": "drizzle-kit studio --config=../../../../apps/demo-scaffold-backend/drizzle.config.ts"
+  },
   "main": "./dist/index.js",
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
