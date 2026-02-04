@@ -80,41 +80,13 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      # Determine version first, then create branch, then run release
-      - name: Determine next version
-        if: ${{ inputs.dry_run == false }}
-        id: next_version
-        run: |
-          # Get current version from root package.json
-          CURRENT_VERSION=$(node -p "require('./package.json').version")
-          echo "Current version: $CURRENT_VERSION"
-
-          # Run dry-run to determine what the next version will be (from conventional commits)
-          OUTPUT=$(npx nx release --dry-run ${{ inputs.first_release == true && '--first-release' || '' }} 2>&1 || true)
-          echo "$OUTPUT"
-
-          # Extract the new version from the dry-run output
-          # Look for pattern like "- @open-kingdom/shared-poly-util-types: 0.0.2-6 => 0.0.3"
-          NEXT_VERSION=$(echo "$OUTPUT" | grep -oE '[0-9]+\.[0-9]+\.[0-9]+(-[a-zA-Z0-9.]+)?' | tail -1)
-
-          if [ -z "$NEXT_VERSION" ]; then
-            echo "Error: Could not determine next version"
-            exit 1
-          fi
-
-          echo "Next version: $NEXT_VERSION"
-          echo "version=$NEXT_VERSION" >> $GITHUB_OUTPUT
-          echo "branch=release/v$NEXT_VERSION" >> $GITHUB_OUTPUT
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
       - name: Create release branch
         if: ${{ inputs.dry_run == false }}
-        run: |
-          git checkout -b ${{ steps.next_version.outputs.branch }}
-          echo "Created branch: ${{ steps.next_version.outputs.branch }}"
+        run: git checkout -b release
 
       # Version, changelog, commit, and tag (on release branch)
+      # Publishing is split into a separate step so that branch and tags
+      # are pushed to the remote before packages are published to NPM.
       - name: Version and Changelog
         if: ${{ inputs.dry_run == false }}
         run: |
@@ -128,7 +100,7 @@ jobs:
       - name: Push release branch and tags
         if: ${{ inputs.dry_run == false }}
         run: |
-          git push -u origin ${{ steps.next_version.outputs.branch }}
+          git push -u origin release
           git push --tags
 
       - name: Create GitHub Release
@@ -156,10 +128,10 @@ jobs:
         if: ${{ inputs.dry_run == false }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          VERSION: ${{ steps.next_version.outputs.version }}
-          BRANCH: ${{ steps.next_version.outputs.branch }}
         run: |
-          # Extract changelog for this version (handle missing file gracefully)
+          LATEST_TAG=$(git describe --tags --abbrev=0)
+          VERSION="${LATEST_TAG#v}"
+
           if [ -f "CHANGELOG.md" ]; then
             CHANGELOG_CONTENT=$(sed -n "/^## ${VERSION}/,/^## [0-9]/p" CHANGELOG.md | sed '$d' || echo "See GitHub release for changes.")
           else
@@ -168,7 +140,7 @@ jobs:
 
           gh pr create \
             --base master \
-            --head "$BRANCH" \
+            --head release \
             --title "chore(release): merge v${VERSION} back to master" \
             --body "## Release v${VERSION}
 
