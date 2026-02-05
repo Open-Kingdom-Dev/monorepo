@@ -1,8 +1,10 @@
 {
   "name": "@open-kingdom/shared-backend-feature-email",
-  "version": "0.0.1",
-  "private": true,
+  "version": "0.0.2-6",
   "type": "module",
+  "publishConfig": {
+    "access": "public"
+  },
   "main": "./dist/index.js",
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
