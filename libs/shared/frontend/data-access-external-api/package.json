@@ -27,5 +27,10 @@
       "type:data-access",
       "environment:frontend"
     ]
+  },
+  "dependencies": {
+    "@reduxjs/toolkit": "^2.11.0",
+    "axios": "^1.6.0",
+    "tslib": "^2.3.0"
   }
 }
