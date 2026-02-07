@@ -105,10 +105,13 @@
     ],
     "version": {
       "preVersionCommand": "npx nx run-many -t build",
-      "conventionalCommits": true
+      "conventionalCommits": true,
+      "fallbackCurrentVersionResolver": "disk",
+      "preserveMatchingDependencyRanges": false
     },
     "versionPlans": false,
     "changelog": {
+      "automaticFromRef": true,
       "workspaceChangelog": true,
       "projectChangelogs": false
     },
@@ -116,10 +119,6 @@
       "commit": true,
       "tag": false,
       "commitMessage": "chore(release): publish {version}"
-    },
-    "publish": {
-      "registry": "https://registry.npmjs.org",
-      "access": "public"
     }
   },
   "generators": {
