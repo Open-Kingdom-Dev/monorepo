@@ -109,7 +109,6 @@ jobs:
         run: npx nx release publish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_ACCESS_TOKEN }}
-          NPM_CONFIG_PROVENANCE: true
 
       - name: Clean up release branch
         run: git push origin --delete release 2>/dev/null || true
