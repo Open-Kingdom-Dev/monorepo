@@ -88,7 +88,7 @@ jobs:
       # Version, changelog, and commit (no tag — tagging happens after merge to master)
       - name: Version and Changelog
         if: ${{ inputs.dry_run == false }}
-        run: npx nx release --skip-publish --yes
+        run: npx nx release --skip-publish
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -101,7 +101,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          VERSION=$(grep -m1 -oP '(?<=^## )\S+' CHANGELOG.md)
+          VERSION=$(sed -n 's/^## \([^ ]*\).*/\1/p' CHANGELOG.md | head -1)
 
           gh pr create \
             --base master \
