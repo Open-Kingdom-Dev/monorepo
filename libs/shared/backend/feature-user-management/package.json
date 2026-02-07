@@ -1,6 +1,6 @@
 {
   "name": "@open-kingdom/shared-backend-feature-user-management",
-  "version": "0.0.2-6",
+  "version": "0.0.2-7",
   "publishConfig": {
     "access": "public"
   },
@@ -30,7 +30,7 @@
   "dependencies": {
     "tslib": "^2.3.0",
     "@nestjs/common": "^11.0.0",
-    "@open-kingdom/shared-backend-data-access-users": "*",
+    "@open-kingdom/shared-backend-data-access-users": "0.0.2-7",
     "drizzle-orm": "^0.44.5"
   }
 }
