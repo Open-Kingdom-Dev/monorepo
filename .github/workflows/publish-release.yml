@@ -67,7 +67,7 @@ jobs:
       - name: Extract version from CHANGELOG
         id: version
         run: |
-          VERSION=$(grep -m1 -oP '(?<=^## )\S+' CHANGELOG.md)
+          VERSION=$(sed -n 's/^## \([^ ]*\).*/\1/p' CHANGELOG.md | head -1)
           echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
           echo "tag=v${VERSION}" >> "$GITHUB_OUTPUT"
           echo "Detected version: ${VERSION}"
