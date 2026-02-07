@@ -113,6 +113,8 @@
       "projectChangelogs": false
     },
     "git": {
+      "commit": true,
+      "tag": false,
       "commitMessage": "chore(release): publish {version}"
     },
     "publish": {
