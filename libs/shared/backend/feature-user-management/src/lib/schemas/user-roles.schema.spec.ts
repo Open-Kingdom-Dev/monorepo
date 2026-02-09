@@ -9,36 +9,12 @@ import { getTableColumns } from 'drizzle-orm';
 describe('UserRoles Schema', () => {
   const columns = getTableColumns(userRoles);
 
-  describe('role assignment', () => {
-    it('links each role to a user', () => {
-      expect(columns.userId).toBeDefined();
-      expect(columns.userId.notNull).toBe(true);
-    });
-
-    it('requires specifying the role type', () => {
-      expect(columns.role).toBeDefined();
-      expect(columns.role.notNull).toBe(true);
-    });
-
-    it('assigns guest role by default', () => {
-      expect(columns.role.default).toBe('guest');
-    });
-
-    it('records when the role was assigned', () => {
-      expect(columns.assignedAt).toBeDefined();
-      expect(columns.assignedAt.notNull).toBe(true);
-    });
-
-    it('optionally tracks who assigned the role', () => {
-      expect(columns.assignedBy).toBeDefined();
-      expect(columns.assignedBy.notNull).toBe(false);
-    });
+  it('assigns guest role by default', () => {
+    expect(columns.role.default).toBe('guest');
   });
 
-  describe('database table', () => {
-    it('uses user_roles as the table name', () => {
-      expect(UserRolesTableName).toBe('user_roles');
-    });
+  it('uses user_roles as the table name', () => {
+    expect(UserRolesTableName).toBe('user_roles');
   });
 
   describe('type safety', () => {

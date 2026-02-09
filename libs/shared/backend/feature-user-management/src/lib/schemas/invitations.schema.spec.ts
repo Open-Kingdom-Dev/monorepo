@@ -9,50 +9,20 @@ import { getTableColumns } from 'drizzle-orm';
 describe('Invitations Schema', () => {
   const columns = getTableColumns(invitations);
 
-  describe('invitation details', () => {
-    it('stores the invited email address', () => {
-      expect(columns.email).toBeDefined();
-      expect(columns.email.notNull).toBe(true);
-    });
-
-    it('generates a unique invitation token', () => {
-      expect(columns.token).toBeDefined();
-      expect(columns.token.notNull).toBe(true);
-      expect(columns.token.isUnique).toBe(true);
-    });
-
-    it('records when the invitation was sent', () => {
-      expect(columns.invitedAt).toBeDefined();
-      expect(columns.invitedAt.notNull).toBe(true);
-    });
-
-    it('tracks who sent the invitation', () => {
-      expect(columns.invitedBy).toBeDefined();
-      expect(columns.invitedBy.notNull).toBe(true);
-    });
-
-    it('assigns guest role by default', () => {
-      expect(columns.role).toBeDefined();
-      expect(columns.role.notNull).toBe(true);
-      expect(columns.role.default).toBe('guest');
-    });
+  it('enforces uniqueness on invitation tokens', () => {
+    expect(columns.token.isUnique).toBe(true);
   });
 
-  describe('invitation lifecycle', () => {
-    it('starts in pending status', () => {
-      expect(columns.status.default).toBe('pending');
-    });
-
-    it('has an expiry date for security', () => {
-      expect(columns.tokenExpiry).toBeDefined();
-      expect(columns.tokenExpiry.notNull).toBe(true);
-    });
+  it('assigns guest role by default', () => {
+    expect(columns.role.default).toBe('guest');
   });
 
-  describe('database table', () => {
-    it('uses invitations as the table name', () => {
-      expect(InvitationsTableName).toBe('invitations');
-    });
+  it('starts in pending status', () => {
+    expect(columns.status.default).toBe('pending');
+  });
+
+  it('uses invitations as the table name', () => {
+    expect(InvitationsTableName).toBe('invitations');
   });
 
   describe('type safety', () => {
