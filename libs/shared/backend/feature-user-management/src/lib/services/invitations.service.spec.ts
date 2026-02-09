@@ -22,6 +22,7 @@ interface MockDb {
   query: MockQuery;
   insert: jest.Mock;
   update: jest.Mock;
+  delete: jest.Mock;
 }
 
 const createMockInvitation = (
@@ -68,6 +69,9 @@ describe('InvitationsService', () => {
         set: jest.fn().mockReturnValue({
           where: jest.fn().mockResolvedValue(undefined),
         }),
+      }),
+      delete: jest.fn().mockReturnValue({
+        where: jest.fn().mockResolvedValue(undefined),
       }),
     };
 
@@ -187,7 +191,7 @@ describe('InvitationsService', () => {
       });
     });
 
-    it('continues successfully even if sending the email fails', async () => {
+    it('rolls back invitation when email sending fails', async () => {
       const mockEmailSender: jest.Mocked<EmailSender> = {
         send: jest
           .fn()
@@ -221,13 +225,11 @@ describe('InvitationsService', () => {
           status: INVITATION_STATUS.PENDING,
         });
 
-      // Should not throw, just log the error
-      const result = await serviceWithEmail.invite(
-        'new@example.com',
-        'user',
-        1
-      );
-      expect(result.email).toBe('new@example.com');
+      await expect(
+        serviceWithEmail.invite('new@example.com', 'user', 1)
+      ).rejects.toThrow(BadRequestException);
+
+      expect(mockDb.delete).toHaveBeenCalledWith(invitations);
     });
   });
 
