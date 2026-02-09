@@ -21,8 +21,6 @@ import {
   Invitation,
   InvitationsTableName,
 } from '../schemas/invitations.schema';
-
-export type InvitationResponse = Omit<Invitation, 'token'>;
 import {
   USER_MANAGEMENT_OPTIONS,
   EMAIL_SENDER,
@@ -38,6 +36,8 @@ import type {
   Role,
   ValidationResult,
 } from '../types';
+
+export type InvitationResponse = Omit<Invitation, 'token'>;
 
 type Schema = {
   [UsersTableName]: typeof users;
@@ -81,8 +81,18 @@ export class InvitationsService {
 
     const invitation = await this.findByToken(token);
 
-    // Fire-and-forget: don't block on email sending
-    this.sendInvitationEmail(email, token);
+    try {
+      await this.sendInvitationEmail(email, token);
+    } catch (error) {
+      this.logger.error(
+        `Failed to send invitation email to ${email}, rolling back invitation`,
+        error
+      );
+      await this.db.delete(invitations).where(eq(invitations.token, token));
+      throw new BadRequestException(
+        'Failed to send invitation email. Please try again.'
+      );
+    }
 
     // Never return token - it's only sent via email
     const { token: _token, ...invitationWithoutToken } =
@@ -209,18 +219,14 @@ export class InvitationsService {
       return;
     }
 
-    try {
-      await this.emailSender.send({
-        to: email,
-        subject: INVITATION_EMAIL_SUBJECT,
-        body: buildInvitationEmailBody({
-          inviteUrl,
-          expiryDays: this.expiryDays,
-        }),
-      });
-      this.logger.log(`Invitation email sent to ${email}`);
-    } catch (error) {
-      this.logger.error(`Failed to send invitation email to ${email}`, error);
-    }
+    await this.emailSender.send({
+      to: email,
+      subject: INVITATION_EMAIL_SUBJECT,
+      body: buildInvitationEmailBody({
+        inviteUrl,
+        expiryDays: this.expiryDays,
+      }),
+    });
+    this.logger.log(`Invitation email sent to ${email}`);
   }
 }
