@@ -1,0 +1,216 @@
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import '@testing-library/jest-dom';
+import { Provider } from 'react-redux';
+import { configureStore } from '@reduxjs/toolkit';
+import type { ColDef } from 'ag-grid-community';
+import { UserList } from './UserList.component';
+
+const mockFindAllQuery = jest.fn();
+const mockDeleteUser = jest.fn();
+
+jest.mock('@open-kingdom/shared-frontend-data-access-api-client', () => ({
+  useUsersControllerFindAllQuery: () => mockFindAllQuery(),
+  useUsersControllerDeleteMutation: () => [
+    mockDeleteUser,
+    { isLoading: false },
+  ],
+  useInvitationsControllerInviteMutation: () => [
+    jest.fn(),
+    { isLoading: false, error: null },
+  ],
+}));
+
+jest.mock('@open-kingdom/shared-frontend-data-access-notifications', () => ({
+  showSuccessNotification: jest.fn((msg: string) => ({
+    type: 'notify',
+    payload: msg,
+  })),
+}));
+
+jest.mock('@open-kingdom/shared-frontend-ui-theme', () => ({
+  __esModule: true,
+  useTheme: () => ({ theme: {}, mode: 'light' }),
+}));
+
+let capturedColumnDefs: ColDef[] = [];
+jest.mock('@open-kingdom/shared-frontend-ui-datagrid', () => ({
+  __esModule: true,
+  DataGrid: ({
+    rowData,
+    loading,
+    columnDefs,
+  }: {
+    rowData: Record<string, unknown>[];
+    loading: boolean;
+    columnDefs: ColDef[];
+  }) => {
+    capturedColumnDefs = columnDefs;
+    const rows = rowData ?? [];
+    return (
+      <div data-testid="data-grid">
+        {loading && <span>Loading...</span>}
+        {!loading &&
+          rows.map((row, i) => (
+            <div key={i} data-testid="grid-row">
+              {columnDefs.map((col, j) => {
+                const value = col.valueGetter
+                  ? (col.valueGetter as CallableFunction)({ data: row })
+                  : (row as Record<string, unknown>)[col.field as string];
+                const rendered = col.cellRenderer
+                  ? (col.cellRenderer as CallableFunction)({ data: row })
+                  : value;
+                return <span key={j}>{rendered}</span>;
+              })}
+            </div>
+          ))}
+      </div>
+    );
+  },
+}));
+
+jest.mock('../shared/ConfirmDialog.component', () => ({
+  __esModule: true,
+  ConfirmDialog: ({
+    isOpen,
+    title,
+    onConfirm,
+    onCancel,
+  }: {
+    isOpen: boolean;
+    title: string;
+    message: string;
+    confirmLabel: string;
+    onConfirm: () => void;
+    onCancel: () => void;
+    isLoading: boolean;
+  }) =>
+    isOpen ? (
+      <div data-testid="confirm-dialog">
+        <span>{title}</span>
+        <button onClick={onConfirm}>Confirm</button>
+        <button onClick={onCancel}>Cancel</button>
+      </div>
+    ) : null,
+}));
+
+jest.mock('../shared/RoleBadge.component', () => ({
+  __esModule: true,
+  RoleBadge: ({ role }: { role: string }) => (
+    <span data-testid="role-badge">{role}</span>
+  ),
+}));
+
+jest.mock('../invitations', () => ({
+  __esModule: true,
+  InviteUserModal: () => null,
+}));
+
+const store = configureStore({ reducer: {} });
+
+function renderWithProviders(ui: React.ReactElement) {
+  return render(<Provider store={store}>{ui}</Provider>);
+}
+
+const mockUsers = [
+  {
+    id: 1,
+    email: 'admin@test.com',
+    firstName: 'Admin',
+    lastName: 'User',
+    role: 'admin',
+  },
+  {
+    id: 2,
+    email: 'guest@test.com',
+    firstName: null,
+    lastName: null,
+    role: 'guest',
+  },
+];
+
+describe('UserList', () => {
+  beforeEach(() => {
+    mockDeleteUser.mockReset();
+    mockDeleteUser.mockReturnValue({ unwrap: () => Promise.resolve() });
+    capturedColumnDefs = [];
+  });
+
+  it('shows a loading indicator while fetching users', () => {
+    mockFindAllQuery.mockReturnValue({
+      data: undefined,
+      isLoading: true,
+      error: null,
+      refetch: jest.fn(),
+    });
+    renderWithProviders(<UserList />);
+    expect(screen.getByText('Loading...')).toBeInTheDocument();
+  });
+
+  it('shows the user list with an invite button', () => {
+    mockFindAllQuery.mockReturnValue({
+      data: mockUsers,
+      isLoading: false,
+      error: null,
+      refetch: jest.fn(),
+    });
+    renderWithProviders(<UserList />);
+    expect(screen.getByText('Users')).toBeInTheDocument();
+    expect(screen.getByText('Invite User')).toBeInTheDocument();
+  });
+
+  it('shows an error with a retry option when loading fails', () => {
+    mockFindAllQuery.mockReturnValue({
+      data: undefined,
+      isLoading: false,
+      error: { status: 500 },
+      refetch: jest.fn(),
+    });
+    renderWithProviders(<UserList />);
+    expect(screen.getByText('Failed to load users.')).toBeInTheDocument();
+    expect(screen.getByText('Try again')).toBeInTheDocument();
+  });
+
+  it('retries loading users when clicking "Try again"', () => {
+    const refetch = jest.fn();
+    mockFindAllQuery.mockReturnValue({
+      data: undefined,
+      isLoading: false,
+      error: { status: 500 },
+      refetch,
+    });
+    renderWithProviders(<UserList />);
+    fireEvent.click(screen.getByText('Try again'));
+    expect(refetch).toHaveBeenCalled();
+  });
+
+  it('asks for confirmation before deleting a user', async () => {
+    mockFindAllQuery.mockReturnValue({
+      data: mockUsers,
+      isLoading: false,
+      error: null,
+      refetch: jest.fn(),
+    });
+    renderWithProviders(<UserList currentUserId={1} />);
+
+    const actionsCol = capturedColumnDefs.find(
+      (c) => c.headerName === 'Actions'
+    );
+    const { container } = render(
+      <Provider store={store}>
+        {(actionsCol?.cellRenderer as CallableFunction)({ data: mockUsers[1] })}
+      </Provider>
+    );
+    const deleteBtn = container.querySelector('button');
+    expect(deleteBtn).toBeTruthy();
+    fireEvent.click(deleteBtn as HTMLElement);
+
+    await waitFor(() => {
+      expect(screen.getByTestId('confirm-dialog')).toBeInTheDocument();
+    });
+
+    fireEvent.click(screen.getByText('Confirm'));
+    await waitFor(() => {
+      expect(mockDeleteUser).toHaveBeenCalledWith({ id: 2 });
+    });
+  });
+});

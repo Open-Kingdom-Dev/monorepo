@@ -71,6 +71,9 @@
     },
     {
       "path": "./libs/shared/backend/feature-user-management"
+    },
+    {
+      "path": "./libs/shared/frontend/feature-user-management"
     }
   ]
 }

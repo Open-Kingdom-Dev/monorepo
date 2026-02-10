@@ -10,6 +10,7 @@ export function AppNav() {
         About
       </NavLink>
       <NavLink to="/profile">Profile</NavLink>
+      <NavLink to="/admin/users">Users</NavLink>
     </nav>
   );
 }

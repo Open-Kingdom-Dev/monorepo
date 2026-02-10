@@ -28,6 +28,7 @@ describe('AppNav Component', () => {
     expect(screen.getByText('Home')).toBeTruthy();
     expect(screen.getByText('About')).toBeTruthy();
     expect(screen.getByText('Profile')).toBeTruthy();
+    expect(screen.getByText('Users')).toBeTruthy();
   });
 
   it('should render navigation in proper structure', () => {
@@ -37,7 +38,7 @@ describe('AppNav Component', () => {
     expect(nav).toBeTruthy();
 
     const links = screen.getAllByRole('link');
-    expect(links).toHaveLength(3);
+    expect(links).toHaveLength(4);
   });
 
   it('should handle different initial routes', () => {
