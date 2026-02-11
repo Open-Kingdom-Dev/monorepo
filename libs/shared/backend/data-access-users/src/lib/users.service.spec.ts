@@ -27,6 +27,7 @@ describe('UsersService', () => {
     mockQuery = {
       users: {
         findFirst: jest.fn(),
+        findMany: jest.fn(),
       },
     };
 
@@ -34,6 +35,9 @@ describe('UsersService', () => {
       query: mockQuery,
       insert: jest.fn().mockReturnValue({
         values: jest.fn().mockResolvedValue(undefined),
+      }),
+      delete: jest.fn().mockReturnValue({
+        where: jest.fn().mockResolvedValue(undefined),
       }),
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } as any;
@@ -61,9 +65,7 @@ describe('UsersService', () => {
         firstName: 'Admin',
         lastName: 'Admin',
         email: 'admin@admin.com',
-        role: 'admin',
         password: 'hashed-password',
-        invitedBy: null,
       });
 
       await service.onModuleInit();
@@ -81,9 +83,7 @@ describe('UsersService', () => {
         firstName: 'Admin',
         lastName: 'Admin',
         email: 'admin@admin.com',
-        role: 'admin',
         password: 'existing-hash',
-        invitedBy: null,
       };
       mockQuery.users.findFirst.mockResolvedValue(existingAdmin);
 
@@ -103,9 +103,7 @@ describe('UsersService', () => {
         firstName: 'John',
         lastName: 'Doe',
         email: 'john@example.com',
-        role: 'user',
         password: 'hashed-password',
-        invitedBy: null,
       };
 
       mockQuery.users.findFirst.mockResolvedValue(mockUser);
@@ -130,6 +128,38 @@ describe('UsersService', () => {
     });
   });
 
+  describe('findById', () => {
+    it('should find user by id', async () => {
+      const mockUser: User = {
+        id: 1,
+        firstName: 'John',
+        lastName: 'Doe',
+        email: 'john@example.com',
+        password: 'hashed-password',
+      };
+
+      mockQuery.users.findFirst.mockResolvedValue(mockUser);
+
+      const result = await service.findById(1);
+
+      expect(result).toEqual(mockUser);
+      expect(mockQuery.users.findFirst).toHaveBeenCalledWith({
+        where: eq(users.id, 1),
+      });
+    });
+
+    it('should return undefined when user not found', async () => {
+      mockQuery.users.findFirst.mockResolvedValue(undefined);
+
+      const result = await service.findById(999);
+
+      expect(result).toBeUndefined();
+      expect(mockQuery.users.findFirst).toHaveBeenCalledWith({
+        where: eq(users.id, 999),
+      });
+    });
+  });
+
   describe('ensureUser', () => {
     it('should create new user when user does not exist', async () => {
       const userData = {
@@ -137,8 +167,6 @@ describe('UsersService', () => {
         lastName: 'Smith',
         email: 'jane@example.com',
         password: 'plain-password',
-        role: 'user' as const,
-        invitedBy: null,
       };
 
       const createdUser: User = {
@@ -167,9 +195,7 @@ describe('UsersService', () => {
         firstName: 'John',
         lastName: 'Doe',
         email: 'john@example.com',
-        role: 'user',
         password: 'existing-hash',
-        invitedBy: null,
       };
 
       const userData = {
@@ -177,8 +203,6 @@ describe('UsersService', () => {
         lastName: 'Doe',
         email: 'john@example.com',
         password: 'new-password',
-        role: 'user' as const,
-        invitedBy: null,
       };
 
       mockQuery.users.findFirst.mockResolvedValue(existingUser);
@@ -193,19 +217,17 @@ describe('UsersService', () => {
       expect(result).toEqual(existingUser);
     });
 
-    it('should default role to admin when not provided', async () => {
+    it('should hash password when creating user', async () => {
       const userData = {
         firstName: 'Test',
         lastName: 'User',
         email: 'test@example.com',
         password: 'password',
-        invitedBy: null,
       };
 
       const createdUser: User = {
         id: 3,
         ...userData,
-        role: 'admin',
         password: 'hashed-password',
       };
 
@@ -213,9 +235,7 @@ describe('UsersService', () => {
         .mockResolvedValueOnce(undefined)
         .mockResolvedValueOnce(createdUser);
 
-      // Intentional type mismatch to test
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      await service.ensureUser(userData as any);
+      await service.ensureUser(userData);
 
       expect(mockDb.insert).toHaveBeenCalledWith(users);
       expect(mockDb.insert(users).values).toHaveBeenCalledWith({
@@ -223,8 +243,77 @@ describe('UsersService', () => {
         lastName: 'User',
         email: 'test@example.com',
         password: 'hashed-password',
-        role: 'admin',
       });
+    });
+  });
+
+  describe('findAll', () => {
+    it('should return all users', async () => {
+      const mockUsers: User[] = [
+        {
+          id: 1,
+          firstName: 'John',
+          lastName: 'Doe',
+          email: 'john@example.com',
+          password: 'hash1',
+        },
+        {
+          id: 2,
+          firstName: 'Jane',
+          lastName: 'Doe',
+          email: 'jane@example.com',
+          password: 'hash2',
+        },
+      ];
+
+      mockQuery.users.findMany.mockResolvedValue(mockUsers);
+
+      const result = await service.findAll();
+
+      expect(result).toEqual(mockUsers);
+      expect(mockQuery.users.findMany).toHaveBeenCalled();
+    });
+
+    it('should return empty array when no users exist', async () => {
+      mockQuery.users.findMany.mockResolvedValue([]);
+
+      const result = await service.findAll();
+
+      expect(result).toEqual([]);
+    });
+  });
+
+  describe('create', () => {
+    it('should create user with hashed password', async () => {
+      const userData = {
+        firstName: 'New',
+        lastName: 'User',
+        email: 'new@example.com',
+        password: 'plain-password',
+      };
+
+      const createdUser: User = {
+        id: 1,
+        ...userData,
+        password: 'hashed-password',
+      };
+
+      mockQuery.users.findFirst.mockResolvedValue(createdUser);
+
+      const result = await service.create(userData);
+
+      expect(mockedBcrypt.hash).toHaveBeenCalledWith('plain-password', 12);
+      expect(mockDb.insert).toHaveBeenCalledWith(users);
+      expect(result).toEqual(createdUser);
+    });
+  });
+
+  describe('delete', () => {
+    it('should delete user by id', async () => {
+      await service.delete(1);
+
+      expect(mockDb.delete).toHaveBeenCalledWith(users);
+      expect(mockDb.delete(users).where).toHaveBeenCalledWith(eq(users.id, 1));
     });
   });
 });

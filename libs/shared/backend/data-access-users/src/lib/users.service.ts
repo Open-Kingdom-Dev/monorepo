@@ -16,12 +16,10 @@ export class UsersService implements OnModuleInit {
 
   async onModuleInit() {
     await this.ensureUser({
-      invitedBy: null,
       firstName: 'Admin',
       lastName: 'Admin',
       email: 'admin@admin.com',
       password: 'admin',
-      role: 'admin',
     });
   }
 
@@ -30,6 +28,29 @@ export class UsersService implements OnModuleInit {
       where: eq(users.email, email),
     });
     return user;
+  }
+
+  async findById(id: number): Promise<User | undefined> {
+    const user = await this.db.query.users.findFirst({
+      where: eq(users.id, id),
+    });
+    return user;
+  }
+
+  async findAll(): Promise<User[]> {
+    return this.db.query.users.findMany();
+  }
+
+  async create(data: Omit<User, 'id'>): Promise<User> {
+    await this.db.insert(users).values({
+      ...data,
+      password: await bcrypt.hash(data.password, 12),
+    });
+    return this.findOne(data.email) as Promise<User>;
+  }
+
+  async delete(id: number): Promise<void> {
+    await this.db.delete(users).where(eq(users.id, id));
   }
 
   async ensureUser(data: Omit<User, 'id'>) {
@@ -41,7 +62,6 @@ export class UsersService implements OnModuleInit {
       lastName: data.lastName,
       email: data.email,
       password: await bcrypt.hash(data.password, 12),
-      role: data.role ?? 'admin',
     });
     return this.findOne(data.email);
   }

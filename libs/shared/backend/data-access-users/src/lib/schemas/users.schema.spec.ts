@@ -24,24 +24,6 @@ describe('Users Schema', () => {
     });
   });
 
-  describe('managing user permissions', () => {
-    it('assigns guest role by default for new users', () => {
-      expect(columns.role.default).toBe('guest');
-    });
-
-    it('supports guest, user, and admin roles', () => {
-      // Type check ensures only valid roles can be assigned
-      const validRoles: User['role'][] = ['guest', 'user', 'admin'];
-      expect(validRoles).toHaveLength(3);
-    });
-  });
-
-  describe('tracking user relationships', () => {
-    it('records who invited each user', () => {
-      expect(columns.invitedBy).toBeDefined();
-    });
-  });
-
   describe('type exports', () => {
     it('exports table name for consistent references', () => {
       expect(UsersTableName).toBe('users');
@@ -55,8 +37,6 @@ describe('Users Schema', () => {
         lastName: 'Doe',
         email: 'john@example.com',
         password: 'hashed',
-        role: 'user',
-        invitedBy: null,
       };
 
       const mockNewUser: NewUser = {

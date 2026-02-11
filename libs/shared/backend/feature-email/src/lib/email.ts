@@ -26,6 +26,7 @@ export class EmailModule {
   static forRoot(options: EmailModuleOptions): DynamicModule {
     return {
       module: EmailModule,
+      global: true,
       controllers: [EmailController],
       providers: [
         {

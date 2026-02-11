@@ -1,5 +1,5 @@
-import path from 'node:path';
 import { defineConfig } from 'drizzle-kit';
+import * as path from 'path';
 
 export default defineConfig({
   dialect: 'sqlite',

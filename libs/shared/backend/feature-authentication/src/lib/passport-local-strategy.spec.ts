@@ -15,8 +15,6 @@ describe('LocalStrategy', () => {
     email: 'test@example.com',
     firstName: 'John',
     lastName: 'Doe',
-    invitee: 1,
-    role: 'user',
   };
 
   beforeEach(async () => {
