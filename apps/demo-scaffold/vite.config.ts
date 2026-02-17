@@ -8,7 +8,13 @@ export default defineConfig(() => ({
   root: __dirname,
   cacheDir: '../../node_modules/.vite/apps/demo-scaffold',
   resolve: {
-    conditions: ['@open-kingdom/source', 'browser', 'module', 'import', 'default'],
+    conditions: [
+      '@open-kingdom/source',
+      'browser',
+      'module',
+      'import',
+      'default',
+    ],
     alias: {
       '@open-kingdom/demo-scaffold-frontend-feature-root-store': path.resolve(
         __dirname,
