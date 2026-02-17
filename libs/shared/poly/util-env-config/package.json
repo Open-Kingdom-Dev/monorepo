@@ -1,6 +1,6 @@
 {
   "name": "@open-kingdom/shared-poly-util-env-config",
-  "version": "0.0.2-7",
+  "version": "0.0.2-8",
   "publishConfig": {
     "access": "public"
   },

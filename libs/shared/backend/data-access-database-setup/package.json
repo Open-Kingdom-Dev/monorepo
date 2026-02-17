@@ -1,6 +1,6 @@
 {
   "name": "@open-kingdom/shared-backend-data-access-database-setup",
-  "version": "0.0.2-7",
+  "version": "0.0.2-8",
   "publishConfig": {
     "access": "public"
   },
@@ -37,6 +37,6 @@
     "tslib": "^2.3.0",
     "@knaadh/nestjs-drizzle-better-sqlite3": "^1.2.0",
     "@nestjs/common": "^11.0.0",
-    "@open-kingdom/shared-poly-util-constants": "0.0.2-7"
+    "@open-kingdom/shared-poly-util-constants": "0.0.2-8"
   }
 }
