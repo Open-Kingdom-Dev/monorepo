@@ -1,6 +1,6 @@
 {
   "name": "@open-kingdom/shared-backend-feature-email",
-  "version": "0.0.2-9",
+  "version": "0.0.2-10",
   "type": "module",
   "publishConfig": {
     "access": "public"
