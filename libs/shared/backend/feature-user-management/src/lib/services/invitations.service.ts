@@ -5,6 +5,7 @@ import {
   Logger,
   BadRequestException,
   BadGatewayException,
+  NotFoundException,
 } from '@nestjs/common';
 import { BetterSQLite3Database } from 'drizzle-orm/better-sqlite3';
 import { eq } from 'drizzle-orm';
@@ -146,6 +147,20 @@ export class InvitationsService {
     return user;
   }
 
+  async findAll(): Promise<InvitationResponse[]> {
+    const records = await this.db.query.invitations.findMany();
+    await this.expireStaleInvitations(records);
+
+    return records
+      .filter((r) => r.status !== INVITATION_STATUS.ACCEPTED)
+      .map(({ token: _, ...rest }) => rest);
+  }
+
+  async cancel(id: number): Promise<void> {
+    await this.findInvitationOrFail(id);
+    await this.db.delete(invitations).where(eq(invitations.id, id));
+  }
+
   private async ensureUserDoesNotExist(email: string): Promise<void> {
     const existingUser = await this.usersService.findOne(email);
 
@@ -166,6 +181,30 @@ export class InvitationsService {
       throw new BadRequestException(
         'A pending invitation already exists for this email'
       );
+    }
+  }
+
+  private async findInvitationOrFail(id: number): Promise<Invitation> {
+    const invitation = await this.db.query.invitations.findFirst({
+      where: eq(invitations.id, id),
+    });
+
+    if (!invitation) {
+      throw new NotFoundException('Invitation not found');
+    }
+
+    return invitation;
+  }
+
+  private async expireStaleInvitations(records: Invitation[]): Promise<void> {
+    for (const record of records) {
+      if (
+        record.status === INVITATION_STATUS.PENDING &&
+        this.isExpired(record.tokenExpiry)
+      ) {
+        await this.markAsExpired(record.id);
+        record.status = INVITATION_STATUS.EXPIRED;
+      }
     }
   }
 

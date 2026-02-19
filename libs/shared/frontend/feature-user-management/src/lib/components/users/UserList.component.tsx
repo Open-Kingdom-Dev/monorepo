@@ -1,6 +1,5 @@
 import { useState, useMemo, useCallback } from 'react';
 import { useDispatch } from 'react-redux';
-import type { ColDef, ICellRendererParams } from 'ag-grid-community';
 import {
   useUsersControllerFindAllQuery,
   useUsersControllerDeleteMutation,
@@ -8,6 +7,8 @@ import {
 import { showSuccessNotification } from '@open-kingdom/shared-frontend-data-access-notifications';
 import {
   DataGrid,
+  type ColDef,
+  type ICellRendererParams,
   type DataGridTheme,
 } from '@open-kingdom/shared-frontend-ui-datagrid';
 import { useTheme } from '@open-kingdom/shared-frontend-ui-theme';

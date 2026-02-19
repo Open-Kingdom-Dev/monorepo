@@ -2,7 +2,7 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { Provider } from 'react-redux';
 import { configureStore } from '@reduxjs/toolkit';
-import type { ColDef } from 'ag-grid-community';
+import type { ColDef } from '@open-kingdom/shared-frontend-ui-datagrid';
 import { UserList } from './UserList.component';
 
 const mockFindAllQuery = jest.fn();

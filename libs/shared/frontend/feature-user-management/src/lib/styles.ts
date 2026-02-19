@@ -17,3 +17,6 @@ export const buttonPrimaryStyles = `${buttonBaseStyles} bg-primary-500 text-whit
 export const buttonSecondaryStyles = `${buttonBaseStyles} border border-neutral-300 text-neutral-700 hover:bg-neutral-50 dark:border-neutral-600 dark:text-neutral-300 dark:hover:bg-neutral-700`;
 
 export const buttonDangerStyles = `${buttonBaseStyles} bg-error-500 text-white hover:bg-error-600 disabled:opacity-50`;
+
+export const buttonInlineDestructiveStyles =
+  'rounded px-2 py-1 text-xs font-medium text-error-600 transition-colors hover:bg-error-50 disabled:cursor-not-allowed disabled:opacity-40 dark:text-error-400 dark:hover:bg-error-900/20';
