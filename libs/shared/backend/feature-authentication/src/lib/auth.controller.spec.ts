@@ -5,6 +5,7 @@ import { User } from '@open-kingdom/shared-backend-data-access-users';
 
 import { AuthController } from './auth.controller';
 import { AuthenticationService } from './authentication.service';
+import { IS_PUBLIC_KEY } from './public.decorator';
 import type { RequestWithUser } from './auth.types';
 
 describe('AuthController', () => {
@@ -37,6 +38,14 @@ describe('AuthController', () => {
 
   afterEach(() => {
     jest.clearAllMocks();
+  });
+
+  it('allows login without requiring a JWT token', () => {
+    const metadata = Reflect.getMetadata(
+      IS_PUBLIC_KEY,
+      AuthController.prototype.login
+    );
+    expect(metadata).toBe(true);
   });
 
   describe('login', () => {
