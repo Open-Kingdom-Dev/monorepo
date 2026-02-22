@@ -39,5 +39,5 @@ export interface EmailSender {
     to: string;
     subject: string;
     body: string;
-  }): Promise<{ success: boolean }>;
+  }): Promise<{ success: boolean; error?: string }>;
 }

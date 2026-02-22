@@ -15,8 +15,6 @@ interface RejectedAction {
   };
 }
 
-const DEFAULT_MESSAGE = 'An error occurred while processing your request';
-
 function isRejectedAction(action: unknown): action is RejectedAction {
   if (typeof action !== 'object' || action === null) {
     return false;
@@ -50,7 +48,6 @@ export function createRTKErrorMiddleware(
     notificationHandler,
     notify = true,
     log = true,
-    defaultMessage = DEFAULT_MESSAGE,
     shouldHandle,
   } = config;
 
@@ -65,7 +62,6 @@ export function createRTKErrorMiddleware(
       reporter.report(getErrorSource(action), {
         notify,
         log,
-        userMessage: defaultMessage,
         context: getErrorContext(action),
       });
     }
@@ -83,7 +79,6 @@ export function createReduxRTKErrorMiddleware(
     notifyAction,
     notify = true,
     log = true,
-    defaultMessage = DEFAULT_MESSAGE,
     shouldHandle,
   } = config;
 
@@ -102,7 +97,6 @@ export function createReduxRTKErrorMiddleware(
         reporter.report(getErrorSource(action), {
           notify,
           log,
-          userMessage: defaultMessage,
           context: getErrorContext(action),
         });
       }

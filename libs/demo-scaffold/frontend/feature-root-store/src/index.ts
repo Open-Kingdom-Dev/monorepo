@@ -35,7 +35,6 @@ export const createRootStore = () => {
   const rtkErrorMiddleware = createReduxRTKErrorMiddleware({
     logAction: addLog,
     notifyAction: showErrorNotification,
-    defaultMessage: 'API request failed',
   });
 
   return configureStore({
