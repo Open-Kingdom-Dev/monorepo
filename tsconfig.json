@@ -74,6 +74,9 @@
     },
     {
       "path": "./libs/shared/frontend/feature-user-management"
+    },
+    {
+      "path": "./libs/shared/backend/feature-gcp-resources"
     }
   ]
 }

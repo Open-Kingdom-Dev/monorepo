@@ -1,5 +1,6 @@
 import 'reflect-metadata';
 import { join } from 'path';
+import { pathToFileURL } from 'node:url';
 import { readdirSync, existsSync, readFileSync } from 'fs';
 import { DocumentBuilder } from '@nestjs/swagger';
 import { generateOpenApi } from './openapi-generator';
@@ -97,9 +98,9 @@ async function generateAllBackends() {
 
       let mod;
       try {
-        mod = await import(distPath);
+        mod = await import(pathToFileURL(distPath).href);
       } catch {
-        mod = await import(srcPath);
+        mod = await import(pathToFileURL(srcPath).href);
       }
 
       if (!mod?.AppModule) {
@@ -115,7 +116,9 @@ async function generateAllBackends() {
           backend.root,
           'src/config/swagger.config'
         );
-        const swaggerModule = await import(swaggerConfigPath);
+        const swaggerModule = await import(
+          pathToFileURL(swaggerConfigPath).href
+        );
 
         if (swaggerModule.globalPrefix && swaggerModule.createSwaggerConfig) {
           globalPrefix = swaggerModule.globalPrefix || 'api';
