@@ -25,22 +25,23 @@ jest.mock('@open-kingdom/shared-backend-feature-authentication', () => ({
   },
 }));
 
-const MockEmailService = class {
-  send = jest.fn().mockResolvedValue({ success: true });
-};
-
-jest.mock('@open-kingdom/shared-backend-feature-email', () => ({
-  EmailModule: {
-    forRoot: jest.fn().mockReturnValue({
-      module: class MockEmailModule {},
-      imports: [],
-      providers: [{ provide: MockEmailService, useClass: MockEmailService }],
-      controllers: [],
-      exports: [MockEmailService],
-    }),
-  },
-  EmailService: MockEmailService,
-}));
+jest.mock('@open-kingdom/shared-backend-feature-email', () => {
+  class MockEmailService {
+    send = jest.fn().mockResolvedValue({ success: true });
+  }
+  return {
+    EmailModule: {
+      forRoot: jest.fn().mockReturnValue({
+        module: class MockEmailModule {},
+        imports: [],
+        providers: [{ provide: MockEmailService, useClass: MockEmailService }],
+        controllers: [],
+        exports: [MockEmailService],
+      }),
+    },
+    EmailService: MockEmailService,
+  };
+});
 
 jest.mock('@open-kingdom/shared-backend-feature-user-management', () => ({
   FeatureUserManagementModule: {

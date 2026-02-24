@@ -1,0 +1,38 @@
+{
+  "name": "@open-kingdom/shared-backend-feature-gcp-resources",
+  "version": "0.0.2-10",
+  "type": "module",
+  "publishConfig": {
+    "access": "public"
+  },
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    "./package.json": "./package.json",
+    ".": {
+      "@open-kingdom/source": "./src/index.ts",
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "!**/*.tsbuildinfo"
+  ],
+  "dependencies": {
+    "tslib": "^2.3.0",
+    "@google-cloud/resource-manager": "^6.0.0",
+    "@nestjs/common": "^11.0.0",
+    "@nestjs/swagger": "^11.0.0"
+  },
+  "nx": {
+    "name": "@open-kingdom/shared-backend-feature-gcp-resources",
+    "tags": [
+      "type:feature",
+      "scope:shared",
+      "environment:backend"
+    ]
+  }
+}

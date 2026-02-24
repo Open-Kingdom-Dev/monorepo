@@ -19,13 +19,14 @@
     "lint:fix": "nx run-many --target=lint --all --fix",
     "format:fix": "nx format --all",
     "format:check": "nx format:check --all",
+    "build-all": "nx run-many --target=build --all --skip-nx-cache",
     "check-all": "npm run typecheck && npm run lint && npm run format:check && npm run test && npm run e2e",
-    "swagger:generate-all": "nx run @open-kingdom/plugin-openapi:generate-openapi-all",
-    "client:generate-all": "nx run @open-kingdom/plugin-openapi:generate-client-all",
-    "db:generate": "DATABASE_URL=$PWD/demo.db npm run db:generate --prefix libs/shared/backend/data-access-database-setup",
-    "db:migrate": "DATABASE_URL=$PWD/demo.db npm run db:migrate --prefix libs/shared/backend/data-access-database-setup",
-    "db:push": "DATABASE_URL=$PWD/demo.db npm run db:push --prefix libs/shared/backend/data-access-database-setup",
-    "db:studio": "DATABASE_URL=$PWD/demo.db npm run db:studio --prefix libs/shared/backend/data-access-database-setup"
+    "db:generate": "npm run db:generate --prefix libs/shared/backend/data-access-database-setup",
+    "db:migrate": "npm run db:migrate --prefix libs/shared/backend/data-access-database-setup",
+    "db:push": "npm run db:push --prefix libs/shared/backend/data-access-database-setup",
+    "db:studio": "npm run db:studio --prefix libs/shared/backend/data-access-database-setup",
+    "swagger:generate-all": "npm run build-all && nx run @open-kingdom/plugin-openapi:generate-openapi-all",
+    "client:generate-all": "npm run swagger:generate-all && nx run @open-kingdom/plugin-openapi:generate-client-all"
   },
   "devDependencies": {
     "@babel/core": "^7.14.5",
@@ -71,6 +72,7 @@
     "ajv": "^8.0.0",
     "autoprefixer": "10.4.13",
     "babel-jest": "^30.0.2",
+    "cross-env": "^7.0.3",
     "drizzle-kit": "^0.31.8",
     "eslint": "^9.8.0",
     "eslint-config-prettier": "^10.0.0",
@@ -116,6 +118,7 @@
     "libs/ui/shared/frontend/*"
   ],
   "dependencies": {
+    "@google-cloud/resource-manager": "^6.0.0",
     "@hookform/resolvers": "^5.2.2",
     "@knaadh/nestjs-drizzle-better-sqlite3": "^1.2.0",
     "@nestjs/common": "^11.0.0",
