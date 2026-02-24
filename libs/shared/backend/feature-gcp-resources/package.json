@@ -1,6 +1,6 @@
 {
   "name": "@open-kingdom/shared-backend-feature-gcp-resources",
-  "version": "0.0.2-10",
+  "version": "0.0.2-11",
   "type": "module",
   "publishConfig": {
     "access": "public"
