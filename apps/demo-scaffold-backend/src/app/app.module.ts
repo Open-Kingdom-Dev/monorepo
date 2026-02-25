@@ -9,6 +9,8 @@ import { OpenKingdomFeatureRootSchemaModule } from '@open-kingdom/demo-scaffold-
 import { OpenKingdomFeatureBackendAuthModule } from '@open-kingdom/shared-backend-feature-authentication';
 import { EmailModule } from '@open-kingdom/shared-backend-feature-email';
 import { FeatureUserManagementModule } from '@open-kingdom/shared-backend-feature-user-management';
+import { FeatureGcpResourcesModule } from '@open-kingdom/shared-backend-feature-gcp-resources';
+
 // Define the environment keys that this app uses
 const envKeys = [
   'PORT',
@@ -46,6 +48,7 @@ const configService = createConfigService(envKeys, nodeEnvAdapter);
       ),
       frontendBaseUrl: configService.get('BASE_URL', 'http://localhost:3000'),
     }),
+    FeatureGcpResourcesModule,
   ],
   controllers: [],
   providers: [],

@@ -6,6 +6,7 @@ export const addTagTypes = [
   "Email",
   "Invitations",
   "Users",
+  "GCP Resources",
 ] as const;
 const injectedRtkApi = api
   .enhanceEndpoints({
@@ -97,6 +98,29 @@ const injectedRtkApi = api
         }),
         invalidatesTags: ["Users"],
       }),
+      gcpProjectsControllerListProjects: build.query<
+        GcpProjectsControllerListProjectsApiResponse,
+        GcpProjectsControllerListProjectsApiArg
+      >({
+        query: (queryArg) => ({
+          url: `/api/gcp/projects`,
+          params: {
+            parent: queryArg.parent,
+          },
+        }),
+        providesTags: ["GCP Resources"],
+      }),
+      gcpProjectsControllerCreateProject: build.mutation<
+        GcpProjectsControllerCreateProjectApiResponse,
+        GcpProjectsControllerCreateProjectApiArg
+      >({
+        query: (queryArg) => ({
+          url: `/api/gcp/projects`,
+          method: "POST",
+          body: queryArg.createProjectDto,
+        }),
+        invalidatesTags: ["GCP Resources"],
+      }),
     }),
     overrideExisting: false,
   });
@@ -142,6 +166,18 @@ export type UsersControllerFindOneApiArg = {
 export type UsersControllerDeleteApiResponse = unknown;
 export type UsersControllerDeleteApiArg = {
   id: number;
+};
+export type GcpProjectsControllerListProjectsApiResponse =
+  /** status 200 List of projects */ GcpProjectSummaryDto[];
+export type GcpProjectsControllerListProjectsApiArg = {
+  /** Parent resource: folders/{folder_id} or organizations/{org_id} */
+  parent: string;
+};
+export type GcpProjectsControllerCreateProjectApiResponse =
+  /** status 201 Project created successfully */ CreateProjectResponseDto;
+export type GcpProjectsControllerCreateProjectApiArg = {
+  /** Project creation details */
+  createProjectDto: CreateProjectDto;
 };
 export type LoginResponseDto = {
   /** JWT access token */
@@ -195,6 +231,34 @@ export type AcceptInvitationDto = {
   /** Last name of the user */
   lastName?: string;
 };
+export type GcpProjectSummaryDto = {
+  /** Full resource name (e.g. projects/123) */
+  name: string;
+  /** Project ID */
+  projectId: string;
+  /** Display name */
+  displayName?: string;
+  /** Project lifecycle state (e.g. ACTIVE, DELETE_REQUESTED) */
+  state?: object;
+};
+export type CreateProjectResponseDto = {
+  /** Full resource name (e.g. projects/123) */
+  name: string;
+  /** Project ID */
+  projectId: string;
+  /** Display name */
+  displayName?: string;
+  /** Project lifecycle state */
+  state?: object;
+};
+export type CreateProjectDto = {
+  /** Project ID (must be unique, lowercase letters, numbers, and hyphens) */
+  projectId: string;
+  /** Display name for the project */
+  displayName?: string;
+  /** Parent resource: folders/{folder_id} or organizations/{org_id} */
+  parent: string;
+};
 export const {
   useAuthControllerLoginMutation,
   useAuthControllerGetProfileQuery,
@@ -205,4 +269,6 @@ export const {
   useUsersControllerFindAllQuery,
   useUsersControllerFindOneQuery,
   useUsersControllerDeleteMutation,
+  useGcpProjectsControllerListProjectsQuery,
+  useGcpProjectsControllerCreateProjectMutation,
 } = injectedRtkApi;
