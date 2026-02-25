@@ -1,5 +1,6 @@
 import { Module, DynamicModule } from '@nestjs/common';
-import { DrizzleBetterSQLiteModule } from '@knaadh/nestjs-drizzle-better-sqlite3';
+import Database from 'better-sqlite3';
+import { drizzle } from 'drizzle-orm/better-sqlite3';
 
 import { DB_TAG } from '@open-kingdom/shared-poly-util-constants';
 
@@ -8,6 +9,7 @@ export interface DatabaseSetupModuleOptions<
 > {
   filename?: string;
   schema: TSchema;
+  pragmas?: Record<string, string>;
 }
 
 @Module({})
@@ -17,15 +19,22 @@ export class DatabaseSetupModule {
   ): DynamicModule {
     return {
       module: DatabaseSetupModule,
-      imports: [
-        DrizzleBetterSQLiteModule.register({
-          tag: DB_TAG,
-          sqlite3: {
-            filename: options.filename || 'demo.db',
+      global: true,
+      providers: [
+        {
+          provide: DB_TAG,
+          useFactory: () => {
+            const sqlite = new Database(options.filename || 'demo.db');
+
+            for (const [key, value] of Object.entries(options.pragmas ?? {})) {
+              sqlite.pragma(`${key} = ${value}`);
+            }
+
+            return drizzle(sqlite, { schema: options.schema });
           },
-          config: { schema: options.schema },
-        }),
+        },
       ],
+      exports: [DB_TAG],
     };
   }
 }
