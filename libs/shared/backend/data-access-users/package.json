@@ -1,6 +1,6 @@
 {
   "name": "@open-kingdom/shared-backend-data-access-users",
-  "version": "0.0.2-13",
+  "version": "0.0.2-14",
   "publishConfig": {
     "access": "public"
   },
@@ -29,7 +29,7 @@
   },
   "dependencies": {
     "tslib": "^2.3.0",
-    "@open-kingdom/shared-poly-util-constants": "0.0.2-13",
+    "@open-kingdom/shared-poly-util-constants": "0.0.2-14",
     "@nestjs/common": "^11.0.0",
     "drizzle-orm": "^0.44.5",
     "bcrypt": "^5.1.1"
