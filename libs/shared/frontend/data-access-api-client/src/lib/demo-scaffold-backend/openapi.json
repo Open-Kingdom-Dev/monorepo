@@ -372,6 +372,91 @@
           "Users"
         ]
       }
+    },
+    "/api/gcp/projects": {
+      "get": {
+        "description": "List all projects under a GCP organization or folder. Parent must be `folders/{folder_id}` or `organizations/{org_id}`.",
+        "operationId": "GcpProjectsController_listProjects",
+        "parameters": [
+          {
+            "name": "parent",
+            "required": true,
+            "in": "query",
+            "description": "Parent resource: folders/{folder_id} or organizations/{org_id}",
+            "schema": {
+              "example": "folders/123456789",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of projects",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/GcpProjectSummaryDto"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Missing or invalid parent parameter"
+          }
+        },
+        "summary": "List GCP projects in org or folder",
+        "tags": [
+          "GCP Resources"
+        ]
+      },
+      "post": {
+        "description": "Create a new project in GCP. The project will be created under the specified parent (folder or organization).",
+        "operationId": "GcpProjectsController_createProject",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "description": "Project creation details",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateProjectDto"
+              },
+              "examples": {
+                "example": {
+                  "summary": "Create a new project",
+                  "value": {
+                    "projectId": "my-new-project",
+                    "displayName": "My New Project",
+                    "parent": "folders/123456789"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Project created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreateProjectResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request - missing required fields or invalid project ID"
+          }
+        },
+        "summary": "Create a new GCP project",
+        "tags": [
+          "GCP Resources"
+        ]
+      }
     }
   },
   "info": {
@@ -568,6 +653,88 @@
         "required": [
           "token",
           "password"
+        ]
+      },
+      "GcpProjectSummaryDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Full resource name (e.g. projects/123)",
+            "example": "projects/my-project-id"
+          },
+          "projectId": {
+            "type": "string",
+            "description": "Project ID",
+            "example": "my-project-id"
+          },
+          "displayName": {
+            "type": "string",
+            "description": "Display name",
+            "example": "My Project"
+          },
+          "state": {
+            "type": "object",
+            "description": "Project lifecycle state (e.g. ACTIVE, DELETE_REQUESTED)",
+            "example": "ACTIVE"
+          }
+        },
+        "required": [
+          "name",
+          "projectId"
+        ]
+      },
+      "CreateProjectDto": {
+        "type": "object",
+        "properties": {
+          "projectId": {
+            "type": "string",
+            "description": "Project ID (must be unique, lowercase letters, numbers, and hyphens)",
+            "example": "my-new-project"
+          },
+          "displayName": {
+            "type": "string",
+            "description": "Display name for the project",
+            "example": "My New Project"
+          },
+          "parent": {
+            "type": "string",
+            "description": "Parent resource: folders/{folder_id} or organizations/{org_id}",
+            "example": "folders/123456789"
+          }
+        },
+        "required": [
+          "projectId",
+          "parent"
+        ]
+      },
+      "CreateProjectResponseDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Full resource name (e.g. projects/123)",
+            "example": "projects/my-new-project"
+          },
+          "projectId": {
+            "type": "string",
+            "description": "Project ID",
+            "example": "my-new-project"
+          },
+          "displayName": {
+            "type": "string",
+            "description": "Display name",
+            "example": "My New Project"
+          },
+          "state": {
+            "type": "object",
+            "description": "Project lifecycle state",
+            "example": "ACTIVE"
+          }
+        },
+        "required": [
+          "name",
+          "projectId"
         ]
       }
     }
