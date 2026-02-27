@@ -1,5 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { BadRequestException } from '@nestjs/common';
+import { BadRequestException, BadGatewayException } from '@nestjs/common';
 
 import { DB_TAG } from '@open-kingdom/shared-poly-util-constants';
 import { UsersService } from '@open-kingdom/shared-backend-data-access-users';
@@ -98,7 +98,7 @@ describe('InvitationsService', () => {
   });
 
   describe('inviting users', () => {
-    it('creates an invitation and never returns the token', async () => {
+    it('keeps the invitation link private when creating a new invite', async () => {
       mockUsersService.findOne.mockResolvedValue(undefined);
       mockQuery.invitations.findFirst
         .mockResolvedValueOnce(undefined) // Check existing invitation
@@ -148,7 +148,7 @@ describe('InvitationsService', () => {
       ).rejects.toThrow(BadRequestException);
     });
 
-    it('sends an email with the invitation link', async () => {
+    it('sends the invited user an email with a link to join', async () => {
       const mockEmailSender: jest.Mocked<EmailSender> = {
         send: jest.fn().mockResolvedValue({ success: true }),
       };
@@ -191,7 +191,7 @@ describe('InvitationsService', () => {
       });
     });
 
-    it('rolls back invitation when email sending fails', async () => {
+    it('removes the invitation and tells the admin when the email service is unavailable', async () => {
       const mockEmailSender: jest.Mocked<EmailSender> = {
         send: jest
           .fn()
@@ -227,14 +227,182 @@ describe('InvitationsService', () => {
 
       await expect(
         serviceWithEmail.invite('new@example.com', 'user', 1)
-      ).rejects.toThrow(BadRequestException);
+      ).rejects.toThrow(BadGatewayException);
 
       expect(mockDb.delete).toHaveBeenCalledWith(invitations);
     });
+
+    it('removes the invitation and tells the admin when the email cannot be delivered', async () => {
+      const mockEmailSender: jest.Mocked<EmailSender> = {
+        send: jest
+          .fn()
+          .mockResolvedValue({ success: false, error: 'Invalid recipient' }),
+      };
+
+      const moduleWithEmail: TestingModule = await Test.createTestingModule({
+        providers: [
+          InvitationsService,
+          { provide: DB_TAG, useValue: mockDb },
+          { provide: USER_MANAGEMENT_OPTIONS, useValue: mockOptions },
+          { provide: UsersService, useValue: mockUsersService },
+          { provide: EMAIL_SENDER, useValue: mockEmailSender },
+        ],
+      }).compile();
+
+      const serviceWithEmail =
+        moduleWithEmail.get<InvitationsService>(InvitationsService);
+
+      mockUsersService.findOne.mockResolvedValue(undefined);
+      mockQuery.invitations.findFirst
+        .mockResolvedValueOnce(undefined)
+        .mockResolvedValueOnce({
+          id: 1,
+          email: 'new@example.com',
+          token: 'generated-token',
+          tokenExpiry: Date.now() + 86400000,
+          invitedBy: 1,
+          invitedAt: Date.now(),
+          role: 'user',
+          status: INVITATION_STATUS.PENDING,
+        });
+
+      await expect(
+        serviceWithEmail.invite('new@example.com', 'user', 1)
+      ).rejects.toThrow(BadGatewayException);
+
+      expect(mockDb.delete).toHaveBeenCalledWith(invitations);
+    });
+
+    it('removes the invitation and tells the admin even when no failure reason is available', async () => {
+      const mockEmailSender: jest.Mocked<EmailSender> = {
+        send: jest.fn().mockResolvedValue({ success: false }),
+      };
+
+      const moduleWithEmail: TestingModule = await Test.createTestingModule({
+        providers: [
+          InvitationsService,
+          { provide: DB_TAG, useValue: mockDb },
+          { provide: USER_MANAGEMENT_OPTIONS, useValue: mockOptions },
+          { provide: UsersService, useValue: mockUsersService },
+          { provide: EMAIL_SENDER, useValue: mockEmailSender },
+        ],
+      }).compile();
+
+      const serviceWithEmail =
+        moduleWithEmail.get<InvitationsService>(InvitationsService);
+
+      mockUsersService.findOne.mockResolvedValue(undefined);
+      mockQuery.invitations.findFirst
+        .mockResolvedValueOnce(undefined)
+        .mockResolvedValueOnce({
+          id: 1,
+          email: 'new@example.com',
+          token: 'generated-token',
+          tokenExpiry: Date.now() + 86400000,
+          invitedBy: 1,
+          invitedAt: Date.now(),
+          role: 'user',
+          status: INVITATION_STATUS.PENDING,
+        });
+
+      await expect(
+        serviceWithEmail.invite('new@example.com', 'user', 1)
+      ).rejects.toThrow(BadGatewayException);
+
+      expect(mockDb.delete).toHaveBeenCalledWith(invitations);
+    });
+
+    it('always cleans up and informs the admin regardless of how the email service fails', async () => {
+      const mockEmailSender: jest.Mocked<EmailSender> = {
+        send: jest.fn().mockRejectedValue('string error'),
+      };
+
+      const moduleWithEmail: TestingModule = await Test.createTestingModule({
+        providers: [
+          InvitationsService,
+          { provide: DB_TAG, useValue: mockDb },
+          { provide: USER_MANAGEMENT_OPTIONS, useValue: mockOptions },
+          { provide: UsersService, useValue: mockUsersService },
+          { provide: EMAIL_SENDER, useValue: mockEmailSender },
+        ],
+      }).compile();
+
+      const serviceWithEmail =
+        moduleWithEmail.get<InvitationsService>(InvitationsService);
+
+      mockUsersService.findOne.mockResolvedValue(undefined);
+      mockQuery.invitations.findFirst
+        .mockResolvedValueOnce(undefined)
+        .mockResolvedValueOnce({
+          id: 1,
+          email: 'new@example.com',
+          token: 'generated-token',
+          tokenExpiry: Date.now() + 86400000,
+          invitedBy: 1,
+          invitedAt: Date.now(),
+          role: 'user',
+          status: INVITATION_STATUS.PENDING,
+        });
+
+      await expect(
+        serviceWithEmail.invite('new@example.com', 'user', 1)
+      ).rejects.toThrow(BadGatewayException);
+
+      expect(mockDb.delete).toHaveBeenCalledWith(invitations);
+    });
+
+    it('tells the invited user the link expires in 7 days when no custom expiry is set', async () => {
+      const optionsWithoutExpiry = {
+        invitationTokenSecret: 'test-secret',
+        frontendBaseUrl: 'http://localhost:3000',
+      };
+
+      const mockEmailSender: jest.Mocked<EmailSender> = {
+        send: jest.fn().mockResolvedValue({ success: true }),
+      };
+
+      const moduleWithDefaults: TestingModule = await Test.createTestingModule({
+        providers: [
+          InvitationsService,
+          { provide: DB_TAG, useValue: mockDb },
+          {
+            provide: USER_MANAGEMENT_OPTIONS,
+            useValue: optionsWithoutExpiry,
+          },
+          { provide: UsersService, useValue: mockUsersService },
+          { provide: EMAIL_SENDER, useValue: mockEmailSender },
+        ],
+      }).compile();
+
+      const serviceWithDefaults =
+        moduleWithDefaults.get<InvitationsService>(InvitationsService);
+
+      mockUsersService.findOne.mockResolvedValue(undefined);
+      mockQuery.invitations.findFirst
+        .mockResolvedValueOnce(undefined)
+        .mockResolvedValueOnce({
+          id: 1,
+          email: 'new@example.com',
+          token: 'generated-token',
+          tokenExpiry: Date.now() + 86400000,
+          invitedBy: 1,
+          invitedAt: Date.now(),
+          role: 'user',
+          status: INVITATION_STATUS.PENDING,
+        });
+
+      await serviceWithDefaults.invite('new@example.com', 'user', 1);
+
+      expect(mockEmailSender.send).toHaveBeenCalledWith(
+        expect.objectContaining({
+          body: expect.stringContaining('7 days'),
+        })
+      );
+    });
   });
 
-  describe('validating invitation tokens', () => {
-    it('confirms a valid invitation token', async () => {
+  describe('checking invitation links', () => {
+    it('confirms a valid invitation link', async () => {
       mockQuery.invitations.findFirst.mockResolvedValue(
         createMockInvitation({
           email: 'valid@example.com',
@@ -249,7 +417,7 @@ describe('InvitationsService', () => {
       expect(result.role).toBe('user');
     });
 
-    it('rejects unknown tokens', async () => {
+    it('rejects an unrecognized invitation link', async () => {
       mockQuery.invitations.findFirst.mockResolvedValue(undefined);
 
       const result = await service.validate('invalid-token');
@@ -257,7 +425,7 @@ describe('InvitationsService', () => {
       expect(result.valid).toBe(false);
     });
 
-    it('rejects expired invitation tokens', async () => {
+    it('rejects an expired invitation link and marks it as expired', async () => {
       mockQuery.invitations.findFirst.mockResolvedValue(
         createMockInvitation({
           email: 'expired@example.com',
@@ -272,7 +440,7 @@ describe('InvitationsService', () => {
       expect(mockDb.update).toHaveBeenCalledWith(invitations);
     });
 
-    it('rejects already used invitation tokens', async () => {
+    it('rejects an invitation link that was already used', async () => {
       mockQuery.invitations.findFirst.mockResolvedValue(
         createMockInvitation({
           email: 'accepted@example.com',
@@ -287,7 +455,7 @@ describe('InvitationsService', () => {
   });
 
   describe('accepting invitations', () => {
-    it('creates the user account and completes the invitation', async () => {
+    it('new user provides their details and gains an account', async () => {
       const mockUser = {
         id: 2,
         email: 'new@example.com',
@@ -318,7 +486,35 @@ describe('InvitationsService', () => {
       expect(result).toEqual(mockUser);
     });
 
-    it('rejects invalid invitation tokens', async () => {
+    it('new user can join without providing their name', async () => {
+      const mockUser = {
+        id: 3,
+        email: 'noname@example.com',
+        password: 'hash',
+        firstName: null,
+        lastName: null,
+      };
+
+      mockQuery.invitations.findFirst.mockResolvedValue(
+        createMockInvitation({
+          email: 'noname@example.com',
+          token: 'valid-token',
+        })
+      );
+      mockUsersService.create.mockResolvedValue(mockUser);
+
+      const result = await service.accept('valid-token', 'password123');
+
+      expect(mockUsersService.create).toHaveBeenCalledWith({
+        email: 'noname@example.com',
+        password: 'password123',
+        firstName: null,
+        lastName: null,
+      });
+      expect(result).toEqual(mockUser);
+    });
+
+    it('rejects joining with an invalid invitation link', async () => {
       mockQuery.invitations.findFirst.mockResolvedValue(undefined);
 
       await expect(service.accept('invalid-token', 'password')).rejects.toThrow(

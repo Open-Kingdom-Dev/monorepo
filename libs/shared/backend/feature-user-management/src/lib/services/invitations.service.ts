@@ -4,6 +4,7 @@ import {
   Optional,
   Logger,
   BadRequestException,
+  BadGatewayException,
 } from '@nestjs/common';
 import { BetterSQLite3Database } from 'drizzle-orm/better-sqlite3';
 import { eq } from 'drizzle-orm';
@@ -85,12 +86,14 @@ export class InvitationsService {
       await this.sendInvitationEmail(email, token);
     } catch (error) {
       this.logger.error(
-        `Failed to send invitation email to ${email}, rolling back invitation`,
-        error
+        `Failed to send invitation email to ${email}: ${
+          error instanceof Error ? error.message : 'Unknown error'
+        }`,
+        error instanceof Error ? error.stack : undefined
       );
       await this.db.delete(invitations).where(eq(invitations.token, token));
-      throw new BadRequestException(
-        'Failed to send invitation email. Please try again.'
+      throw new BadGatewayException(
+        'Invitation could not be sent - email delivery failed'
       );
     }
 
@@ -219,7 +222,7 @@ export class InvitationsService {
       return;
     }
 
-    await this.emailSender.send({
+    const result = await this.emailSender.send({
       to: email,
       subject: INVITATION_EMAIL_SUBJECT,
       body: buildInvitationEmailBody({
@@ -227,6 +230,11 @@ export class InvitationsService {
         expiryDays: this.expiryDays,
       }),
     });
+
+    if (!result.success) {
+      throw new Error(result.error || 'Email delivery failed');
+    }
+
     this.logger.log(`Invitation email sent to ${email}`);
   }
 }

@@ -17,12 +17,12 @@ describe('createRTKErrorMiddleware', () => {
     mockGetState = jest.fn();
   });
 
-  it('should return a middleware function', () => {
+  it('can be created without any configuration', () => {
     const middleware = createRTKErrorMiddleware();
     expect(typeof middleware).toBe('function');
   });
 
-  describe('rejected action handling', () => {
+  describe('when an API request fails', () => {
     let middleware: Middleware;
 
     beforeEach(() => {
@@ -32,7 +32,7 @@ describe('createRTKErrorMiddleware', () => {
       });
     });
 
-    it('should handle actions ending with /rejected', () => {
+    it('logs the error and notifies the user', () => {
       const action = {
         type: 'api/fetchUser/rejected',
         payload: { status: 404 },
@@ -50,7 +50,7 @@ describe('createRTKErrorMiddleware', () => {
       expect(mockNext).toHaveBeenCalledWith(action);
     });
 
-    it('should handle actions with rejectedWithValue', () => {
+    it('notifies the user when the server explicitly rejects a request', () => {
       const action = {
         type: 'custom/action',
         payload: { message: 'Custom error' },
@@ -65,7 +65,7 @@ describe('createRTKErrorMiddleware', () => {
       expect(mockNotificationHandler).toHaveBeenCalled();
     });
 
-    it('should pass through non-rejected actions', () => {
+    it('does not interfere with successful requests', () => {
       const action = { type: 'api/fetchUser/fulfilled', payload: { id: 1 } };
 
       middleware({ getState: mockGetState, dispatch: jest.fn() })(mockNext)(
@@ -77,7 +77,7 @@ describe('createRTKErrorMiddleware', () => {
       expect(mockNext).toHaveBeenCalledWith(action);
     });
 
-    it('should use error property when payload is not available', () => {
+    it('shows network error details to the user', () => {
       const action = {
         type: 'api/fetchUser/rejected',
         error: { message: 'Network error' },
@@ -92,7 +92,7 @@ describe('createRTKErrorMiddleware', () => {
       );
     });
 
-    it('should handle null action', () => {
+    it('safely ignores actions that are not API responses', () => {
       middleware({ getState: mockGetState, dispatch: jest.fn() })(mockNext)(
         null
       );
@@ -101,7 +101,7 @@ describe('createRTKErrorMiddleware', () => {
       expect(mockNext).toHaveBeenCalledWith(null);
     });
 
-    it('should use "unknown" endpoint when meta is missing', () => {
+    it('labels the error as from an unknown source when the origin is unclear', () => {
       const action = { type: 'api/fetchUser/rejected', payload: {} };
 
       middleware({ getState: mockGetState, dispatch: jest.fn() })(mockNext)(
@@ -114,8 +114,8 @@ describe('createRTKErrorMiddleware', () => {
     });
   });
 
-  describe('configuration options', () => {
-    it('should skip handling when shouldHandle returns false', () => {
+  describe('customizing behavior', () => {
+    it('can be configured to ignore specific errors', () => {
       const middleware = createRTKErrorMiddleware({
         logger: mockLogger,
         notificationHandler: mockNotificationHandler,
@@ -133,7 +133,7 @@ describe('createRTKErrorMiddleware', () => {
       expect(mockNext).toHaveBeenCalledWith(action);
     });
 
-    it('should respect notify: false', () => {
+    it('can log errors without showing notifications to the user', () => {
       const middleware = createRTKErrorMiddleware({
         logger: mockLogger,
         notificationHandler: mockNotificationHandler,
@@ -149,7 +149,7 @@ describe('createRTKErrorMiddleware', () => {
       expect(mockNotificationHandler).not.toHaveBeenCalled();
     });
 
-    it('should respect log: false', () => {
+    it('can show notifications without logging', () => {
       const middleware = createRTKErrorMiddleware({
         logger: mockLogger,
         notificationHandler: mockNotificationHandler,
@@ -165,19 +165,19 @@ describe('createRTKErrorMiddleware', () => {
       expect(mockNotificationHandler).toHaveBeenCalled();
     });
 
-    it('should use custom defaultMessage', () => {
+    it('shows the server error message to the user', () => {
       const middleware = createRTKErrorMiddleware({
         logger: mockLogger,
         notificationHandler: mockNotificationHandler,
-        defaultMessage: 'Custom message',
       });
 
       middleware({ getState: mockGetState, dispatch: jest.fn() })(mockNext)({
         type: 'api/test/rejected',
-        payload: {},
+        payload: { status: 400, data: { message: 'Validation failed' } },
+        meta: { arg: { endpointName: 'test' } },
       });
 
-      expect(mockNotificationHandler).toHaveBeenCalledWith('Custom message');
+      expect(mockNotificationHandler).toHaveBeenCalledWith('Validation failed');
     });
   });
 });
@@ -198,11 +198,10 @@ describe('createReduxRTKErrorMiddleware', () => {
     mockNext = jest.fn((action) => action);
   });
 
-  it('should dispatch actions on rejected action', () => {
+  it('logs the failure and notifies the user when a request is rejected', () => {
     const middleware = createReduxRTKErrorMiddleware({
       logAction: mockLogAction,
       notifyAction: mockNotifyAction,
-      defaultMessage: 'API failed',
     });
 
     const action = {
@@ -219,11 +218,39 @@ describe('createReduxRTKErrorMiddleware', () => {
       message: expect.stringContaining('fetchUser'),
       level: 'error',
     });
-    expect(mockNotifyAction).toHaveBeenCalledWith('API failed');
+    expect(mockNotifyAction).toHaveBeenCalledWith(
+      'Request failed with status 404'
+    );
     expect(mockDispatch).toHaveBeenCalledTimes(2);
   });
 
-  it('should respect notify: false', () => {
+  it('shows the admin the exact error message from the server', () => {
+    const middleware = createReduxRTKErrorMiddleware({
+      logAction: mockLogAction,
+      notifyAction: mockNotifyAction,
+    });
+
+    const action = {
+      type: 'api/invitationsControllerInvite/rejected',
+      payload: {
+        status: 502,
+        data: {
+          message: 'Invitation could not be sent — email delivery failed',
+        },
+      },
+      meta: { arg: { endpointName: 'invitationsControllerInvite' } },
+    };
+
+    middleware({ getState: jest.fn(), dispatch: mockDispatch })(mockNext)(
+      action
+    );
+
+    expect(mockNotifyAction).toHaveBeenCalledWith(
+      'Invitation could not be sent — email delivery failed'
+    );
+  });
+
+  it('can log errors without notifying the user', () => {
     const middleware = createReduxRTKErrorMiddleware({
       logAction: mockLogAction,
       notifyAction: mockNotifyAction,
@@ -239,7 +266,7 @@ describe('createReduxRTKErrorMiddleware', () => {
     expect(mockNotifyAction).not.toHaveBeenCalled();
   });
 
-  it('should respect log: false', () => {
+  it('can notify the user without logging', () => {
     const middleware = createReduxRTKErrorMiddleware({
       logAction: mockLogAction,
       notifyAction: mockNotifyAction,
@@ -255,7 +282,7 @@ describe('createReduxRTKErrorMiddleware', () => {
     expect(mockNotifyAction).toHaveBeenCalled();
   });
 
-  it('should pass through non-rejected actions', () => {
+  it('does not interfere with successful requests', () => {
     const middleware = createReduxRTKErrorMiddleware({
       logAction: mockLogAction,
       notifyAction: mockNotifyAction,

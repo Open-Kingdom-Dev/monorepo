@@ -42,6 +42,10 @@ export class InvitationsController {
   @ApiBadRequestResponse({
     description: 'User already exists or pending invitation exists',
   })
+  @ApiResponse({
+    status: 502,
+    description: 'Email delivery failed — invitation rolled back',
+  })
   @ApiUnauthorizedResponse({
     description: 'Unauthorized - Invalid or missing JWT token',
   })
