@@ -10,6 +10,7 @@ import {
 import { AuthGuard } from '@nestjs/passport';
 
 import { AuthenticationService } from './authentication.service';
+import { Public } from './public.decorator';
 import { LoginDto, LoginResponseDto, ProfileResponseDto } from './auth.dto';
 import type { RequestWithUser } from './auth.types';
 
@@ -52,6 +53,7 @@ export class AuthController {
       },
     },
   })
+  @Public()
   @UseGuards(AuthGuard('local'))
   @Post('auth/login')
   /* c8 ignore next */
