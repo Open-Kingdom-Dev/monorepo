@@ -2,6 +2,7 @@ import { sqliteTable as table } from 'drizzle-orm/sqlite-core';
 import * as t from 'drizzle-orm/sqlite-core';
 
 import { users } from '@open-kingdom/shared-backend-data-access-users';
+import { roles } from './roles.schema';
 
 export const InvitationsTableName = 'invitations';
 
@@ -15,7 +16,10 @@ export const invitations = table(InvitationsTableName, {
     .notNull()
     .references(() => users.id),
   invitedAt: t.int('invited_at').notNull(),
-  role: t.text().$type<'guest' | 'user' | 'admin'>().notNull().default('guest'),
+  roleId: t
+    .int('role_id')
+    .notNull()
+    .references(() => roles.id),
   status: t
     .text()
     .$type<'pending' | 'accepted' | 'expired'>()

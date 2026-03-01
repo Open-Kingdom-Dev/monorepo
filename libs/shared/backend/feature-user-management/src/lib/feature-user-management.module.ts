@@ -16,7 +16,6 @@ export type {
   UserManagementModuleOptions,
   EmailSender,
   AuthenticatedRequest,
-  Role,
   InvitationStatus,
   ValidationResult,
 } from './types';

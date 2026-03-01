@@ -21,6 +21,9 @@ interface MockQuery {
     findFirst: jest.Mock<Promise<Partial<Invitation> | undefined>>;
     findMany: jest.Mock<Promise<Partial<Invitation>[]>>;
   };
+  roles: {
+    findFirst: jest.Mock;
+  };
 }
 
 interface MockDb {
@@ -29,6 +32,8 @@ interface MockDb {
   update: jest.Mock;
   delete: jest.Mock;
 }
+
+const MOCK_ROLE_ID = 2;
 
 const createMockInvitation = (
   overrides: Partial<Invitation> = {}
@@ -39,7 +44,7 @@ const createMockInvitation = (
   tokenExpiry: Date.now() + 86400000,
   invitedBy: 1,
   invitedAt: Date.now(),
-  role: 'user',
+  roleId: MOCK_ROLE_ID,
   status: INVITATION_STATUS.PENDING,
   ...overrides,
 });
@@ -63,6 +68,11 @@ describe('InvitationsService', () => {
       invitations: {
         findFirst: jest.fn(),
         findMany: jest.fn().mockResolvedValue([]),
+      },
+      roles: {
+        findFirst: jest
+          .fn()
+          .mockResolvedValue({ id: MOCK_ROLE_ID, name: 'user', priority: 10 }),
       },
     };
 
@@ -108,25 +118,31 @@ describe('InvitationsService', () => {
       mockUsersService.findOne.mockResolvedValue(undefined);
       mockQuery.invitations.findFirst
         .mockResolvedValueOnce(undefined) // Check existing invitation
-        .mockResolvedValueOnce({
-          id: 1,
-          email: 'new@example.com',
-          token: 'generated-token',
-          tokenExpiry: Date.now() + 86400000,
-          invitedBy: 1,
-          invitedAt: Date.now(),
-          role: 'user',
-          status: INVITATION_STATUS.PENDING,
-        });
+        .mockResolvedValueOnce(
+          createMockInvitation({
+            email: 'new@example.com',
+            token: 'generated-token',
+          })
+        );
 
       const result = await service.invite('new@example.com', 'user', 1);
 
       expect(mockUsersService.findOne).toHaveBeenCalledWith('new@example.com');
       expect(mockDb.insert).toHaveBeenCalledWith(invitations);
       expect(result.email).toBe('new@example.com');
-      expect(result.role).toBe('user');
+      expect(result.roleId).toBe(MOCK_ROLE_ID);
       // Token should never be returned - only sent via email
       expect(result).not.toHaveProperty('token');
+    });
+
+    it('rejects inviting with a non-existent role', async () => {
+      mockUsersService.findOne.mockResolvedValue(undefined);
+      mockQuery.invitations.findFirst.mockResolvedValueOnce(undefined);
+      mockQuery.roles.findFirst.mockResolvedValueOnce(undefined);
+
+      await expect(
+        service.invite('new@example.com', 'nonexistent', 1)
+      ).rejects.toThrow(BadRequestException);
     });
 
     it('prevents inviting someone who already has an account', async () => {
@@ -175,16 +191,12 @@ describe('InvitationsService', () => {
       mockUsersService.findOne.mockResolvedValue(undefined);
       mockQuery.invitations.findFirst
         .mockResolvedValueOnce(undefined)
-        .mockResolvedValueOnce({
-          id: 1,
-          email: 'new@example.com',
-          token: 'generated-token',
-          tokenExpiry: Date.now() + 86400000,
-          invitedBy: 1,
-          invitedAt: Date.now(),
-          role: 'user',
-          status: INVITATION_STATUS.PENDING,
-        });
+        .mockResolvedValueOnce(
+          createMockInvitation({
+            email: 'new@example.com',
+            token: 'generated-token',
+          })
+        );
 
       await serviceWithEmail.invite('new@example.com', 'user', 1);
 
@@ -220,16 +232,12 @@ describe('InvitationsService', () => {
       mockUsersService.findOne.mockResolvedValue(undefined);
       mockQuery.invitations.findFirst
         .mockResolvedValueOnce(undefined)
-        .mockResolvedValueOnce({
-          id: 1,
-          email: 'new@example.com',
-          token: 'generated-token',
-          tokenExpiry: Date.now() + 86400000,
-          invitedBy: 1,
-          invitedAt: Date.now(),
-          role: 'user',
-          status: INVITATION_STATUS.PENDING,
-        });
+        .mockResolvedValueOnce(
+          createMockInvitation({
+            email: 'new@example.com',
+            token: 'generated-token',
+          })
+        );
 
       await expect(
         serviceWithEmail.invite('new@example.com', 'user', 1)
@@ -261,16 +269,12 @@ describe('InvitationsService', () => {
       mockUsersService.findOne.mockResolvedValue(undefined);
       mockQuery.invitations.findFirst
         .mockResolvedValueOnce(undefined)
-        .mockResolvedValueOnce({
-          id: 1,
-          email: 'new@example.com',
-          token: 'generated-token',
-          tokenExpiry: Date.now() + 86400000,
-          invitedBy: 1,
-          invitedAt: Date.now(),
-          role: 'user',
-          status: INVITATION_STATUS.PENDING,
-        });
+        .mockResolvedValueOnce(
+          createMockInvitation({
+            email: 'new@example.com',
+            token: 'generated-token',
+          })
+        );
 
       await expect(
         serviceWithEmail.invite('new@example.com', 'user', 1)
@@ -300,16 +304,12 @@ describe('InvitationsService', () => {
       mockUsersService.findOne.mockResolvedValue(undefined);
       mockQuery.invitations.findFirst
         .mockResolvedValueOnce(undefined)
-        .mockResolvedValueOnce({
-          id: 1,
-          email: 'new@example.com',
-          token: 'generated-token',
-          tokenExpiry: Date.now() + 86400000,
-          invitedBy: 1,
-          invitedAt: Date.now(),
-          role: 'user',
-          status: INVITATION_STATUS.PENDING,
-        });
+        .mockResolvedValueOnce(
+          createMockInvitation({
+            email: 'new@example.com',
+            token: 'generated-token',
+          })
+        );
 
       await expect(
         serviceWithEmail.invite('new@example.com', 'user', 1)
@@ -339,16 +339,12 @@ describe('InvitationsService', () => {
       mockUsersService.findOne.mockResolvedValue(undefined);
       mockQuery.invitations.findFirst
         .mockResolvedValueOnce(undefined)
-        .mockResolvedValueOnce({
-          id: 1,
-          email: 'new@example.com',
-          token: 'generated-token',
-          tokenExpiry: Date.now() + 86400000,
-          invitedBy: 1,
-          invitedAt: Date.now(),
-          role: 'user',
-          status: INVITATION_STATUS.PENDING,
-        });
+        .mockResolvedValueOnce(
+          createMockInvitation({
+            email: 'new@example.com',
+            token: 'generated-token',
+          })
+        );
 
       await expect(
         serviceWithEmail.invite('new@example.com', 'user', 1)
@@ -386,16 +382,12 @@ describe('InvitationsService', () => {
       mockUsersService.findOne.mockResolvedValue(undefined);
       mockQuery.invitations.findFirst
         .mockResolvedValueOnce(undefined)
-        .mockResolvedValueOnce({
-          id: 1,
-          email: 'new@example.com',
-          token: 'generated-token',
-          tokenExpiry: Date.now() + 86400000,
-          invitedBy: 1,
-          invitedAt: Date.now(),
-          role: 'user',
-          status: INVITATION_STATUS.PENDING,
-        });
+        .mockResolvedValueOnce(
+          createMockInvitation({
+            email: 'new@example.com',
+            token: 'generated-token',
+          })
+        );
 
       await serviceWithDefaults.invite('new@example.com', 'user', 1);
 
@@ -420,7 +412,7 @@ describe('InvitationsService', () => {
 
       expect(result.valid).toBe(true);
       expect(result.email).toBe('valid@example.com');
-      expect(result.role).toBe('user');
+      expect(result.roleId).toBe(MOCK_ROLE_ID);
     });
 
     it('rejects an unrecognized invitation link', async () => {

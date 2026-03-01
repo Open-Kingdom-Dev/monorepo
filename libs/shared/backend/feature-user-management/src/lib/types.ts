@@ -17,8 +17,6 @@ export interface AuthenticatedRequest extends Request {
 }
 
 // Domain types
-export type Role = 'guest' | 'user' | 'admin';
-
 export type InvitationStatus = 'pending' | 'accepted' | 'expired';
 
 export const INVITATION_STATUS = {
@@ -30,7 +28,7 @@ export const INVITATION_STATUS = {
 export interface ValidationResult {
   valid: boolean;
   email?: string;
-  role?: Role;
+  roleId?: number;
 }
 
 // Integration interfaces

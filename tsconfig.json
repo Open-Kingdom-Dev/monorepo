@@ -80,6 +80,9 @@
     },
     {
       "path": "./libs/shared/poly/util-date"
+    },
+    {
+      "path": "./libs/shared/backend/util-rbac"
     }
   ]
 }

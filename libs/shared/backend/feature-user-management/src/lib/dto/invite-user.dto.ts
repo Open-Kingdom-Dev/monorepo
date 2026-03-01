@@ -9,11 +9,10 @@ export class InviteUserDto {
   email!: string;
 
   @ApiProperty({
-    description: 'Role to assign to the invited user',
-    example: 'user',
-    enum: ['guest', 'user', 'admin'],
+    description: 'Role name to assign to the invited user',
+    example: 'guest',
     default: 'guest',
     required: false,
   })
-  role?: 'guest' | 'user' | 'admin';
+  role?: string;
 }

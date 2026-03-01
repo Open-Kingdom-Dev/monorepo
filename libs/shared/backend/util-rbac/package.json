@@ -1,6 +1,6 @@
 {
-  "name": "@open-kingdom/shared-frontend-feature-user-management",
-  "version": "0.0.2-16",
+  "name": "@open-kingdom/shared-backend-util-rbac",
+  "version": "0.0.2-14",
   "publishConfig": {
     "access": "public"
   },
@@ -18,18 +18,18 @@
     }
   },
   "files": [
-    "README.md",
     "dist",
     "!**/*.tsbuildinfo"
   ],
-  "dependencies": {
-    "@open-kingdom/shared-poly-util-date": "*"
-  },
   "nx": {
     "tags": [
       "scope:shared",
-      "type:feature",
-      "environment:frontend"
+      "type:util",
+      "environment:backend"
     ]
+  },
+  "dependencies": {
+    "@nestjs/common": "^11.0.0",
+    "@nestjs/core": "^11.0.0"
   }
 }
