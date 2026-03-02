@@ -2,8 +2,10 @@ import {
   Controller,
   Post,
   Get,
+  Delete,
   Body,
   Param,
+  ParseIntPipe,
   UseGuards,
   Request,
 } from '@nestjs/common';
@@ -15,6 +17,7 @@ import {
   ApiBody,
   ApiBadRequestResponse,
   ApiUnauthorizedResponse,
+  ApiNotFoundResponse,
 } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
 
@@ -26,6 +29,25 @@ import type { AuthenticatedRequest } from '../types';
 @Controller('invitations')
 export class InvitationsController {
   constructor(private readonly invitationsService: InvitationsService) {}
+
+  @Get()
+  @ApiBearerAuth('JWT-auth')
+  @UseGuards(AuthGuard('jwt'))
+  @ApiOperation({
+    summary: 'List pending and expired invitations',
+    description:
+      'Returns pending and expired invitations. Accepted invitations are excluded. Expired invitations are auto-updated.',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'List of invitations',
+  })
+  @ApiUnauthorizedResponse({
+    description: 'Unauthorized - Invalid or missing JWT token',
+  })
+  async findAll() {
+    return this.invitationsService.findAll();
+  }
 
   @Post('invite')
   @ApiBearerAuth('JWT-auth')
@@ -108,5 +130,28 @@ export class InvitationsController {
 
     const { password: _password, ...userWithoutPassword } = user;
     return userWithoutPassword;
+  }
+
+  @Delete(':id')
+  @ApiBearerAuth('JWT-auth')
+  @UseGuards(AuthGuard('jwt'))
+  @ApiOperation({
+    summary: 'Cancel an invitation',
+    description:
+      'Cancel and delete an invitation regardless of its current status.',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Invitation cancelled successfully',
+  })
+  @ApiNotFoundResponse({
+    description: 'Invitation not found',
+  })
+  @ApiUnauthorizedResponse({
+    description: 'Unauthorized - Invalid or missing JWT token',
+  })
+  async cancel(@Param('id', ParseIntPipe) id: number) {
+    await this.invitationsService.cancel(id);
+    return { message: 'Invitation cancelled successfully' };
   }
 }

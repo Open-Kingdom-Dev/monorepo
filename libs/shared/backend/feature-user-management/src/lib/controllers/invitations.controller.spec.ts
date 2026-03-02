@@ -1,5 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { BadRequestException } from '@nestjs/common';
+import { BadRequestException, NotFoundException } from '@nestjs/common';
 
 import { InvitationsController } from './invitations.controller';
 import { InvitationsService } from '../services';
@@ -14,6 +14,8 @@ describe('InvitationsController', () => {
       invite: jest.fn(),
       validate: jest.fn(),
       accept: jest.fn(),
+      findAll: jest.fn(),
+      cancel: jest.fn(),
     } as unknown as jest.Mocked<InvitationsService>;
 
     const module: TestingModule = await Test.createTestingModule({
@@ -129,6 +131,61 @@ describe('InvitationsController', () => {
       await expect(
         controller.accept({ token: 'invalid', password: 'pass' })
       ).rejects.toThrow(BadRequestException);
+    });
+  });
+
+  describe('listing invitations', () => {
+    it('provides a full list of invitations', async () => {
+      const mockInvitations = [
+        {
+          id: 1,
+          email: 'a@test.com',
+          tokenExpiry: Date.now() + 86400000,
+          invitedBy: 1,
+          invitedAt: Date.now(),
+          role: 'user',
+          status: 'pending',
+        },
+        {
+          id: 2,
+          email: 'b@test.com',
+          tokenExpiry: Date.now() - 86400000,
+          invitedBy: 1,
+          invitedAt: Date.now(),
+          role: 'guest',
+          status: 'expired',
+        },
+      ];
+
+      mockInvitationsService.findAll.mockResolvedValue(
+        mockInvitations as never
+      );
+
+      const result = await controller.findAll();
+
+      expect(mockInvitationsService.findAll).toHaveBeenCalled();
+      expect(result).toEqual(mockInvitations);
+    });
+  });
+
+  describe('cancelling invitations', () => {
+    it('confirms cancellation with a success message', async () => {
+      mockInvitationsService.cancel.mockResolvedValue(undefined);
+
+      const result = await controller.cancel(1);
+
+      expect(mockInvitationsService.cancel).toHaveBeenCalledWith(1);
+      expect(result).toEqual({
+        message: 'Invitation cancelled successfully',
+      });
+    });
+
+    it('reports when the invitation does not exist', async () => {
+      mockInvitationsService.cancel.mockRejectedValue(
+        new NotFoundException('Invitation not found')
+      );
+
+      await expect(controller.cancel(999)).rejects.toThrow(NotFoundException);
     });
   });
 });

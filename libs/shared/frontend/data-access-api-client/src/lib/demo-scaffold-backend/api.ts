@@ -43,6 +43,13 @@ const injectedRtkApi = api
         }),
         invalidatesTags: ["Email"],
       }),
+      invitationsControllerFindAll: build.query<
+        InvitationsControllerFindAllApiResponse,
+        InvitationsControllerFindAllApiArg
+      >({
+        query: () => ({ url: `/api/invitations` }),
+        providesTags: ["Invitations"],
+      }),
       invitationsControllerInvite: build.mutation<
         InvitationsControllerInviteApiResponse,
         InvitationsControllerInviteApiArg
@@ -71,6 +78,16 @@ const injectedRtkApi = api
           url: `/api/invitations/accept`,
           method: "POST",
           body: queryArg.acceptInvitationDto,
+        }),
+        invalidatesTags: ["Invitations"],
+      }),
+      invitationsControllerCancel: build.mutation<
+        InvitationsControllerCancelApiResponse,
+        InvitationsControllerCancelApiArg
+      >({
+        query: (queryArg) => ({
+          url: `/api/invitations/${queryArg.id}`,
+          method: "DELETE",
         }),
         invalidatesTags: ["Invitations"],
       }),
@@ -140,6 +157,8 @@ export type EmailControllerSendEmailApiArg = {
   /** Email details */
   sendEmailDto: SendEmailDto;
 };
+export type InvitationsControllerFindAllApiResponse = unknown;
+export type InvitationsControllerFindAllApiArg = void;
 export type InvitationsControllerInviteApiResponse = unknown;
 export type InvitationsControllerInviteApiArg = {
   inviteUserDto: InviteUserDto;
@@ -156,6 +175,10 @@ export type InvitationsControllerValidateApiArg = {
 export type InvitationsControllerAcceptApiResponse = unknown;
 export type InvitationsControllerAcceptApiArg = {
   acceptInvitationDto: AcceptInvitationDto;
+};
+export type InvitationsControllerCancelApiResponse = unknown;
+export type InvitationsControllerCancelApiArg = {
+  id: number;
 };
 export type UsersControllerFindAllApiResponse = unknown;
 export type UsersControllerFindAllApiArg = void;
@@ -263,9 +286,11 @@ export const {
   useAuthControllerLoginMutation,
   useAuthControllerGetProfileQuery,
   useEmailControllerSendEmailMutation,
+  useInvitationsControllerFindAllQuery,
   useInvitationsControllerInviteMutation,
   useInvitationsControllerValidateQuery,
   useInvitationsControllerAcceptMutation,
+  useInvitationsControllerCancelMutation,
   useUsersControllerFindAllQuery,
   useUsersControllerFindOneQuery,
   useUsersControllerDeleteMutation,

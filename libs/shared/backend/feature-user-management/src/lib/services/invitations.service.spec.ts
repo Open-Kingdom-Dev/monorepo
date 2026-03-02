@@ -1,5 +1,9 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { BadRequestException, BadGatewayException } from '@nestjs/common';
+import {
+  BadRequestException,
+  BadGatewayException,
+  NotFoundException,
+} from '@nestjs/common';
 
 import { DB_TAG } from '@open-kingdom/shared-poly-util-constants';
 import { UsersService } from '@open-kingdom/shared-backend-data-access-users';
@@ -15,6 +19,7 @@ import { invitations, Invitation } from '../schemas/invitations.schema';
 interface MockQuery {
   invitations: {
     findFirst: jest.Mock<Promise<Partial<Invitation> | undefined>>;
+    findMany: jest.Mock<Promise<Partial<Invitation>[]>>;
   };
 }
 
@@ -57,6 +62,7 @@ describe('InvitationsService', () => {
     mockQuery = {
       invitations: {
         findFirst: jest.fn(),
+        findMany: jest.fn().mockResolvedValue([]),
       },
     };
 
@@ -520,6 +526,126 @@ describe('InvitationsService', () => {
       await expect(service.accept('invalid-token', 'password')).rejects.toThrow(
         BadRequestException
       );
+    });
+  });
+
+  describe('listing invitations', () => {
+    it('never exposes invitation tokens in the response', async () => {
+      const inv1 = createMockInvitation({
+        id: 1,
+        email: 'a@test.com',
+        token: 'secret-token-1',
+      });
+      const inv2 = createMockInvitation({
+        id: 2,
+        email: 'b@test.com',
+        token: 'secret-token-2',
+        status: INVITATION_STATUS.EXPIRED,
+      });
+      mockQuery.invitations.findMany.mockResolvedValue([inv1, inv2]);
+
+      const results = await service.findAll();
+
+      expect(results).toHaveLength(2);
+      for (const result of results) {
+        expect(result).not.toHaveProperty('token');
+      }
+      expect(results[0].email).toBe('a@test.com');
+      expect(results[1].email).toBe('b@test.com');
+    });
+
+    it('excludes accepted invitations from the list', async () => {
+      const pending = createMockInvitation({
+        id: 1,
+        email: 'pending@test.com',
+      });
+      const accepted = createMockInvitation({
+        id: 2,
+        email: 'accepted@test.com',
+        status: INVITATION_STATUS.ACCEPTED,
+      });
+      const expired = createMockInvitation({
+        id: 3,
+        email: 'expired@test.com',
+        status: INVITATION_STATUS.EXPIRED,
+      });
+      mockQuery.invitations.findMany.mockResolvedValue([
+        pending,
+        accepted,
+        expired,
+      ]);
+
+      const results = await service.findAll();
+
+      expect(results).toHaveLength(2);
+      expect(results.map((r) => r.email)).toEqual([
+        'pending@test.com',
+        'expired@test.com',
+      ]);
+    });
+
+    it('marks overdue pending invitations as expired when listing', async () => {
+      const stale = createMockInvitation({
+        id: 1,
+        tokenExpiry: Date.now() - 86400000,
+        status: INVITATION_STATUS.PENDING,
+      });
+      mockQuery.invitations.findMany.mockResolvedValue([stale]);
+
+      const results = await service.findAll();
+
+      expect(results[0].status).toBe(INVITATION_STATUS.EXPIRED);
+      expect(mockDb.update).toHaveBeenCalledWith(invitations);
+    });
+
+    it('handles having no invitations gracefully', async () => {
+      mockQuery.invitations.findMany.mockResolvedValue([]);
+
+      const results = await service.findAll();
+
+      expect(results).toEqual([]);
+    });
+  });
+
+  describe('cancelling invitations', () => {
+    it('removes a pending invitation when cancelled', async () => {
+      mockQuery.invitations.findFirst.mockResolvedValue(
+        createMockInvitation({ id: 5 })
+      );
+
+      await service.cancel(5);
+
+      expect(mockDb.delete).toHaveBeenCalledWith(invitations);
+    });
+
+    it('cancels an accepted invitation', async () => {
+      mockQuery.invitations.findFirst.mockResolvedValue(
+        createMockInvitation({ id: 3, status: INVITATION_STATUS.ACCEPTED })
+      );
+
+      await service.cancel(3);
+
+      expect(mockDb.delete).toHaveBeenCalledWith(invitations);
+    });
+
+    it('cancels an expired invitation', async () => {
+      mockQuery.invitations.findFirst.mockResolvedValue(
+        createMockInvitation({
+          id: 4,
+          status: INVITATION_STATUS.EXPIRED,
+          tokenExpiry: Date.now() - 86400000,
+        })
+      );
+
+      await service.cancel(4);
+
+      expect(mockDb.delete).toHaveBeenCalledWith(invitations);
+    });
+
+    it('reports when trying to cancel an invitation that does not exist', async () => {
+      mockQuery.invitations.findFirst.mockResolvedValue(undefined);
+
+      await expect(service.cancel(999)).rejects.toThrow(NotFoundException);
     });
   });
 });

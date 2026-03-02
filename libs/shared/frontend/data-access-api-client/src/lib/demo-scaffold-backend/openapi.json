@@ -160,6 +160,30 @@
         ]
       }
     },
+    "/api/invitations": {
+      "get": {
+        "description": "Returns all invitations with their status. Expired invitations are auto-updated.",
+        "operationId": "InvitationsController_findAll",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "List of invitations"
+          },
+          "401": {
+            "description": "Unauthorized - Invalid or missing JWT token"
+          }
+        },
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ],
+        "summary": "List all invitations",
+        "tags": [
+          "Invitations"
+        ]
+      }
+    },
     "/api/invitations/invite": {
       "post": {
         "description": "Send an invitation to a new user. Requires authentication.",
@@ -271,6 +295,45 @@
           }
         },
         "summary": "Accept an invitation",
+        "tags": [
+          "Invitations"
+        ]
+      }
+    },
+    "/api/invitations/{id}": {
+      "delete": {
+        "description": "Cancel and delete a pending invitation. Only pending invitations can be cancelled.",
+        "operationId": "InvitationsController_cancel",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Invitation cancelled successfully"
+          },
+          "400": {
+            "description": "Only pending invitations can be cancelled"
+          },
+          "401": {
+            "description": "Unauthorized - Invalid or missing JWT token"
+          },
+          "404": {
+            "description": "Invitation not found"
+          }
+        },
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ],
+        "summary": "Cancel a pending invitation",
         "tags": [
           "Invitations"
         ]
