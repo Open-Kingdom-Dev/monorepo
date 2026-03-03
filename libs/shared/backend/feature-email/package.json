@@ -25,6 +25,11 @@
     "@nestjs/common": "^11.0.0",
     "@nestjs/swagger": "^11.0.0"
   },
+  "files": [
+    "README.md",
+    "dist",
+    "!**/*.tsbuildinfo"
+  ],
   "nx": {
     "name": "@open-kingdom/shared-backend-feature-email",
     "tags": [
