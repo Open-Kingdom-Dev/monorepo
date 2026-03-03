@@ -1,6 +1,6 @@
 {
   "name": "@open-kingdom/shared-backend-data-access-database-setup",
-  "version": "0.0.2-14",
+  "version": "0.0.2-15",
   "publishConfig": {
     "access": "public"
   },
@@ -36,7 +36,7 @@
   },
   "dependencies": {
     "tslib": "^2.3.0",
-    "@open-kingdom/shared-poly-util-constants": "0.0.2-14"
+    "@open-kingdom/shared-poly-util-constants": "0.0.2-15"
   },
   "peerDependencies": {
     "@nestjs/common": "^11.0.0",

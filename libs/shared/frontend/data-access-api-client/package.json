@@ -1,6 +1,6 @@
 {
   "name": "@open-kingdom/shared-frontend-data-access-api-client",
-  "version": "0.0.2-14",
+  "version": "0.0.2-15",
   "publishConfig": {
     "access": "public"
   },
