@@ -17,6 +17,11 @@
       "default": "./dist/index.js"
     }
   },
+  "files": [
+    "README.md",
+    "dist",
+    "!**/*.tsbuildinfo"
+  ],
   "nx": {
     "tags": [
       "scope:shared",
