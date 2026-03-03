@@ -6,20 +6,20 @@ A global NestJS dynamic module providing email sending through a pluggable provi
 
 ## Exports
 
-| Export | Kind | Description |
-|---|---|---|
-| `EmailModule` | `class` | Global NestJS dynamic module. Call `.forRoot(options)` to configure. |
-| `EmailModuleOptions` | `interface` | Type-only. Argument type for `.forRoot()`. |
-| `EmailService` | `class` | Injectable service. Wraps the active `EmailProvider`. Primary injection point for sending email. |
-| `EmailController` | `class` | REST controller. Registers `POST /email/send`. |
-| `GmailProvider` | `class` | Gmail implementation of `EmailProvider`. |
-| `GmailProviderConfig` | `interface` | Configuration for `GmailProvider`. |
-| `EMAIL_PROVIDER` | `symbol` | DI token for the active `EmailProvider` implementation. Value: `Symbol('EMAIL_PROVIDER')`. |
-| `EmailProvider` | `interface` | Contract for email provider implementations. |
-| `EmailMessage` | `interface` | Message shape passed to `EmailProvider.send()`. |
-| `EmailResult` | `interface` | Return type of `EmailProvider.send()`. |
-| `SendEmailDto` | `class` | Request DTO for `POST /email/send`. |
-| `SendEmailResponseDto` | `class` | Response DTO for `POST /email/send`. |
+| Export                 | Kind        | Description                                                                                      |
+| ---------------------- | ----------- | ------------------------------------------------------------------------------------------------ |
+| `EmailModule`          | `class`     | Global NestJS dynamic module. Call `.forRoot(options)` to configure.                             |
+| `EmailModuleOptions`   | `interface` | Type-only. Argument type for `.forRoot()`.                                                       |
+| `EmailService`         | `class`     | Injectable service. Wraps the active `EmailProvider`. Primary injection point for sending email. |
+| `EmailController`      | `class`     | REST controller. Registers `POST /email/send`.                                                   |
+| `GmailProvider`        | `class`     | Gmail implementation of `EmailProvider`.                                                         |
+| `GmailProviderConfig`  | `interface` | Configuration for `GmailProvider`.                                                               |
+| `EMAIL_PROVIDER`       | `symbol`    | DI token for the active `EmailProvider` implementation. Value: `Symbol('EMAIL_PROVIDER')`.       |
+| `EmailProvider`        | `interface` | Contract for email provider implementations.                                                     |
+| `EmailMessage`         | `interface` | Message shape passed to `EmailProvider.send()`.                                                  |
+| `EmailResult`          | `interface` | Return type of `EmailProvider.send()`.                                                           |
+| `SendEmailDto`         | `class`     | Request DTO for `POST /email/send`.                                                              |
+| `SendEmailResponseDto` | `class`     | Response DTO for `POST /email/send`.                                                             |
 
 ---
 
@@ -31,27 +31,27 @@ Any email provider implementation must expose a single `send` method that accept
 
 ### `EmailMessage`
 
-| Property | Type | Required | Description |
-|---|---|---|---|
-| `to` | `string[]` | Yes | Array of recipient email addresses. |
-| `from` | `string` | No | Optional sender override. Defaults to `GmailProviderConfig.impersonateEmail`. |
-| `subject` | `string` | Yes | Email subject line. |
-| `text` | `string` | No | Plain text body. |
-| `html` | `string` | No | HTML body. Takes precedence over `text` if both are provided. |
+| Property  | Type       | Required | Description                                                                   |
+| --------- | ---------- | -------- | ----------------------------------------------------------------------------- |
+| `to`      | `string[]` | Yes      | Array of recipient email addresses.                                           |
+| `from`    | `string`   | No       | Optional sender override. Defaults to `GmailProviderConfig.impersonateEmail`. |
+| `subject` | `string`   | Yes      | Email subject line.                                                           |
+| `text`    | `string`   | No       | Plain text body.                                                              |
+| `html`    | `string`   | No       | HTML body. Takes precedence over `text` if both are provided.                 |
 
 ### `EmailResult`
 
-| Property | Type | Description |
-|---|---|---|
+| Property    | Type                  | Description                                      |
+| ----------- | --------------------- | ------------------------------------------------ |
 | `messageId` | `string \| undefined` | Gmail message ID returned from the API response. |
 
 ### `GmailProviderConfig`
 
-| Property | Type | Description |
-|---|---|---|
-| `clientEmail` | `string` | Service account email address (e.g. `my-sa@project.iam.gserviceaccount.com`). |
-| `privateKey` | `string` | PEM private key for the service account. Literal `\n` sequences in environment variables are automatically replaced with real newlines. |
-| `impersonateEmail` | `string` | The Gmail address to send from. Requires domain-wide delegation granted to the service account in Google Workspace Admin. |
+| Property           | Type     | Description                                                                                                                             |
+| ------------------ | -------- | --------------------------------------------------------------------------------------------------------------------------------------- |
+| `clientEmail`      | `string` | Service account email address (e.g. `my-sa@project.iam.gserviceaccount.com`).                                                           |
+| `privateKey`       | `string` | PEM private key for the service account. Literal `\n` sequences in environment variables are automatically replaced with real newlines. |
+| `impersonateEmail` | `string` | The Gmail address to send from. Requires domain-wide delegation granted to the service account in Google Workspace Admin.               |
 
 ### `EmailModuleOptions`
 
@@ -59,19 +59,19 @@ Any email provider implementation must expose a single `send` method that accept
 
 ### `SendEmailDto`
 
-| Property | Type | Description |
-|---|---|---|
-| `to` | `string` | Single recipient address. The controller wraps it in an array before passing to the provider. |
-| `subject` | `string` | Email subject line. |
-| `body` | `string` | Plain text body. |
+| Property  | Type     | Description                                                                                   |
+| --------- | -------- | --------------------------------------------------------------------------------------------- |
+| `to`      | `string` | Single recipient address. The controller wraps it in an array before passing to the provider. |
+| `subject` | `string` | Email subject line.                                                                           |
+| `body`    | `string` | Plain text body.                                                                              |
 
 ### `SendEmailResponseDto`
 
-| Property | Type | Description |
-|---|---|---|
-| `success` | `boolean` | Whether the send operation succeeded. |
-| `messageId` | `string \| undefined` | Present on success. |
-| `error` | `string \| undefined` | Present on failure. |
+| Property    | Type                  | Description                           |
+| ----------- | --------------------- | ------------------------------------- |
+| `success`   | `boolean`             | Whether the send operation succeeded. |
+| `messageId` | `string \| undefined` | Present on success.                   |
+| `error`     | `string \| undefined` | Present on failure.                   |
 
 ---
 
@@ -89,8 +89,8 @@ import { EmailModule } from '@open-kingdom/shared-backend-feature-email';
     EmailModule.forRoot({
       provider: 'gmail',
       config: {
-        clientEmail:      process.env['GMAIL_CLIENT_EMAIL']!,
-        privateKey:       process.env['GMAIL_PRIVATE_KEY']!,
+        clientEmail: process.env['GMAIL_CLIENT_EMAIL']!,
+        privateKey: process.env['GMAIL_PRIVATE_KEY']!,
         impersonateEmail: process.env['GMAIL_IMPERSONATE_EMAIL']!,
       },
     }),
@@ -103,12 +103,12 @@ export class AppModule {}
 
 ## Configuration Options
 
-| Option | Type | Description |
-|---|---|---|
-| `provider` | `'gmail'` | Selects the email provider implementation. Only `'gmail'` is supported. |
-| `config.clientEmail` | `string` | Google service account email address. |
-| `config.privateKey` | `string` | PEM-format private key for the service account. Literal `\n` sequences in environment variables are automatically replaced with real newlines. |
-| `config.impersonateEmail` | `string` | The Gmail address to impersonate as the sender. Requires domain-wide delegation granted to the service account in Google Workspace Admin. |
+| Option                    | Type      | Description                                                                                                                                    |
+| ------------------------- | --------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
+| `provider`                | `'gmail'` | Selects the email provider implementation. Only `'gmail'` is supported.                                                                        |
+| `config.clientEmail`      | `string`  | Google service account email address.                                                                                                          |
+| `config.privateKey`       | `string`  | PEM-format private key for the service account. Literal `\n` sequences in environment variables are automatically replaced with real newlines. |
+| `config.impersonateEmail` | `string`  | The Gmail address to impersonate as the sender. Requires domain-wide delegation granted to the service account in Google Workspace Admin.      |
 
 ---
 
@@ -124,8 +124,8 @@ export class AppModule {}
 
 ## EmailService API
 
-| Method | Parameters | Returns | Description |
-|---|---|---|---|
+| Method | Parameters          | Returns                         | Description                                                                                                                                                                                                          |
+| ------ | ------------------- | ------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `send` | `dto: SendEmailDto` | `Promise<SendEmailResponseDto>` | Sends a single email. Wraps `dto.to` in an array and maps `dto.body` to the `text` field before calling the provider. Catches provider errors and returns `{ success: false, error: message }` rather than throwing. |
 
 `EmailService.send()` accepts the flat `SendEmailDto` shape (single `to` string, `body` field) and maps it to the `EmailMessage` shape (`to: [dto.to]`, `text: dto.body`) before calling the underlying provider.

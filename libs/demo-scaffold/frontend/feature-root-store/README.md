@@ -14,14 +14,14 @@ This library is the single store-creation point for the demo-scaffold frontend. 
 
 The store produced by `createRootStore()` has the following reducer keys:
 
-| Key | Source Package | Description |
-|---|---|---|
-| `'logger'` (`LoggerKey`) | `shared-frontend-data-access-logger` | Client-side log entries |
-| `'notifications'` (`NotificationKey`) | `shared-frontend-data-access-notifications` | UI notification queue |
-| `'datagrid'` (`DataGridKey`) | `shared-frontend-ui-datagrid` | AG Grid persisted state |
-| `'api'` (`ApiKey`) | `shared-frontend-data-access-api-client` | RTK Query cache for backend API |
-| `'auth'` (`AuthKey`) | `shared-frontend-data-access-api-client` | JWT token and user identity |
-| `'catFactsApi'` (`CatFactsApiKey`) | `shared-frontend-data-access-external-api` | External API RTK Query cache |
+| Key                                   | Source Package                              | Description                     |
+| ------------------------------------- | ------------------------------------------- | ------------------------------- |
+| `'logger'` (`LoggerKey`)              | `shared-frontend-data-access-logger`        | Client-side log entries         |
+| `'notifications'` (`NotificationKey`) | `shared-frontend-data-access-notifications` | UI notification queue           |
+| `'datagrid'` (`DataGridKey`)          | `shared-frontend-ui-datagrid`               | AG Grid persisted state         |
+| `'api'` (`ApiKey`)                    | `shared-frontend-data-access-api-client`    | RTK Query cache for backend API |
+| `'auth'` (`AuthKey`)                  | `shared-frontend-data-access-api-client`    | JWT token and user identity     |
+| `'catFactsApi'` (`CatFactsApiKey`)    | `shared-frontend-data-access-external-api`  | External API RTK Query cache    |
 
 ## Middleware Stack
 
@@ -68,18 +68,9 @@ When building a new application, create a new store module and compose the slice
 
 ```typescript
 import { configureStore } from '@reduxjs/toolkit';
-import {
-  ApiKey, apiReducer, apiMiddleware,
-  AuthKey, authReducer,
-  createAuthListenerMiddleware, createAuthHydrationMiddleware,
-} from '@open-kingdom/shared-frontend-data-access-api-client';
-import {
-  LoggerKey, loggerReducer,
-  createConsoleLoggerMiddleware,
-} from '@open-kingdom/shared-frontend-data-access-logger';
-import {
-  NotificationKey, notificationReducer,
-} from '@open-kingdom/shared-frontend-data-access-notifications';
+import { ApiKey, apiReducer, apiMiddleware, AuthKey, authReducer, createAuthListenerMiddleware, createAuthHydrationMiddleware } from '@open-kingdom/shared-frontend-data-access-api-client';
+import { LoggerKey, loggerReducer, createConsoleLoggerMiddleware } from '@open-kingdom/shared-frontend-data-access-logger';
+import { NotificationKey, notificationReducer } from '@open-kingdom/shared-frontend-data-access-notifications';
 
 export const createRootStore = () =>
   configureStore({
@@ -90,12 +81,7 @@ export const createRootStore = () =>
       [AuthKey]: authReducer,
       // add your feature slices here
     },
-    middleware: (getDefault) =>
-      getDefault()
-        .prepend(createConsoleLoggerMiddleware())
-        .prepend(createAuthHydrationMiddleware())
-        .concat(apiMiddleware)
-        .concat(createAuthListenerMiddleware()),
+    middleware: (getDefault) => getDefault().prepend(createConsoleLoggerMiddleware()).prepend(createAuthHydrationMiddleware()).concat(apiMiddleware).concat(createAuthListenerMiddleware()),
   });
 ```
 

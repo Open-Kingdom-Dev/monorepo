@@ -8,12 +8,12 @@ Shared TypeScript type definitions used across both backend and frontend package
 
 ### Notification Types
 
-| Export | Kind | Description |
-|---|---|---|
-| `NotificationEntry` | `interface` | Shape of a single notification entry in the notifications Redux slice |
-| `NotificationState` | `interface` | Shape of the notifications Redux slice state |
-| `NotificationConfig` | `interface` | Configuration options for notification behavior |
-| `RootStateContaining<K, V>` | `type` | Generic helper for creating typed selector state shapes |
+| Export                      | Kind        | Description                                                           |
+| --------------------------- | ----------- | --------------------------------------------------------------------- |
+| `NotificationEntry`         | `interface` | Shape of a single notification entry in the notifications Redux slice |
+| `NotificationState`         | `interface` | Shape of the notifications Redux slice state                          |
+| `NotificationConfig`        | `interface` | Configuration options for notification behavior                       |
+| `RootStateContaining<K, V>` | `type`      | Generic helper for creating typed selector state shapes               |
 
 ---
 
@@ -21,28 +21,28 @@ Shared TypeScript type definitions used across both backend and frontend package
 
 ### `NotificationConfig`
 
-| Property | Type | Required | Default | Description |
-|---|---|---|---|---|
-| `maxNotifications` | `number` | No | `5` | Max entries to keep in state; oldest are dropped |
-| `autoDismiss` | `boolean` | No | `true` | Whether notifications auto-dismiss |
-| `dismissTimeout` | `number` | No | `5000` | Auto-dismiss delay in milliseconds |
+| Property           | Type      | Required | Default | Description                                      |
+| ------------------ | --------- | -------- | ------- | ------------------------------------------------ |
+| `maxNotifications` | `number`  | No       | `5`     | Max entries to keep in state; oldest are dropped |
+| `autoDismiss`      | `boolean` | No       | `true`  | Whether notifications auto-dismiss               |
+| `dismissTimeout`   | `number`  | No       | `5000`  | Auto-dismiss delay in milliseconds               |
 
 ### `NotificationEntry`
 
-| Property | Type | Required | Default | Description |
-|---|---|---|---|---|
-| `id` | `string` | Yes | — | Unique identifier |
-| `message` | `string` | Yes | — | Display message text |
-| `type` | `'success' \| 'warning' \| 'error'` | Yes | — | Notification severity |
-| `timestamp` | `number` | Yes | — | Unix timestamp in milliseconds |
-| `dismissed` | `boolean` | No | — | True after dismiss is triggered (before removal) |
+| Property    | Type                                | Required | Default | Description                                      |
+| ----------- | ----------------------------------- | -------- | ------- | ------------------------------------------------ |
+| `id`        | `string`                            | Yes      | —       | Unique identifier                                |
+| `message`   | `string`                            | Yes      | —       | Display message text                             |
+| `type`      | `'success' \| 'warning' \| 'error'` | Yes      | —       | Notification severity                            |
+| `timestamp` | `number`                            | Yes      | —       | Unix timestamp in milliseconds                   |
+| `dismissed` | `boolean`                           | No       | —       | True after dismiss is triggered (before removal) |
 
 ### `NotificationState`
 
-| Property | Type | Required | Default | Description |
-|---|---|---|---|---|
-| `notifications` | `NotificationEntry[]` | Yes | — | Active notification entries |
-| `config` | `NotificationConfig` | Yes | — | Slice configuration |
+| Property        | Type                  | Required | Default | Description                 |
+| --------------- | --------------------- | -------- | ------- | --------------------------- |
+| `notifications` | `NotificationEntry[]` | Yes      | —       | Active notification entries |
+| `config`        | `NotificationConfig`  | Yes      | —       | Slice configuration         |
 
 ### `RootStateContaining<K, V>`
 
@@ -55,12 +55,7 @@ A generic intersection type that satisfies both a general index signature and a 
 Always use type-only imports from this package:
 
 ```typescript
-import type {
-  NotificationEntry,
-  NotificationState,
-  NotificationConfig,
-  RootStateContaining,
-} from '@open-kingdom/shared-poly-util-types';
+import type { NotificationEntry, NotificationState, NotificationConfig, RootStateContaining } from '@open-kingdom/shared-poly-util-types';
 ```
 
 ### Using `RootStateContaining` for typed selectors
@@ -71,15 +66,10 @@ import type {
 import type { RootStateContaining } from '@open-kingdom/shared-poly-util-types';
 import type { NotificationState } from '@open-kingdom/shared-poly-util-types';
 
-export type RootStateContainingNotifications = RootStateContaining<
-  'notifications',
-  NotificationState
->;
+export type RootStateContainingNotifications = RootStateContaining<'notifications', NotificationState>;
 
 // Selector:
-export const selectNotificationsState = (
-  state: RootStateContainingNotifications
-) => state['notifications'];
+export const selectNotificationsState = (state: RootStateContainingNotifications) => state['notifications'];
 ```
 
 ### Using `NotificationEntry` in component props

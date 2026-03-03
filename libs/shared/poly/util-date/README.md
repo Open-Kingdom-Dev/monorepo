@@ -2,13 +2,12 @@
 
 Shared date utility functions that work in both Node.js and browser environments, providing common date formatting helpers with no external library dependencies.
 
-
 ---
 
 ## Exports
 
-| Export | Signature | Description |
-|---|---|---|
+| Export                  | Signature                                    | Description                                                                                                                                      |
+| ----------------------- | -------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
 | `formatDate(timestamp)` | `(timestamp: number \| undefined) => string` | Formats a Unix millisecond timestamp as a locale date string using `toLocaleDateString()`; returns `'—'` (em-dash) if `timestamp` is `undefined` |
 
 ---

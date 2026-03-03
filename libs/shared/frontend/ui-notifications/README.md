@@ -6,8 +6,8 @@ Primitive React UI notification component (`NotificationToast`) that renders a s
 
 ## Exports
 
-| Export | Type | Description |
-|---|---|---|
+| Export              | Type                               | Description                                                                |
+| ------------------- | ---------------------------------- | -------------------------------------------------------------------------- |
 | `NotificationToast` | `React.FC<NotificationToastProps>` | Renders a single toast notification with type styling and dismiss behavior |
 
 ---
@@ -16,21 +16,21 @@ Primitive React UI notification component (`NotificationToast`) that renders a s
 
 ### `NotificationToastProps`
 
-| Property | Type | Required | Description |
-|---|---|---|---|
-| `notification` | `NotificationEntry` | Yes | The notification entry to render (from `@open-kingdom/shared-poly-util-types`) |
-| `onDismissed` | `(id: string) => void` | Yes | Called immediately when the user clicks dismiss or auto-dismiss fires |
-| `onRemoved` | `(id: string) => void` | Yes | Called after the 300ms exit animation delay, signalling safe removal from state |
+| Property       | Type                   | Required | Description                                                                     |
+| -------------- | ---------------------- | -------- | ------------------------------------------------------------------------------- |
+| `notification` | `NotificationEntry`    | Yes      | The notification entry to render (from `@open-kingdom/shared-poly-util-types`)  |
+| `onDismissed`  | `(id: string) => void` | Yes      | Called immediately when the user clicks dismiss or auto-dismiss fires           |
+| `onRemoved`    | `(id: string) => void` | Yes      | Called after the 300ms exit animation delay, signalling safe removal from state |
 
 ### `NotificationEntry` (from `@open-kingdom/shared-poly-util-types`)
 
-| Property | Type | Required | Description |
-|---|---|---|---|
-| `id` | `string` | Yes | Unique identifier |
-| `message` | `string` | Yes | The notification text |
-| `type` | `'success' \| 'warning' \| 'error'` | Yes | Controls icon and color styling |
-| `timestamp` | `number` | Yes | Unix millisecond timestamp |
-| `dismissed` | `boolean` | No | When `true`, triggers the exit animation |
+| Property    | Type                                | Required | Description                              |
+| ----------- | ----------------------------------- | -------- | ---------------------------------------- |
+| `id`        | `string`                            | Yes      | Unique identifier                        |
+| `message`   | `string`                            | Yes      | The notification text                    |
+| `type`      | `'success' \| 'warning' \| 'error'` | Yes      | Controls icon and color styling          |
+| `timestamp` | `number`                            | Yes      | Unix millisecond timestamp               |
+| `dismissed` | `boolean`                           | No       | When `true`, triggers the exit animation |
 
 ---
 
@@ -60,13 +60,7 @@ function CustomNotificationContainer() {
     console.log('Removed:', id);
   };
 
-  return (
-    <NotificationToast
-      notification={notification}
-      onDismissed={handleDismissed}
-      onRemoved={handleRemoved}
-    />
-  );
+  return <NotificationToast notification={notification} onDismissed={handleDismissed} onRemoved={handleRemoved} />;
 }
 ```
 
@@ -80,11 +74,7 @@ function NotificationStack({ notifications, onDismiss, onRemove }) {
     <div className="fixed bottom-4 right-4 z-50 flex flex-col gap-3 pointer-events-none">
       {notifications.map((n) => (
         <div key={n.id} className="pointer-events-auto">
-          <NotificationToast
-            notification={n}
-            onDismissed={onDismiss}
-            onRemoved={onRemove}
-          />
+          <NotificationToast notification={n} onDismissed={onDismiss} onRemoved={onRemove} />
         </div>
       ))}
     </div>
@@ -105,11 +95,11 @@ function NotificationStack({ notifications, onDismiss, onRemove }) {
 
 ## Type-Specific Styling
 
-| Type | Background | Border | Icon |
-|---|---|---|---|
-| `'success'` | `bg-success-50 dark:bg-success-900/20` | `border-success-200 dark:border-success-700` | Checkmark SVG |
+| Type        | Background                             | Border                                       | Icon               |
+| ----------- | -------------------------------------- | -------------------------------------------- | ------------------ |
+| `'success'` | `bg-success-50 dark:bg-success-900/20` | `border-success-200 dark:border-success-700` | Checkmark SVG      |
 | `'warning'` | `bg-warning-50 dark:bg-warning-900/20` | `border-warning-200 dark:border-warning-700` | Triangle/alert SVG |
-| `'error'` | `bg-error-50 dark:bg-error-900/20` | `border-error-200 dark:border-error-700` | Circle/X SVG |
+| `'error'`   | `bg-error-50 dark:bg-error-900/20`     | `border-error-200 dark:border-error-700`     | Circle/X SVG       |
 
 All color classes reference CSS variables from `@open-kingdom/shared-frontend-ui-theme`. The Tailwind config used by the consuming application must include the `ui-theme` preset so these classes are generated.
 
@@ -123,10 +113,7 @@ const baseConfig = require('@open-kingdom/shared-frontend-ui-theme/tailwind.conf
 
 module.exports = {
   presets: [baseConfig],
-  content: [
-    './src/**/*.{ts,tsx}',
-    '../../libs/shared/frontend/ui-notifications/src/**/*.{ts,tsx}',
-  ],
+  content: ['./src/**/*.{ts,tsx}', '../../libs/shared/frontend/ui-notifications/src/**/*.{ts,tsx}'],
 };
 ```
 

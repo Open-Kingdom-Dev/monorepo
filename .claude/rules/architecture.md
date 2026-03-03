@@ -14,6 +14,7 @@ data-access → (no feature imports, no ui imports)
 ```
 
 **Allowed dependency graph:**
+
 - `backend/feature-*` → `backend/data-access-*`, `shared/poly/*`
 - `backend/data-access-*` → `shared/poly/*`
 - `frontend/feature-*` → `frontend/data-access-*`, `frontend/ui-*`, `shared/poly/*`
@@ -22,6 +23,7 @@ data-access → (no feature imports, no ui imports)
 - `shared/poly/*` → no other `@open-kingdom/*` imports
 
 **Never:**
+
 - Import `frontend` packages from `backend`
 - Import `backend` packages from `frontend`
 - Import `feature` packages from `data-access` or `ui`
@@ -29,12 +31,12 @@ data-access → (no feature imports, no ui imports)
 
 ## Library Type Definitions
 
-| Type | Naming Pattern | Responsibility |
-|---|---|---|
-| `data-access` | `data-access-<name>` | Persistence, state slices, API clients |
-| `feature` | `feature-<name>` | User-facing business logic, orchestration |
-| `ui` | `ui-<name>` | Presentational components, no business logic |
-| `util` | `util-<name>` | Pure functions, types, constants |
+| Type          | Naming Pattern       | Responsibility                               |
+| ------------- | -------------------- | -------------------------------------------- |
+| `data-access` | `data-access-<name>` | Persistence, state slices, API clients       |
+| `feature`     | `feature-<name>`     | User-facing business logic, orchestration    |
+| `ui`          | `ui-<name>`          | Presentational components, no business logic |
+| `util`        | `util-<name>`        | Pure functions, types, constants             |
 
 ## Creating New Libraries
 
@@ -47,6 +49,7 @@ When adding a new library to this workspace:
 5. Package name: `@open-kingdom/<scope>-<env>-<type>-<name>`
 
 Use the Nx generator to scaffold:
+
 ```bash
 nx g @nx/nest:library --name=<type>-<name> --directory=libs/shared/backend/<type>-<name>
 nx g @nx/react:library --name=<type>-<name> --directory=libs/shared/frontend/<type>-<name>
@@ -62,6 +65,7 @@ The backend uses a **schema composition module** to collect all Drizzle table de
 - No library should call `DatabaseSetupModule.register()` except the root schema module
 
 When adding a new feature with database tables:
+
 1. Define tables in the `data-access` or `feature` library using Drizzle
 2. Export the table from the library's `index.ts`
 3. Import and add to the schema object in `feature-root-schema`

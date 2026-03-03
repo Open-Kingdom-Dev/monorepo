@@ -6,10 +6,10 @@ A NestJS global dynamic module that opens a `better-sqlite3` connection, wraps i
 
 ## Exports
 
-| Export | Kind | Description |
-|---|---|---|
-| `DatabaseSetupModule` | `class` | Global NestJS dynamic module. Use `.register(options)` to configure. |
-| `DatabaseSetupModuleOptions` | `interface` | Type-only export. Type of the argument accepted by `.register()`. |
+| Export                       | Kind        | Description                                                          |
+| ---------------------------- | ----------- | -------------------------------------------------------------------- |
+| `DatabaseSetupModule`        | `class`     | Global NestJS dynamic module. Use `.register(options)` to configure. |
+| `DatabaseSetupModuleOptions` | `interface` | Type-only export. Type of the argument accepted by `.register()`.    |
 
 ---
 
@@ -17,11 +17,11 @@ A NestJS global dynamic module that opens a `better-sqlite3` connection, wraps i
 
 `DatabaseSetupModuleOptions` is a generic interface with a type parameter `TSchema extends Record<string, unknown>` (defaulting to `Record<string, unknown>`). It accepts the following properties:
 
-| Property | Type | Required | Default | Description |
-|---|---|---|---|---|
-| `schema` | `TSchema` | Yes | — | Drizzle table definitions object. Pass all tables the application needs so relational queries resolve correctly. |
-| `filename` | `string` | No | `'demo.db'` | Path to the SQLite database file. Relative paths resolve from the process working directory. The file is created if it does not exist. |
-| `pragmas` | `Record<string, string>` | No | `{}` | SQLite PRAGMAs applied immediately after the connection opens. Each key/value pair is executed as `sqlite.pragma('key = value')`. |
+| Property   | Type                     | Required | Default     | Description                                                                                                                            |
+| ---------- | ------------------------ | -------- | ----------- | -------------------------------------------------------------------------------------------------------------------------------------- |
+| `schema`   | `TSchema`                | Yes      | —           | Drizzle table definitions object. Pass all tables the application needs so relational queries resolve correctly.                       |
+| `filename` | `string`                 | No       | `'demo.db'` | Path to the SQLite database file. Relative paths resolve from the process working directory. The file is created if it does not exist. |
+| `pragmas`  | `Record<string, string>` | No       | `{}`        | SQLite PRAGMAs applied immediately after the connection opens. Each key/value pair is executed as `sqlite.pragma('key = value')`.      |
 
 The injection token is **not** exported from this package. It is `DB_TAG` from `@open-kingdom/shared-poly-util-constants`.
 
@@ -56,11 +56,11 @@ export class AppModule {}
 
 ## Configuration Options
 
-| Option | Type | Default | Description |
-|---|---|---|---|
-| `schema` | `TSchema extends Record<string, unknown>` | — (required) | All Drizzle table definition objects the application needs. Pass the full merged schema so that relational queries (`db.query.*`) resolve correctly. |
-| `filename` | `string` | `'demo.db'` | Path to the SQLite database file. Relative paths resolve from the process working directory. The file is created if it does not exist. |
-| `pragmas` | `Record<string, string>` | `{}` | SQLite PRAGMAs applied immediately after the connection opens. Each entry is executed as `sqlite.pragma('key = value')`. Common values: `{ journal_mode: 'WAL', foreign_keys: 'ON' }`. |
+| Option     | Type                                      | Default      | Description                                                                                                                                                                            |
+| ---------- | ----------------------------------------- | ------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `schema`   | `TSchema extends Record<string, unknown>` | — (required) | All Drizzle table definition objects the application needs. Pass the full merged schema so that relational queries (`db.query.*`) resolve correctly.                                   |
+| `filename` | `string`                                  | `'demo.db'`  | Path to the SQLite database file. Relative paths resolve from the process working directory. The file is created if it does not exist.                                                 |
+| `pragmas`  | `Record<string, string>`                  | `{}`         | SQLite PRAGMAs applied immediately after the connection opens. Each entry is executed as `sqlite.pragma('key = value')`. Common values: `{ journal_mode: 'WAL', foreign_keys: 'ON' }`. |
 
 ---
 
@@ -86,9 +86,7 @@ import * as schema from '@open-kingdom/demo-scaffold-backend-feature-root-schema
 
 @Injectable()
 export class MyService {
-  constructor(
-    @Inject(DB_TAG) private db: BetterSQLite3Database<typeof schema>
-  ) {}
+  constructor(@Inject(DB_TAG) private db: BetterSQLite3Database<typeof schema>) {}
 
   async findAll() {
     return this.db.query.myTable.findMany();

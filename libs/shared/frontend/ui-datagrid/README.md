@@ -8,53 +8,53 @@ React data grid component wrapping AG Grid Community Edition with opinionated de
 
 ### Component
 
-| Export | Type | Description |
-|---|---|---|
+| Export     | Type                                                        | Description              |
+| ---------- | ----------------------------------------------------------- | ------------------------ |
 | `DataGrid` | `ForwardRefExoticComponent<DataGridProps, GridApi \| null>` | Main data grid component |
 
 ### Redux Store (optional)
 
-| Export | Type | Description |
-|---|---|---|
-| `dataGridSlice` | `Slice<DataGridState>` | Redux slice for multi-grid state and saved views, `name: 'dataGrid'` |
-| `dataGridReducer` | `Reducer<DataGridState>` | Add to store under `DataGridKey` |
-| `DataGridKey` | `'dataGrid'` | Reducer path string constant |
-| `setGridState` | `ActionCreator<{ id: string; gridState: GridState }>` | Stores a grid instance's state by ID |
-| `saveView` | `ActionCreator<{ id: string; name: string; gridState: GridState; description?: string }>` | Saves a named view |
-| `deleteView` | `ActionCreator<string>` | Deletes a saved view by ID |
-| `clearGridState` | `ActionCreator<string>` | Removes a grid instance's state by ID |
-| `selectDataGridSlice` | `(state: RootStateWithDataGrid) => DataGridState` | Selects full slice |
-| `selectGridInstance(id)` | `(id: string) => (state) => GridState \| undefined` | Selects a specific instance's state |
-| `selectAllViews` | `(state) => DataGridView[]` | All saved views as array |
-| `selectView(id)` | `(id: string) => (state) => DataGridView \| undefined` | Selects a single saved view |
-| `selectHasDataGridSlice` | `(state) => boolean` | True if slice is registered in store |
-| `RootStateWithDataGrid` | `type` | `{ dataGrid: DataGridState }` |
+| Export                   | Type                                                                                      | Description                                                          |
+| ------------------------ | ----------------------------------------------------------------------------------------- | -------------------------------------------------------------------- |
+| `dataGridSlice`          | `Slice<DataGridState>`                                                                    | Redux slice for multi-grid state and saved views, `name: 'dataGrid'` |
+| `dataGridReducer`        | `Reducer<DataGridState>`                                                                  | Add to store under `DataGridKey`                                     |
+| `DataGridKey`            | `'dataGrid'`                                                                              | Reducer path string constant                                         |
+| `setGridState`           | `ActionCreator<{ id: string; gridState: GridState }>`                                     | Stores a grid instance's state by ID                                 |
+| `saveView`               | `ActionCreator<{ id: string; name: string; gridState: GridState; description?: string }>` | Saves a named view                                                   |
+| `deleteView`             | `ActionCreator<string>`                                                                   | Deletes a saved view by ID                                           |
+| `clearGridState`         | `ActionCreator<string>`                                                                   | Removes a grid instance's state by ID                                |
+| `selectDataGridSlice`    | `(state: RootStateWithDataGrid) => DataGridState`                                         | Selects full slice                                                   |
+| `selectGridInstance(id)` | `(id: string) => (state) => GridState \| undefined`                                       | Selects a specific instance's state                                  |
+| `selectAllViews`         | `(state) => DataGridView[]`                                                               | All saved views as array                                             |
+| `selectView(id)`         | `(id: string) => (state) => DataGridView \| undefined`                                    | Selects a single saved view                                          |
+| `selectHasDataGridSlice` | `(state) => boolean`                                                                      | True if slice is registered in store                                 |
+| `RootStateWithDataGrid`  | `type`                                                                                    | `{ dataGrid: DataGridState }`                                        |
 
 ### Hooks
 
-| Export | Type | Description |
-|---|---|---|
+| Export                    | Type   | Description                                                                |
+| ------------------------- | ------ | -------------------------------------------------------------------------- |
 | `useGridStatePersistence` | `hook` | Internal hook for state persistence — consumed by `DataGrid` automatically |
 
 ### Theme
 
-| Export | Type | Description |
-|---|---|---|
-| `DataGridThemeAdapter` | `class` | Converts a `UITheme` and `ThemeMode` into an AG Grid theme object |
-| `ThemeMode` | `type` | `'light' \| 'dark'` |
-| `DataGridTheme` | `type` | `UITheme \| undefined` |
-| `UITheme` | `interface` | Subset of `ui-theme` `Theme` that maps to AG Grid parameters |
+| Export                 | Type        | Description                                                       |
+| ---------------------- | ----------- | ----------------------------------------------------------------- |
+| `DataGridThemeAdapter` | `class`     | Converts a `UITheme` and `ThemeMode` into an AG Grid theme object |
+| `ThemeMode`            | `type`      | `'light' \| 'dark'`                                               |
+| `DataGridTheme`        | `type`      | `UITheme \| undefined`                                            |
+| `UITheme`              | `interface` | Subset of `ui-theme` `Theme` that maps to AG Grid parameters      |
 
 ### Constants
 
-| Export | Value | Description |
-|---|---|---|
-| `DEFAULT_PAGE_SIZE` | `20` | Default pagination page size |
-| `DEFAULT_PAGE_SIZE_OPTIONS` | `[10, 20, 50, 100]` | Pagination page size selector options |
-| `DEFAULT_MIN_WIDTH` | `100` | Default column minimum width in pixels |
-| `DEFAULT_TOOLTIP_DELAY` | `500` | Tooltip show delay in milliseconds |
-| `ROW_SELECTION_SINGLE` | `'singleRow'` | AG Grid row selection mode constant |
-| `ROW_SELECTION_MULTI` | `'multiRow'` | AG Grid row selection mode constant |
+| Export                      | Value               | Description                            |
+| --------------------------- | ------------------- | -------------------------------------- |
+| `DEFAULT_PAGE_SIZE`         | `20`                | Default pagination page size           |
+| `DEFAULT_PAGE_SIZE_OPTIONS` | `[10, 20, 50, 100]` | Pagination page size selector options  |
+| `DEFAULT_MIN_WIDTH`         | `100`               | Default column minimum width in pixels |
+| `DEFAULT_TOOLTIP_DELAY`     | `500`               | Tooltip show delay in milliseconds     |
+| `ROW_SELECTION_SINGLE`      | `'singleRow'`       | AG Grid row selection mode constant    |
+| `ROW_SELECTION_MULTI`       | `'multiRow'`        | AG Grid row selection mode constant    |
 
 ### AG Grid Re-exports
 
@@ -68,26 +68,26 @@ All AG Grid Community exports are re-exported from `ag-grid-community`. This inc
 
 `DataGridProps` extends `AgGridReactProps` (excluding `theme`) with the following additional properties:
 
-| Property | Type | Required | Default | Description |
-|---|---|---|---|---|
-| `enableStatePersistence` | `boolean` | No | `false` | Enables grid state save/restore using `storageProvider` |
-| `storageProvider` | `StorageProvider` | No | — | Required when `enableStatePersistence` is `true` |
-| `storageKey` | `string` | No | `'grid-state'` | Key used when reading/writing state to the storage provider |
-| `className` | `string` | No | — | CSS class applied to the grid container |
-| `containerStyle` | `CSSProperties` | No | `{ height: 'auto' }` | Inline styles for the grid container |
-| `enableRowSelection` | `boolean` | No | `false` | Enables multi-row selection with checkboxes |
-| `mode` | `ThemeMode` | No | — | Light or dark mode, passed to `DataGridThemeAdapter` |
-| `theme` | `DataGridTheme` | No | — | `UITheme` object from `ui-theme`; used to style the grid |
-| `onStateLoaded` | `(state: GridState) => void` | No | — | Called after persisted state is restored from storage |
-| `onStatePersisted` | `(state: GridState) => void` | No | — | Called after state is written to storage |
+| Property                 | Type                         | Required | Default              | Description                                                 |
+| ------------------------ | ---------------------------- | -------- | -------------------- | ----------------------------------------------------------- |
+| `enableStatePersistence` | `boolean`                    | No       | `false`              | Enables grid state save/restore using `storageProvider`     |
+| `storageProvider`        | `StorageProvider`            | No       | —                    | Required when `enableStatePersistence` is `true`            |
+| `storageKey`             | `string`                     | No       | `'grid-state'`       | Key used when reading/writing state to the storage provider |
+| `className`              | `string`                     | No       | —                    | CSS class applied to the grid container                     |
+| `containerStyle`         | `CSSProperties`              | No       | `{ height: 'auto' }` | Inline styles for the grid container                        |
+| `enableRowSelection`     | `boolean`                    | No       | `false`              | Enables multi-row selection with checkboxes                 |
+| `mode`                   | `ThemeMode`                  | No       | —                    | Light or dark mode, passed to `DataGridThemeAdapter`        |
+| `theme`                  | `DataGridTheme`              | No       | —                    | `UITheme` object from `ui-theme`; used to style the grid    |
+| `onStateLoaded`          | `(state: GridState) => void` | No       | —                    | Called after persisted state is restored from storage       |
+| `onStatePersisted`       | `(state: GridState) => void` | No       | —                    | Called after state is written to storage                    |
 
 ### `StorageProvider`
 
-| Method | Parameters | Returns | Description |
-|---|---|---|---|
-| `get` | `key: string` | `Promise<string \| null>` | Reads a stored value by key |
-| `set` | `key: string, value: string` | `Promise<void>` | Writes a value by key |
-| `remove` | `key: string` | `Promise<void>` | Removes a stored value by key |
+| Method   | Parameters                   | Returns                   | Description                   |
+| -------- | ---------------------------- | ------------------------- | ----------------------------- |
+| `get`    | `key: string`                | `Promise<string \| null>` | Reads a stored value by key   |
+| `set`    | `key: string, value: string` | `Promise<void>`           | Writes a value by key         |
+| `remove` | `key: string`                | `Promise<void>`           | Removes a stored value by key |
 
 ### `UITheme`
 
@@ -95,21 +95,21 @@ All AG Grid Community exports are re-exported from `ag-grid-community`. This inc
 
 ### `DataGridView`
 
-| Property | Type | Description |
-|---|---|---|
-| `id` | `string` | Unique view identifier |
-| `name` | `string` | Human-readable view name |
-| `state` | `GridState` | The AG Grid state snapshot |
-| `description` | `string` | Optional description |
-| `createdAt` | `number` | Unix millisecond timestamp |
-| `updatedAt` | `number` | Unix millisecond timestamp |
+| Property      | Type        | Description                |
+| ------------- | ----------- | -------------------------- |
+| `id`          | `string`    | Unique view identifier     |
+| `name`        | `string`    | Human-readable view name   |
+| `state`       | `GridState` | The AG Grid state snapshot |
+| `description` | `string`    | Optional description       |
+| `createdAt`   | `number`    | Unix millisecond timestamp |
+| `updatedAt`   | `number`    | Unix millisecond timestamp |
 
 ### `DataGridState`
 
-| Property | Type | Description |
-|---|---|---|
-| `instances` | `Record<string, GridState>` | Per-instance grid state, keyed by grid ID |
-| `views` | `Record<string, DataGridView>` | Saved named views, keyed by view ID |
+| Property    | Type                           | Description                               |
+| ----------- | ------------------------------ | ----------------------------------------- |
+| `instances` | `Record<string, GridState>`    | Per-instance grid state, keyed by grid ID |
+| `views`     | `Record<string, DataGridView>` | Saved named views, keyed by view ID       |
 
 ---
 
@@ -117,23 +117,23 @@ All AG Grid Community exports are re-exported from `ag-grid-community`. This inc
 
 `DataGrid` spreads `gridDefaults` before all props:
 
-| Setting | Default value |
-|---|---|
-| `defaultColDef.sortable` | `true` |
-| `defaultColDef.filter` | `true` |
-| `defaultColDef.resizable` | `true` |
-| `defaultColDef.floatingFilter` | `true` |
-| `defaultColDef.minWidth` | `100` |
-| `pagination` | `true` |
-| `paginationPageSize` | `20` |
-| `paginationPageSizeSelector` | `[10, 20, 50, 100]` |
-| `animateRows` | `true` |
-| `enableCellTextSelection` | `true` |
-| `ensureDomOrder` | `true` |
-| `tooltipShowDelay` | `500` |
-| `suppressDragLeaveHidesColumns` | `true` |
-| `domLayout` | `'autoHeight'` |
-| `onFirstDataRendered` | `params.api.sizeColumnsToFit()` |
+| Setting                         | Default value                   |
+| ------------------------------- | ------------------------------- |
+| `defaultColDef.sortable`        | `true`                          |
+| `defaultColDef.filter`          | `true`                          |
+| `defaultColDef.resizable`       | `true`                          |
+| `defaultColDef.floatingFilter`  | `true`                          |
+| `defaultColDef.minWidth`        | `100`                           |
+| `pagination`                    | `true`                          |
+| `paginationPageSize`            | `20`                            |
+| `paginationPageSizeSelector`    | `[10, 20, 50, 100]`             |
+| `animateRows`                   | `true`                          |
+| `enableCellTextSelection`       | `true`                          |
+| `ensureDomOrder`                | `true`                          |
+| `tooltipShowDelay`              | `500`                           |
+| `suppressDragLeaveHidesColumns` | `true`                          |
+| `domLayout`                     | `'autoHeight'`                  |
+| `onFirstDataRendered`           | `params.api.sizeColumnsToFit()` |
 
 ---
 
@@ -157,12 +157,7 @@ const columnDefs: ColDef<Row>[] = [
 ];
 
 function UserTable({ rows }: { rows: Row[] }) {
-  return (
-    <DataGrid
-      rowData={rows}
-      columnDefs={columnDefs}
-    />
-  );
+  return <DataGrid rowData={rows} columnDefs={columnDefs} />;
 }
 ```
 
@@ -179,8 +174,8 @@ function ThemedGrid({ rows, cols }) {
     <DataGrid
       rowData={rows}
       columnDefs={cols}
-      theme={theme}    // UITheme from ThemeProvider
-      mode={mode}      // 'light' | 'dark'
+      theme={theme} // UITheme from ThemeProvider
+      mode={mode} // 'light' | 'dark'
     />
   );
 }
@@ -233,17 +228,7 @@ const localStorageProvider: StorageProvider = {
 };
 
 function PersistentGrid({ rows, cols }) {
-  return (
-    <DataGrid
-      rowData={rows}
-      columnDefs={cols}
-      enableStatePersistence
-      storageProvider={localStorageProvider}
-      storageKey="my-grid-v1"
-      onStateLoaded={(state) => console.log('State loaded', state)}
-      onStatePersisted={(state) => console.log('State saved', state)}
-    />
-  );
+  return <DataGrid rowData={rows} columnDefs={cols} enableStatePersistence storageProvider={localStorageProvider} storageKey="my-grid-v1" onStateLoaded={(state) => console.log('State loaded', state)} onStatePersisted={(state) => console.log('State saved', state)} />;
 }
 ```
 

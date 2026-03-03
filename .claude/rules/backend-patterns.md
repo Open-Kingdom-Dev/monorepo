@@ -3,6 +3,7 @@
 ## NestJS Module Authoring
 
 ### Static Module (simple, no configuration)
+
 ```typescript
 @Module({
   imports: [OpenKingdomDataAccessBackendUsersModule],
@@ -14,6 +15,7 @@ export class MyFeatureModule {}
 ```
 
 ### Dynamic Module (requires configuration)
+
 ```typescript
 export interface MyModuleOptions {
   requiredSetting: string;
@@ -41,6 +43,7 @@ export const MY_OPTIONS_TOKEN = 'MY_OPTIONS_TOKEN';
 ```
 
 ### Consuming Dynamic Module Options in a Service
+
 ```typescript
 @Injectable()
 export class MyService {
@@ -54,6 +57,7 @@ export class MyService {
 ## Database Access with Drizzle
 
 ### Inject the Database
+
 ```typescript
 import { Inject, Injectable } from '@nestjs/common';
 import { DB_TAG } from '@open-kingdom/shared-poly-util-constants';
@@ -78,6 +82,7 @@ export class MyService {
 ```
 
 ### Defining a Drizzle Schema
+
 ```typescript
 import { sqliteTable, text, integer } from 'drizzle-orm/sqlite-core';
 
@@ -85,8 +90,7 @@ export const myTable = sqliteTable('my_table', {
   id: integer('id').primaryKey({ autoIncrement: true }),
   name: text('name').notNull(),
   status: text('status', { enum: ['active', 'inactive'] }).default('active'),
-  createdAt: integer('created_at', { mode: 'timestamp' })
-    .$defaultFn(() => new Date()),
+  createdAt: integer('created_at', { mode: 'timestamp' }).$defaultFn(() => new Date()),
 });
 
 // Export inferred types
@@ -97,12 +101,14 @@ export type NewMyRecord = typeof myTable.$inferInsert;
 ## Authentication Patterns
 
 ### Protecting All Routes (Global Guard)
+
 ```typescript
 // In AppModule providers:
 { provide: APP_GUARD, useClass: JwtAuthGuard }
 ```
 
 ### Marking a Route as Public
+
 ```typescript
 import { Public } from '@open-kingdom/shared-backend-feature-authentication';
 
@@ -115,6 +121,7 @@ export class AuthController {
 ```
 
 ### Accessing the Authenticated User
+
 ```typescript
 import { AuthenticatedRequest } from '@open-kingdom/shared-backend-feature-user-management';
 
@@ -146,6 +153,7 @@ export class CreateUserDto {
 ```
 
 Enable global validation pipe in `main.ts`:
+
 ```typescript
 app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }));
 ```
@@ -162,10 +170,7 @@ Use `ConfigService` from `@open-kingdom/shared-poly-util-env-config`:
 ```typescript
 import { createConfigService, nodeEnvAdapter } from '@open-kingdom/shared-poly-util-env-config';
 
-const config = createConfigService(
-  ['PORT', 'JWT_SECRET', 'GMAIL_CLIENT_ID', 'GMAIL_CLIENT_SECRET', 'GMAIL_REFRESH_TOKEN'] as const,
-  nodeEnvAdapter
-);
+const config = createConfigService(['PORT', 'JWT_SECRET', 'GMAIL_CLIENT_ID', 'GMAIL_CLIENT_SECRET', 'GMAIL_REFRESH_TOKEN'] as const, nodeEnvAdapter);
 
 // In module bootstrap (main.ts):
 const port = config.get('PORT', '3000');
@@ -175,6 +180,7 @@ const jwtSecret = config.getOrThrow('JWT_SECRET');
 ## API Documentation
 
 All controllers and their DTOs should use `@nestjs/swagger` decorators:
+
 - `@ApiTags('tag-name')` on controller
 - `@ApiOperation({ summary: '...' })` on each endpoint
 - `@ApiResponse({ status: 200, type: ResponseDto })` for typed responses

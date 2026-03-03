@@ -32,10 +32,10 @@ Only invoke Nx directly for one-off diagnostic commands (e.g. `nx graph`, `nx af
 
 Project names in Nx are derived from the directory structure, not the package name. Examples:
 
-| Directory | Nx project name | npm package name |
-|---|---|---|
-| `libs/shared/backend/feature-authentication` | `shared-backend-feature-authentication` | `@open-kingdom/shared-backend-feature-authentication` |
-| `libs/shared/frontend/ui-datagrid` | `shared-frontend-ui-datagrid` | `@open-kingdom/shared-frontend-ui-datagrid` |
+| Directory                                        | Nx project name                             | npm package name                                          |
+| ------------------------------------------------ | ------------------------------------------- | --------------------------------------------------------- |
+| `libs/shared/backend/feature-authentication`     | `shared-backend-feature-authentication`     | `@open-kingdom/shared-backend-feature-authentication`     |
+| `libs/shared/frontend/ui-datagrid`               | `shared-frontend-ui-datagrid`               | `@open-kingdom/shared-frontend-ui-datagrid`               |
 | `libs/demo-scaffold/backend/feature-root-schema` | `demo-scaffold-backend-feature-root-schema` | `@open-kingdom/demo-scaffold-backend-feature-root-schema` |
 
 ## Library Generation
@@ -64,6 +64,7 @@ nx g @nx/js:library \
 ```
 
 After generation, update `package.json` with:
+
 - `"name": "@open-kingdom/<scope>-<env>-<type>-<name>"`
 - `"version": "0.0.2-14"` (match current workspace version)
 - `"publishConfig": { "access": "public" }`
@@ -71,6 +72,7 @@ After generation, update `package.json` with:
 ## Project Configuration (`project.json`)
 
 Every library has a `project.json` defining its Nx targets. Standard targets:
+
 - `build` — compiles the library
 - `test` — runs unit tests (Jest or Vitest)
 - `lint` — ESLint
@@ -81,6 +83,7 @@ Every library has a `project.json` defining its Nx targets. Standard targets:
 Nx caches task outputs. Cached by default: `build`, `test`, `lint`, `typecheck`.
 
 To force a fresh run (bypass cache):
+
 ```bash
 nx test my-project --skip-nx-cache
 ```
@@ -92,6 +95,7 @@ Build order is enforced by `"dependsOn": ["^build"]` in `nx.json` target default
 ## Versioning and Publishing
 
 The workspace uses conventional commits for automated versioning:
+
 - `feat:` → minor bump
 - `fix:` → patch bump
 - `BREAKING CHANGE:` → major bump
@@ -103,6 +107,7 @@ App-specific libraries (`libs/demo-scaffold/`) have `"private": true` and are no
 ## Workspace Graph
 
 View the dependency graph:
+
 ```bash
 nx graph
 ```
@@ -112,6 +117,7 @@ Useful for verifying that library boundaries are respected before committing.
 ## MCP Tools Available
 
 When working in this workspace with Claude Code, the following MCP tools are available:
+
 - `nx_workspace` — get overall workspace architecture and errors
 - `nx_project_details` — get a specific project's config and dependencies
 - `nx_docs` — search Nx documentation

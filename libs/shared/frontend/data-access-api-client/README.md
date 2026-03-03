@@ -8,50 +8,50 @@ RTK Query base API instance with JWT auth header injection, auth state managemen
 
 ### Base API
 
-| Export | Type | Description |
-|---|---|---|
-| `baseApi` | `Api<...>` | RTK Query `createApi` instance, `reducerPath: 'api'` |
-| `ApiKey` | `'api'` | The reducer path string constant |
-| `apiReducer` | `Reducer` | `baseApi.reducer` — add to store under `ApiKey` |
+| Export          | Type         | Description                                          |
+| --------------- | ------------ | ---------------------------------------------------- |
+| `baseApi`       | `Api<...>`   | RTK Query `createApi` instance, `reducerPath: 'api'` |
+| `ApiKey`        | `'api'`      | The reducer path string constant                     |
+| `apiReducer`    | `Reducer`    | `baseApi.reducer` — add to store under `ApiKey`      |
 | `apiMiddleware` | `Middleware` | `baseApi.middleware` — add to store middleware chain |
 
 ### Auth Slice
 
-| Export | Type | Description |
-|---|---|---|
-| `authSlice` | `Slice<AuthState>` | Redux slice, `name: 'auth'` |
-| `AuthKey` | `'auth'` | The slice name string constant |
-| `AuthState` | `interface` | `{ token: string \| null }` |
-| `AuthPersistence` | `interface` | `{ getToken(): string \| null; setToken(token: string \| null): void }` |
-| `authReducer` | `Reducer<AuthState>` | `authSlice.reducer` |
-| `setToken` | `ActionCreator<string \| null>` | Sets the JWT token in Redux state |
-| `logout` | `ActionCreator<void>` | Clears token and resets RTK Query API state |
-| `selectToken` | `(state: { auth: AuthState }) => string \| null` | Selector for current token |
-| `selectIsAuthenticated` | `(state: { auth: AuthState }) => boolean` | Selector for auth status |
+| Export                  | Type                                             | Description                                                             |
+| ----------------------- | ------------------------------------------------ | ----------------------------------------------------------------------- |
+| `authSlice`             | `Slice<AuthState>`                               | Redux slice, `name: 'auth'`                                             |
+| `AuthKey`               | `'auth'`                                         | The slice name string constant                                          |
+| `AuthState`             | `interface`                                      | `{ token: string \| null }`                                             |
+| `AuthPersistence`       | `interface`                                      | `{ getToken(): string \| null; setToken(token: string \| null): void }` |
+| `authReducer`           | `Reducer<AuthState>`                             | `authSlice.reducer`                                                     |
+| `setToken`              | `ActionCreator<string \| null>`                  | Sets the JWT token in Redux state                                       |
+| `logout`                | `ActionCreator<void>`                            | Clears token and resets RTK Query API state                             |
+| `selectToken`           | `(state: { auth: AuthState }) => string \| null` | Selector for current token                                              |
+| `selectIsAuthenticated` | `(state: { auth: AuthState }) => boolean`        | Selector for auth status                                                |
 
 ### Auth Listener Middleware
 
-| Export | Type | Description |
-|---|---|---|
-| `configureAuth(config: AuthConfig)` | `function` | Configures global persistence and logout callback — call before store creation |
-| `createAuthListenerMiddleware()` | `() => Middleware` | RTK listener that persists token on `setToken`/`logout` and handles logout side effects |
-| `createAuthHydrationMiddleware()` | `() => Middleware` | Middleware that hydrates token from persistence on the first dispatched action |
-| `AuthConfig` | `interface` | `{ persistence?: AuthPersistence; onLogout?: () => void }` |
+| Export                              | Type               | Description                                                                             |
+| ----------------------------------- | ------------------ | --------------------------------------------------------------------------------------- |
+| `configureAuth(config: AuthConfig)` | `function`         | Configures global persistence and logout callback — call before store creation          |
+| `createAuthListenerMiddleware()`    | `() => Middleware` | RTK listener that persists token on `setToken`/`logout` and handles logout side effects |
+| `createAuthHydrationMiddleware()`   | `() => Middleware` | Middleware that hydrates token from persistence on the first dispatched action          |
+| `AuthConfig`                        | `interface`        | `{ persistence?: AuthPersistence; onLogout?: () => void }`                              |
 
 ### Auth Adapter
 
-| Export | Type | Description |
-|---|---|---|
-| `AuthAdapter` | `interface` | `{ prepareHeaders(headers: Headers, token: string): void }` |
-| `setAuthAdapter(adapter)` | `(adapter: AuthAdapter \| null) => void` | Registers a module-level custom adapter; replaces default `Authorization: Bearer` injection |
-| `getAuthAdapter()` | `() => AuthAdapter \| null` | Returns the currently registered adapter |
-| `createCustomHeaderAdapter(config)` | `(config: CustomHeaderAdapterConfig) => AuthAdapter` | Factory for adapters that set a named header |
-| `CustomHeaderAdapterConfig` | `interface` | `{ headerName: string; formatValue?: (token: string) => string }` |
+| Export                              | Type                                                 | Description                                                                                 |
+| ----------------------------------- | ---------------------------------------------------- | ------------------------------------------------------------------------------------------- |
+| `AuthAdapter`                       | `interface`                                          | `{ prepareHeaders(headers: Headers, token: string): void }`                                 |
+| `setAuthAdapter(adapter)`           | `(adapter: AuthAdapter \| null) => void`             | Registers a module-level custom adapter; replaces default `Authorization: Bearer` injection |
+| `getAuthAdapter()`                  | `() => AuthAdapter \| null`                          | Returns the currently registered adapter                                                    |
+| `createCustomHeaderAdapter(config)` | `(config: CustomHeaderAdapterConfig) => AuthAdapter` | Factory for adapters that set a named header                                                |
+| `CustomHeaderAdapterConfig`         | `interface`                                          | `{ headerName: string; formatValue?: (token: string) => string }`                           |
 
 ### Token Persistence
 
-| Export | Type | Description |
-|---|---|---|
+| Export                              | Type                                                      | Description                                                                                            |
+| ----------------------------------- | --------------------------------------------------------- | ------------------------------------------------------------------------------------------------------ |
 | `storagePersistence(storage, key?)` | `(storage: StorageLike, key?: string) => AuthPersistence` | Creates `AuthPersistence` backed by any `localStorage`-compatible storage; `key` defaults to `'token'` |
 
 ---
@@ -60,36 +60,36 @@ RTK Query base API instance with JWT auth header injection, auth state managemen
 
 ### `AuthState`
 
-| Property | Type | Required | Default | Description |
-|---|---|---|---|---|
-| `token` | `string \| null` | Yes | — | The current JWT token, or `null` when unauthenticated |
+| Property | Type             | Required | Default | Description                                           |
+| -------- | ---------------- | -------- | ------- | ----------------------------------------------------- |
+| `token`  | `string \| null` | Yes      | —       | The current JWT token, or `null` when unauthenticated |
 
 ### `AuthPersistence`
 
-| Method | Parameters | Returns | Description |
-|---|---|---|---|
-| `getToken` | — | `string \| null` | Retrieves the persisted token |
-| `setToken` | `token: string \| null` | `void` | Persists or clears the token |
+| Method     | Parameters              | Returns          | Description                   |
+| ---------- | ----------------------- | ---------------- | ----------------------------- |
+| `getToken` | —                       | `string \| null` | Retrieves the persisted token |
+| `setToken` | `token: string \| null` | `void`           | Persists or clears the token  |
 
 ### `AuthConfig`
 
-| Property | Type | Required | Default | Description |
-|---|---|---|---|---|
-| `persistence` | `AuthPersistence` | No | — | Storage backend for token persistence |
-| `onLogout` | `() => void` | No | — | Callback fired when `logout` action is dispatched |
+| Property      | Type              | Required | Default | Description                                       |
+| ------------- | ----------------- | -------- | ------- | ------------------------------------------------- |
+| `persistence` | `AuthPersistence` | No       | —       | Storage backend for token persistence             |
+| `onLogout`    | `() => void`      | No       | —       | Callback fired when `logout` action is dispatched |
 
 ### `AuthAdapter`
 
-| Method | Parameters | Returns | Description |
-|---|---|---|---|
-| `prepareHeaders` | `headers: Headers, token: string` | `void` | Injects auth credentials into the outgoing request headers |
+| Method           | Parameters                        | Returns | Description                                                |
+| ---------------- | --------------------------------- | ------- | ---------------------------------------------------------- |
+| `prepareHeaders` | `headers: Headers, token: string` | `void`  | Injects auth credentials into the outgoing request headers |
 
 ### `CustomHeaderAdapterConfig`
 
-| Property | Type | Required | Default | Description |
-|---|---|---|---|---|
-| `headerName` | `string` | Yes | — | The HTTP header name to set (e.g. `'X-Api-Key'`) |
-| `formatValue` | `(token: string) => string` | No | Identity function | Transforms the raw token into the header value |
+| Property      | Type                        | Required | Default           | Description                                      |
+| ------------- | --------------------------- | -------- | ----------------- | ------------------------------------------------ |
+| `headerName`  | `string`                    | Yes      | —                 | The HTTP header name to set (e.g. `'X-Api-Key'`) |
+| `formatValue` | `(token: string) => string` | No       | Identity function | Transforms the raw token into the header value   |
 
 ### `StorageLike`
 
@@ -115,17 +115,7 @@ Any `localStorage`-compatible object that implements `getItem(key)`, `setItem(ke
 
 ```typescript
 import { configureStore } from '@reduxjs/toolkit';
-import {
-  ApiKey,
-  apiReducer,
-  apiMiddleware,
-  AuthKey,
-  authReducer,
-  configureAuth,
-  createAuthListenerMiddleware,
-  createAuthHydrationMiddleware,
-  storagePersistence,
-} from '@open-kingdom/shared-frontend-data-access-api-client';
+import { ApiKey, apiReducer, apiMiddleware, AuthKey, authReducer, configureAuth, createAuthListenerMiddleware, createAuthHydrationMiddleware, storagePersistence } from '@open-kingdom/shared-frontend-data-access-api-client';
 
 // Configure persistence BEFORE creating the store
 configureAuth({
@@ -137,14 +127,10 @@ configureAuth({
 
 export const store = configureStore({
   reducer: {
-    [ApiKey]: apiReducer,    // reducerPath: 'api'
-    [AuthKey]: authReducer,  // name: 'auth'
+    [ApiKey]: apiReducer, // reducerPath: 'api'
+    [AuthKey]: authReducer, // name: 'auth'
   },
-  middleware: (getDefault) =>
-    getDefault()
-      .concat(apiMiddleware)
-      .concat(createAuthListenerMiddleware())
-      .concat(createAuthHydrationMiddleware()),
+  middleware: (getDefault) => getDefault().concat(apiMiddleware).concat(createAuthListenerMiddleware()).concat(createAuthHydrationMiddleware()),
 });
 ```
 
@@ -180,10 +166,7 @@ dispatch(logout());
 ### Read auth state in components
 
 ```typescript
-import {
-  selectToken,
-  selectIsAuthenticated,
-} from '@open-kingdom/shared-frontend-data-access-api-client';
+import { selectToken, selectIsAuthenticated } from '@open-kingdom/shared-frontend-data-access-api-client';
 import { useSelector } from 'react-redux';
 
 function AuthStatus() {
@@ -196,10 +179,7 @@ function AuthStatus() {
 ### Custom auth header adapter
 
 ```typescript
-import {
-  createCustomHeaderAdapter,
-  setAuthAdapter,
-} from '@open-kingdom/shared-frontend-data-access-api-client';
+import { createCustomHeaderAdapter, setAuthAdapter } from '@open-kingdom/shared-frontend-data-access-api-client';
 
 // Set a custom header instead of the default Authorization: Bearer
 setAuthAdapter(

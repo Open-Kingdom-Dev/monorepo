@@ -71,25 +71,25 @@ function WeatherWidget({ city }: { city: string }) {
 
 ### Base Query Factory
 
-| Export | Type | Description |
-|---|---|---|
+| Export                         | Type                                            | Description                                           |
+| ------------------------------ | ----------------------------------------------- | ----------------------------------------------------- |
 | `createAxiosBaseQuery(config)` | `(config: AxiosBaseQueryConfig) => BaseQueryFn` | Creates an RTK Query `baseQuery` function using Axios |
-| `AxiosBaseQueryConfig` | `interface` | Configuration for the Axios base query |
-| `AxiosBaseQueryArgs` | `interface` | Per-request arguments passed to the query |
-| `AxiosBaseQueryError` | `interface` | Shape of errors returned on Axios failures |
-| `AxiosBaseQueryMeta` | `interface` | Shape of response metadata |
+| `AxiosBaseQueryConfig`         | `interface`                                     | Configuration for the Axios base query                |
+| `AxiosBaseQueryArgs`           | `interface`                                     | Per-request arguments passed to the query             |
+| `AxiosBaseQueryError`          | `interface`                                     | Shape of errors returned on Axios failures            |
+| `AxiosBaseQueryMeta`           | `interface`                                     | Shape of response metadata                            |
 
 ### Cat Facts API (reference implementation)
 
-| Export | Type | Description |
-|---|---|---|
-| `catFactsApi` | `Api<...>` | RTK Query `createApi` instance for `https://catfact.ninja`, `reducerPath: 'catFactsApi'` |
-| `CatFactsApiKey` | `'catFactsApi'` | The reducer path string constant |
-| `catFactsApiReducer` | `Reducer` | `catFactsApi.reducer` |
-| `catFactsApiMiddleware` | `Middleware` | `catFactsApi.middleware` |
-| `useGetFactQuery` | `QueryHook<CatFact, void>` | RTK Query hook for `GET /fact` |
-| `useGetFactsQuery` | `QueryHook<PaginatedResponse<CatFact>, PaginationParams \| void>` | RTK Query hook for `GET /facts` |
-| `useGetBreedsQuery` | `QueryHook<PaginatedResponse<Breed>, PaginationParams \| void>` | RTK Query hook for `GET /breeds` |
+| Export                  | Type                                                              | Description                                                                              |
+| ----------------------- | ----------------------------------------------------------------- | ---------------------------------------------------------------------------------------- |
+| `catFactsApi`           | `Api<...>`                                                        | RTK Query `createApi` instance for `https://catfact.ninja`, `reducerPath: 'catFactsApi'` |
+| `CatFactsApiKey`        | `'catFactsApi'`                                                   | The reducer path string constant                                                         |
+| `catFactsApiReducer`    | `Reducer`                                                         | `catFactsApi.reducer`                                                                    |
+| `catFactsApiMiddleware` | `Middleware`                                                      | `catFactsApi.middleware`                                                                 |
+| `useGetFactQuery`       | `QueryHook<CatFact, void>`                                        | RTK Query hook for `GET /fact`                                                           |
+| `useGetFactsQuery`      | `QueryHook<PaginatedResponse<CatFact>, PaginationParams \| void>` | RTK Query hook for `GET /facts`                                                          |
+| `useGetBreedsQuery`     | `QueryHook<PaginatedResponse<Breed>, PaginationParams \| void>`   | RTK Query hook for `GET /breeds`                                                         |
 
 ---
 
@@ -97,71 +97,71 @@ function WeatherWidget({ city }: { city: string }) {
 
 ### `AxiosBaseQueryConfig`
 
-| Property | Type | Required | Default | Description |
-|---|---|---|---|---|
-| `baseUrl` | `string` | Yes | — | The base URL for all requests made by this query function |
-| `prepareHeaders` | `(headers: AxiosHeaders, api: BaseQueryApi) => AxiosHeaders` | No | — | Optional hook to inject headers (e.g. auth tokens) before each request |
+| Property         | Type                                                         | Required | Default | Description                                                            |
+| ---------------- | ------------------------------------------------------------ | -------- | ------- | ---------------------------------------------------------------------- |
+| `baseUrl`        | `string`                                                     | Yes      | —       | The base URL for all requests made by this query function              |
+| `prepareHeaders` | `(headers: AxiosHeaders, api: BaseQueryApi) => AxiosHeaders` | No       | —       | Optional hook to inject headers (e.g. auth tokens) before each request |
 
 ### `AxiosBaseQueryArgs`
 
-| Property | Type | Required | Default | Description |
-|---|---|---|---|---|
-| `url` | `string` | Yes | — | Path appended to `baseUrl` |
-| `method` | `AxiosRequestConfig['method']` | No | `'GET'` | HTTP method |
-| `params` | `Record<string, unknown>` | No | — | URL query parameters |
-| `body` | `unknown` | No | — | Request body |
-| `headers` | `Record<string, string>` | No | — | Per-request header overrides |
+| Property  | Type                           | Required | Default | Description                  |
+| --------- | ------------------------------ | -------- | ------- | ---------------------------- |
+| `url`     | `string`                       | Yes      | —       | Path appended to `baseUrl`   |
+| `method`  | `AxiosRequestConfig['method']` | No       | `'GET'` | HTTP method                  |
+| `params`  | `Record<string, unknown>`      | No       | —       | URL query parameters         |
+| `body`    | `unknown`                      | No       | —       | Request body                 |
+| `headers` | `Record<string, string>`       | No       | —       | Per-request header overrides |
 
 Additional properties are passed through to the Axios config object.
 
 ### `AxiosBaseQueryError`
 
-| Property | Type | Required | Description |
-|---|---|---|---|
-| `status` | `number` | No | HTTP status code |
-| `data` | `unknown` | No | Response body from the failed request |
-| `headers` | `unknown` | No | Response headers |
+| Property  | Type      | Required | Description                           |
+| --------- | --------- | -------- | ------------------------------------- |
+| `status`  | `number`  | No       | HTTP status code                      |
+| `data`    | `unknown` | No       | Response body from the failed request |
+| `headers` | `unknown` | No       | Response headers                      |
 
 ### `AxiosBaseQueryMeta`
 
-| Property | Type | Required | Description |
-|---|---|---|---|
-| `headers` | `unknown` | No | Response headers |
-| `status` | `number` | No | HTTP status code |
-| `config` | `AxiosRequestConfig` | No | The Axios config used for the request |
+| Property  | Type                 | Required | Description                           |
+| --------- | -------------------- | -------- | ------------------------------------- |
+| `headers` | `unknown`            | No       | Response headers                      |
+| `status`  | `number`             | No       | HTTP status code                      |
+| `config`  | `AxiosRequestConfig` | No       | The Axios config used for the request |
 
 ### `CatFact`
 
-| Property | Type | Description |
-|---|---|---|
-| `fact` | `string` | The fact text |
+| Property | Type     | Description                  |
+| -------- | -------- | ---------------------------- |
+| `fact`   | `string` | The fact text                |
 | `length` | `number` | Character length of the fact |
 
 ### `Breed`
 
-| Property | Type | Description |
-|---|---|---|
-| `breed` | `string` | Breed name |
-| `country` | `string` | Country of origin |
-| `origin` | `string` | Origin description |
-| `coat` | `string` | Coat type |
-| `pattern` | `string` | Coat pattern |
+| Property  | Type     | Description        |
+| --------- | -------- | ------------------ |
+| `breed`   | `string` | Breed name         |
+| `country` | `string` | Country of origin  |
+| `origin`  | `string` | Origin description |
+| `coat`    | `string` | Coat type          |
+| `pattern` | `string` | Coat pattern       |
 
 ### `PaginatedResponse<T>`
 
-| Property | Type | Description |
-|---|---|---|
-| `current_page` | `number` | Current page number |
-| `data` | `T[]` | Array of items for the current page |
-| `last_page` | `number` | Total number of pages |
-| `total` | `number` | Total number of items across all pages |
+| Property       | Type     | Description                            |
+| -------------- | -------- | -------------------------------------- |
+| `current_page` | `number` | Current page number                    |
+| `data`         | `T[]`    | Array of items for the current page    |
+| `last_page`    | `number` | Total number of pages                  |
+| `total`        | `number` | Total number of items across all pages |
 
 ### `PaginationParams`
 
-| Property | Type | Required | Description |
-|---|---|---|---|
-| `page` | `number` | No | Page number to fetch |
-| `limit` | `number` | No | Number of items per page |
+| Property | Type     | Required | Description              |
+| -------- | -------- | -------- | ------------------------ |
+| `page`   | `number` | No       | Page number to fetch     |
+| `limit`  | `number` | No       | Number of items per page |
 
 Additional properties are forwarded to the query string.
 
@@ -173,18 +173,13 @@ Additional properties are forwarded to the query string.
 
 ```typescript
 import { configureStore } from '@reduxjs/toolkit';
-import {
-  CatFactsApiKey,
-  catFactsApiReducer,
-  catFactsApiMiddleware,
-} from '@open-kingdom/shared-frontend-data-access-external-api';
+import { CatFactsApiKey, catFactsApiReducer, catFactsApiMiddleware } from '@open-kingdom/shared-frontend-data-access-external-api';
 
 export const store = configureStore({
   reducer: {
     [CatFactsApiKey]: catFactsApiReducer, // 'catFactsApi'
   },
-  middleware: (getDefault) =>
-    getDefault().concat(catFactsApiMiddleware),
+  middleware: (getDefault) => getDefault().concat(catFactsApiMiddleware),
 });
 ```
 
@@ -235,7 +230,9 @@ function BreedList() {
   return (
     <ul>
       {data?.data.map((breed) => (
-        <li key={breed.breed}>{breed.breed} — {breed.country}</li>
+        <li key={breed.breed}>
+          {breed.breed} — {breed.country}
+        </li>
       ))}
     </ul>
   );

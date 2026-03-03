@@ -21,21 +21,21 @@ monorepo/
 
 ## Tech Stack
 
-| Layer | Technology |
-|---|---|
-| Backend framework | NestJS 11 |
-| Database | SQLite via Drizzle ORM + better-sqlite3 |
-| Auth | Passport.js + JWT (`@nestjs/passport`, `@nestjs/jwt`) |
-| Frontend framework | React 19 |
-| State management | Redux Toolkit + RTK Query |
-| Build system | Nx 22 (monorepo orchestration) |
-| Frontend build | Vite |
-| Styling | Tailwind CSS |
-| Data grid | AG Grid Community |
-| Testing (backend) | Jest |
-| Testing (frontend) | Vitest |
-| E2E testing | Playwright |
-| API codegen | OpenAPI → RTK Query (custom Nx plugin) |
+| Layer              | Technology                                            |
+| ------------------ | ----------------------------------------------------- |
+| Backend framework  | NestJS 11                                             |
+| Database           | SQLite via Drizzle ORM + better-sqlite3               |
+| Auth               | Passport.js + JWT (`@nestjs/passport`, `@nestjs/jwt`) |
+| Frontend framework | React 19                                              |
+| State management   | Redux Toolkit + RTK Query                             |
+| Build system       | Nx 22 (monorepo orchestration)                        |
+| Frontend build     | Vite                                                  |
+| Styling            | Tailwind CSS                                          |
+| Data grid          | AG Grid Community                                     |
+| Testing (backend)  | Jest                                                  |
+| Testing (frontend) | Vitest                                                |
+| E2E testing        | Playwright                                            |
+| API codegen        | OpenAPI → RTK Query (custom Nx plugin)                |
 
 ## Package Naming Convention
 
@@ -52,41 +52,42 @@ monorepo/
 
 ### Backend (NestJS)
 
-| Package | Import Token / Class | Purpose |
-|---|---|---|
-| `@open-kingdom/shared-backend-data-access-database-setup` | `DatabaseSetupModule` | Drizzle + SQLite DI setup |
-| `@open-kingdom/shared-backend-data-access-users` | `UsersService`, `users` schema | User persistence + bcrypt |
-| `@open-kingdom/shared-backend-feature-authentication` | `OpenKingdomFeatureBackendAuthModule`, `JwtAuthGuard`, `@Public()` | JWT auth + login endpoint |
-| `@open-kingdom/shared-backend-feature-email` | `EmailModule`, `EmailService` | Email via Gmail provider |
-| `@open-kingdom/shared-backend-feature-user-management` | `FeatureUserManagementModule`, `UserManagementService`, `InvitationsService` | User + invitation CRUD |
-| `@open-kingdom/shared-backend-feature-gcp-resources` | `FeatureGcpResourcesModule` | GCP project listing |
+| Package                                                   | Import Token / Class                                                         | Purpose                   |
+| --------------------------------------------------------- | ---------------------------------------------------------------------------- | ------------------------- |
+| `@open-kingdom/shared-backend-data-access-database-setup` | `DatabaseSetupModule`                                                        | Drizzle + SQLite DI setup |
+| `@open-kingdom/shared-backend-data-access-users`          | `UsersService`, `users` schema                                               | User persistence + bcrypt |
+| `@open-kingdom/shared-backend-feature-authentication`     | `OpenKingdomFeatureBackendAuthModule`, `JwtAuthGuard`, `@Public()`           | JWT auth + login endpoint |
+| `@open-kingdom/shared-backend-feature-email`              | `EmailModule`, `EmailService`                                                | Email via Gmail provider  |
+| `@open-kingdom/shared-backend-feature-user-management`    | `FeatureUserManagementModule`, `UserManagementService`, `InvitationsService` | User + invitation CRUD    |
+| `@open-kingdom/shared-backend-feature-gcp-resources`      | `FeatureGcpResourcesModule`                                                  | GCP project listing       |
 
 ### Frontend (React + Redux)
 
-| Package | Key Exports | Purpose |
-|---|---|---|
-| `@open-kingdom/shared-frontend-data-access-api-client` | `baseApi`, `apiReducer`, `apiMiddleware`, `authSlice` | RTK Query base + JWT auth state |
-| `@open-kingdom/shared-frontend-data-access-logger` | `loggerSlice`, `logInfo/Warn/Error`, middleware | Client log state + middleware |
-| `@open-kingdom/shared-frontend-data-access-notifications` | `notificationReducer`, `addNotification` | Notification state |
-| `@open-kingdom/shared-frontend-data-access-external-api` | `catFactsApiReducer` | External API integration pattern |
-| `@open-kingdom/shared-frontend-feature-notifications` | `NotificationToastContainer` | Toast UI |
-| `@open-kingdom/shared-frontend-feature-error-autologger` | `createReduxRTKErrorMiddleware` | Auto error capture |
-| `@open-kingdom/shared-frontend-feature-user-management` | User management UI components | Admin user/invite UI |
-| `@open-kingdom/shared-frontend-ui-datagrid` | `DataGrid` | AG Grid wrapper |
-| `@open-kingdom/shared-frontend-ui-theme` | `ThemeProvider`, `useTheme` | Design tokens + dark mode |
+| Package                                                   | Key Exports                                           | Purpose                          |
+| --------------------------------------------------------- | ----------------------------------------------------- | -------------------------------- |
+| `@open-kingdom/shared-frontend-data-access-api-client`    | `baseApi`, `apiReducer`, `apiMiddleware`, `authSlice` | RTK Query base + JWT auth state  |
+| `@open-kingdom/shared-frontend-data-access-logger`        | `loggerSlice`, `logInfo/Warn/Error`, middleware       | Client log state + middleware    |
+| `@open-kingdom/shared-frontend-data-access-notifications` | `notificationReducer`, `addNotification`              | Notification state               |
+| `@open-kingdom/shared-frontend-data-access-external-api`  | `catFactsApiReducer`                                  | External API integration pattern |
+| `@open-kingdom/shared-frontend-feature-notifications`     | `NotificationToastContainer`                          | Toast UI                         |
+| `@open-kingdom/shared-frontend-feature-error-autologger`  | `createReduxRTKErrorMiddleware`                       | Auto error capture               |
+| `@open-kingdom/shared-frontend-feature-user-management`   | User management UI components                         | Admin user/invite UI             |
+| `@open-kingdom/shared-frontend-ui-datagrid`               | `DataGrid`                                            | AG Grid wrapper                  |
+| `@open-kingdom/shared-frontend-ui-theme`                  | `ThemeProvider`, `useTheme`                           | Design tokens + dark mode        |
 
 ### Isomorphic (Poly)
 
-| Package | Key Exports | Purpose |
-|---|---|---|
-| `@open-kingdom/shared-poly-util-constants` | `DB_TAG` | Shared DI tokens |
-| `@open-kingdom/shared-poly-util-env-config` | `ConfigService`, `createConfigService`, `nodeEnvAdapter`, `createBrowserEnvAdapter` | Type-safe env vars |
-| `@open-kingdom/shared-poly-util-types` | Various types | Shared TypeScript types |
-| `@open-kingdom/shared-poly-util-date` | Date utilities | Date formatting/comparison |
+| Package                                     | Key Exports                                                                         | Purpose                    |
+| ------------------------------------------- | ----------------------------------------------------------------------------------- | -------------------------- |
+| `@open-kingdom/shared-poly-util-constants`  | `DB_TAG`                                                                            | Shared DI tokens           |
+| `@open-kingdom/shared-poly-util-env-config` | `ConfigService`, `createConfigService`, `nodeEnvAdapter`, `createBrowserEnvAdapter` | Type-safe env vars         |
+| `@open-kingdom/shared-poly-util-types`      | Various types                                                                       | Shared TypeScript types    |
+| `@open-kingdom/shared-poly-util-date`       | Date utilities                                                                      | Date formatting/comparison |
 
 ## Standard Module Wiring Patterns
 
 ### Backend AppModule
+
 ```typescript
 @Module({
   imports: [
@@ -107,6 +108,7 @@ export class AppModule {}
 ```
 
 ### Frontend Root Store
+
 ```typescript
 // See @open-kingdom/demo-scaffold-frontend-feature-root-store
 // for the canonical store composition pattern

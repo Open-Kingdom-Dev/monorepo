@@ -6,10 +6,10 @@ React UI feature library providing a Redux-connected toast notification containe
 
 ## Exports
 
-| Export | Type | Description |
-|---|---|---|
+| Export                       | Type       | Description                                                                                                                                      |
+| ---------------------------- | ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
 | `NotificationToastContainer` | `React.FC` | Connected container that renders all active notifications as positioned toasts; handles auto-dismiss timing and remove-after-animation lifecycle |
-| `SharedFeatureNotifications` | `React.FC` | Thin wrapper around `NotificationToastContainer` — equivalent component, exported for convenience |
+| `SharedFeatureNotifications` | `React.FC` | Thin wrapper around `NotificationToastContainer` — equivalent component, exported for convenience                                                |
 
 ---
 
@@ -19,10 +19,7 @@ React UI feature library providing a Redux-connected toast notification containe
 
 ```typescript
 import { configureStore } from '@reduxjs/toolkit';
-import {
-  NotificationKey,
-  notificationReducer,
-} from '@open-kingdom/shared-frontend-data-access-notifications';
+import { NotificationKey, notificationReducer } from '@open-kingdom/shared-frontend-data-access-notifications';
 
 export const store = configureStore({
   reducer: {
@@ -76,11 +73,7 @@ function App() {
 ### Trigger notifications from anywhere in the app
 
 ```typescript
-import {
-  showSuccessNotification,
-  showErrorNotification,
-  showWarningNotification,
-} from '@open-kingdom/shared-frontend-data-access-notifications';
+import { showSuccessNotification, showErrorNotification, showWarningNotification } from '@open-kingdom/shared-frontend-data-access-notifications';
 import { useDispatch } from 'react-redux';
 
 function SomeFeatureComponent() {

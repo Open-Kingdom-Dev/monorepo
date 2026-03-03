@@ -12,7 +12,9 @@ The OpenKingdom monorepo is a full-stack enterprise application toolkit. It prov
 ## Your Review Checklist
 
 ### 1. Internal Duplication (do not reimplement what already exists)
+
 Existing libraries that must NOT be reimplemented:
+
 - Auth: `shared-backend-feature-authentication` (Passport JWT/local)
 - User management: `shared-backend-feature-user-management`, `shared-backend-data-access-users`
 - Database setup: `shared-backend-data-access-database-setup`
@@ -29,7 +31,9 @@ Existing libraries that must NOT be reimplemented:
 If a new lib duplicates something from this list, flag it and recommend using the existing library instead.
 
 ### 2. Library Naming and Tagging
+
 New libs must follow: `@open-kingdom/{scope}-{environment}-{type}-{name}`
+
 - `scope`: `shared` (published, reusable) or `demo-scaffold` (app-specific)
 - `environment`: `frontend` | `backend` | `poly`
 - `type`: `feature` | `data-access` | `ui` | `util`
@@ -40,7 +44,9 @@ New libs must follow: `@open-kingdom/{scope}-{environment}-{type}-{name}`
 Flag any lib missing these or using a non-conforming name.
 
 ### 3. Library Boundary Enforcement
+
 Imports must respect these boundaries:
+
 - `poly` → no monorepo imports
 - `backend/*` → `poly` only
 - `frontend/*` → `poly` only
@@ -49,11 +55,13 @@ Imports must respect these boundaries:
 - `data-access-*` → `poly` only (no feature imports)
 
 Flag any import that crosses these boundaries. Common violations:
+
 - A `ui-*` lib importing from a `data-access-*` or `feature-*` lib
 - A `backend` lib importing from a `frontend` lib or vice versa
 - A `data-access-*` lib importing from a `feature-*` lib
 
 ### 4. Schema Composition Pattern
+
 - Only `demo-scaffold-backend-feature-root-schema` should call `DatabaseSetupModule.register()`
 - New tables must be exported from their library's `index.ts` and added to the root schema module
 - Never call `DatabaseSetupModule.register()` inside a shared library
@@ -61,18 +69,22 @@ Flag any import that crosses these boundaries. Common violations:
 Flag any library that calls `DatabaseSetupModule.register()`.
 
 ### 5. Testing
+
 - Test files are `*.spec.ts` / `*.spec.tsx` co-located with source
 - React component tests use `@testing-library/react`
 - Backend tests mock external dependencies at module level
 
 ### 6. Code Style
+
 - Prettier: single quotes — flag double-quoted string literals in `.ts`/`.tsx` files
 - Components: `PascalCase.tsx`
 - Routes, services, utils: `kebab-case.ts` or `camelCase.ts`
 - No `console.log` left in committed code (use the logger package)
 
 ### 7. Code Deletion
+
 Deletion is a first-class positive signal. Actively look for and recommend:
+
 - Dead code: functions, exports, variables, imports that are defined but never used
 - Redundant logic: conditions, transformations, or conversions that can be proven unnecessary
 - Code replaced by an existing library that wasn't removed when the library was adopted
@@ -82,7 +94,9 @@ Deletion is a first-class positive signal. Actively look for and recommend:
 When you find a deletion opportunity, recommend it directly and explain why nothing breaks. A PR that deletes more lines than it adds is a good PR.
 
 ### 8. No Duplicate Definitions (especially types)
+
 Every concept must have exactly one canonical definition:
+
 - **Types and interfaces**: Never define the same shape in two places. Cross-environment types belong in `shared-poly-util-types`; environment-specific types belong in the owning lib.
 - **Constants**: One source of truth per constant. Recurring magic strings/numbers should be extracted to `shared-poly-util-constants` or a local `util` lib.
 - **Logic**: Identical or near-identical functions in different files must be consolidated.
@@ -90,6 +104,7 @@ Every concept must have exactly one canonical definition:
 Flag every duplication you find. Identify where the canonical definition should live and which file should be deleted or replaced with an import.
 
 ### 9. Abstraction Quality
+
 This is a first-class concern — flag in both directions:
 
 **Under-abstracted:** Logic repeated across files or clearly needed in multiple places should be extracted. Call out what the abstraction should be and where it should live.
@@ -99,6 +114,7 @@ This is a first-class concern — flag in both directions:
 **Candidates for a new library:** If coherent functionality is living inline in an app or spread across files, call it out. Name the suggested lib following the naming convention and identify its environment and type.
 
 ### 10. Design Principles (anti-patterns to flag)
+
 - Hardcoded `DB_TAG` string (`'DB'` or `'DB_DEV'`) — always import `DB_TAG` from `shared-poly-util-constants`
 - `EmailModule` registered more than once — it is `global: true`, register once in `AppModule` only
 - `JwtAuthGuard` registered per-module rather than globally via `APP_GUARD`
@@ -107,7 +123,9 @@ This is a first-class concern — flag in both directions:
 - Tailwind hardcoded hex values — always use semantic palette classes (`bg-primary-500`, etc.)
 
 ### 11. Security
+
 Flag any of the following:
+
 - SQL injection (raw string interpolation in queries)
 - XSS (`dangerouslySetInnerHTML` with unescaped user input)
 - Command injection (shell exec with user-controlled strings)
@@ -128,6 +146,7 @@ Flag any of the following:
 9. If a gap in the existing libraries is identified (something that should exist but doesn't), note it explicitly so it can be added in a future session
 
 ## What NOT to Do
+
 - Do not suggest refactoring code outside the scope of the current change
 - Do not rewrite working logic just to make it "cleaner"
 - Do not add docstrings, comments, or type annotations to code that wasn't changed

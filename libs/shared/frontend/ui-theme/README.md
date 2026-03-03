@@ -8,42 +8,42 @@ Centralized theming system providing a `Theme` object structure, CSS custom prop
 
 ### Provider and Hook
 
-| Export | Type | Description |
-|---|---|---|
+| Export          | Type                           | Description                                                                             |
+| --------------- | ------------------------------ | --------------------------------------------------------------------------------------- |
 | `ThemeProvider` | `React.FC<ThemeProviderProps>` | Context provider; applies theme CSS variables to DOM on mount and on theme/mode changes |
-| `useTheme` | `() => ThemeContextValue` | Returns current theme state and setters; throws if used outside `ThemeProvider` |
+| `useTheme`      | `() => ThemeContextValue`      | Returns current theme state and setters; throws if used outside `ThemeProvider`         |
 
 ### Default Themes
 
-| Export | Type | Description |
-|---|---|---|
+| Export              | Type    | Description                                                                    |
+| ------------------- | ------- | ------------------------------------------------------------------------------ |
 | `defaultLightTheme` | `Theme` | Full default light theme object (blues primary, slate secondary, zinc neutral) |
-| `defaultDarkTheme` | `Theme` | Dark variant — same as light but with inverted `neutral` palette |
+| `defaultDarkTheme`  | `Theme` | Dark variant — same as light but with inverted `neutral` palette               |
 
 ### Utilities
 
-| Export | Signature | Description |
-|---|---|---|
-| `generateCSSVariables(theme)` | `(theme: Theme) => Record<string, string>` | Converts `Theme` object to flat `{ '--color-primary-500': '#3b82f6', ... }` map |
-| `applyThemeToDOM(theme)` | `(theme: Theme) => void` | Calls `generateCSSVariables` and sets all vars on `document.documentElement.style`; no-op in SSR |
-| `mergeThemes(base, override)` | `(base: Theme, override: Partial<Theme>) => Theme` | Deep-merges two themes, preserving unspecified color shades from `base` |
-| `saveThemeMode(mode)` | `(mode: ThemeMode) => void` | Saves mode to `localStorage` under key `'theme-mode'` |
-| `loadThemeMode()` | `() => ThemeMode \| null` | Reads mode from `localStorage`; returns `null` if not set or invalid |
+| Export                        | Signature                                          | Description                                                                                      |
+| ----------------------------- | -------------------------------------------------- | ------------------------------------------------------------------------------------------------ |
+| `generateCSSVariables(theme)` | `(theme: Theme) => Record<string, string>`         | Converts `Theme` object to flat `{ '--color-primary-500': '#3b82f6', ... }` map                  |
+| `applyThemeToDOM(theme)`      | `(theme: Theme) => void`                           | Calls `generateCSSVariables` and sets all vars on `document.documentElement.style`; no-op in SSR |
+| `mergeThemes(base, override)` | `(base: Theme, override: Partial<Theme>) => Theme` | Deep-merges two themes, preserving unspecified color shades from `base`                          |
+| `saveThemeMode(mode)`         | `(mode: ThemeMode) => void`                        | Saves mode to `localStorage` under key `'theme-mode'`                                            |
+| `loadThemeMode()`             | `() => ThemeMode \| null`                          | Reads mode from `localStorage`; returns `null` if not set or invalid                             |
 
 ### Types
 
-| Export | Type | Description |
-|---|---|---|
-| `Theme` | `interface` | Full theme object structure |
-| `ThemeMode` | `'light' \| 'dark'` | Mode discriminant |
-| `ThemeContextValue` | `interface` | Return type of `useTheme()` |
-| `ThemeColors` | `interface` | Color section of `Theme` |
-| `ColorPalette` | `interface` | Single color scale (50–950) |
-| `TypographyScale` | `interface` | Font size scale |
-| `SpacingScale` | `interface` | Spacing scale |
-| `BorderRadiusScale` | `interface` | Border radius scale |
-| `ShadowScale` | `interface` | Box shadow scale |
-| `FontFamily` | `interface` | Font family arrays |
+| Export              | Type                | Description                 |
+| ------------------- | ------------------- | --------------------------- |
+| `Theme`             | `interface`         | Full theme object structure |
+| `ThemeMode`         | `'light' \| 'dark'` | Mode discriminant           |
+| `ThemeContextValue` | `interface`         | Return type of `useTheme()` |
+| `ThemeColors`       | `interface`         | Color section of `Theme`    |
+| `ColorPalette`      | `interface`         | Single color scale (50–950) |
+| `TypographyScale`   | `interface`         | Font size scale             |
+| `SpacingScale`      | `interface`         | Spacing scale               |
+| `BorderRadiusScale` | `interface`         | Border radius scale         |
+| `ShadowScale`       | `interface`         | Box shadow scale            |
+| `FontFamily`        | `interface`         | Font family arrays          |
 
 ---
 
@@ -51,19 +51,19 @@ Centralized theming system providing a `Theme` object structure, CSS custom prop
 
 ### `ThemeProviderProps`
 
-| Property | Type | Required | Default | Description |
-|---|---|---|---|---|
-| `children` | `React.ReactNode` | Yes | — | Content to wrap with the theme context |
-| `initialTheme` | `Theme` | No | `defaultLightTheme` | Starting theme object |
-| `initialMode` | `ThemeMode` | No | `'light'` | Starting light/dark mode |
+| Property       | Type              | Required | Default             | Description                            |
+| -------------- | ----------------- | -------- | ------------------- | -------------------------------------- |
+| `children`     | `React.ReactNode` | Yes      | —                   | Content to wrap with the theme context |
+| `initialTheme` | `Theme`           | No       | `defaultLightTheme` | Starting theme object                  |
+| `initialMode`  | `ThemeMode`       | No       | `'light'`           | Starting light/dark mode               |
 
 ### `ThemeContextValue`
 
-| Property | Type | Description |
-|---|---|---|
-| `theme` | `Theme` | The currently active theme object |
-| `mode` | `ThemeMode` | The current mode (`'light'` or `'dark'`) |
-| `setMode` | `(mode: ThemeMode) => void` | Switches mode and persists the choice to `localStorage` |
+| Property   | Type                              | Description                                                                     |
+| ---------- | --------------------------------- | ------------------------------------------------------------------------------- |
+| `theme`    | `Theme`                           | The currently active theme object                                               |
+| `mode`     | `ThemeMode`                       | The current mode (`'light'` or `'dark'`)                                        |
+| `setMode`  | `(mode: ThemeMode) => void`       | Switches mode and persists the choice to `localStorage`                         |
 | `setTheme` | `(theme: Partial<Theme>) => void` | Deep-merges the provided partial theme with the current theme via `mergeThemes` |
 
 ### `ColorPalette`
@@ -72,25 +72,25 @@ Each color scale has optional shade keys from `50` through `950` (all `string` v
 
 ### `ThemeColors`
 
-| Property | Type | Description |
-|---|---|---|
-| `primary` | `ColorPalette` | Primary brand color scale |
-| `secondary` | `ColorPalette` | Secondary color scale |
-| `neutral` | `ColorPalette` | Neutral/grey color scale (inverted in dark mode) |
-| `success` | `ColorPalette` | Success state color scale |
-| `warning` | `ColorPalette` | Warning state color scale |
-| `error` | `ColorPalette` | Error state color scale |
+| Property    | Type           | Description                                      |
+| ----------- | -------------- | ------------------------------------------------ |
+| `primary`   | `ColorPalette` | Primary brand color scale                        |
+| `secondary` | `ColorPalette` | Secondary color scale                            |
+| `neutral`   | `ColorPalette` | Neutral/grey color scale (inverted in dark mode) |
+| `success`   | `ColorPalette` | Success state color scale                        |
+| `warning`   | `ColorPalette` | Warning state color scale                        |
+| `error`     | `ColorPalette` | Error state color scale                          |
 
 ### `Theme`
 
-| Property | Type | Description |
-|---|---|---|
-| `colors` | `ThemeColors` | Color palettes for all semantic scales |
-| `typography.fontFamily` | `FontFamily` | Font family arrays for `sans`, `serif`, and `mono` |
-| `typography.fontSize` | `TypographyScale` | Font size entries from `xs` through `6xl`; each value is a size string or `[size, { lineHeight }]` tuple |
-| `spacing` | `SpacingScale` | Spacing values for `xs`, `sm`, `md`, `lg`, `xl`, `2xl`, `3xl` |
-| `borderRadius` | `BorderRadiusScale` | Border radius values for `none`, `sm`, `md`, `lg`, `xl`, `full` |
-| `boxShadow` | `ShadowScale` | Box shadow values for `sm`, `md`, `lg`, `xl`, `2xl` |
+| Property                | Type                | Description                                                                                              |
+| ----------------------- | ------------------- | -------------------------------------------------------------------------------------------------------- |
+| `colors`                | `ThemeColors`       | Color palettes for all semantic scales                                                                   |
+| `typography.fontFamily` | `FontFamily`        | Font family arrays for `sans`, `serif`, and `mono`                                                       |
+| `typography.fontSize`   | `TypographyScale`   | Font size entries from `xs` through `6xl`; each value is a size string or `[size, { lineHeight }]` tuple |
+| `spacing`               | `SpacingScale`      | Spacing values for `xs`, `sm`, `md`, `lg`, `xl`, `2xl`, `3xl`                                            |
+| `borderRadius`          | `BorderRadiusScale` | Border radius values for `none`, `sm`, `md`, `lg`, `xl`, `full`                                          |
+| `boxShadow`             | `ShadowScale`       | Box shadow values for `sm`, `md`, `lg`, `xl`, `2xl`                                                      |
 
 ---
 
@@ -114,14 +114,14 @@ Each color scale has optional shade keys from `50` through `950` (all `string` v
 
 ### `defaultLightTheme` (colors excerpt)
 
-| Token | 500 value |
-|---|---|
-| `primary` | `#3b82f6` (blue-500) |
-| `secondary` | `#64748b` (slate-500) |
-| `neutral` | `#737373` (neutral-500) |
-| `success` | `#22c55e` (green-500) |
-| `warning` | `#f59e0b` (amber-500) |
-| `error` | `#ef4444` (red-500) |
+| Token       | 500 value               |
+| ----------- | ----------------------- |
+| `primary`   | `#3b82f6` (blue-500)    |
+| `secondary` | `#64748b` (slate-500)   |
+| `neutral`   | `#737373` (neutral-500) |
+| `success`   | `#22c55e` (green-500)   |
+| `warning`   | `#f59e0b` (amber-500)   |
+| `error`     | `#ef4444` (red-500)     |
 
 Font families: `sans: ['Inter', 'system-ui', 'sans-serif']`, `serif: ['Georgia', 'serif']`, `mono: ['JetBrains Mono', 'ui-monospace', 'monospace']`
 
@@ -168,7 +168,7 @@ const brandTheme: Theme = {
 
 <ThemeProvider initialTheme={brandTheme} initialMode="light">
   <App />
-</ThemeProvider>
+</ThemeProvider>;
 ```
 
 ---
@@ -185,11 +185,7 @@ import { useTheme } from '@open-kingdom/shared-frontend-ui-theme';
 function ThemeToggle() {
   const { mode, setMode } = useTheme();
 
-  return (
-    <button onClick={() => setMode(mode === 'light' ? 'dark' : 'light')}>
-      Switch to {mode === 'light' ? 'dark' : 'light'} mode
-    </button>
-  );
+  return <button onClick={() => setMode(mode === 'light' ? 'dark' : 'light')}>Switch to {mode === 'light' ? 'dark' : 'light'} mode</button>;
 }
 ```
 
@@ -270,15 +266,7 @@ The base config extends Tailwind's default theme with CSS-variable-backed values
 ## Utility Function Examples
 
 ```typescript
-import {
-  generateCSSVariables,
-  applyThemeToDOM,
-  mergeThemes,
-  saveThemeMode,
-  loadThemeMode,
-  defaultLightTheme,
-  defaultDarkTheme,
-} from '@open-kingdom/shared-frontend-ui-theme';
+import { generateCSSVariables, applyThemeToDOM, mergeThemes, saveThemeMode, loadThemeMode, defaultLightTheme, defaultDarkTheme } from '@open-kingdom/shared-frontend-ui-theme';
 
 // Generate variable map (useful for SSR/injection):
 const vars = generateCSSVariables(defaultLightTheme);

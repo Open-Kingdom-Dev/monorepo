@@ -6,12 +6,12 @@ A NestJS dynamic module providing JWT + Passport-based authentication: a `POST /
 
 ## Exports
 
-| Export | Kind | Description |
-|---|---|---|
-| `OpenKingdomFeatureBackendAuthModule` | `class` | Dynamic NestJS module. Call `.forRoot(options)` to configure. |
-| `JwtAuthGuard` | `class` | Passport JWT guard implementing `canActivate`. Skips routes decorated with `@Public()`. Register as `APP_GUARD` for global JWT enforcement. |
-| `Public` | `function` | Decorator factory: `@Public()`. Marks a route handler or controller as publicly accessible (bypasses `JwtAuthGuard`). |
-| `IS_PUBLIC_KEY` | `string` | Metadata key used by `@Public()`. Value: `'isPublic'`. |
+| Export                                | Kind       | Description                                                                                                                                 |
+| ------------------------------------- | ---------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
+| `OpenKingdomFeatureBackendAuthModule` | `class`    | Dynamic NestJS module. Call `.forRoot(options)` to configure.                                                                               |
+| `JwtAuthGuard`                        | `class`    | Passport JWT guard implementing `canActivate`. Skips routes decorated with `@Public()`. Register as `APP_GUARD` for global JWT enforcement. |
+| `Public`                              | `function` | Decorator factory: `@Public()`. Marks a route handler or controller as publicly accessible (bypasses `JwtAuthGuard`).                       |
+| `IS_PUBLIC_KEY`                       | `string`   | Metadata key used by `@Public()`. Value: `'isPublic'`.                                                                                      |
 
 ---
 
@@ -19,10 +19,10 @@ A NestJS dynamic module providing JWT + Passport-based authentication: a `POST /
 
 ### `AuthModuleOptions`
 
-| Property | Type | Required | Default | Description |
-|---|---|---|---|---|
-| `jwtSecret` | `string` | Yes | — | HMAC secret used to sign and verify JWT tokens. |
-| `jwtExpiresIn` | `string \| number` | No | `60` | Token lifetime. A number is interpreted as seconds. A string uses the ms format (e.g. `'60s'`, `'1h'`, `'7d'`). |
+| Property       | Type               | Required | Default | Description                                                                                                     |
+| -------------- | ------------------ | -------- | ------- | --------------------------------------------------------------------------------------------------------------- |
+| `jwtSecret`    | `string`           | Yes      | —       | HMAC secret used to sign and verify JWT tokens.                                                                 |
+| `jwtExpiresIn` | `string \| number` | No       | `60`    | Token lifetime. A number is interpreted as seconds. A string uses the ms format (e.g. `'60s'`, `'1h'`, `'7d'`). |
 
 ### `RequestWithUser`
 
@@ -46,10 +46,7 @@ The token payload signed on login contains `username` (set to the user's email a
 // app.module.ts
 import { Module } from '@nestjs/common';
 import { APP_GUARD } from '@nestjs/core';
-import {
-  OpenKingdomFeatureBackendAuthModule,
-  JwtAuthGuard,
-} from '@open-kingdom/shared-backend-feature-authentication';
+import { OpenKingdomFeatureBackendAuthModule, JwtAuthGuard } from '@open-kingdom/shared-backend-feature-authentication';
 
 @Module({
   imports: [
@@ -58,9 +55,7 @@ import {
       jwtExpiresIn: '7d',
     }),
   ],
-  providers: [
-    { provide: APP_GUARD, useClass: JwtAuthGuard },
-  ],
+  providers: [{ provide: APP_GUARD, useClass: JwtAuthGuard }],
 })
 export class AppModule {}
 ```
@@ -69,10 +64,10 @@ export class AppModule {}
 
 ## Configuration Options
 
-| Option | Type | Default | Description |
-|---|---|---|---|
-| `jwtSecret` | `string` | — (required) | HMAC secret for signing JWT tokens. Must be the same value in all instances sharing a session. |
-| `jwtExpiresIn` | `string \| number` | `60` | Token expiry. A `number` is interpreted as seconds. A `string` uses the [ms](https://github.com/vercel/ms) format (`'60s'`, `'1h'`, `'7d'`). |
+| Option         | Type               | Default      | Description                                                                                                                                  |
+| -------------- | ------------------ | ------------ | -------------------------------------------------------------------------------------------------------------------------------------------- |
+| `jwtSecret`    | `string`           | — (required) | HMAC secret for signing JWT tokens. Must be the same value in all instances sharing a session.                                               |
+| `jwtExpiresIn` | `string \| number` | `60`         | Token expiry. A `number` is interpreted as seconds. A `string` uses the [ms](https://github.com/vercel/ms) format (`'60s'`, `'1h'`, `'7d'`). |
 
 ---
 
@@ -80,16 +75,16 @@ export class AppModule {}
 
 The returned `DynamicModule` imports and provides the following:
 
-| Component | Type | Description |
-|---|---|---|
-| `OpenKingdomDataAccessBackendUsersModule` | imported module | Provides `UsersService` for credential and token validation. |
-| `PassportModule` | imported module | Registers Passport strategies. |
-| `JwtModule` | imported module | Configured with `jwtSecret` and `jwtExpiresIn`. |
-| `LocalStrategy` | provider | Passport `local` strategy. Validates `email`/`password` via `AuthenticationService.validateUser()`. Uses `usernameField: 'email'`. |
-| `JwtStrategy` | provider | Passport `jwt` strategy. Extracts Bearer token from `Authorization` header, verifies signature, loads user via `UsersService.findOne()`. |
-| `AuthenticationService` | provider | Calls `bcrypt.compare()` for login, calls `JwtService.sign()` to issue tokens. |
-| `AuthController` | controller | Registers `POST /auth/login` and `GET /profile` endpoints. |
-| `JWT_CONSTANTS` | provider | Value provider holding `{ secret: jwtSecret }`. Injected into `JwtStrategy` using the token `'JWT_CONSTANTS'`. |
+| Component                                 | Type            | Description                                                                                                                              |
+| ----------------------------------------- | --------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
+| `OpenKingdomDataAccessBackendUsersModule` | imported module | Provides `UsersService` for credential and token validation.                                                                             |
+| `PassportModule`                          | imported module | Registers Passport strategies.                                                                                                           |
+| `JwtModule`                               | imported module | Configured with `jwtSecret` and `jwtExpiresIn`.                                                                                          |
+| `LocalStrategy`                           | provider        | Passport `local` strategy. Validates `email`/`password` via `AuthenticationService.validateUser()`. Uses `usernameField: 'email'`.       |
+| `JwtStrategy`                             | provider        | Passport `jwt` strategy. Extracts Bearer token from `Authorization` header, verifies signature, loads user via `UsersService.findOne()`. |
+| `AuthenticationService`                   | provider        | Calls `bcrypt.compare()` for login, calls `JwtService.sign()` to issue tokens.                                                           |
+| `AuthController`                          | controller      | Registers `POST /auth/login` and `GET /profile` endpoints.                                                                               |
+| `JWT_CONSTANTS`                           | provider        | Value provider holding `{ secret: jwtSecret }`. Injected into `JwtStrategy` using the token `'JWT_CONSTANTS'`.                           |
 
 Exported from the module: `AuthenticationService`, `JwtStrategy`.
 
@@ -132,7 +127,7 @@ export class HealthController {
 **Global registration (required for guard to apply everywhere):**
 
 ```typescript
-providers: [{ provide: APP_GUARD, useClass: JwtAuthGuard }]
+providers: [{ provide: APP_GUARD, useClass: JwtAuthGuard }];
 ```
 
 ---
@@ -159,10 +154,10 @@ export class OpenController { ... }
 
 ## AuthenticationService API
 
-| Method | Parameters | Returns | Description |
-|---|---|---|---|
-| `validateUser` | `email: string, password: string` | `Promise<Omit<User, 'password'>>` | Validates email and password. Throws `UnauthorizedException` on failure. Returns the user object without the password field. |
-| `login` | `user: Omit<User, 'password'>` | `Promise<{ access_token: string }>` | Signs a JWT with payload `{ username: user.email, id: user.id }` and returns it wrapped in an object. |
+| Method         | Parameters                        | Returns                             | Description                                                                                                                  |
+| -------------- | --------------------------------- | ----------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| `validateUser` | `email: string, password: string` | `Promise<Omit<User, 'password'>>`   | Validates email and password. Throws `UnauthorizedException` on failure. Returns the user object without the password field. |
+| `login`        | `user: Omit<User, 'password'>`    | `Promise<{ access_token: string }>` | Signs a JWT with payload `{ username: user.email, id: user.id }` and returns it wrapped in an object.                        |
 
 ---
 

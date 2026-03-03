@@ -76,6 +76,7 @@ Never create a new `createApi()` instance for the backend — always use `baseAp
 ## Auth State
 
 Reading auth state in components:
+
 ```typescript
 import { selectToken, selectUser } from '@open-kingdom/shared-frontend-data-access-api-client';
 import { useSelector } from 'react-redux';
@@ -85,6 +86,7 @@ const user = useSelector(selectUser);
 ```
 
 Dispatching auth actions:
+
 ```typescript
 import { setToken, setUser, clearAuth } from '@open-kingdom/shared-frontend-data-access-api-client';
 dispatch(setToken(token));
@@ -107,16 +109,19 @@ dispatch(logError('Something failed'));
 ```typescript
 import { addNotification } from '@open-kingdom/shared-frontend-data-access-notifications';
 
-dispatch(addNotification({
-  message: 'User created successfully',
-  type: 'success',
-  duration: 3000,
-}));
+dispatch(
+  addNotification({
+    message: 'User created successfully',
+    type: 'success',
+    duration: 3000,
+  })
+);
 ```
 
 ## Theming
 
 ### Wrapping the App
+
 ```tsx
 import { ThemeProvider } from '@open-kingdom/shared-frontend-ui-theme';
 
@@ -130,24 +135,24 @@ function Root() {
 ```
 
 ### Reading Theme in Components
+
 ```tsx
 import { useTheme } from '@open-kingdom/shared-frontend-ui-theme';
 
 function MyComponent() {
   const { mode, setMode } = useTheme();
-  return (
-    <button onClick={() => setMode(mode === 'light' ? 'dark' : 'light')}>
-      Toggle
-    </button>
-  );
+  return <button onClick={() => setMode(mode === 'light' ? 'dark' : 'light')}>Toggle</button>;
 }
 ```
 
 ### Tailwind Color Classes
+
 Always use semantic palette classes (`bg-primary-500`, `text-secondary-900`, `bg-success-100`, etc.) — never hardcoded hex values.
 
 ### Tailwind Config Inheritance
+
 All app and library Tailwind configs must extend the base config:
+
 ```javascript
 // tailwind.config.js
 const baseConfig = require('@open-kingdom/shared-frontend-ui-theme/tailwind.config.js');
@@ -172,17 +177,7 @@ const colDefs: ColDef[] = [
 function MyTable({ rows }: { rows: User[] }) {
   const gridRef = useRef<GridApi | null>(null);
 
-  return (
-    <DataGrid
-      ref={gridRef}
-      columnDefs={colDefs}
-      rowData={rows}
-      mode="light"
-      enableRowSelection
-      enableStatePersistence
-      storageKey="users-grid"
-    />
-  );
+  return <DataGrid ref={gridRef} columnDefs={colDefs} rowData={rows} mode="light" enableRowSelection enableStatePersistence storageKey="users-grid" />;
 }
 ```
 
@@ -194,24 +189,23 @@ function MyTable({ rows }: { rows: User[] }) {
 ## Error Boundary
 
 Use the error boundary from `feature-error-autologger` to wrap critical UI sections:
+
 ```tsx
 import { ErrorBoundary } from '@open-kingdom/shared-frontend-feature-error-autologger';
 
 <ErrorBoundary fallback={<ErrorFallback />}>
   <CriticalComponent />
-</ErrorBoundary>
+</ErrorBoundary>;
 ```
 
 ## Environment Variables (Frontend)
 
 Use `@open-kingdom/shared-poly-util-env-config` for type-safe access:
+
 ```typescript
 import { createConfigService, createBrowserEnvAdapter } from '@open-kingdom/shared-poly-util-env-config';
 
-const config = createConfigService(
-  ['VITE_API_BASE_URL', 'VITE_APP_NAME'] as const,
-  createBrowserEnvAdapter(import.meta)
-);
+const config = createConfigService(['VITE_API_BASE_URL', 'VITE_APP_NAME'] as const, createBrowserEnvAdapter(import.meta));
 
 export const API_BASE_URL = config.get('VITE_API_BASE_URL', 'http://localhost:3000');
 ```

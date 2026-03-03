@@ -6,13 +6,13 @@ React feature library that automatically captures uncaught errors, unhandled pro
 
 ## Exports
 
-| Export | Type | Description |
-|---|---|---|
-| `ErrorBoundary` | `class Component` | React error boundary — catches render errors and calls logger/notification handlers |
-| `useGlobalErrorListener` | hook | Attaches `window.error` and `unhandledrejection` listeners on mount; cleans up on unmount |
-| `useErrorReporter` | hook | Returns a stable `report(error, options?)` function for manual error reporting |
+| Export                          | Type               | Description                                                                                   |
+| ------------------------------- | ------------------ | --------------------------------------------------------------------------------------------- |
+| `ErrorBoundary`                 | `class Component`  | React error boundary — catches render errors and calls logger/notification handlers           |
+| `useGlobalErrorListener`        | hook               | Attaches `window.error` and `unhandledrejection` listeners on mount; cleans up on unmount     |
+| `useErrorReporter`              | hook               | Returns a stable `report(error, options?)` function for manual error reporting                |
 | `createReduxRTKErrorMiddleware` | middleware factory | Redux middleware that intercepts `/rejected` RTK actions and dispatches Redux action creators |
-| `createRTKErrorMiddleware` | middleware factory | Redux middleware variant that calls plain callbacks instead of dispatching action creators |
+| `createRTKErrorMiddleware`      | middleware factory | Redux middleware variant that calls plain callbacks instead of dispatching action creators    |
 
 ---
 
@@ -20,46 +20,46 @@ React feature library that automatically captures uncaught errors, unhandled pro
 
 ### `ErrorBoundaryProps`
 
-| Property | Type | Required | Default | Description |
-|---|---|---|---|---|
-| `children` | `ReactNode` | Yes | — | Content to render |
-| `fallback` | `ReactNode \| ((error: Error) => ReactNode)` | No | — | Rendered when an error is caught; accepts a render prop |
-| `logger` | `(message: string) => void` | No | — | Called with the error message on catch |
-| `notificationHandler` | `(message: string) => void` | No | — | Called with the user-facing message on catch |
-| `userMessage` | `string` | No | `'Something went wrong. Please try again.'` | Message passed to `notificationHandler` |
-| `notify` | `boolean` | No | `true` | Whether to call `notificationHandler` |
-| `log` | `boolean` | No | `true` | Whether to call `logger` |
-| `onError` | `(error: Error, errorInfo: ErrorInfo) => void` | No | — | Additional callback after the error is reported |
+| Property              | Type                                           | Required | Default                                     | Description                                             |
+| --------------------- | ---------------------------------------------- | -------- | ------------------------------------------- | ------------------------------------------------------- |
+| `children`            | `ReactNode`                                    | Yes      | —                                           | Content to render                                       |
+| `fallback`            | `ReactNode \| ((error: Error) => ReactNode)`   | No       | —                                           | Rendered when an error is caught; accepts a render prop |
+| `logger`              | `(message: string) => void`                    | No       | —                                           | Called with the error message on catch                  |
+| `notificationHandler` | `(message: string) => void`                    | No       | —                                           | Called with the user-facing message on catch            |
+| `userMessage`         | `string`                                       | No       | `'Something went wrong. Please try again.'` | Message passed to `notificationHandler`                 |
+| `notify`              | `boolean`                                      | No       | `true`                                      | Whether to call `notificationHandler`                   |
+| `log`                 | `boolean`                                      | No       | `true`                                      | Whether to call `logger`                                |
+| `onError`             | `(error: Error, errorInfo: ErrorInfo) => void` | No       | —                                           | Additional callback after the error is reported         |
 
 ### `ErrorListenerConfig` (for `useGlobalErrorListener`)
 
-| Property | Type | Required | Default | Description |
-|---|---|---|---|---|
-| `logger` | `(message: string) => void` | No | — | Called with the error message |
-| `notificationHandler` | `(message: string) => void` | No | — | Called with the user-facing message |
-| `notify` | `boolean` | No | `true` | Whether to call `notificationHandler` |
-| `log` | `boolean` | No | `true` | Whether to call `logger` |
-| `defaultMessage` | `string` | No | `'An unexpected error occurred'` | Fallback when the error has no message |
+| Property              | Type                        | Required | Default                          | Description                            |
+| --------------------- | --------------------------- | -------- | -------------------------------- | -------------------------------------- |
+| `logger`              | `(message: string) => void` | No       | —                                | Called with the error message          |
+| `notificationHandler` | `(message: string) => void` | No       | —                                | Called with the user-facing message    |
+| `notify`              | `boolean`                   | No       | `true`                           | Whether to call `notificationHandler`  |
+| `log`                 | `boolean`                   | No       | `true`                           | Whether to call `logger`               |
+| `defaultMessage`      | `string`                    | No       | `'An unexpected error occurred'` | Fallback when the error has no message |
 
 ### `HandleErrorOptions` (per-call options for `useErrorReporter`)
 
-| Property | Type | Required | Default | Description |
-|---|---|---|---|---|
-| `notify` | `boolean` | No | `true` | Whether to call `notificationHandler` |
-| `log` | `boolean` | No | `true` | Whether to call `logger` |
-| `userMessage` | `string` | No | — | Override the user-facing message |
-| `context` | `Record<string, unknown>` | No | — | Additional context attached to the error |
+| Property      | Type                      | Required | Default | Description                              |
+| ------------- | ------------------------- | -------- | ------- | ---------------------------------------- |
+| `notify`      | `boolean`                 | No       | `true`  | Whether to call `notificationHandler`    |
+| `log`         | `boolean`                 | No       | `true`  | Whether to call `logger`                 |
+| `userMessage` | `string`                  | No       | —       | Override the user-facing message         |
+| `context`     | `Record<string, unknown>` | No       | —       | Additional context attached to the error |
 
 ### `ReduxRTKErrorMiddlewareConfig` (for `createReduxRTKErrorMiddleware`)
 
-| Property | Type | Required | Default | Description |
-|---|---|---|---|---|
-| `logAction` | `(payload: { message: string; level: 'error' }) => Action` | Yes | — | Action creator dispatched for logging |
-| `notifyAction` | `(message: string) => Action` | Yes | — | Action creator dispatched for notifications |
-| `notify` | `boolean` | No | `true` | Whether to dispatch `notifyAction` |
-| `log` | `boolean` | No | `true` | Whether to dispatch `logAction` |
-| `defaultMessage` | `string` | No | — | Fallback message for errors without one |
-| `shouldHandle` | `(action: unknown) => boolean` | No | — | Predicate to filter which rejected actions are handled |
+| Property         | Type                                                       | Required | Default | Description                                            |
+| ---------------- | ---------------------------------------------------------- | -------- | ------- | ------------------------------------------------------ |
+| `logAction`      | `(payload: { message: string; level: 'error' }) => Action` | Yes      | —       | Action creator dispatched for logging                  |
+| `notifyAction`   | `(message: string) => Action`                              | Yes      | —       | Action creator dispatched for notifications            |
+| `notify`         | `boolean`                                                  | No       | `true`  | Whether to dispatch `notifyAction`                     |
+| `log`            | `boolean`                                                  | No       | `true`  | Whether to dispatch `logAction`                        |
+| `defaultMessage` | `string`                                                   | No       | —       | Fallback message for errors without one                |
+| `shouldHandle`   | `(action: unknown) => boolean`                             | No       | —       | Predicate to filter which rejected actions are handled |
 
 ---
 
@@ -73,11 +73,7 @@ import { ErrorBoundary } from '@open-kingdom/shared-frontend-feature-error-autol
 function App() {
   const dispatch = useDispatch();
   return (
-    <ErrorBoundary
-      logger={(msg) => dispatch(logError(msg))}
-      notificationHandler={(msg) => dispatch(showErrorNotification(msg))}
-      fallback={(error) => <div>Something went wrong: {error.message}</div>}
-    >
+    <ErrorBoundary logger={(msg) => dispatch(logError(msg))} notificationHandler={(msg) => dispatch(showErrorNotification(msg))} fallback={(error) => <div>Something went wrong: {error.message}</div>}>
       <YourAppContent />
     </ErrorBoundary>
   );

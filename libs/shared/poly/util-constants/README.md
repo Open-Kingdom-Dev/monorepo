@@ -6,8 +6,8 @@ Shared constants used across both backend (NestJS) and frontend (React) packages
 
 ## Exports
 
-| Export | Type | Value | Description |
-|---|---|---|---|
+| Export   | Type     | Value  | Description                                              |
+| -------- | -------- | ------ | -------------------------------------------------------- |
 | `DB_TAG` | `string` | `'DB'` | NestJS injection token for the Drizzle database instance |
 
 ---
@@ -35,9 +35,7 @@ import { NodePgDatabase } from 'drizzle-orm/node-postgres';
 
 @Injectable()
 class MyService {
-  constructor(
-    @Inject(DB_TAG) private db: NodePgDatabase<typeof schema>
-  ) {}
+  constructor(@Inject(DB_TAG) private db: NodePgDatabase<typeof schema>) {}
 
   async findAll() {
     return this.db.select().from(schema.users);

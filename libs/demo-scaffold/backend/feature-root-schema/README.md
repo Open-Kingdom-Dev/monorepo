@@ -16,9 +16,9 @@ The module wires the following tables into `DatabaseSetupModule`:
 
 ```typescript
 const schema = {
-  users,       // from @open-kingdom/shared-backend-data-access-users
+  users, // from @open-kingdom/shared-backend-data-access-users
   invitations, // from @open-kingdom/shared-backend-feature-user-management
-  userRoles,   // from @open-kingdom/shared-backend-feature-user-management
+  userRoles, // from @open-kingdom/shared-backend-feature-user-management
 };
 ```
 
@@ -58,8 +58,8 @@ const schema = { users, invitations, userRoles, myTable };
   imports: [
     DatabaseSetupModule.register({
       schema,
-      tag: DB_TAG,           // from @open-kingdom/shared-poly-util-constants
-      filename: 'myapp.db',  // SQLite file name
+      tag: DB_TAG, // from @open-kingdom/shared-poly-util-constants
+      filename: 'myapp.db', // SQLite file name
     }),
   ],
   exports: [],

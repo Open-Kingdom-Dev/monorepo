@@ -6,15 +6,15 @@ A NestJS module providing `UsersService` for User entity persistence via Drizzle
 
 ## Exports
 
-| Export | Kind | Description |
-|---|---|---|
-| `OpenKingdomDataAccessBackendUsersModule` | `class` | Standard NestJS module. Provides and exports `UsersService`. |
-| `DataAccessBackendUsersModule` | `class` | Alias for `OpenKingdomDataAccessBackendUsersModule`. |
-| `UsersService` | `class` | Injectable service for all user persistence operations. |
-| `users` | `BetterSQLite3Table` | Drizzle table definition for the `users` table. |
-| `UsersTableName` | `string` | The literal string `'users'`. Used when constructing typed schema objects. |
-| `User` | `type` | TypeScript type inferred from `users.$inferSelect`. |
-| `NewUser` | `type` | TypeScript type inferred from `users.$inferInsert`. |
+| Export                                    | Kind                 | Description                                                                |
+| ----------------------------------------- | -------------------- | -------------------------------------------------------------------------- |
+| `OpenKingdomDataAccessBackendUsersModule` | `class`              | Standard NestJS module. Provides and exports `UsersService`.               |
+| `DataAccessBackendUsersModule`            | `class`              | Alias for `OpenKingdomDataAccessBackendUsersModule`.                       |
+| `UsersService`                            | `class`              | Injectable service for all user persistence operations.                    |
+| `users`                                   | `BetterSQLite3Table` | Drizzle table definition for the `users` table.                            |
+| `UsersTableName`                          | `string`             | The literal string `'users'`. Used when constructing typed schema objects. |
+| `User`                                    | `type`               | TypeScript type inferred from `users.$inferSelect`.                        |
+| `NewUser`                                 | `type`               | TypeScript type inferred from `users.$inferInsert`.                        |
 
 ---
 
@@ -24,25 +24,25 @@ A NestJS module providing `UsersService` for User entity persistence via Drizzle
 
 The `users` SQLite table has the following columns:
 
-| Column | Type | Constraints | Description |
-|---|---|---|---|
-| `id` | `integer` | Primary key, auto-increment | Unique user identifier |
-| `first_name` | `text` | Nullable | User's first name |
-| `last_name` | `text` | Nullable | User's last name |
-| `email` | `text` | Not null, unique | User's email address |
-| `password` | `text` | Not null | bcrypt-hashed password; never returned in plaintext |
+| Column       | Type      | Constraints                 | Description                                         |
+| ------------ | --------- | --------------------------- | --------------------------------------------------- |
+| `id`         | `integer` | Primary key, auto-increment | Unique user identifier                              |
+| `first_name` | `text`    | Nullable                    | User's first name                                   |
+| `last_name`  | `text`    | Nullable                    | User's last name                                    |
+| `email`      | `text`    | Not null, unique            | User's email address                                |
+| `password`   | `text`    | Not null                    | bcrypt-hashed password; never returned in plaintext |
 
 ### `User` Type
 
 The `User` type is inferred from `users.$inferSelect` and has the following shape:
 
-| Property | Type | Description |
-|---|---|---|
-| `id` | `number` | Auto-incremented primary key |
-| `firstName` | `string \| null` | User's first name |
-| `lastName` | `string \| null` | User's last name |
-| `email` | `string` | Unique email address |
-| `password` | `string` | bcrypt hash — never exposed to clients |
+| Property    | Type             | Description                            |
+| ----------- | ---------------- | -------------------------------------- |
+| `id`        | `number`         | Auto-incremented primary key           |
+| `firstName` | `string \| null` | User's first name                      |
+| `lastName`  | `string \| null` | User's last name                       |
+| `email`     | `string`         | Unique email address                   |
+| `password`  | `string`         | bcrypt hash — never exposed to clients |
 
 ### `NewUser` Type
 
@@ -93,13 +93,13 @@ export class MyService {
 
 ### Methods
 
-| Method | Parameters | Returns | Description |
-|---|---|---|---|
-| `findOne` | `email: string` | `Promise<User \| undefined>` | Finds a user by email address. Returns `undefined` if not found. |
-| `findById` | `id: number` | `Promise<User \| undefined>` | Finds a user by primary key. Returns `undefined` if not found. |
-| `findAll` | — | `Promise<User[]>` | Returns all users. |
-| `create` | `data: Omit<User, 'id'>` | `Promise<User>` | Inserts a new user. Hashes the plaintext password with bcrypt (12 salt rounds) before storage. |
-| `delete` | `id: number` | `Promise<void>` | Deletes a user by primary key. |
+| Method       | Parameters               | Returns                      | Description                                                                                                                                              |
+| ------------ | ------------------------ | ---------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `findOne`    | `email: string`          | `Promise<User \| undefined>` | Finds a user by email address. Returns `undefined` if not found.                                                                                         |
+| `findById`   | `id: number`             | `Promise<User \| undefined>` | Finds a user by primary key. Returns `undefined` if not found.                                                                                           |
+| `findAll`    | —                        | `Promise<User[]>`            | Returns all users.                                                                                                                                       |
+| `create`     | `data: Omit<User, 'id'>` | `Promise<User>`              | Inserts a new user. Hashes the plaintext password with bcrypt (12 salt rounds) before storage.                                                           |
+| `delete`     | `id: number`             | `Promise<void>`              | Deletes a user by primary key.                                                                                                                           |
 | `ensureUser` | `data: Omit<User, 'id'>` | `Promise<User \| undefined>` | Inserts a user only if no user with that email already exists. Returns the existing user if found. Password is hashed before storage (same as `create`). |
 
 ### Lifecycle: `onModuleInit`
@@ -130,11 +130,7 @@ The `invitations` table in `feature-user-management` references `users.id` via a
 ```typescript
 import { Module } from '@nestjs/common';
 import { Injectable } from '@nestjs/common';
-import {
-  OpenKingdomDataAccessBackendUsersModule,
-  UsersService,
-  User,
-} from '@open-kingdom/shared-backend-data-access-users';
+import { OpenKingdomDataAccessBackendUsersModule, UsersService, User } from '@open-kingdom/shared-backend-data-access-users';
 
 @Injectable()
 export class ProfileService {

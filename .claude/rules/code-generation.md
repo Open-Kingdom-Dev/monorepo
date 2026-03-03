@@ -25,20 +25,26 @@ When scaffolding new libraries, follow the library creation process defined in `
 Once the libraries exist, wire them together:
 
 ### Register Schema
+
 Add new Drizzle tables to `libs/demo-scaffold/backend/feature-root-schema/src/lib/feature-root-schema.module.ts`:
+
 ```typescript
 import { myTable } from '@open-kingdom/shared-backend-data-access-<name>';
 const schema = { users, invitations, userRoles, myTable };
 ```
 
 ### Register Module in AppModule
+
 ```typescript
 imports: [
-  MyFeatureModule.forRoot({ /* options */ }),
-]
+  MyFeatureModule.forRoot({
+    /* options */
+  }),
+];
 ```
 
 ### Generate OpenAPI Spec and API Client
+
 ```bash
 npm run swagger:generate-all
 npm run client:generate-all
@@ -48,11 +54,11 @@ npm run client:generate-all
 
 ## Naming Conventions
 
-| Artifact | Convention | Example |
-|---|---|---|
-| Redux slice | camelCase | `myFeatureSlice` |
-| Redux key constant | PascalCase + `Key` | `MyFeatureKey` |
-| Injection token | SCREAMING_SNAKE_CASE | `MY_FEATURE_OPTIONS` |
+| Artifact           | Convention           | Example              |
+| ------------------ | -------------------- | -------------------- |
+| Redux slice        | camelCase            | `myFeatureSlice`     |
+| Redux key constant | PascalCase + `Key`   | `MyFeatureKey`       |
+| Injection token    | SCREAMING_SNAKE_CASE | `MY_FEATURE_OPTIONS` |
 
 ## What NOT to Generate
 
