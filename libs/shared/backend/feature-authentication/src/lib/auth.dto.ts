@@ -54,4 +54,19 @@ export class ProfileResponseDto {
     example: 'john@example.com',
   })
   email!: string;
+
+  @ApiProperty({
+    description: 'Primary role name',
+    example: 'admin',
+    type: 'string',
+    nullable: true,
+  })
+  role!: string | null;
+
+  @ApiProperty({
+    description: 'Granted permissions',
+    example: ['users:read', 'users:write'],
+    type: [String],
+  })
+  permissions!: string[];
 }
