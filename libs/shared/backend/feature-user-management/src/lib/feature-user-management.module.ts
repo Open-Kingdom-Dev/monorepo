@@ -10,7 +10,13 @@ import {
   UserRolesService,
   SeedService,
 } from './services';
-import { InvitationsController, UsersController } from './controllers';
+import {
+  InvitationsController,
+  UsersController,
+  RolesController,
+  PermissionsController,
+  UserRolesController,
+} from './controllers';
 import { USER_MANAGEMENT_OPTIONS, EMAIL_SENDER } from './types';
 import type { UserManagementModuleOptions } from './types';
 
@@ -33,7 +39,13 @@ export class FeatureUserManagementModule {
     return {
       module: FeatureUserManagementModule,
       imports: [OpenKingdomDataAccessBackendUsersModule],
-      controllers: [InvitationsController, UsersController],
+      controllers: [
+        InvitationsController,
+        UsersController,
+        RolesController,
+        PermissionsController,
+        UserRolesController,
+      ],
       providers: [
         { provide: USER_MANAGEMENT_OPTIONS, useValue: options },
         { provide: EMAIL_SENDER, useExisting: EmailService },

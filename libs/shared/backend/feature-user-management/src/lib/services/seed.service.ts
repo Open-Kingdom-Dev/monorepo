@@ -38,7 +38,6 @@ export class SeedService implements OnModuleInit {
       await this.rolesService.create(
         role.name,
         role.description,
-        role.priority,
         role.isSystem
       );
       this.logger.log(`Seeded role: ${role.name}`);
