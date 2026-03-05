@@ -13,17 +13,25 @@ jest.mock('@open-kingdom/demo-scaffold-backend-feature-root-schema', () => ({
   OpenKingdomFeatureRootSchemaModule: class MockFeatureRootSchemaModule {},
 }));
 
-jest.mock('@open-kingdom/shared-backend-feature-authentication', () => ({
-  OpenKingdomFeatureBackendAuthModule: {
-    forRoot: jest.fn().mockReturnValue({
-      module: class MockFeatureBackendAuthModule {},
-      imports: [],
-      providers: [],
-      controllers: [],
-      exports: [],
-    }),
-  },
-}));
+jest.mock('@open-kingdom/shared-backend-feature-authentication', () => {
+  class MockJwtAuthGuard {
+    canActivate() {
+      return true;
+    }
+  }
+  return {
+    OpenKingdomFeatureBackendAuthModule: {
+      forRoot: jest.fn().mockReturnValue({
+        module: class MockFeatureBackendAuthModule {},
+        imports: [],
+        providers: [],
+        controllers: [],
+        exports: [],
+      }),
+    },
+    JwtAuthGuard: MockJwtAuthGuard,
+  };
+});
 
 jest.mock('@open-kingdom/shared-backend-feature-email', () => {
   class MockEmailService {
@@ -61,7 +69,26 @@ jest.mock('@open-kingdom/shared-backend-feature-user-management', () => {
   };
 });
 
-describe('AppModule', () => {
+jest.mock('@open-kingdom/shared-backend-util-rbac', () => {
+  class MockPermissionGuard {
+    canActivate() {
+      return true;
+    }
+    onModuleInit() {
+      return;
+    }
+  }
+  return {
+    PermissionGuard: MockPermissionGuard,
+    ROLE_RESOLVER: 'ROLE_RESOLVER',
+    Public: () => () => undefined,
+    IS_PUBLIC_KEY: 'isPublic',
+    RequirePermission: () => () => undefined,
+    REQUIRED_PERMISSION_KEY: 'requiredPermission',
+  };
+});
+
+describe('assembling the application', () => {
   let module: TestingModule;
 
   beforeEach(async () => {
@@ -77,32 +104,25 @@ describe('AppModule', () => {
     await module.close();
   });
 
-  it('should be defined', () => {
-    expect(AppModule).toBeDefined();
-  });
-
-  it('should compile successfully', () => {
+  it('starts up without errors', () => {
     expect(module).toBeDefined();
   });
 
-  it('should have correct module metadata', () => {
-    // Test that the module has the expected structure
-    const moduleMetadata = Reflect.getMetadata('imports', AppModule);
-    const controllerMetadata = Reflect.getMetadata('controllers', AppModule);
-    const providerMetadata = Reflect.getMetadata('providers', AppModule);
+  it('wires up imports, controllers, and providers', () => {
+    const imports = Reflect.getMetadata('imports', AppModule);
+    const controllers = Reflect.getMetadata('controllers', AppModule);
+    const providers = Reflect.getMetadata('providers', AppModule);
 
-    expect(moduleMetadata).toBeDefined();
-    expect(controllerMetadata).toBeDefined();
-    expect(providerMetadata).toBeDefined();
+    expect(imports).toBeDefined();
+    expect(controllers).toBeDefined();
+    expect(providers).toBeDefined();
   });
 
-  it('should configure auth module with forRoot', () => {
-    // Get the mocked module from the jest mock
+  it('configures authentication with the environment settings', () => {
     const {
       OpenKingdomFeatureBackendAuthModule,
     } = require('@open-kingdom/shared-backend-feature-authentication');
 
-    // Verify that forRoot was called
     expect(OpenKingdomFeatureBackendAuthModule.forRoot).toHaveBeenCalledWith({
       jwtSecret: configService.get('JWT_SECRET', 'your-secret-key-here'),
       jwtExpiresIn: configService.get('JWT_EXPIRES_IN', '1h'),

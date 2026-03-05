@@ -7,7 +7,6 @@ import {
   Param,
   Body,
   ParseIntPipe,
-  UseGuards,
   Request,
 } from '@nestjs/common';
 import {
@@ -19,11 +18,7 @@ import {
   ApiForbiddenResponse,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
-import { AuthGuard } from '@nestjs/passport';
-import {
-  PermissionGuard,
-  RequirePermission,
-} from '@open-kingdom/shared-backend-util-rbac';
+import { RequirePermission } from '@open-kingdom/shared-backend-util-rbac';
 
 import { UserRolesService } from '../services';
 import { AssignUserRoleDto, UpdateUserRolesDto } from '../dto';
@@ -32,7 +27,6 @@ import type { AuthenticatedRequest } from '../types';
 @ApiTags('User Roles')
 @Controller('users')
 @ApiBearerAuth('JWT-auth')
-@UseGuards(AuthGuard('jwt'), PermissionGuard)
 @ApiUnauthorizedResponse({
   description: 'Unauthorized - Invalid or missing JWT token',
 })

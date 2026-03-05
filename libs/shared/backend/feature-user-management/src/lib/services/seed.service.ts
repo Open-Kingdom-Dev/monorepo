@@ -1,6 +1,8 @@
 import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
+import { DiscoveryService, Reflector } from '@nestjs/core';
 
 import { UsersService } from '@open-kingdom/shared-backend-data-access-users';
+import { REQUIRED_PERMISSION_KEY } from '@open-kingdom/shared-backend-util-rbac';
 import { RolesService } from './roles.service';
 import { PermissionsService } from './permissions.service';
 import { UserRolesService } from './user-roles.service';
@@ -19,7 +21,9 @@ export class SeedService implements OnModuleInit {
     private readonly usersService: UsersService,
     private readonly rolesService: RolesService,
     private readonly permissionsService: PermissionsService,
-    private readonly userRolesService: UserRolesService
+    private readonly userRolesService: UserRolesService,
+    private readonly discoveryService: DiscoveryService,
+    private readonly reflector: Reflector
   ) {}
 
   async onModuleInit() {
@@ -27,6 +31,7 @@ export class SeedService implements OnModuleInit {
     await this.seedPermissions();
     await this.seedRolePermissions();
     await this.seedAdminUser();
+    await this.discoverPermissions();
   }
 
   private async seedRoles(): Promise<void> {
@@ -120,5 +125,49 @@ export class SeedService implements OnModuleInit {
     }
 
     await this.userRolesService.assignRole(admin.id, adminRole.id);
+  }
+
+  private async discoverPermissions(): Promise<void> {
+    const declared = this.collectDeclaredPermissions();
+
+    for (const key of declared) {
+      const [resource, action] = key.split(':');
+      const existing = await this.permissionsService.findByResourceAction(
+        resource,
+        action
+      );
+
+      if (existing) continue;
+
+      await this.permissionsService.create(resource, action, 'Auto-discovered');
+      this.logger.log(`Auto-discovered permission: ${key}`);
+    }
+  }
+
+  private collectDeclaredPermissions(): Set<string> {
+    const permissions = new Set<string>();
+
+    for (const { instance } of this.discoveryService.getControllers()) {
+      if (!instance) continue;
+
+      const prototype = Object.getPrototypeOf(instance);
+
+      for (const name of Object.getOwnPropertyNames(prototype)) {
+        if (name === 'constructor' || typeof prototype[name] !== 'function') {
+          continue;
+        }
+
+        const permission = this.reflector.get<string>(
+          REQUIRED_PERMISSION_KEY,
+          prototype[name]
+        );
+
+        if (permission) {
+          permissions.add(permission);
+        }
+      }
+    }
+
+    return permissions;
   }
 }

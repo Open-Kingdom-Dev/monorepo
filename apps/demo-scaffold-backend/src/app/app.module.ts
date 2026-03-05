@@ -1,19 +1,26 @@
 /* eslint-disable @nx/enforce-module-boundaries -- static imports for app module */
 import { Module } from '@nestjs/common';
+import { APP_GUARD } from '@nestjs/core';
 import {
   createConfigService,
   nodeEnvAdapter,
 } from '@open-kingdom/shared-poly-util-env-config';
 
 import { OpenKingdomFeatureRootSchemaModule } from '@open-kingdom/demo-scaffold-backend-feature-root-schema';
-import { OpenKingdomFeatureBackendAuthModule } from '@open-kingdom/shared-backend-feature-authentication';
+import {
+  OpenKingdomFeatureBackendAuthModule,
+  JwtAuthGuard,
+} from '@open-kingdom/shared-backend-feature-authentication';
 import { EmailModule } from '@open-kingdom/shared-backend-feature-email';
 import {
   FeatureUserManagementModule,
   UserRolesService,
 } from '@open-kingdom/shared-backend-feature-user-management';
 import { FeatureGcpResourcesModule } from '@open-kingdom/shared-backend-feature-gcp-resources';
-import { ROLE_RESOLVER } from '@open-kingdom/shared-backend-util-rbac';
+import {
+  PermissionGuard,
+  ROLE_RESOLVER,
+} from '@open-kingdom/shared-backend-util-rbac';
 
 // Define the environment keys that this app uses
 const envKeys = [
@@ -55,6 +62,10 @@ const configService = createConfigService(envKeys, nodeEnvAdapter);
     FeatureGcpResourcesModule,
   ],
   controllers: [],
-  providers: [{ provide: ROLE_RESOLVER, useExisting: UserRolesService }],
+  providers: [
+    { provide: APP_GUARD, useClass: JwtAuthGuard },
+    { provide: APP_GUARD, useClass: PermissionGuard },
+    { provide: ROLE_RESOLVER, useExisting: UserRolesService },
+  ],
 })
 export class AppModule {}
