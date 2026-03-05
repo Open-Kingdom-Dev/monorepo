@@ -15,9 +15,9 @@ const schema = {
   users,
   roles,
   permissions,
-  rolePermissions,
+  role_permissions: rolePermissions,
   invitations,
-  userRoles,
+  user_roles: userRoles,
 };
 
 @Module({
