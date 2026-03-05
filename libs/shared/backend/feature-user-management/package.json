@@ -35,6 +35,7 @@
     "@nestjs/swagger": "^11.2.3",
     "@open-kingdom/shared-backend-data-access-users": "0.0.2-16",
     "@open-kingdom/shared-backend-feature-email": "0.0.2-16",
+    "@open-kingdom/shared-backend-util-rbac": "0.0.2-14",
     "@open-kingdom/shared-poly-util-constants": "0.0.2-16",
     "drizzle-orm": "^0.44.5",
     "express": "5.2.1"
