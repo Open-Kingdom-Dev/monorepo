@@ -8,24 +8,31 @@ import {
   UsersService,
   User,
 } from '@open-kingdom/shared-backend-data-access-users';
+import { UserRolesService } from './user-roles.service';
 
 export type UserWithoutPassword = Omit<User, 'password'>;
+export type UserWithRole = UserWithoutPassword & { role: string | null };
 
 @Injectable()
 export class UserManagementService {
-  constructor(private readonly usersService: UsersService) {}
+  constructor(
+    private readonly usersService: UsersService,
+    private readonly userRolesService: UserRolesService
+  ) {}
 
-  async findAll(): Promise<UserWithoutPassword[]> {
+  async findAll(): Promise<UserWithRole[]> {
     const users = await this.usersService.findAll();
-    return users.map((user) => this.excludePassword(user));
+    return Promise.all(users.map((user) => this.enrichWithRole(user)));
   }
 
-  async findById(id: number): Promise<UserWithoutPassword> {
+  async findById(id: number): Promise<UserWithRole> {
     const user = await this.usersService.findById(id);
+
     if (!user) {
       throw new NotFoundException('User not found');
     }
-    return this.excludePassword(user);
+
+    return this.enrichWithRole(user);
   }
 
   async delete(id: number, requesterId: number): Promise<void> {
@@ -41,8 +48,10 @@ export class UserManagementService {
     await this.usersService.delete(id);
   }
 
-  private excludePassword(user: User): UserWithoutPassword {
+  private async enrichWithRole(user: User): Promise<UserWithRole> {
     const { password: _password, ...userWithoutPassword } = user;
-    return userWithoutPassword;
+    const role = await this.userRolesService.findPrimaryRole(user.id);
+
+    return { ...userWithoutPassword, role };
   }
 }

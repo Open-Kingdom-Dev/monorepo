@@ -5,7 +5,7 @@ import {
   BadRequestException,
 } from '@nestjs/common';
 import { BetterSQLite3Database } from 'drizzle-orm/better-sqlite3';
-import { eq, and } from 'drizzle-orm';
+import { eq, and, getTableColumns } from 'drizzle-orm';
 
 import { DB_TAG } from '@open-kingdom/shared-poly-util-constants';
 import {
@@ -61,12 +61,7 @@ export class PermissionsService {
 
   async findByRole(roleId: number): Promise<Permission[]> {
     return this.db
-      .select({
-        id: permissions.id,
-        resource: permissions.resource,
-        action: permissions.action,
-        description: permissions.description,
-      })
+      .select(getTableColumns(permissions))
       .from(rolePermissions)
       .innerJoin(permissions, eq(rolePermissions.permissionId, permissions.id))
       .where(eq(rolePermissions.roleId, roleId));
