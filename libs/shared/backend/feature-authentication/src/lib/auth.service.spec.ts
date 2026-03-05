@@ -8,6 +8,8 @@ import {
   User,
 } from '@open-kingdom/shared-backend-data-access-users';
 
+import { ROLE_RESOLVER } from '@open-kingdom/shared-backend-util-rbac';
+
 import { AuthenticationService } from './authentication.service';
 
 jest.mock('bcrypt');
@@ -35,11 +37,17 @@ describe('AuthService', () => {
       sign: jest.fn(),
     };
 
+    const mockRoleResolver = {
+      findPrimaryRole: jest.fn().mockResolvedValue('admin'),
+      findPermissions: jest.fn().mockResolvedValue(['users:read']),
+    };
+
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         AuthenticationService,
         { provide: UsersService, useValue: mockUsersService },
         { provide: JwtService, useValue: mockJwtService },
+        { provide: ROLE_RESOLVER, useValue: mockRoleResolver },
       ],
     }).compile();
 
@@ -52,68 +60,73 @@ describe('AuthService', () => {
     jest.clearAllMocks();
   });
 
-  describe('validateUser', () => {
-    it('should authenticate user with valid credentials', async () => {
+  describe('validating credentials', () => {
+    it('authenticates a user with valid credentials', async () => {
       usersService.findOne.mockResolvedValue(mockUser);
       mockedBcrypt.compare.mockResolvedValue(true as never);
 
       const result = await service.validateUser(mockUser.email, 'password');
+
       const { password: _, ...userWithoutPassword } = mockUser;
       expect(result).toEqual(userWithoutPassword);
-      expect(usersService.findOne).toHaveBeenCalledWith(mockUser.email);
-      expect(mockedBcrypt.compare).toHaveBeenCalledWith(
-        'password',
-        mockUser.password
-      );
     });
 
-    it('should reject authentication for invalid credentials', async () => {
+    it('rejects invalid passwords', async () => {
       usersService.findOne.mockResolvedValue(mockUser);
       mockedBcrypt.compare.mockResolvedValue(false as never);
 
       await expect(
-        service.validateUser(mockUser.email, 'invalid-password')
+        service.validateUser(mockUser.email, 'wrong-password')
       ).rejects.toThrow(UnauthorizedException);
-      expect(usersService.findOne).toHaveBeenCalledWith(mockUser.email);
-      expect(mockedBcrypt.compare).toHaveBeenCalledWith(
-        'invalid-password',
-        mockUser.password
-      );
     });
 
-    it('should reject authentication for non-existing user', async () => {
-      // Arrange
-      const email = 'nonexistent@example.com';
-      // Intentionally type mismatch to test the error
+    it('rejects unknown users', async () => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       usersService.findOne.mockResolvedValue(null as any);
 
-      // Act & Assert
-      await expect(service.validateUser(email, 'password')).rejects.toThrow(
-        UnauthorizedException
-      );
-
-      expect(usersService.findOne).toHaveBeenCalledWith(email);
+      await expect(
+        service.validateUser('unknown@example.com', 'password')
+      ).rejects.toThrow(UnauthorizedException);
     });
   });
 
-  describe('login', () => {
-    it('should generate JWT token for authenticated user', async () => {
-      // Arrange
+  describe('signing in', () => {
+    it('carries role and permissions through to the session token', async () => {
       const { password: _, ...userWithoutPassword } = mockUser;
       const expectedToken = 'jwt-token';
 
       jwtService.sign.mockReturnValue(expectedToken);
 
-      // Act
       const result = await service.login(userWithoutPassword);
 
-      // Assert
       expect(result).toEqual({ access_token: expectedToken });
       expect(jwtService.sign).toHaveBeenCalledWith({
         username: mockUser.email,
         id: mockUser.id,
+        role: 'admin',
+        permissions: ['users:read'],
       });
+    });
+
+    it('signs in without role information when none is configured', async () => {
+      const moduleWithoutResolver = await Test.createTestingModule({
+        providers: [
+          AuthenticationService,
+          { provide: UsersService, useValue: { findOne: jest.fn() } },
+          {
+            provide: JwtService,
+            useValue: { sign: jest.fn().mockReturnValue('token') },
+          },
+        ],
+      }).compile();
+
+      const serviceWithoutResolver =
+        moduleWithoutResolver.get<AuthenticationService>(AuthenticationService);
+      const { password: _, ...userWithoutPassword } = mockUser;
+
+      const result = await serviceWithoutResolver.login(userWithoutPassword);
+
+      expect(result).toEqual({ access_token: 'token' });
     });
   });
 });

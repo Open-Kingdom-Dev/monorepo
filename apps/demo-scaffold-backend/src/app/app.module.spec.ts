@@ -43,17 +43,23 @@ jest.mock('@open-kingdom/shared-backend-feature-email', () => {
   };
 });
 
-jest.mock('@open-kingdom/shared-backend-feature-user-management', () => ({
-  FeatureUserManagementModule: {
-    forRoot: jest.fn().mockReturnValue({
-      module: class MockFeatureUserManagementModule {},
-      imports: [],
-      providers: [],
-      controllers: [],
-      exports: [],
-    }),
-  },
-}));
+jest.mock('@open-kingdom/shared-backend-feature-user-management', () => {
+  class MockUserRolesService {}
+  return {
+    FeatureUserManagementModule: {
+      forRoot: jest.fn().mockReturnValue({
+        module: class MockFeatureUserManagementModule {},
+        imports: [],
+        providers: [
+          { provide: MockUserRolesService, useClass: MockUserRolesService },
+        ],
+        controllers: [],
+        exports: [MockUserRolesService],
+      }),
+    },
+    UserRolesService: MockUserRolesService,
+  };
+});
 
 describe('AppModule', () => {
   let module: TestingModule;

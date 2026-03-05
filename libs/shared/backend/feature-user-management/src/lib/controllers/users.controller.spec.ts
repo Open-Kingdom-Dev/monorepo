@@ -10,8 +10,20 @@ describe('UsersController', () => {
   let mockUserManagementService: jest.Mocked<UserManagementService>;
 
   const mockUsers = [
-    { id: 1, email: 'user1@example.com', firstName: 'John', lastName: 'Doe' },
-    { id: 2, email: 'user2@example.com', firstName: 'Jane', lastName: 'Doe' },
+    {
+      id: 1,
+      email: 'user1@example.com',
+      firstName: 'John',
+      lastName: 'Doe',
+      role: 'user',
+    },
+    {
+      id: 2,
+      email: 'user2@example.com',
+      firstName: 'Jane',
+      lastName: 'Doe',
+      role: 'admin',
+    },
   ];
 
   beforeEach(async () => {
