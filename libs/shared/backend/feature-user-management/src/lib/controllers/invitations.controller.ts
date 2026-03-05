@@ -6,7 +6,6 @@ import {
   Body,
   Param,
   ParseIntPipe,
-  UseGuards,
   Request,
 } from '@nestjs/common';
 import {
@@ -19,7 +18,10 @@ import {
   ApiUnauthorizedResponse,
   ApiNotFoundResponse,
 } from '@nestjs/swagger';
-import { AuthGuard } from '@nestjs/passport';
+import {
+  Public,
+  RequirePermission,
+} from '@open-kingdom/shared-backend-util-rbac';
 
 import { InvitationsService } from '../services';
 import { InviteUserDto, AcceptInvitationDto } from '../dto';
@@ -31,8 +33,8 @@ export class InvitationsController {
   constructor(private readonly invitationsService: InvitationsService) {}
 
   @Get()
+  @RequirePermission('invitations', 'read')
   @ApiBearerAuth('JWT-auth')
-  @UseGuards(AuthGuard('jwt'))
   @ApiOperation({
     summary: 'List pending and expired invitations',
     description:
@@ -50,8 +52,8 @@ export class InvitationsController {
   }
 
   @Post('invite')
+  @RequirePermission('invitations', 'create')
   @ApiBearerAuth('JWT-auth')
-  @UseGuards(AuthGuard('jwt'))
   @ApiOperation({
     summary: 'Invite a new user',
     description: 'Send an invitation to a new user. Requires authentication.',
@@ -82,6 +84,7 @@ export class InvitationsController {
     );
   }
 
+  @Public()
   @Get('validate/:token')
   @ApiOperation({
     summary: 'Validate an invitation token',
@@ -103,6 +106,7 @@ export class InvitationsController {
     return this.invitationsService.validate(token);
   }
 
+  @Public()
   @Post('accept')
   @ApiOperation({
     summary: 'Accept an invitation',
@@ -129,8 +133,8 @@ export class InvitationsController {
   }
 
   @Delete(':id')
+  @RequirePermission('invitations', 'delete')
   @ApiBearerAuth('JWT-auth')
-  @UseGuards(AuthGuard('jwt'))
   @ApiOperation({
     summary: 'Cancel an invitation',
     description:

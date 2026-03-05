@@ -1,4 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
+import { DiscoveryService, Reflector } from '@nestjs/core';
 
 import { UsersService } from '@open-kingdom/shared-backend-data-access-users';
 import { SeedService } from './seed.service';
@@ -11,23 +12,18 @@ import {
   SYSTEM_ROLES,
 } from '../constants/rbac-defaults';
 
-describe('SeedService', () => {
+describe('preparing the system on first launch', () => {
   let service: SeedService;
-  let mockUsersService: {
-    ensureUser: jest.Mock;
-  };
-  let mockRolesService: {
-    findByName: jest.Mock;
-    create: jest.Mock;
-  };
+  let mockUsersService: { ensureUser: jest.Mock };
+  let mockRolesService: { findByName: jest.Mock; create: jest.Mock };
   let mockPermissionsService: {
     findByResourceAction: jest.Mock;
     create: jest.Mock;
     setRolePermissions: jest.Mock;
   };
-  let mockUserRolesService: {
-    assignRole: jest.Mock;
-  };
+  let mockUserRolesService: { assignRole: jest.Mock };
+  let mockDiscoveryService: { getControllers: jest.Mock };
+  let mockReflector: { get: jest.Mock };
 
   beforeEach(async () => {
     mockUsersService = {
@@ -60,6 +56,14 @@ describe('SeedService', () => {
       assignRole: jest.fn().mockResolvedValue(undefined),
     };
 
+    mockDiscoveryService = {
+      getControllers: jest.fn().mockReturnValue([]),
+    };
+
+    mockReflector = {
+      get: jest.fn().mockReturnValue(undefined),
+    };
+
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         SeedService,
@@ -67,14 +71,16 @@ describe('SeedService', () => {
         { provide: RolesService, useValue: mockRolesService },
         { provide: PermissionsService, useValue: mockPermissionsService },
         { provide: UserRolesService, useValue: mockUserRolesService },
+        { provide: DiscoveryService, useValue: mockDiscoveryService },
+        { provide: Reflector, useValue: mockReflector },
       ],
     }).compile();
 
     service = module.get<SeedService>(SeedService);
   });
 
-  describe('seeding on startup', () => {
-    it('seeds all default roles when none exist', async () => {
+  describe('setting up roles', () => {
+    it('creates all built-in roles on a fresh system', async () => {
       mockRolesService.findByName.mockResolvedValue(undefined);
 
       await service.onModuleInit();
@@ -84,7 +90,7 @@ describe('SeedService', () => {
       );
     });
 
-    it('skips roles that already exist', async () => {
+    it('leaves existing roles untouched', async () => {
       mockRolesService.findByName.mockResolvedValue({
         id: 1,
         name: 'existing',
@@ -94,8 +100,10 @@ describe('SeedService', () => {
 
       expect(mockRolesService.create).not.toHaveBeenCalled();
     });
+  });
 
-    it('seeds all default permissions when none exist', async () => {
+  describe('setting up permissions', () => {
+    it('creates all built-in permissions on a fresh system', async () => {
       mockPermissionsService.findByResourceAction.mockResolvedValue(undefined);
 
       await service.onModuleInit();
@@ -105,7 +113,7 @@ describe('SeedService', () => {
       );
     });
 
-    it('skips permissions that already exist', async () => {
+    it('leaves existing permissions untouched', async () => {
       mockPermissionsService.findByResourceAction.mockResolvedValue({
         id: 1,
         resource: 'existing',
@@ -116,8 +124,10 @@ describe('SeedService', () => {
 
       expect(mockPermissionsService.create).not.toHaveBeenCalled();
     });
+  });
 
-    it('maps permissions to roles', async () => {
+  describe('connecting permissions to roles', () => {
+    it('grants each role the permissions it should have', async () => {
       const adminRole = { id: 1, name: SYSTEM_ROLES.ADMIN };
       const userRole = { id: 2, name: SYSTEM_ROLES.USER };
 
@@ -136,8 +146,10 @@ describe('SeedService', () => {
 
       expect(mockPermissionsService.setRolePermissions).toHaveBeenCalled();
     });
+  });
 
-    it('seeds the admin user and assigns the admin role', async () => {
+  describe('setting up the admin account', () => {
+    it('creates the admin user and gives them the admin role', async () => {
       const admin = { id: 1, email: 'admin@admin.com' };
       const adminRole = { id: 3, name: SYSTEM_ROLES.ADMIN };
 
@@ -158,13 +170,65 @@ describe('SeedService', () => {
       );
     });
 
-    it('skips role assignment when the admin role does not exist', async () => {
+    it('skips role assignment when the admin role does not exist yet', async () => {
       mockUsersService.ensureUser.mockResolvedValue({ id: 1 });
       mockRolesService.findByName.mockResolvedValue(undefined);
 
       await service.onModuleInit();
 
       expect(mockUserRolesService.assignRole).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('picking up new permissions from the codebase', () => {
+    it('registers a permission that exists in code but not in the database', async () => {
+      class WidgetsController {
+        list() {
+          return;
+        }
+      }
+      const instance = new WidgetsController();
+
+      mockDiscoveryService.getControllers.mockReturnValue([{ instance }]);
+      mockReflector.get.mockImplementation((_key: string, method: unknown) =>
+        method === instance.list ? 'widgets:read' : undefined
+      );
+      mockPermissionsService.findByResourceAction.mockResolvedValue(undefined);
+
+      await service.onModuleInit();
+
+      expect(mockPermissionsService.create).toHaveBeenCalledWith(
+        'widgets',
+        'read',
+        'Auto-discovered'
+      );
+    });
+
+    it('does not duplicate a permission that already exists', async () => {
+      class WidgetsController {
+        list() {
+          return;
+        }
+      }
+      const instance = new WidgetsController();
+
+      mockDiscoveryService.getControllers.mockReturnValue([{ instance }]);
+      mockReflector.get.mockImplementation((_key: string, method: unknown) =>
+        method === instance.list ? 'users:read' : undefined
+      );
+      mockPermissionsService.findByResourceAction.mockResolvedValue({
+        id: 1,
+        resource: 'users',
+        action: 'read',
+      });
+
+      await service.onModuleInit();
+
+      expect(mockPermissionsService.create).not.toHaveBeenCalledWith(
+        'users',
+        'read',
+        'Auto-discovered'
+      );
     });
   });
 });

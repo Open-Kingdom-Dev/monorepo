@@ -5,7 +5,7 @@ import { User } from '@open-kingdom/shared-backend-data-access-users';
 
 import { AuthController } from './auth.controller';
 import { AuthenticationService } from './authentication.service';
-import { IS_PUBLIC_KEY } from './public.decorator';
+import { IS_PUBLIC_KEY } from '@open-kingdom/shared-backend-util-rbac';
 import type { RequestWithUser } from './auth.types';
 
 describe('AuthController', () => {

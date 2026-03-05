@@ -46,16 +46,34 @@ export const DEFAULT_PERMISSIONS = [
     action: 'delete',
     description: 'Cancel invitations',
   },
+  {
+    resource: 'permissions',
+    action: 'read',
+    description: 'View permissions',
+  },
+  {
+    resource: 'permissions',
+    action: 'create',
+    description: 'Create permissions',
+  },
+  {
+    resource: 'permissions',
+    action: 'delete',
+    description: 'Delete permissions',
+  },
+  { resource: 'profile', action: 'read', description: 'View own profile' },
 ] as const;
 
 export const DEFAULT_ROLE_PERMISSIONS: Record<
   string,
   ReadonlyArray<{ resource: string; action: string }>
 > = {
+  [SYSTEM_ROLES.GUEST]: [{ resource: 'profile', action: 'read' }],
   [SYSTEM_ROLES.USER]: [
     { resource: 'users', action: 'read' },
     { resource: 'roles', action: 'read' },
     { resource: 'invitations', action: 'read' },
+    { resource: 'profile', action: 'read' },
   ],
   [SYSTEM_ROLES.ADMIN]: [
     { resource: 'users', action: 'read' },
@@ -66,8 +84,12 @@ export const DEFAULT_ROLE_PERMISSIONS: Record<
     { resource: 'roles', action: 'create' },
     { resource: 'roles', action: 'update' },
     { resource: 'roles', action: 'delete' },
+    { resource: 'permissions', action: 'read' },
+    { resource: 'permissions', action: 'create' },
+    { resource: 'permissions', action: 'delete' },
     { resource: 'invitations', action: 'read' },
     { resource: 'invitations', action: 'create' },
     { resource: 'invitations', action: 'delete' },
+    { resource: 'profile', action: 'read' },
   ],
 };

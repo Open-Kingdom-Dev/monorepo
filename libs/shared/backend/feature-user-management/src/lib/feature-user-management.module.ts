@@ -1,4 +1,5 @@
 import { Module, DynamicModule } from '@nestjs/common';
+import { DiscoveryModule } from '@nestjs/core';
 
 import { OpenKingdomDataAccessBackendUsersModule } from '@open-kingdom/shared-backend-data-access-users';
 import { EmailService } from '@open-kingdom/shared-backend-feature-email';
@@ -38,7 +39,7 @@ export class FeatureUserManagementModule {
   static forRoot(options: UserManagementModuleOptions): DynamicModule {
     return {
       module: FeatureUserManagementModule,
-      imports: [OpenKingdomDataAccessBackendUsersModule],
+      imports: [OpenKingdomDataAccessBackendUsersModule, DiscoveryModule],
       controllers: [
         InvitationsController,
         UsersController,

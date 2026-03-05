@@ -31,7 +31,7 @@
   "dependencies": {
     "tslib": "^2.3.0",
     "@nestjs/common": "^11.0.0",
-    "@nestjs/passport": "^11.0.5",
+    "@nestjs/core": "^11.0.0",
     "@nestjs/swagger": "^11.2.3",
     "@open-kingdom/shared-backend-data-access-users": "0.0.2-16",
     "@open-kingdom/shared-backend-feature-email": "0.0.2-16",

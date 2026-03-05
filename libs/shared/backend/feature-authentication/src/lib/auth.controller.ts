@@ -8,9 +8,12 @@ import {
   ApiBearerAuth,
 } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
+import {
+  Public,
+  RequirePermission,
+} from '@open-kingdom/shared-backend-util-rbac';
 
 import { AuthenticationService } from './authentication.service';
-import { Public } from './public.decorator';
 import { LoginDto, LoginResponseDto, ProfileResponseDto } from './auth.dto';
 import type { RequestWithUser } from './auth.types';
 
@@ -62,7 +65,7 @@ export class AuthController {
   }
 
   @ApiBearerAuth('JWT-auth')
-  @UseGuards(AuthGuard('jwt'))
+  @RequirePermission('profile', 'read')
   @Get('profile')
   @ApiOperation({
     summary: 'Get user profile',

@@ -8,7 +8,6 @@ import {
   Param,
   Body,
   ParseIntPipe,
-  UseGuards,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -21,11 +20,7 @@ import {
   ApiForbiddenResponse,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
-import { AuthGuard } from '@nestjs/passport';
-import {
-  PermissionGuard,
-  RequirePermission,
-} from '@open-kingdom/shared-backend-util-rbac';
+import { RequirePermission } from '@open-kingdom/shared-backend-util-rbac';
 
 import { RolesService, PermissionsService } from '../services';
 import { CreateRoleDto, UpdateRoleDto, SetRolePermissionsDto } from '../dto';
@@ -33,7 +28,6 @@ import { CreateRoleDto, UpdateRoleDto, SetRolePermissionsDto } from '../dto';
 @ApiTags('Roles')
 @Controller('roles')
 @ApiBearerAuth('JWT-auth')
-@UseGuards(AuthGuard('jwt'), PermissionGuard)
 @ApiUnauthorizedResponse({
   description: 'Unauthorized - Invalid or missing JWT token',
 })
