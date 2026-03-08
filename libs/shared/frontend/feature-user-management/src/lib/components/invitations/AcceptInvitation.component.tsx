@@ -58,7 +58,6 @@ export function AcceptInvitation({ token, loginPath }: AcceptInvitationProps) {
   });
 
   const email = validation?.email ?? '';
-  const role = validation?.role ?? 'user';
 
   const onSubmit = async (data: AcceptFormValues) => {
     try {
@@ -128,8 +127,8 @@ export function AcceptInvitation({ token, loginPath }: AcceptInvitationProps) {
         Accept Invitation
       </h2>
       <p className={`mt-1 text-sm ${bodyTextStyles}`}>
-        You've been invited as <strong data-testid="accept-role">{role}</strong>{' '}
-        with email <strong data-testid="accept-email">{email}</strong>
+        You've been invited with email{' '}
+        <strong data-testid="accept-email">{email}</strong>
       </p>
 
       <form onSubmit={handleSubmit(onSubmit)} className="mt-4 space-y-4">

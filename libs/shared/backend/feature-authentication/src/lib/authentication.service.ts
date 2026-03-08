@@ -1,9 +1,4 @@
-import {
-  Injectable,
-  UnauthorizedException,
-  Inject,
-  Optional,
-} from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 
@@ -11,19 +6,12 @@ import {
   UsersService,
   User,
 } from '@open-kingdom/shared-backend-data-access-users';
-import {
-  ROLE_RESOLVER,
-  type RoleResolver,
-} from '@open-kingdom/shared-backend-util-rbac';
 
 @Injectable()
 export class AuthenticationService {
   constructor(
     private usersService: UsersService,
-    private jwtService: JwtService,
-    @Optional()
-    @Inject(ROLE_RESOLVER)
-    private roleResolver?: RoleResolver
+    private jwtService: JwtService
   ) {}
 
   async validateUser(
@@ -44,10 +32,7 @@ export class AuthenticationService {
   }
 
   async login(user: Omit<User, 'password'>): Promise<{ access_token: string }> {
-    const role = (await this.roleResolver?.findPrimaryRole(user.id)) ?? null;
-    const permissions =
-      (await this.roleResolver?.findPermissions(user.id)) ?? [];
-    const payload = { username: user.email, id: user.id, role, permissions };
+    const payload = { username: user.email, id: user.id };
 
     return {
       access_token: this.jwtService.sign(payload),

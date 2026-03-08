@@ -1,4 +1,8 @@
-import { Injectable, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  BadRequestException,
+  OnModuleDestroy,
+} from '@nestjs/common';
 import { ProjectsClient } from '@google-cloud/resource-manager';
 
 export interface GcpProjectSummary {
@@ -15,8 +19,19 @@ export interface CreateProjectRequest {
 }
 
 @Injectable()
-export class GcpProjectsService {
-  private readonly projectsClient = new ProjectsClient();
+export class GcpProjectsService implements OnModuleDestroy {
+  private _projectsClient?: ProjectsClient;
+
+  private get projectsClient(): ProjectsClient {
+    if (!this._projectsClient) {
+      this._projectsClient = new ProjectsClient();
+    }
+    return this._projectsClient;
+  }
+
+  async onModuleDestroy() {
+    await this._projectsClient?.close();
+  }
 
   /**
    * List all projects under a GCP organization or folder.

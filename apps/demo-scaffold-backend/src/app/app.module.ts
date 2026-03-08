@@ -63,9 +63,9 @@ const configService = createConfigService(envKeys, nodeEnvAdapter);
   ],
   controllers: [],
   providers: [
+    { provide: ROLE_RESOLVER, useExisting: UserRolesService },
     { provide: APP_GUARD, useClass: JwtAuthGuard },
     { provide: APP_GUARD, useClass: PermissionGuard },
-    { provide: ROLE_RESOLVER, useExisting: UserRolesService },
   ],
 })
 export class AppModule {}

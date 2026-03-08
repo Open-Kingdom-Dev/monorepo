@@ -51,7 +51,7 @@ describe('AcceptInvitation', () => {
 
   it('shows the registration form for a valid invitation', () => {
     mockValidateQuery.mockReturnValue({
-      data: { valid: true, email: 'test@example.com', role: 'user' },
+      data: { valid: true, email: 'test@example.com', roleId: 2 },
       isLoading: false,
       error: null,
     });
@@ -63,20 +63,19 @@ describe('AcceptInvitation', () => {
     expect(screen.getByLabelText(/confirm password/i)).toBeInTheDocument();
   });
 
-  it('shows the invited email and assigned role', () => {
+  it('shows the invited email', () => {
     mockValidateQuery.mockReturnValue({
-      data: { valid: true, email: 'test@example.com', role: 'admin' },
+      data: { valid: true, email: 'test@example.com', roleId: 1 },
       isLoading: false,
       error: null,
     });
     render(<AcceptInvitation token="test-token" />);
-    expect(screen.getByText('admin')).toBeInTheDocument();
     expect(screen.getByText('test@example.com')).toBeInTheDocument();
   });
 
   it('requires a password of at least 8 characters', async () => {
     mockValidateQuery.mockReturnValue({
-      data: { valid: true, email: 'test@example.com', role: 'user' },
+      data: { valid: true, email: 'test@example.com', roleId: 2 },
       isLoading: false,
       error: null,
     });
@@ -97,7 +96,7 @@ describe('AcceptInvitation', () => {
 
   it('requires password and confirmation to match', async () => {
     mockValidateQuery.mockReturnValue({
-      data: { valid: true, email: 'test@example.com', role: 'user' },
+      data: { valid: true, email: 'test@example.com', roleId: 2 },
       isLoading: false,
       error: null,
     });
@@ -116,7 +115,7 @@ describe('AcceptInvitation', () => {
 
   it('submits the account details when the form is filled correctly', async () => {
     mockValidateQuery.mockReturnValue({
-      data: { valid: true, email: 'test@example.com', role: 'user' },
+      data: { valid: true, email: 'test@example.com', roleId: 2 },
       isLoading: false,
       error: null,
     });
@@ -142,7 +141,7 @@ describe('AcceptInvitation', () => {
 
   it('confirms account creation and links to login', () => {
     mockValidateQuery.mockReturnValue({
-      data: { valid: true, email: 'test@example.com', role: 'user' },
+      data: { valid: true, email: 'test@example.com', roleId: 2 },
       isLoading: false,
       error: null,
     });

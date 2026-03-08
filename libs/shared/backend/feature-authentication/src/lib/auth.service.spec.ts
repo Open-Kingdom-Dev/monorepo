@@ -8,8 +8,6 @@ import {
   User,
 } from '@open-kingdom/shared-backend-data-access-users';
 
-import { ROLE_RESOLVER } from '@open-kingdom/shared-backend-util-rbac';
-
 import { AuthenticationService } from './authentication.service';
 
 jest.mock('bcrypt');
@@ -37,17 +35,11 @@ describe('AuthService', () => {
       sign: jest.fn(),
     };
 
-    const mockRoleResolver = {
-      findPrimaryRole: jest.fn().mockResolvedValue('admin'),
-      findPermissions: jest.fn().mockResolvedValue(['users:read']),
-    };
-
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         AuthenticationService,
         { provide: UsersService, useValue: mockUsersService },
         { provide: JwtService, useValue: mockJwtService },
-        { provide: ROLE_RESOLVER, useValue: mockRoleResolver },
       ],
     }).compile();
 
@@ -91,7 +83,7 @@ describe('AuthService', () => {
   });
 
   describe('signing in', () => {
-    it('carries role and permissions through to the session token', async () => {
+    it('creates a session token with the user identity', async () => {
       const { password: _, ...userWithoutPassword } = mockUser;
       const expectedToken = 'jwt-token';
 
@@ -103,30 +95,7 @@ describe('AuthService', () => {
       expect(jwtService.sign).toHaveBeenCalledWith({
         username: mockUser.email,
         id: mockUser.id,
-        role: 'admin',
-        permissions: ['users:read'],
       });
-    });
-
-    it('signs in without role information when none is configured', async () => {
-      const moduleWithoutResolver = await Test.createTestingModule({
-        providers: [
-          AuthenticationService,
-          { provide: UsersService, useValue: { findOne: jest.fn() } },
-          {
-            provide: JwtService,
-            useValue: { sign: jest.fn().mockReturnValue('token') },
-          },
-        ],
-      }).compile();
-
-      const serviceWithoutResolver =
-        moduleWithoutResolver.get<AuthenticationService>(AuthenticationService);
-      const { password: _, ...userWithoutPassword } = mockUser;
-
-      const result = await serviceWithoutResolver.login(userWithoutPassword);
-
-      expect(result).toEqual({ access_token: 'token' });
     });
   });
 });

@@ -1,3 +1,4 @@
+import { useId } from 'react';
 import { ModalOverlay } from './ModalOverlay.component';
 import { buttonSecondaryStyles, buttonDangerStyles } from '../../styles';
 
@@ -20,7 +21,7 @@ export function ConfirmDialog({
   onCancel,
   isLoading = false,
 }: ConfirmDialogProps) {
-  const titleId = 'confirm-dialog-title';
+  const titleId = useId();
 
   return (
     <ModalOverlay isOpen={isOpen} onClose={onCancel} ariaLabelledBy={titleId}>
