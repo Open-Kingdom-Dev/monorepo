@@ -52,7 +52,10 @@ jest.mock('@open-kingdom/shared-backend-feature-email', () => {
 });
 
 jest.mock('@open-kingdom/shared-backend-feature-user-management', () => {
-  class MockUserRolesService {}
+  class MockUserRolesService {
+    findPrimaryRole = jest.fn().mockResolvedValue(null);
+    findPermissions = jest.fn().mockResolvedValue([]);
+  }
   return {
     FeatureUserManagementModule: {
       forRoot: jest.fn().mockReturnValue({

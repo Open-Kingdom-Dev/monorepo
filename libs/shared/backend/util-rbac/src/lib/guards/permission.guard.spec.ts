@@ -26,14 +26,21 @@ describe('checking permissions', () => {
     guard.onModuleInit();
   });
 
-  function simulateRequest(user?: { id?: number }): ExecutionContext {
+  function simulateRequest(user?: { id?: number }): {
+    context: ExecutionContext;
+    getUser: () => Record<string, unknown>;
+  } {
+    const requestUser = user ? { ...user } : user;
     return {
-      getHandler: jest.fn(),
-      getClass: jest.fn(),
-      switchToHttp: () => ({
-        getRequest: () => ({ user }),
-      }),
-    } as unknown as ExecutionContext;
+      context: {
+        getHandler: jest.fn(),
+        getClass: jest.fn(),
+        switchToHttp: () => ({
+          getRequest: () => ({ user: requestUser }),
+        }),
+      } as unknown as ExecutionContext,
+      getUser: () => requestUser as Record<string, unknown>,
+    };
   }
 
   function markRoute(opts: { isPublic?: boolean; permission?: string }) {
@@ -49,15 +56,17 @@ describe('checking permissions', () => {
   describe('allowing access', () => {
     it('lets anyone reach a public endpoint without signing in', async () => {
       markRoute({ isPublic: true });
-      const context = simulateRequest();
+      const { context } = simulateRequest();
 
       await expect(guard.canActivate(context)).resolves.toBe(true);
       expect(mockRoleResolver.findPermissions).not.toHaveBeenCalled();
     });
 
-    it('lets anyone reach an endpoint that requires no specific permission', async () => {
+    it('lets a user through an endpoint that requires no specific permission', async () => {
       markRoute({});
-      const context = simulateRequest();
+      mockRoleResolver.findPrimaryRole.mockResolvedValue('user');
+      mockRoleResolver.findPermissions.mockResolvedValue(['profile:read']);
+      const { context } = simulateRequest({ id: 1 });
 
       await expect(guard.canActivate(context)).resolves.toBe(true);
     });
@@ -68,7 +77,7 @@ describe('checking permissions', () => {
         'users:read',
         'profile:read',
       ]);
-      const context = simulateRequest({ id: 1 });
+      const { context } = simulateRequest({ id: 1 });
 
       await expect(guard.canActivate(context)).resolves.toBe(true);
     });
@@ -81,7 +90,7 @@ describe('checking permissions', () => {
         'users:read',
         'profile:read',
       ]);
-      const context = simulateRequest({ id: 1 });
+      const { context } = simulateRequest({ id: 1 });
 
       await expect(guard.canActivate(context)).rejects.toThrow(
         ForbiddenException
@@ -91,7 +100,7 @@ describe('checking permissions', () => {
     it('turns away a user who has no permissions at all', async () => {
       markRoute({ permission: 'users:read' });
       mockRoleResolver.findPermissions.mockResolvedValue([]);
-      const context = simulateRequest({ id: 1 });
+      const { context } = simulateRequest({ id: 1 });
 
       await expect(guard.canActivate(context)).rejects.toThrow(
         ForbiddenException
@@ -100,7 +109,7 @@ describe('checking permissions', () => {
 
     it('turns away a visitor who is not signed in', async () => {
       markRoute({ permission: 'users:read' });
-      const context = simulateRequest(undefined);
+      const { context } = simulateRequest(undefined);
 
       await expect(guard.canActivate(context)).rejects.toThrow(
         UnauthorizedException
@@ -108,15 +117,57 @@ describe('checking permissions', () => {
     });
   });
 
+  describe('enriching the request with role data', () => {
+    it('attaches the role and permissions to the request user', async () => {
+      markRoute({});
+      mockRoleResolver.findPrimaryRole.mockResolvedValue('admin');
+      mockRoleResolver.findPermissions.mockResolvedValue([
+        'users:read',
+        'profile:read',
+      ]);
+      const { context, getUser } = simulateRequest({ id: 42 });
+
+      await guard.canActivate(context);
+
+      const user = getUser();
+      expect(user['role']).toBe('admin');
+      expect(user['permissions']).toEqual(['users:read', 'profile:read']);
+    });
+
+    it('sets role to null when the user has no role assigned', async () => {
+      markRoute({});
+      mockRoleResolver.findPrimaryRole.mockResolvedValue(null);
+      mockRoleResolver.findPermissions.mockResolvedValue([]);
+      const { context, getUser } = simulateRequest({ id: 1 });
+
+      await guard.canActivate(context);
+
+      const user = getUser();
+      expect(user['role']).toBeNull();
+      expect(user['permissions']).toEqual([]);
+    });
+
+    it('skips enrichment for public endpoints', async () => {
+      markRoute({ isPublic: true });
+      const { context } = simulateRequest();
+
+      await guard.canActivate(context);
+
+      expect(mockRoleResolver.findPrimaryRole).not.toHaveBeenCalled();
+      expect(mockRoleResolver.findPermissions).not.toHaveBeenCalled();
+    });
+  });
+
   describe('verifying permissions come from the database', () => {
     it('looks up the current permissions for the signed-in user', async () => {
       markRoute({ permission: 'users:read' });
       mockRoleResolver.findPermissions.mockResolvedValue(['users:read']);
-      const context = simulateRequest({ id: 42 });
+      const { context } = simulateRequest({ id: 42 });
 
       await guard.canActivate(context);
 
       expect(mockRoleResolver.findPermissions).toHaveBeenCalledWith(42);
+      expect(mockRoleResolver.findPrimaryRole).toHaveBeenCalledWith(42);
     });
   });
 

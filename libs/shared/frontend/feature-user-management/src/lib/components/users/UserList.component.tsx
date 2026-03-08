@@ -15,6 +15,8 @@ import { useTheme } from '@open-kingdom/shared-frontend-ui-theme';
 import { ConfirmDialog } from '../shared/ConfirmDialog.component';
 import { RoleBadge } from '../shared/RoleBadge.component';
 import { InviteUserModal } from '../invitations';
+import { RoleChangeModal } from './RoleChangeModal.component';
+import { useHasPermission } from '../../hooks/useHasPermission';
 import { buttonPrimaryStyles } from '../../styles';
 import type { User } from '../../types';
 
@@ -29,8 +31,12 @@ export function UserList({ currentUserId }: UserListProps) {
   const [deleteUser, { isLoading: isDeleting }] =
     useUsersControllerDeleteMutation();
 
+  const canDeleteUsers = useHasPermission('users', 'delete');
+  const canChangeRoles = useHasPermission('roles', 'update');
+
   const [showInviteModal, setShowInviteModal] = useState(false);
   const [userToDelete, setUserToDelete] = useState<User | null>(null);
+  const [userToChangeRole, setUserToChangeRole] = useState<User | null>(null);
 
   const users = (data as User[] | undefined) ?? [];
 
@@ -73,19 +79,39 @@ export function UserList({ currentUserId }: UserListProps) {
           if (!params.data) return null;
           const isSelf = params.data.id === currentUserId;
           return (
-            <button
-              onClick={() => params.data && setUserToDelete(params.data)}
-              disabled={isSelf}
-              title={isSelf ? 'Cannot delete your own account' : 'Delete user'}
-              className="rounded px-2 py-1 text-xs font-medium text-error-600 transition-colors hover:bg-error-50 disabled:cursor-not-allowed disabled:opacity-40 dark:text-error-400 dark:hover:bg-error-900/20"
-            >
-              Delete
-            </button>
+            <div className="flex gap-1">
+              {canChangeRoles && (
+                <button
+                  onClick={() =>
+                    params.data && setUserToChangeRole(params.data)
+                  }
+                  disabled={isSelf}
+                  title={
+                    isSelf ? 'Cannot change your own role' : 'Change user role'
+                  }
+                  className="rounded px-2 py-1 text-xs font-medium text-primary-600 transition-colors hover:bg-primary-50 disabled:cursor-not-allowed disabled:opacity-40 dark:text-primary-400 dark:hover:bg-primary-900/20"
+                >
+                  Change Role
+                </button>
+              )}
+              {canDeleteUsers && (
+                <button
+                  onClick={() => params.data && setUserToDelete(params.data)}
+                  disabled={isSelf}
+                  title={
+                    isSelf ? 'Cannot delete your own account' : 'Delete user'
+                  }
+                  className="rounded px-2 py-1 text-xs font-medium text-error-600 transition-colors hover:bg-error-50 disabled:cursor-not-allowed disabled:opacity-40 dark:text-error-400 dark:hover:bg-error-900/20"
+                >
+                  Delete
+                </button>
+              )}
+            </div>
           );
         },
       },
     ],
-    [currentUserId]
+    [currentUserId, canChangeRoles, canDeleteUsers]
   );
 
   if (error) {
@@ -138,6 +164,20 @@ export function UserList({ currentUserId }: UserListProps) {
       <InviteUserModal
         isOpen={showInviteModal}
         onClose={() => setShowInviteModal(false)}
+      />
+
+      <RoleChangeModal
+        isOpen={!!userToChangeRole}
+        onClose={() => setUserToChangeRole(null)}
+        user={
+          userToChangeRole
+            ? {
+                id: userToChangeRole.id,
+                email: userToChangeRole.email,
+                role: userToChangeRole.role ?? '',
+              }
+            : { id: 0, email: '', role: '' }
+        }
       />
 
       <ConfirmDialog

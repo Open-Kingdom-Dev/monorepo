@@ -11,6 +11,13 @@ jest.mock('@open-kingdom/shared-frontend-data-access-api-client', () => ({
     mockInvite,
     { isLoading: false },
   ],
+  useRolesControllerFindAllQuery: () => ({
+    data: [
+      { id: 1, name: 'admin' },
+      { id: 2, name: 'user' },
+      { id: 3, name: 'guest' },
+    ],
+  }),
 }));
 
 jest.mock('@open-kingdom/shared-frontend-data-access-notifications', () => ({

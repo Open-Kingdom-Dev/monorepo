@@ -43,24 +43,26 @@ export class PermissionGuard implements CanActivate, OnModuleInit {
     ]);
     if (isPublic) return true;
 
-    const requiredPermission = this.reflector.getAllAndOverride<string>(
-      REQUIRED_PERMISSION_KEY,
-      [context.getHandler(), context.getClass()]
-    );
-
-    if (!requiredPermission) return true;
-
     const { user } = context.switchToHttp().getRequest();
 
     if (!user?.id) {
       throw new UnauthorizedException();
     }
 
-    const permissions = await this.resolvedRoleResolver.findPermissions(
-      user.id
+    const [role, permissions] = await Promise.all([
+      this.resolvedRoleResolver.findPrimaryRole(user.id),
+      this.resolvedRoleResolver.findPermissions(user.id),
+    ]);
+
+    user.role = role;
+    user.permissions = permissions;
+
+    const requiredPermission = this.reflector.getAllAndOverride<string>(
+      REQUIRED_PERMISSION_KEY,
+      [context.getHandler(), context.getClass()]
     );
 
-    if (!permissions.includes(requiredPermission)) {
+    if (requiredPermission && !permissions.includes(requiredPermission)) {
       throw new ForbiddenException('Insufficient permissions');
     }
 

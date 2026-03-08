@@ -6,6 +6,9 @@ export const addTagTypes = [
   "Email",
   "Invitations",
   "Users",
+  "Roles",
+  "Permissions",
+  "User Roles",
   "GCP Resources",
 ] as const;
 const injectedRtkApi = api
@@ -115,6 +118,144 @@ const injectedRtkApi = api
         }),
         invalidatesTags: ["Users"],
       }),
+      rolesControllerFindAll: build.query<
+        RolesControllerFindAllApiResponse,
+        RolesControllerFindAllApiArg
+      >({
+        query: () => ({ url: `/api/roles` }),
+        providesTags: ["Roles"],
+      }),
+      rolesControllerCreate: build.mutation<
+        RolesControllerCreateApiResponse,
+        RolesControllerCreateApiArg
+      >({
+        query: (queryArg) => ({
+          url: `/api/roles`,
+          method: "POST",
+          body: queryArg.createRoleDto,
+        }),
+        invalidatesTags: ["Roles"],
+      }),
+      rolesControllerFindOne: build.query<
+        RolesControllerFindOneApiResponse,
+        RolesControllerFindOneApiArg
+      >({
+        query: (queryArg) => ({ url: `/api/roles/${queryArg.id}` }),
+        providesTags: ["Roles"],
+      }),
+      rolesControllerUpdate: build.mutation<
+        RolesControllerUpdateApiResponse,
+        RolesControllerUpdateApiArg
+      >({
+        query: (queryArg) => ({
+          url: `/api/roles/${queryArg.id}`,
+          method: "PATCH",
+          body: queryArg.updateRoleDto,
+        }),
+        invalidatesTags: ["Roles"],
+      }),
+      rolesControllerDelete: build.mutation<
+        RolesControllerDeleteApiResponse,
+        RolesControllerDeleteApiArg
+      >({
+        query: (queryArg) => ({
+          url: `/api/roles/${queryArg.id}`,
+          method: "DELETE",
+        }),
+        invalidatesTags: ["Roles"],
+      }),
+      rolesControllerGetPermissions: build.query<
+        RolesControllerGetPermissionsApiResponse,
+        RolesControllerGetPermissionsApiArg
+      >({
+        query: (queryArg) => ({ url: `/api/roles/${queryArg.id}/permissions` }),
+        providesTags: ["Roles"],
+      }),
+      rolesControllerSetPermissions: build.mutation<
+        RolesControllerSetPermissionsApiResponse,
+        RolesControllerSetPermissionsApiArg
+      >({
+        query: (queryArg) => ({
+          url: `/api/roles/${queryArg.id}/permissions`,
+          method: "PUT",
+          body: queryArg.setRolePermissionsDto,
+        }),
+        invalidatesTags: ["Roles"],
+      }),
+      permissionsControllerFindAll: build.query<
+        PermissionsControllerFindAllApiResponse,
+        PermissionsControllerFindAllApiArg
+      >({
+        query: () => ({ url: `/api/permissions` }),
+        providesTags: ["Permissions"],
+      }),
+      permissionsControllerCreate: build.mutation<
+        PermissionsControllerCreateApiResponse,
+        PermissionsControllerCreateApiArg
+      >({
+        query: (queryArg) => ({
+          url: `/api/permissions`,
+          method: "POST",
+          body: queryArg.createPermissionDto,
+        }),
+        invalidatesTags: ["Permissions"],
+      }),
+      permissionsControllerFindOne: build.query<
+        PermissionsControllerFindOneApiResponse,
+        PermissionsControllerFindOneApiArg
+      >({
+        query: (queryArg) => ({ url: `/api/permissions/${queryArg.id}` }),
+        providesTags: ["Permissions"],
+      }),
+      permissionsControllerDelete: build.mutation<
+        PermissionsControllerDeleteApiResponse,
+        PermissionsControllerDeleteApiArg
+      >({
+        query: (queryArg) => ({
+          url: `/api/permissions/${queryArg.id}`,
+          method: "DELETE",
+        }),
+        invalidatesTags: ["Permissions"],
+      }),
+      userRolesControllerFindByUser: build.query<
+        UserRolesControllerFindByUserApiResponse,
+        UserRolesControllerFindByUserApiArg
+      >({
+        query: (queryArg) => ({ url: `/api/users/${queryArg.userId}/roles` }),
+        providesTags: ["User Roles"],
+      }),
+      userRolesControllerSetRoles: build.mutation<
+        UserRolesControllerSetRolesApiResponse,
+        UserRolesControllerSetRolesApiArg
+      >({
+        query: (queryArg) => ({
+          url: `/api/users/${queryArg.userId}/roles`,
+          method: "PUT",
+          body: queryArg.updateUserRolesDto,
+        }),
+        invalidatesTags: ["User Roles"],
+      }),
+      userRolesControllerAssignRole: build.mutation<
+        UserRolesControllerAssignRoleApiResponse,
+        UserRolesControllerAssignRoleApiArg
+      >({
+        query: (queryArg) => ({
+          url: `/api/users/${queryArg.userId}/roles`,
+          method: "POST",
+          body: queryArg.assignUserRoleDto,
+        }),
+        invalidatesTags: ["User Roles"],
+      }),
+      userRolesControllerRemoveRole: build.mutation<
+        UserRolesControllerRemoveRoleApiResponse,
+        UserRolesControllerRemoveRoleApiArg
+      >({
+        query: (queryArg) => ({
+          url: `/api/users/${queryArg.userId}/roles/${queryArg.roleId}`,
+          method: "DELETE",
+        }),
+        invalidatesTags: ["User Roles"],
+      }),
       gcpProjectsControllerListProjects: build.query<
         GcpProjectsControllerListProjectsApiResponse,
         GcpProjectsControllerListProjectsApiArg
@@ -167,7 +308,7 @@ export type InvitationsControllerValidateApiResponse =
   /** status 200 Validation result */ {
     valid?: boolean;
     email?: string | null;
-    role?: ("guest" | "user" | "admin") | null;
+    roleId?: number | null;
   };
 export type InvitationsControllerValidateApiArg = {
   token: string;
@@ -189,6 +330,67 @@ export type UsersControllerFindOneApiArg = {
 export type UsersControllerDeleteApiResponse = unknown;
 export type UsersControllerDeleteApiArg = {
   id: number;
+};
+export type RolesControllerFindAllApiResponse = unknown;
+export type RolesControllerFindAllApiArg = void;
+export type RolesControllerCreateApiResponse = unknown;
+export type RolesControllerCreateApiArg = {
+  createRoleDto: CreateRoleDto;
+};
+export type RolesControllerFindOneApiResponse = unknown;
+export type RolesControllerFindOneApiArg = {
+  id: number;
+};
+export type RolesControllerUpdateApiResponse = unknown;
+export type RolesControllerUpdateApiArg = {
+  id: number;
+  updateRoleDto: UpdateRoleDto;
+};
+export type RolesControllerDeleteApiResponse = unknown;
+export type RolesControllerDeleteApiArg = {
+  id: number;
+};
+export type RolesControllerGetPermissionsApiResponse = unknown;
+export type RolesControllerGetPermissionsApiArg = {
+  id: number;
+};
+export type RolesControllerSetPermissionsApiResponse = unknown;
+export type RolesControllerSetPermissionsApiArg = {
+  id: number;
+  setRolePermissionsDto: SetRolePermissionsDto;
+};
+export type PermissionsControllerFindAllApiResponse = unknown;
+export type PermissionsControllerFindAllApiArg = void;
+export type PermissionsControllerCreateApiResponse = unknown;
+export type PermissionsControllerCreateApiArg = {
+  createPermissionDto: CreatePermissionDto;
+};
+export type PermissionsControllerFindOneApiResponse = unknown;
+export type PermissionsControllerFindOneApiArg = {
+  id: number;
+};
+export type PermissionsControllerDeleteApiResponse = unknown;
+export type PermissionsControllerDeleteApiArg = {
+  id: number;
+};
+export type UserRolesControllerFindByUserApiResponse = unknown;
+export type UserRolesControllerFindByUserApiArg = {
+  userId: number;
+};
+export type UserRolesControllerSetRolesApiResponse = unknown;
+export type UserRolesControllerSetRolesApiArg = {
+  userId: number;
+  updateUserRolesDto: UpdateUserRolesDto;
+};
+export type UserRolesControllerAssignRoleApiResponse = unknown;
+export type UserRolesControllerAssignRoleApiArg = {
+  userId: number;
+  assignUserRoleDto: AssignUserRoleDto;
+};
+export type UserRolesControllerRemoveRoleApiResponse = unknown;
+export type UserRolesControllerRemoveRoleApiArg = {
+  userId: number;
+  roleId: number;
 };
 export type GcpProjectsControllerListProjectsApiResponse =
   /** status 200 List of projects */ GcpProjectSummaryDto[];
@@ -221,6 +423,10 @@ export type ProfileResponseDto = {
   lastName: string | null;
   /** User email address */
   email: string;
+  /** Primary role name */
+  role: string | null;
+  /** Granted permissions */
+  permissions: string[];
 };
 export type SendEmailResponseDto = {
   /** Whether the email was sent successfully */
@@ -241,8 +447,8 @@ export type SendEmailDto = {
 export type InviteUserDto = {
   /** Email address of the user to invite */
   email: string;
-  /** Role to assign to the invited user */
-  role?: "guest" | "user" | "admin";
+  /** Role name to assign to the invited user */
+  role?: string;
 };
 export type AcceptInvitationDto = {
   /** Invitation token from the invite link */
@@ -253,6 +459,38 @@ export type AcceptInvitationDto = {
   firstName?: string;
   /** Last name of the user */
   lastName?: string;
+};
+export type CreateRoleDto = {
+  /** Unique role name */
+  name: string;
+  /** Role description */
+  description?: string;
+};
+export type UpdateRoleDto = {
+  /** New role name */
+  name?: string;
+  /** New description */
+  description?: string;
+};
+export type SetRolePermissionsDto = {
+  /** Array of permission IDs to assign */
+  permissionIds: number[];
+};
+export type CreatePermissionDto = {
+  /** Resource name */
+  resource: string;
+  /** Action name */
+  action: string;
+  /** Permission description */
+  description?: string;
+};
+export type UpdateUserRolesDto = {
+  /** Array of role IDs to assign (replaces all existing roles) */
+  roleIds: number[];
+};
+export type AssignUserRoleDto = {
+  /** Role ID to assign */
+  roleId: number;
 };
 export type GcpProjectSummaryDto = {
   /** Full resource name (e.g. projects/123) */
@@ -294,6 +532,21 @@ export const {
   useUsersControllerFindAllQuery,
   useUsersControllerFindOneQuery,
   useUsersControllerDeleteMutation,
+  useRolesControllerFindAllQuery,
+  useRolesControllerCreateMutation,
+  useRolesControllerFindOneQuery,
+  useRolesControllerUpdateMutation,
+  useRolesControllerDeleteMutation,
+  useRolesControllerGetPermissionsQuery,
+  useRolesControllerSetPermissionsMutation,
+  usePermissionsControllerFindAllQuery,
+  usePermissionsControllerCreateMutation,
+  usePermissionsControllerFindOneQuery,
+  usePermissionsControllerDeleteMutation,
+  useUserRolesControllerFindByUserQuery,
+  useUserRolesControllerSetRolesMutation,
+  useUserRolesControllerAssignRoleMutation,
+  useUserRolesControllerRemoveRoleMutation,
   useGcpProjectsControllerListProjectsQuery,
   useGcpProjectsControllerCreateProjectMutation,
 } = injectedRtkApi;

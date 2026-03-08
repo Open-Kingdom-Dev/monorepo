@@ -7,6 +7,7 @@ import { UserList } from './UserList.component';
 
 const mockFindAllQuery = jest.fn();
 const mockDeleteUser = jest.fn();
+const mockHasPermission = jest.fn();
 
 jest.mock('@open-kingdom/shared-frontend-data-access-api-client', () => ({
   useUsersControllerFindAllQuery: () => mockFindAllQuery(),
@@ -18,6 +19,13 @@ jest.mock('@open-kingdom/shared-frontend-data-access-api-client', () => ({
     jest.fn(),
     { isLoading: false, error: null },
   ],
+  useRolesControllerFindAllQuery: () => ({
+    data: [
+      { id: 1, name: 'admin' },
+      { id: 2, name: 'user' },
+      { id: 3, name: 'guest' },
+    ],
+  }),
 }));
 
 jest.mock('@open-kingdom/shared-frontend-data-access-notifications', () => ({
@@ -30,6 +38,11 @@ jest.mock('@open-kingdom/shared-frontend-data-access-notifications', () => ({
 jest.mock('@open-kingdom/shared-frontend-ui-theme', () => ({
   __esModule: true,
   useTheme: () => ({ theme: {}, mode: 'light' }),
+}));
+
+jest.mock('../../hooks/useHasPermission', () => ({
+  __esModule: true,
+  useHasPermission: (...args: unknown[]) => mockHasPermission(...args),
 }));
 
 let capturedColumnDefs: ColDef[] = [];
@@ -105,6 +118,11 @@ jest.mock('../invitations', () => ({
   InviteUserModal: () => null,
 }));
 
+jest.mock('./RoleChangeModal.component', () => ({
+  __esModule: true,
+  RoleChangeModal: () => null,
+}));
+
 const store = configureStore({ reducer: {} });
 
 function renderWithProviders(ui: React.ReactElement) {
@@ -132,6 +150,7 @@ describe('UserList', () => {
   beforeEach(() => {
     mockDeleteUser.mockReset();
     mockDeleteUser.mockReturnValue({ unwrap: () => Promise.resolve() });
+    mockHasPermission.mockReturnValue(true);
     capturedColumnDefs = [];
   });
 
@@ -200,7 +219,9 @@ describe('UserList', () => {
         {(actionsCol?.cellRenderer as CallableFunction)({ data: mockUsers[1] })}
       </Provider>
     );
-    const deleteBtn = container.querySelector('button');
+    const deleteBtn = Array.from(container.querySelectorAll('button')).find(
+      (btn) => btn.textContent === 'Delete'
+    );
     expect(deleteBtn).toBeTruthy();
     fireEvent.click(deleteBtn as HTMLElement);
 
@@ -212,5 +233,52 @@ describe('UserList', () => {
     await waitFor(() => {
       expect(mockDeleteUser).toHaveBeenCalledWith({ id: 2 });
     });
+  });
+
+  it('hides delete and role change buttons when the user lacks permissions', () => {
+    mockHasPermission.mockReturnValue(false);
+    mockFindAllQuery.mockReturnValue({
+      data: mockUsers,
+      isLoading: false,
+      error: null,
+      refetch: jest.fn(),
+    });
+    renderWithProviders(<UserList />);
+
+    const actionsCol = capturedColumnDefs.find(
+      (c) => c.headerName === 'Actions'
+    );
+    const { container } = render(
+      <Provider store={store}>
+        {(actionsCol?.cellRenderer as CallableFunction)({ data: mockUsers[0] })}
+      </Provider>
+    );
+    expect(container.querySelectorAll('button')).toHaveLength(0);
+  });
+
+  it('shows the change role button when the user has role update permission', () => {
+    mockHasPermission.mockImplementation(
+      (resource: string, action: string) =>
+        resource === 'roles' && action === 'update'
+    );
+    mockFindAllQuery.mockReturnValue({
+      data: mockUsers,
+      isLoading: false,
+      error: null,
+      refetch: jest.fn(),
+    });
+    renderWithProviders(<UserList currentUserId={1} />);
+
+    const actionsCol = capturedColumnDefs.find(
+      (c) => c.headerName === 'Actions'
+    );
+    const { container } = render(
+      <Provider store={store}>
+        {(actionsCol?.cellRenderer as CallableFunction)({ data: mockUsers[1] })}
+      </Provider>
+    );
+    const buttons = Array.from(container.querySelectorAll('button'));
+    expect(buttons.map((b) => b.textContent)).toContain('Change Role');
+    expect(buttons.map((b) => b.textContent)).not.toContain('Delete');
   });
 });

@@ -73,10 +73,10 @@ describe('PermissionsService', () => {
       transaction: jest.fn().mockImplementation((fn) => {
         const tx = {
           delete: jest.fn().mockReturnValue({
-            where: jest.fn(),
+            where: jest.fn().mockReturnValue({ run: jest.fn() }),
           }),
           insert: jest.fn().mockReturnValue({
-            values: jest.fn(),
+            values: jest.fn().mockReturnValue({ run: jest.fn() }),
           }),
         };
         return fn(tx);
@@ -226,13 +226,13 @@ describe('PermissionsService', () => {
 
     it('clears all permissions when given an empty list', async () => {
       const txDelete = jest.fn().mockReturnValue({
-        where: jest.fn(),
+        where: jest.fn().mockReturnValue({ run: jest.fn() }),
       });
       mockDb.transaction.mockImplementation((fn) => {
         const tx = {
           delete: txDelete,
           insert: jest.fn().mockReturnValue({
-            values: jest.fn(),
+            values: jest.fn().mockReturnValue({ run: jest.fn() }),
           }),
         };
         return fn(tx);
