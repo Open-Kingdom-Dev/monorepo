@@ -30,7 +30,10 @@ export class DatabaseSetupModule {
               sqlite.pragma(`${key} = ${value}`);
             }
 
-            return drizzle(sqlite, { schema: options.schema });
+            return drizzle(sqlite, {
+              schema: options.schema,
+              casing: 'snake_case',
+            });
           },
         },
       ],
