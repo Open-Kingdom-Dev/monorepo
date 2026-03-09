@@ -23,6 +23,9 @@
   "references": [
     {
       "path": "../data-access-users/tsconfig.lib.json"
+    },
+    {
+      "path": "../util-rbac/tsconfig.lib.json"
     }
   ]
 }

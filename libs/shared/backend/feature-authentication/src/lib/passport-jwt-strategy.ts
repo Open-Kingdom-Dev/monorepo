@@ -1,8 +1,17 @@
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { PassportStrategy } from '@nestjs/passport';
-import { Injectable, UnauthorizedException, Inject } from '@nestjs/common';
+import {
+  Injectable,
+  UnauthorizedException,
+  Inject,
+  Optional,
+} from '@nestjs/common';
 
 import { UsersService } from '@open-kingdom/shared-backend-data-access-users';
+import {
+  ROLE_RESOLVER,
+  type RoleResolver,
+} from '@open-kingdom/shared-backend-util-rbac';
 
 export const JWT_CONSTANTS = 'JWT_CONSTANTS';
 
@@ -10,7 +19,10 @@ export const JWT_CONSTANTS = 'JWT_CONSTANTS';
 export class JwtStrategy extends PassportStrategy(Strategy) {
   constructor(
     private usersService: UsersService,
-    @Inject(JWT_CONSTANTS) jwtConstants: { secret: string }
+    @Inject(JWT_CONSTANTS) jwtConstants: { secret: string },
+    @Optional()
+    @Inject(ROLE_RESOLVER)
+    private roleResolver?: RoleResolver
   ) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
@@ -24,8 +36,11 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     if (!user) {
       throw new UnauthorizedException();
     }
-    // Exclude password from the returned user object
     const { password: _, ...userWithoutPassword } = user;
-    return userWithoutPassword;
+    const role = (await this.roleResolver?.findPrimaryRole(user.id)) ?? null;
+    const permissions =
+      (await this.roleResolver?.findPermissions(user.id)) ?? [];
+
+    return { ...userWithoutPassword, role, permissions };
   }
 }

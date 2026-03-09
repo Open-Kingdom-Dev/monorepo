@@ -13,7 +13,12 @@ export interface UserManagementModuleOptions {
 
 // Request types
 export interface AuthenticatedRequest extends Request {
-  user: { id: number; email: string };
+  user: {
+    id: number;
+    email: string;
+    role: string | null;
+    permissions: string[];
+  };
 }
 
 // Domain types

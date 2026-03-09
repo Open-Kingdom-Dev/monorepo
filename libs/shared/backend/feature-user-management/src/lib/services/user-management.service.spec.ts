@@ -3,10 +3,12 @@ import { NotFoundException, ForbiddenException } from '@nestjs/common';
 
 import { UsersService } from '@open-kingdom/shared-backend-data-access-users';
 import { UserManagementService } from './user-management.service';
+import { UserRolesService } from './user-roles.service';
 
 describe('UserManagementService', () => {
   let service: UserManagementService;
   let mockUsersService: jest.Mocked<UsersService>;
+  let mockUserRolesService: { findPrimaryRole: jest.Mock };
 
   const mockUser = {
     id: 1,
@@ -23,10 +25,15 @@ describe('UserManagementService', () => {
       delete: jest.fn(),
     } as unknown as jest.Mocked<UsersService>;
 
+    mockUserRolesService = {
+      findPrimaryRole: jest.fn().mockResolvedValue('user'),
+    };
+
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         UserManagementService,
         { provide: UsersService, useValue: mockUsersService },
+        { provide: UserRolesService, useValue: mockUserRolesService },
       ],
     }).compile();
 
@@ -43,6 +50,14 @@ describe('UserManagementService', () => {
       expect(result[0]).not.toHaveProperty('password');
       expect(result[0].email).toBe('test@example.com');
     });
+
+    it("shows each user's assigned role", async () => {
+      mockUsersService.findAll.mockResolvedValue([mockUser]);
+
+      const result = await service.findAll();
+
+      expect(result[0].role).toBe('user');
+    });
   });
 
   describe('viewing a user', () => {
@@ -53,6 +68,14 @@ describe('UserManagementService', () => {
 
       expect(result).not.toHaveProperty('password');
       expect(result.email).toBe('test@example.com');
+    });
+
+    it("shows the user's assigned role", async () => {
+      mockUsersService.findById.mockResolvedValue(mockUser);
+
+      const result = await service.findById(1);
+
+      expect(result.role).toBe('user');
     });
 
     it('reports when the user does not exist', async () => {
