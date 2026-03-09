@@ -23,6 +23,7 @@ import {
   Invitation,
   InvitationsTableName,
 } from '../schemas/invitations.schema';
+import { roles, RolesTableName } from '../schemas/roles.schema';
 import {
   USER_MANAGEMENT_OPTIONS,
   EMAIL_SENDER,
@@ -35,7 +36,6 @@ import {
 import type {
   UserManagementModuleOptions,
   EmailSender,
-  Role,
   ValidationResult,
 } from '../types';
 
@@ -44,6 +44,7 @@ export type InvitationResponse = Omit<Invitation, 'token'>;
 type Schema = {
   [UsersTableName]: typeof users;
   [InvitationsTableName]: typeof invitations;
+  [RolesTableName]: typeof roles;
 };
 
 const MS_PER_DAY = 24 * 60 * 60 * 1000;
@@ -63,12 +64,13 @@ export class InvitationsService {
 
   async invite(
     email: string,
-    role: Role,
+    roleName: string,
     invitedById: number
   ): Promise<InvitationResponse> {
     await this.ensureUserDoesNotExist(email);
     await this.ensureNoPendingInvitation(email);
 
+    const role = await this.resolveRole(roleName);
     const { token, expiresAt } = this.generateToken(email);
 
     await this.db.insert(invitations).values({
@@ -77,31 +79,17 @@ export class InvitationsService {
       tokenExpiry: expiresAt,
       invitedBy: invitedById,
       invitedAt: Date.now(),
-      role,
+      roleId: role.id,
       status: INVITATION_STATUS.PENDING,
     });
-
-    const invitation = await this.findByToken(token);
 
     try {
       await this.sendInvitationEmail(email, token);
     } catch (error) {
-      this.logger.error(
-        `Failed to send invitation email to ${email}: ${
-          error instanceof Error ? error.message : 'Unknown error'
-        }`,
-        error instanceof Error ? error.stack : undefined
-      );
-      await this.db.delete(invitations).where(eq(invitations.token, token));
-      throw new BadGatewayException(
-        'Invitation could not be sent - email delivery failed'
-      );
+      await this.rollbackInvitation(email, token, error);
     }
 
-    // Never return token - it's only sent via email
-    const { token: _token, ...invitationWithoutToken } =
-      invitation as Invitation;
-    return invitationWithoutToken;
+    return this.stripToken(token);
   }
 
   async validate(token: string): Promise<ValidationResult> {
@@ -119,7 +107,7 @@ export class InvitationsService {
     return {
       valid: true,
       email: invitation.email,
-      role: invitation.role as Role,
+      roleId: invitation.roleId,
     };
   }
 
@@ -184,6 +172,18 @@ export class InvitationsService {
     }
   }
 
+  private async resolveRole(roleName: string) {
+    const role = await this.db.query.roles.findFirst({
+      where: eq(roles.name, roleName),
+    });
+
+    if (!role) {
+      throw new BadRequestException(`Role '${roleName}' does not exist`);
+    }
+
+    return role;
+  }
+
   private async findInvitationOrFail(id: number): Promise<Invitation> {
     const invitation = await this.db.query.invitations.findFirst({
       where: eq(invitations.id, id),
@@ -230,6 +230,36 @@ export class InvitationsService {
       .update(invitations)
       .set({ status: INVITATION_STATUS.ACCEPTED })
       .where(eq(invitations.token, token));
+  }
+
+  private async rollbackInvitation(
+    email: string,
+    token: string,
+    error: unknown
+  ): Promise<never> {
+    const message = error instanceof Error ? error.message : 'Unknown error';
+
+    this.logger.error(
+      `Failed to send invitation email to ${email}: ${message}`,
+      error instanceof Error ? error.stack : undefined
+    );
+
+    await this.db.delete(invitations).where(eq(invitations.token, token));
+
+    throw new BadGatewayException(
+      'Invitation could not be sent - email delivery failed'
+    );
+  }
+
+  private async stripToken(token: string): Promise<InvitationResponse> {
+    const invitation = await this.findByToken(token);
+
+    if (!invitation) {
+      throw new BadRequestException('Failed to retrieve created invitation');
+    }
+
+    const { token: _token, ...rest } = invitation;
+    return rest;
   }
 
   private get expiryDays(): number {

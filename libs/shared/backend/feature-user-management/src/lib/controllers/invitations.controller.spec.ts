@@ -30,14 +30,13 @@ describe('InvitationsController', () => {
 
   describe('sending invitations', () => {
     it('invites a user with the specified role', async () => {
-      // Service returns InvitationResponse (without token)
       const mockInvitationResponse = {
         id: 1,
         email: 'new@example.com',
         tokenExpiry: Date.now() + 86400000,
         invitedBy: 1,
         invitedAt: Date.now(),
-        role: 'user',
+        roleId: 2,
         status: 'pending',
       };
 
@@ -67,7 +66,7 @@ describe('InvitationsController', () => {
       const mockInvitation = {
         id: 1,
         email: 'new@example.com',
-        role: 'guest',
+        roleId: 1,
       };
 
       mockInvitationsService.invite.mockResolvedValue(mockInvitation as never);
@@ -90,7 +89,7 @@ describe('InvitationsController', () => {
       mockInvitationsService.validate.mockResolvedValue({
         valid: true,
         email: 'test@example.com',
-        role: 'user',
+        roleId: 2,
       });
 
       const result = await controller.validate('token123');

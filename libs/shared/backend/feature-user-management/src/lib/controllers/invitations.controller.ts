@@ -95,11 +95,7 @@ export class InvitationsController {
       properties: {
         valid: { type: 'boolean' },
         email: { type: 'string', nullable: true },
-        role: {
-          type: 'string',
-          enum: ['guest', 'user', 'admin'],
-          nullable: true,
-        },
+        roleId: { type: 'number', nullable: true },
       },
     },
   })
