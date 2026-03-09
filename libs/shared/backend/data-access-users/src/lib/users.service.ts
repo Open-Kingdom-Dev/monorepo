@@ -1,4 +1,4 @@
-import { Inject, Injectable, OnModuleInit } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { BetterSQLite3Database } from 'drizzle-orm/better-sqlite3';
 import { eq } from 'drizzle-orm';
 import * as bcrypt from 'bcrypt';
@@ -11,17 +11,8 @@ type schema = {
 };
 
 @Injectable()
-export class UsersService implements OnModuleInit {
+export class UsersService {
   constructor(@Inject(DB_TAG) private db: BetterSQLite3Database<schema>) {}
-
-  async onModuleInit() {
-    await this.ensureUser({
-      firstName: 'Admin',
-      lastName: 'Admin',
-      email: 'admin@admin.com',
-      password: 'admin',
-    });
-  }
 
   async findOne(email: string): Promise<User | undefined> {
     const user = await this.db.query.users.findFirst({

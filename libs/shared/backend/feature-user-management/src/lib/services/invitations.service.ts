@@ -18,6 +18,7 @@ import {
   users,
   UsersTableName,
 } from '@open-kingdom/shared-backend-data-access-users';
+import { UserRolesService } from './user-roles.service';
 import {
   invitations,
   Invitation,
@@ -59,6 +60,7 @@ export class InvitationsService {
     @Inject(USER_MANAGEMENT_OPTIONS)
     private readonly options: UserManagementModuleOptions,
     private readonly usersService: UsersService,
+    private readonly userRolesService: UserRolesService,
     @Optional() @Inject(EMAIL_SENDER) private readonly emailSender?: EmailSender
   ) {}
 
@@ -129,6 +131,10 @@ export class InvitationsService {
       firstName: firstName ?? null,
       lastName: lastName ?? null,
     });
+
+    if (validation.roleId) {
+      await this.userRolesService.assignRole(user.id, validation.roleId);
+    }
 
     await this.markAsAccepted(token);
 

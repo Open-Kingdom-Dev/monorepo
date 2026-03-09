@@ -6,6 +6,6 @@ export default defineConfig({
   schema: path.join(__dirname, 'src/db/schema.ts').replace(/\\/g, '/'),
   out: path.join(__dirname, 'drizzle/migrations'),
   dbCredentials: {
-    url: process.env['DATABASE_URL'] || path.join(__dirname, 'demo.db'),
+    url: process.env['DATABASE_URL'] || 'demo.db',
   },
 });

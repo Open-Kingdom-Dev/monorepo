@@ -2,7 +2,14 @@ import { Module, DynamicModule } from '@nestjs/common';
 
 import { OpenKingdomDataAccessBackendUsersModule } from '@open-kingdom/shared-backend-data-access-users';
 import { EmailService } from '@open-kingdom/shared-backend-feature-email';
-import { InvitationsService, UserManagementService } from './services';
+import {
+  InvitationsService,
+  UserManagementService,
+  RolesService,
+  PermissionsService,
+  UserRolesService,
+  SeedService,
+} from './services';
 import { InvitationsController, UsersController } from './controllers';
 import { USER_MANAGEMENT_OPTIONS, EMAIL_SENDER } from './types';
 import type { UserManagementModuleOptions } from './types';
@@ -32,8 +39,18 @@ export class FeatureUserManagementModule {
         { provide: EMAIL_SENDER, useExisting: EmailService },
         InvitationsService,
         UserManagementService,
+        RolesService,
+        PermissionsService,
+        UserRolesService,
+        SeedService,
       ],
-      exports: [InvitationsService, UserManagementService],
+      exports: [
+        InvitationsService,
+        UserManagementService,
+        RolesService,
+        PermissionsService,
+        UserRolesService,
+      ],
     };
   }
 }

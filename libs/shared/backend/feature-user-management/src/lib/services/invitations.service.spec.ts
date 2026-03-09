@@ -8,6 +8,7 @@ import {
 import { DB_TAG } from '@open-kingdom/shared-poly-util-constants';
 import { UsersService } from '@open-kingdom/shared-backend-data-access-users';
 import { InvitationsService } from './invitations.service';
+import { UserRolesService } from './user-roles.service';
 import {
   USER_MANAGEMENT_OPTIONS,
   EMAIL_SENDER,
@@ -52,6 +53,7 @@ const createMockInvitation = (
 describe('InvitationsService', () => {
   let service: InvitationsService;
   let mockUsersService: jest.Mocked<UsersService>;
+  let mockUserRolesService: { assignRole: jest.Mock };
   let mockDb: MockDb;
   let mockQuery: MockQuery;
 
@@ -98,8 +100,11 @@ describe('InvitationsService', () => {
       create: jest.fn(),
       delete: jest.fn(),
       ensureUser: jest.fn(),
-      onModuleInit: jest.fn(),
     } as unknown as jest.Mocked<UsersService>;
+
+    mockUserRolesService = {
+      assignRole: jest.fn().mockResolvedValue(undefined),
+    };
 
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -107,6 +112,7 @@ describe('InvitationsService', () => {
         { provide: DB_TAG, useValue: mockDb },
         { provide: USER_MANAGEMENT_OPTIONS, useValue: mockOptions },
         { provide: UsersService, useValue: mockUsersService },
+        { provide: UserRolesService, useValue: mockUserRolesService },
       ],
     }).compile();
 
@@ -181,6 +187,7 @@ describe('InvitationsService', () => {
           { provide: DB_TAG, useValue: mockDb },
           { provide: USER_MANAGEMENT_OPTIONS, useValue: mockOptions },
           { provide: UsersService, useValue: mockUsersService },
+          { provide: UserRolesService, useValue: mockUserRolesService },
           { provide: EMAIL_SENDER, useValue: mockEmailSender },
         ],
       }).compile();
@@ -222,6 +229,7 @@ describe('InvitationsService', () => {
           { provide: DB_TAG, useValue: mockDb },
           { provide: USER_MANAGEMENT_OPTIONS, useValue: mockOptions },
           { provide: UsersService, useValue: mockUsersService },
+          { provide: UserRolesService, useValue: mockUserRolesService },
           { provide: EMAIL_SENDER, useValue: mockEmailSender },
         ],
       }).compile();
@@ -259,6 +267,7 @@ describe('InvitationsService', () => {
           { provide: DB_TAG, useValue: mockDb },
           { provide: USER_MANAGEMENT_OPTIONS, useValue: mockOptions },
           { provide: UsersService, useValue: mockUsersService },
+          { provide: UserRolesService, useValue: mockUserRolesService },
           { provide: EMAIL_SENDER, useValue: mockEmailSender },
         ],
       }).compile();
@@ -294,6 +303,7 @@ describe('InvitationsService', () => {
           { provide: DB_TAG, useValue: mockDb },
           { provide: USER_MANAGEMENT_OPTIONS, useValue: mockOptions },
           { provide: UsersService, useValue: mockUsersService },
+          { provide: UserRolesService, useValue: mockUserRolesService },
           { provide: EMAIL_SENDER, useValue: mockEmailSender },
         ],
       }).compile();
@@ -329,6 +339,7 @@ describe('InvitationsService', () => {
           { provide: DB_TAG, useValue: mockDb },
           { provide: USER_MANAGEMENT_OPTIONS, useValue: mockOptions },
           { provide: UsersService, useValue: mockUsersService },
+          { provide: UserRolesService, useValue: mockUserRolesService },
           { provide: EMAIL_SENDER, useValue: mockEmailSender },
         ],
       }).compile();
@@ -372,6 +383,7 @@ describe('InvitationsService', () => {
             useValue: optionsWithoutExpiry,
           },
           { provide: UsersService, useValue: mockUsersService },
+          { provide: UserRolesService, useValue: mockUserRolesService },
           { provide: EMAIL_SENDER, useValue: mockEmailSender },
         ],
       }).compile();
@@ -510,6 +522,29 @@ describe('InvitationsService', () => {
         lastName: null,
       });
       expect(result).toEqual(mockUser);
+    });
+
+    it('assigns the invited role to the new user on acceptance', async () => {
+      const mockUser = {
+        id: 5,
+        email: 'role@example.com',
+        password: 'hash',
+        firstName: 'Role',
+        lastName: 'User',
+      };
+
+      mockQuery.invitations.findFirst.mockResolvedValue(
+        createMockInvitation({
+          email: 'role@example.com',
+          token: 'role-token',
+          roleId: 3,
+        })
+      );
+      mockUsersService.create.mockResolvedValue(mockUser);
+
+      await service.accept('role-token', 'password123', 'Role', 'User');
+
+      expect(mockUserRolesService.assignRole).toHaveBeenCalledWith(5, 3);
     });
 
     it('rejects joining with an invalid invitation link', async () => {

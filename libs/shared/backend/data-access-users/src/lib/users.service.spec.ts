@@ -55,47 +55,6 @@ describe('UsersService', () => {
     service = module.get<UsersService>(UsersService);
   });
 
-  describe('onModuleInit', () => {
-    it('should create admin user on initialization', async () => {
-      mockQuery.users.findFirst.mockResolvedValue(undefined);
-      mockQuery.users.findFirst.mockResolvedValueOnce(undefined); // First call for existing check
-      mockQuery.users.findFirst.mockResolvedValueOnce({
-        // Second call for return
-        id: 1,
-        firstName: 'Admin',
-        lastName: 'Admin',
-        email: 'admin@admin.com',
-        password: 'hashed-password',
-      });
-
-      await service.onModuleInit();
-
-      expect(mockQuery.users.findFirst).toHaveBeenCalledWith({
-        where: eq(users.email, 'admin@admin.com'),
-      });
-      expect(mockDb.insert).toHaveBeenCalledWith(users);
-      expect(mockedBcrypt.hash).toHaveBeenCalledWith('admin', 12);
-    });
-
-    it('should not create admin user if already exists', async () => {
-      const existingAdmin = {
-        id: 1,
-        firstName: 'Admin',
-        lastName: 'Admin',
-        email: 'admin@admin.com',
-        password: 'existing-hash',
-      };
-      mockQuery.users.findFirst.mockResolvedValue(existingAdmin);
-
-      await service.onModuleInit();
-
-      expect(mockQuery.users.findFirst).toHaveBeenCalledWith({
-        where: eq(users.email, 'admin@admin.com'),
-      });
-      expect(mockDb.insert).not.toHaveBeenCalled();
-    });
-  });
-
   describe('findOne', () => {
     it('should find user by email', async () => {
       const mockUser: User = {
