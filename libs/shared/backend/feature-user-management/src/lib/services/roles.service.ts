@@ -48,7 +48,6 @@ export class RolesService {
   async create(
     name: string,
     description: string | null,
-    priority: number,
     isSystem = 0
   ): Promise<Role> {
     const existing = await this.findByName(name);
@@ -57,9 +56,7 @@ export class RolesService {
       throw new BadRequestException(`Role '${name}' already exists`);
     }
 
-    await this.db
-      .insert(roles)
-      .values({ name, description, priority, isSystem });
+    await this.db.insert(roles).values({ name, description, isSystem });
 
     const created = await this.findByName(name);
 
@@ -72,7 +69,7 @@ export class RolesService {
 
   async update(
     id: number,
-    data: Partial<Pick<NewRole, 'name' | 'description' | 'priority'>>
+    data: Partial<Pick<NewRole, 'name' | 'description'>>
   ): Promise<Role> {
     const role = await this.findById(id);
 

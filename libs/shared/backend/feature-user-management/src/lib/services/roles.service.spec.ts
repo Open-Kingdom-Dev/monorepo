@@ -26,7 +26,6 @@ const createMockRole = (overrides: Partial<Role> = {}): Role => ({
   id: 1,
   name: 'editor',
   description: 'Can edit content',
-  priority: 20,
   isSystem: 0,
   createdAt: Date.now(),
   ...overrides,
@@ -116,7 +115,7 @@ describe('RolesService', () => {
         .mockResolvedValueOnce(undefined)
         .mockResolvedValueOnce(createMockRole());
 
-      const result = await service.create('editor', 'Can edit content', 20);
+      const result = await service.create('editor', 'Can edit content');
 
       expect(mockDb.insert).toHaveBeenCalled();
       expect(result.name).toBe('editor');
@@ -125,7 +124,7 @@ describe('RolesService', () => {
     it('rejects creating a role with a duplicate name', async () => {
       mockQuery.roles.findFirst.mockResolvedValue(createMockRole());
 
-      await expect(service.create('editor', 'duplicate', 20)).rejects.toThrow(
+      await expect(service.create('editor', 'duplicate')).rejects.toThrow(
         BadRequestException
       );
     });

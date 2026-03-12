@@ -7,19 +7,16 @@ export const SYSTEM_ROLES = {
 export const DEFAULT_ROLES = [
   {
     name: SYSTEM_ROLES.GUEST,
-    priority: 0,
     isSystem: 1,
     description: 'Default role for unauthenticated or limited-access users',
   },
   {
     name: SYSTEM_ROLES.USER,
-    priority: 10,
     isSystem: 1,
     description: 'Standard authenticated user',
   },
   {
     name: SYSTEM_ROLES.ADMIN,
-    priority: 100,
     isSystem: 1,
     description: 'Full system administrator',
   },

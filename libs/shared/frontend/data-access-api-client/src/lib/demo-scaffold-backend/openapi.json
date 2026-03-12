@@ -162,7 +162,7 @@
     },
     "/api/invitations": {
       "get": {
-        "description": "Returns all invitations with their status. Expired invitations are auto-updated.",
+        "description": "Returns pending and expired invitations. Accepted invitations are excluded. Expired invitations are auto-updated.",
         "operationId": "InvitationsController_findAll",
         "parameters": [],
         "responses": {
@@ -178,7 +178,7 @@
             "JWT-auth": []
           }
         ],
-        "summary": "List all invitations",
+        "summary": "List pending and expired invitations",
         "tags": [
           "Invitations"
         ]
@@ -208,6 +208,9 @@
           },
           "401": {
             "description": "Unauthorized - Invalid or missing JWT token"
+          },
+          "502": {
+            "description": "Email delivery failed — invitation rolled back"
           }
         },
         "security": [
@@ -250,13 +253,8 @@
                       "type": "string",
                       "nullable": true
                     },
-                    "role": {
-                      "type": "string",
-                      "enum": [
-                        "guest",
-                        "user",
-                        "admin"
-                      ],
+                    "roleId": {
+                      "type": "number",
                       "nullable": true
                     }
                   }
@@ -302,7 +300,7 @@
     },
     "/api/invitations/{id}": {
       "delete": {
-        "description": "Cancel and delete a pending invitation. Only pending invitations can be cancelled.",
+        "description": "Cancel and delete an invitation regardless of its current status.",
         "operationId": "InvitationsController_cancel",
         "parameters": [
           {
@@ -318,9 +316,6 @@
           "200": {
             "description": "Invitation cancelled successfully"
           },
-          "400": {
-            "description": "Only pending invitations can be cancelled"
-          },
           "401": {
             "description": "Unauthorized - Invalid or missing JWT token"
           },
@@ -333,7 +328,7 @@
             "JWT-auth": []
           }
         ],
-        "summary": "Cancel a pending invitation",
+        "summary": "Cancel an invitation",
         "tags": [
           "Invitations"
         ]
@@ -433,6 +428,582 @@
         "summary": "Delete a user",
         "tags": [
           "Users"
+        ]
+      }
+    },
+    "/api/roles": {
+      "get": {
+        "operationId": "RolesController_findAll",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "List of roles"
+          },
+          "401": {
+            "description": "Unauthorized - Invalid or missing JWT token"
+          },
+          "403": {
+            "description": "Insufficient permissions"
+          }
+        },
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ],
+        "summary": "List all roles",
+        "tags": [
+          "Roles"
+        ]
+      },
+      "post": {
+        "operationId": "RolesController_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateRoleDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Role created"
+          },
+          "400": {
+            "description": "Role name already exists"
+          },
+          "401": {
+            "description": "Unauthorized - Invalid or missing JWT token"
+          },
+          "403": {
+            "description": "Insufficient permissions"
+          }
+        },
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ],
+        "summary": "Create a new role",
+        "tags": [
+          "Roles"
+        ]
+      }
+    },
+    "/api/roles/{id}": {
+      "get": {
+        "operationId": "RolesController_findOne",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Role found"
+          },
+          "401": {
+            "description": "Unauthorized - Invalid or missing JWT token"
+          },
+          "403": {
+            "description": "Insufficient permissions"
+          },
+          "404": {
+            "description": "Role not found"
+          }
+        },
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ],
+        "summary": "Get a role by ID",
+        "tags": [
+          "Roles"
+        ]
+      },
+      "patch": {
+        "operationId": "RolesController_update",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateRoleDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Role updated"
+          },
+          "400": {
+            "description": "Cannot rename a system role"
+          },
+          "401": {
+            "description": "Unauthorized - Invalid or missing JWT token"
+          },
+          "403": {
+            "description": "Insufficient permissions"
+          },
+          "404": {
+            "description": "Role not found"
+          }
+        },
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ],
+        "summary": "Update a role",
+        "tags": [
+          "Roles"
+        ]
+      },
+      "delete": {
+        "operationId": "RolesController_delete",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Role deleted successfully"
+          },
+          "400": {
+            "description": "Cannot delete system role or role with assigned users"
+          },
+          "401": {
+            "description": "Unauthorized - Invalid or missing JWT token"
+          },
+          "403": {
+            "description": "Insufficient permissions"
+          },
+          "404": {
+            "description": "Role not found"
+          }
+        },
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ],
+        "summary": "Delete a role",
+        "tags": [
+          "Roles"
+        ]
+      }
+    },
+    "/api/roles/{id}/permissions": {
+      "get": {
+        "operationId": "RolesController_getPermissions",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of permissions for the role"
+          },
+          "401": {
+            "description": "Unauthorized - Invalid or missing JWT token"
+          },
+          "403": {
+            "description": "Insufficient permissions"
+          }
+        },
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ],
+        "summary": "Get permissions for a role",
+        "tags": [
+          "Roles"
+        ]
+      },
+      "put": {
+        "description": "Replace all permissions for a role",
+        "operationId": "RolesController_setPermissions",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SetRolePermissionsDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Permissions updated"
+          },
+          "401": {
+            "description": "Unauthorized - Invalid or missing JWT token"
+          },
+          "403": {
+            "description": "Insufficient permissions"
+          },
+          "404": {
+            "description": "Role not found"
+          }
+        },
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ],
+        "summary": "Set permissions for a role",
+        "tags": [
+          "Roles"
+        ]
+      }
+    },
+    "/api/permissions": {
+      "get": {
+        "operationId": "PermissionsController_findAll",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "List of permissions"
+          },
+          "401": {
+            "description": "Unauthorized - Invalid or missing JWT token"
+          },
+          "403": {
+            "description": "Insufficient permissions"
+          }
+        },
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ],
+        "summary": "List all permissions",
+        "tags": [
+          "Permissions"
+        ]
+      },
+      "post": {
+        "operationId": "PermissionsController_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreatePermissionDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Permission created"
+          },
+          "400": {
+            "description": "Permission already exists"
+          },
+          "401": {
+            "description": "Unauthorized - Invalid or missing JWT token"
+          },
+          "403": {
+            "description": "Insufficient permissions"
+          }
+        },
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ],
+        "summary": "Create a new permission",
+        "tags": [
+          "Permissions"
+        ]
+      }
+    },
+    "/api/permissions/{id}": {
+      "get": {
+        "operationId": "PermissionsController_findOne",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Permission found"
+          },
+          "401": {
+            "description": "Unauthorized - Invalid or missing JWT token"
+          },
+          "403": {
+            "description": "Insufficient permissions"
+          },
+          "404": {
+            "description": "Permission not found"
+          }
+        },
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ],
+        "summary": "Get a permission by ID",
+        "tags": [
+          "Permissions"
+        ]
+      },
+      "delete": {
+        "operationId": "PermissionsController_delete",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Permission deleted successfully"
+          },
+          "400": {
+            "description": "Cannot delete permission assigned to roles"
+          },
+          "401": {
+            "description": "Unauthorized - Invalid or missing JWT token"
+          },
+          "403": {
+            "description": "Insufficient permissions"
+          },
+          "404": {
+            "description": "Permission not found"
+          }
+        },
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ],
+        "summary": "Delete a permission",
+        "tags": [
+          "Permissions"
+        ]
+      }
+    },
+    "/api/users/{userId}/roles": {
+      "get": {
+        "operationId": "UserRolesController_findByUser",
+        "parameters": [
+          {
+            "name": "userId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of roles assigned to the user"
+          },
+          "401": {
+            "description": "Unauthorized - Invalid or missing JWT token"
+          },
+          "403": {
+            "description": "Insufficient permissions"
+          }
+        },
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ],
+        "summary": "Get roles for a user",
+        "tags": [
+          "User Roles"
+        ]
+      },
+      "put": {
+        "description": "Replaces all role assignments for the user",
+        "operationId": "UserRolesController_setRoles",
+        "parameters": [
+          {
+            "name": "userId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateUserRolesDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Roles updated"
+          },
+          "401": {
+            "description": "Unauthorized - Invalid or missing JWT token"
+          },
+          "403": {
+            "description": "Insufficient permissions"
+          }
+        },
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ],
+        "summary": "Replace all roles for a user",
+        "tags": [
+          "User Roles"
+        ]
+      },
+      "post": {
+        "operationId": "UserRolesController_assignRole",
+        "parameters": [
+          {
+            "name": "userId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AssignUserRoleDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Role assigned"
+          },
+          "401": {
+            "description": "Unauthorized - Invalid or missing JWT token"
+          },
+          "403": {
+            "description": "Insufficient permissions"
+          }
+        },
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ],
+        "summary": "Assign a role to a user",
+        "tags": [
+          "User Roles"
+        ]
+      }
+    },
+    "/api/users/{userId}/roles/{roleId}": {
+      "delete": {
+        "operationId": "UserRolesController_removeRole",
+        "parameters": [
+          {
+            "name": "userId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "roleId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Role removed"
+          },
+          "401": {
+            "description": "Unauthorized - Invalid or missing JWT token"
+          },
+          "403": {
+            "description": "Insufficient permissions"
+          }
+        },
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ],
+        "summary": "Remove a role from a user",
+        "tags": [
+          "User Roles"
         ]
       }
     },
@@ -605,13 +1176,32 @@
             "type": "string",
             "description": "User email address",
             "example": "john@example.com"
+          },
+          "role": {
+            "type": "string",
+            "description": "Primary role name",
+            "example": "admin",
+            "nullable": true
+          },
+          "permissions": {
+            "description": "Granted permissions",
+            "example": [
+              "users:read",
+              "users:write"
+            ],
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
           }
         },
         "required": [
           "id",
           "firstName",
           "lastName",
-          "email"
+          "email",
+          "role",
+          "permissions"
         ]
       },
       "SendEmailDto": {
@@ -674,13 +1264,8 @@
           },
           "role": {
             "type": "string",
-            "description": "Role to assign to the invited user",
-            "example": "user",
-            "enum": [
-              "guest",
-              "user",
-              "admin"
-            ],
+            "description": "Role name to assign to the invited user",
+            "example": "guest",
             "default": "guest"
           }
         },
@@ -716,6 +1301,112 @@
         "required": [
           "token",
           "password"
+        ]
+      },
+      "CreateRoleDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Unique role name",
+            "example": "editor"
+          },
+          "description": {
+            "type": "string",
+            "description": "Role description",
+            "example": "Content editor with publishing rights"
+          }
+        },
+        "required": [
+          "name"
+        ]
+      },
+      "UpdateRoleDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "New role name"
+          },
+          "description": {
+            "type": "string",
+            "description": "New description"
+          }
+        }
+      },
+      "SetRolePermissionsDto": {
+        "type": "object",
+        "properties": {
+          "permissionIds": {
+            "description": "Array of permission IDs to assign",
+            "example": [
+              1,
+              2,
+              3
+            ],
+            "type": "array",
+            "items": {
+              "type": "number"
+            }
+          }
+        },
+        "required": [
+          "permissionIds"
+        ]
+      },
+      "CreatePermissionDto": {
+        "type": "object",
+        "properties": {
+          "resource": {
+            "type": "string",
+            "description": "Resource name",
+            "example": "articles"
+          },
+          "action": {
+            "type": "string",
+            "description": "Action name",
+            "example": "publish"
+          },
+          "description": {
+            "type": "string",
+            "description": "Permission description"
+          }
+        },
+        "required": [
+          "resource",
+          "action"
+        ]
+      },
+      "UpdateUserRolesDto": {
+        "type": "object",
+        "properties": {
+          "roleIds": {
+            "description": "Array of role IDs to assign (replaces all existing roles)",
+            "example": [
+              1,
+              2
+            ],
+            "type": "array",
+            "items": {
+              "type": "number"
+            }
+          }
+        },
+        "required": [
+          "roleIds"
+        ]
+      },
+      "AssignUserRoleDto": {
+        "type": "object",
+        "properties": {
+          "roleId": {
+            "type": "number",
+            "description": "Role ID to assign",
+            "example": 2
+          }
+        },
+        "required": [
+          "roleId"
         ]
       },
       "GcpProjectSummaryDto": {

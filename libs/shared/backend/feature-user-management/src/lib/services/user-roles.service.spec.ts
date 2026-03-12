@@ -19,11 +19,9 @@ interface MockDb {
 }
 
 const createSelectChain = (result: unknown[] = []) => {
-  // Thenable so await resolves directly; also supports .orderBy().limit() chaining
+  // Thenable so await resolves directly; also supports .limit() chaining
   const whereResult = {
-    orderBy: jest.fn().mockReturnValue({
-      limit: jest.fn().mockResolvedValue(result),
-    }),
+    limit: jest.fn().mockResolvedValue(result),
     then: (resolve: (v: unknown) => void) =>
       Promise.resolve(result).then(resolve),
   };
@@ -101,7 +99,6 @@ describe('UserRolesService', () => {
             id: 2,
             name: 'user',
             description: 'Standard user',
-            priority: 10,
             isSystem: 1,
             createdAt: Date.now(),
           },
@@ -114,7 +111,7 @@ describe('UserRolesService', () => {
       expect(result).toEqual(rows);
     });
 
-    it('returns the highest-priority role name', async () => {
+    it('returns the primary role name', async () => {
       const rows = [{ name: 'admin' }];
       mockDb.select.mockReturnValue(createSelectChain(rows));
 

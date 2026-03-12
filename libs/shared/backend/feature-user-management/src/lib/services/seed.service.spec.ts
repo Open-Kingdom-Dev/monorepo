@@ -38,15 +38,10 @@ describe('SeedService', () => {
 
     mockRolesService = {
       findByName: jest.fn().mockResolvedValue(undefined),
-      create: jest
-        .fn()
-        .mockImplementation(
-          (name: string, _desc: string, priority: number) => ({
-            id: Math.floor(Math.random() * 100),
-            name,
-            priority,
-          })
-        ),
+      create: jest.fn().mockImplementation((name: string) => ({
+        id: Math.floor(Math.random() * 100),
+        name,
+      })),
     };
 
     mockPermissionsService = {

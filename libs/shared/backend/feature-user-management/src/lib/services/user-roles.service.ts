@@ -1,6 +1,6 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { BetterSQLite3Database } from 'drizzle-orm/better-sqlite3';
-import { eq, and, desc, getTableColumns } from 'drizzle-orm';
+import { eq, and, getTableColumns } from 'drizzle-orm';
 
 import { DB_TAG } from '@open-kingdom/shared-poly-util-constants';
 import type { RoleResolver } from '@open-kingdom/shared-backend-util-rbac';
@@ -45,7 +45,6 @@ export class UserRolesService implements RoleResolver {
       .from(userRoles)
       .innerJoin(roles, eq(userRoles.roleId, roles.id))
       .where(eq(userRoles.userId, userId))
-      .orderBy(desc(roles.priority))
       .limit(1);
 
     return row?.name ?? null;

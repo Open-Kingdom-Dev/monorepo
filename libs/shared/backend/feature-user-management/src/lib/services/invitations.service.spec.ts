@@ -74,7 +74,7 @@ describe('InvitationsService', () => {
       roles: {
         findFirst: jest
           .fn()
-          .mockResolvedValue({ id: MOCK_ROLE_ID, name: 'user', priority: 10 }),
+          .mockResolvedValue({ id: MOCK_ROLE_ID, name: 'user' }),
       },
     };
 
