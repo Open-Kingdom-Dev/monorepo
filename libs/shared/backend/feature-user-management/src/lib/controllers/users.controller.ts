@@ -3,7 +3,6 @@ import {
   Get,
   Delete,
   Param,
-  UseGuards,
   Request,
   ParseIntPipe,
 } from '@nestjs/common';
@@ -16,7 +15,7 @@ import {
   ApiForbiddenResponse,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
-import { AuthGuard } from '@nestjs/passport';
+import { RequirePermission } from '@open-kingdom/shared-backend-util-rbac';
 
 import { UserManagementService } from '../services';
 import type { AuthenticatedRequest } from '../types';
@@ -24,7 +23,6 @@ import type { AuthenticatedRequest } from '../types';
 @ApiTags('Users')
 @Controller('users')
 @ApiBearerAuth('JWT-auth')
-@UseGuards(AuthGuard('jwt'))
 @ApiUnauthorizedResponse({
   description: 'Unauthorized - Invalid or missing JWT token',
 })
@@ -32,6 +30,7 @@ export class UsersController {
   constructor(private readonly userManagementService: UserManagementService) {}
 
   @Get()
+  @RequirePermission('users', 'read')
   @ApiOperation({
     summary: 'List all users',
     description: 'Returns a list of all users without passwords',
@@ -45,6 +44,7 @@ export class UsersController {
   }
 
   @Get(':id')
+  @RequirePermission('users', 'read')
   @ApiOperation({
     summary: 'Get a user by ID',
     description: 'Returns a single user by their ID',
@@ -61,6 +61,7 @@ export class UsersController {
   }
 
   @Delete(':id')
+  @RequirePermission('users', 'delete')
   @ApiOperation({
     summary: 'Delete a user',
     description: 'Delete a user by their ID. Cannot delete your own account.',

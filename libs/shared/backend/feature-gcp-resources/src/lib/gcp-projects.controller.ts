@@ -13,6 +13,7 @@ import {
   ApiQuery,
   ApiBody,
 } from '@nestjs/swagger';
+import { Public } from '@open-kingdom/shared-backend-util-rbac';
 import { GcpProjectsService } from './gcp-projects.service.js';
 import {
   GcpProjectSummaryDto,
@@ -25,6 +26,7 @@ import {
 export class GcpProjectsController {
   constructor(private readonly gcpProjectsService: GcpProjectsService) {}
 
+  @Public()
   @Get('projects')
   @ApiOperation({
     summary: 'List GCP projects in org or folder',
@@ -58,6 +60,7 @@ export class GcpProjectsController {
     return this.gcpProjectsService.listProjectsByParent(parent.trim());
   }
 
+  @Public()
   @Post('projects')
   @ApiOperation({
     summary: 'Create a new GCP project',
