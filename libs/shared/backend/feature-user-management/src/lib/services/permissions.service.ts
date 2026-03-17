@@ -8,21 +8,15 @@ import { BetterSQLite3Database } from 'drizzle-orm/better-sqlite3';
 import { eq, and, getTableColumns } from 'drizzle-orm';
 
 import { DB_TAG } from '@open-kingdom/shared-poly-util-constants';
-import {
-  permissions,
-  PermissionsTableName,
-} from '../schemas/permissions.schema';
-import {
-  rolePermissions,
-  RolePermissionsTableName,
-} from '../schemas/role-permissions.schema';
-import { userRoles, UserRolesTableName } from '../schemas/user-roles.schema';
+import { permissions } from '../schemas/permissions.schema';
+import { rolePermissions } from '../schemas/role-permissions.schema';
+import { userRoles } from '../schemas/user-roles.schema';
 import type { Permission } from '../schemas/permissions.schema';
 
 type Schema = {
-  [PermissionsTableName]: typeof permissions;
-  [RolePermissionsTableName]: typeof rolePermissions;
-  [UserRolesTableName]: typeof userRoles;
+  permissions: typeof permissions;
+  rolePermissions: typeof rolePermissions;
+  userRoles: typeof userRoles;
 };
 
 @Injectable()
@@ -111,7 +105,7 @@ export class PermissionsService {
   async delete(id: number): Promise<void> {
     await this.findById(id);
 
-    const assigned = await this.db.query.role_permissions.findFirst({
+    const assigned = await this.db.query.rolePermissions.findFirst({
       where: eq(rolePermissions.permissionId, id),
     });
 

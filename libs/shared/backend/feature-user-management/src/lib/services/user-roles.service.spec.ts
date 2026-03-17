@@ -5,7 +5,7 @@ import { UserRolesService } from './user-roles.service';
 import { PermissionsService } from './permissions.service';
 
 interface MockQuery {
-  user_roles: {
+  userRoles: {
     findFirst: jest.Mock;
   };
 }
@@ -44,7 +44,7 @@ describe('UserRolesService', () => {
 
   beforeEach(async () => {
     mockQuery = {
-      user_roles: {
+      userRoles: {
         findFirst: jest.fn().mockResolvedValue(undefined),
       },
     };
@@ -142,7 +142,7 @@ describe('UserRolesService', () => {
 
   describe('assigning roles', () => {
     it('assigns a role to a user', async () => {
-      mockQuery.user_roles.findFirst.mockResolvedValue(undefined);
+      mockQuery.userRoles.findFirst.mockResolvedValue(undefined);
 
       await service.assignRole(1, 2);
 
@@ -150,7 +150,7 @@ describe('UserRolesService', () => {
     });
 
     it('skips assignment when the user already has the role', async () => {
-      mockQuery.user_roles.findFirst.mockResolvedValue({
+      mockQuery.userRoles.findFirst.mockResolvedValue({
         id: 1,
         userId: 1,
         roleId: 2,

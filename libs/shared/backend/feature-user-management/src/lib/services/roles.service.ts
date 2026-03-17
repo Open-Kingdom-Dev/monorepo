@@ -8,13 +8,13 @@ import { BetterSQLite3Database } from 'drizzle-orm/better-sqlite3';
 import { eq } from 'drizzle-orm';
 
 import { DB_TAG } from '@open-kingdom/shared-poly-util-constants';
-import { roles, RolesTableName } from '../schemas/roles.schema';
-import { userRoles, UserRolesTableName } from '../schemas/user-roles.schema';
+import { roles } from '../schemas/roles.schema';
+import { userRoles } from '../schemas/user-roles.schema';
 import type { Role, NewRole } from '../schemas/roles.schema';
 
 type Schema = {
-  [RolesTableName]: typeof roles;
-  [UserRolesTableName]: typeof userRoles;
+  roles: typeof roles;
+  userRoles: typeof userRoles;
 };
 
 @Injectable()
@@ -89,7 +89,7 @@ export class RolesService {
       throw new BadRequestException('Cannot delete a system role');
     }
 
-    const assigned = await this.db.query.user_roles.findFirst({
+    const assigned = await this.db.query.userRoles.findFirst({
       where: eq(userRoles.roleId, id),
     });
 

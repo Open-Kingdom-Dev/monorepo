@@ -10,7 +10,7 @@ interface MockQuery {
     findFirst: jest.Mock;
     findMany: jest.Mock;
   };
-  user_roles: {
+  userRoles: {
     findFirst: jest.Mock;
   };
 }
@@ -42,7 +42,7 @@ describe('RolesService', () => {
         findFirst: jest.fn(),
         findMany: jest.fn().mockResolvedValue([]),
       },
-      user_roles: {
+      userRoles: {
         findFirst: jest.fn().mockResolvedValue(undefined),
       },
     };
@@ -154,7 +154,7 @@ describe('RolesService', () => {
     it('deletes a non-system role with no users', async () => {
       const role = createMockRole();
       mockQuery.roles.findFirst.mockResolvedValue(role);
-      mockQuery.user_roles.findFirst.mockResolvedValue(undefined);
+      mockQuery.userRoles.findFirst.mockResolvedValue(undefined);
 
       await service.delete(1);
 
@@ -171,7 +171,7 @@ describe('RolesService', () => {
     it('prevents deleting a role assigned to users', async () => {
       const role = createMockRole();
       mockQuery.roles.findFirst.mockResolvedValue(role);
-      mockQuery.user_roles.findFirst.mockResolvedValue({
+      mockQuery.userRoles.findFirst.mockResolvedValue({
         id: 1,
         userId: 1,
         roleId: 1,
