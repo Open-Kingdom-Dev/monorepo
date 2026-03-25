@@ -4,15 +4,15 @@ import { eq, and, getTableColumns } from 'drizzle-orm';
 
 import { DB_TAG } from '@open-kingdom/shared-poly-util-constants';
 import type { RoleResolver } from '@open-kingdom/shared-backend-util-rbac';
-import { userRoles, UserRolesTableName } from '../schemas/user-roles.schema';
-import { roles, RolesTableName } from '../schemas/roles.schema';
+import { userRoles } from '../schemas/user-roles.schema';
+import { roles } from '../schemas/roles.schema';
 import { PermissionsService } from './permissions.service';
 import type { Role } from '../schemas/roles.schema';
 import type { UserRole } from '../schemas/user-roles.schema';
 
 type Schema = {
-  [UserRolesTableName]: typeof userRoles;
-  [RolesTableName]: typeof roles;
+  userRoles: typeof userRoles;
+  roles: typeof roles;
 };
 
 export interface UserRoleWithRole extends UserRole {
@@ -59,7 +59,7 @@ export class UserRolesService implements RoleResolver {
     roleId: number,
     assignedBy?: number | null
   ): Promise<void> {
-    const existing = await this.db.query.user_roles.findFirst({
+    const existing = await this.db.query.userRoles.findFirst({
       where: and(eq(userRoles.userId, userId), eq(userRoles.roleId, roleId)),
     });
 

@@ -10,7 +10,7 @@ interface MockQuery {
     findFirst: jest.Mock;
     findMany: jest.Mock;
   };
-  role_permissions: {
+  rolePermissions: {
     findFirst: jest.Mock;
   };
 }
@@ -56,7 +56,7 @@ describe('PermissionsService', () => {
         findFirst: jest.fn(),
         findMany: jest.fn().mockResolvedValue([]),
       },
-      role_permissions: {
+      rolePermissions: {
         findFirst: jest.fn().mockResolvedValue(undefined),
       },
     };
@@ -198,7 +198,7 @@ describe('PermissionsService', () => {
   describe('deleting permissions', () => {
     it('deletes a permission not assigned to any role', async () => {
       mockQuery.permissions.findFirst.mockResolvedValue(createMockPermission());
-      mockQuery.role_permissions.findFirst.mockResolvedValue(undefined);
+      mockQuery.rolePermissions.findFirst.mockResolvedValue(undefined);
 
       await service.delete(1);
 
@@ -207,7 +207,7 @@ describe('PermissionsService', () => {
 
     it('prevents deleting a permission assigned to roles', async () => {
       mockQuery.permissions.findFirst.mockResolvedValue(createMockPermission());
-      mockQuery.role_permissions.findFirst.mockResolvedValue({
+      mockQuery.rolePermissions.findFirst.mockResolvedValue({
         id: 1,
         roleId: 1,
         permissionId: 1,
