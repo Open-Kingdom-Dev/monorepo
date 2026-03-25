@@ -1,4 +1,4 @@
-export type Role = 'guest' | 'user' | 'admin';
+export type Role = string;
 
 export type InvitationStatus = 'pending' | 'accepted' | 'expired';
 
@@ -16,6 +16,6 @@ export interface Invitation {
   tokenExpiry: number;
   invitedBy: number;
   invitedAt: number;
-  role: Role;
+  roleId: number;
   status: InvitationStatus;
 }

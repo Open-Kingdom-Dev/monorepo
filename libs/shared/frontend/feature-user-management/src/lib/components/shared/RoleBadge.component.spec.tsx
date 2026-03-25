@@ -17,4 +17,9 @@ describe('RoleBadge', () => {
     render(<RoleBadge role="guest" />);
     expect(screen.getByText('Guest')).toBeInTheDocument();
   });
+
+  it('displays a custom role with a capitalized label', () => {
+    render(<RoleBadge role="editor" />);
+    expect(screen.getByText('Editor')).toBeInTheDocument();
+  });
 });

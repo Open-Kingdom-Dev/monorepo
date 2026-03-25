@@ -3,6 +3,7 @@ import { useDispatch } from 'react-redux';
 import {
   useInvitationsControllerFindAllQuery,
   useInvitationsControllerCancelMutation,
+  useRolesControllerFindAllQuery,
 } from '@open-kingdom/shared-frontend-data-access-api-client';
 import { showSuccessNotification } from '@open-kingdom/shared-frontend-data-access-notifications';
 import {
@@ -25,13 +26,16 @@ const emailColumn: ColDef<Invitation> = {
   flex: 2,
 };
 
-const roleColumn: ColDef<Invitation> = {
-  field: 'role',
-  headerName: 'Role',
-  flex: 1,
-  cellRenderer: (params: ICellRendererParams<Invitation>) =>
-    params.data ? <RoleBadge role={params.data.role} /> : null,
-};
+function roleColumn(rolesMap: Map<number, string>): ColDef<Invitation> {
+  return {
+    headerName: 'Role',
+    flex: 1,
+    cellRenderer: (params: ICellRendererParams<Invitation>) =>
+      params.data ? (
+        <RoleBadge role={rolesMap.get(params.data.roleId) ?? null} />
+      ) : null,
+  };
+}
 
 const statusColumn: ColDef<Invitation> = {
   field: 'status',
@@ -75,18 +79,18 @@ function cancelColumn(
   };
 }
 
-const staticColumns = [
-  emailColumn,
-  roleColumn,
-  statusColumn,
-  invitedColumn,
-  expiresColumn,
-];
-
 function buildColumnDefs(
-  onCancel: (invitation: Invitation) => void
+  onCancel: (invitation: Invitation) => void,
+  rolesMap: Map<number, string>
 ): ColDef<Invitation>[] {
-  return [...staticColumns, cancelColumn(onCancel)];
+  return [
+    emailColumn,
+    roleColumn(rolesMap),
+    statusColumn,
+    invitedColumn,
+    expiresColumn,
+    cancelColumn(onCancel),
+  ];
 }
 
 export function InvitationList() {
@@ -96,25 +100,35 @@ export function InvitationList() {
     useInvitationsControllerFindAllQuery();
   const [cancelInvitation, { isLoading: isCancelling }] =
     useInvitationsControllerCancelMutation();
+  const { data: roles } = useRolesControllerFindAllQuery();
 
   const [invitationToCancel, setInvitationToCancel] =
     useState<Invitation | null>(null);
 
   const invitations = (data as Invitation[] | undefined) ?? [];
 
+  const rolesMap = useMemo(() => {
+    const list = (roles as { id: number; name: string }[]) ?? [];
+    return new Map(list.map((r) => [r.id, r.name]));
+  }, [roles]);
+
   async function handleCancelConfirm() {
     if (!invitationToCancel) return;
 
-    const result = await cancelInvitation({ id: invitationToCancel.id });
-
-    if (!('error' in result)) {
+    try {
+      await cancelInvitation({ id: invitationToCancel.id }).unwrap();
       dispatch(showSuccessNotification('Invitation cancelled successfully'));
+    } catch {
+      // handled by RTK error middleware
+    } finally {
+      setInvitationToCancel(null);
     }
-
-    setInvitationToCancel(null);
   }
 
-  const columnDefs = useMemo(() => buildColumnDefs(setInvitationToCancel), []);
+  const columnDefs = useMemo(
+    () => buildColumnDefs(setInvitationToCancel, rolesMap),
+    [rolesMap]
+  );
 
   if (error) {
     return (

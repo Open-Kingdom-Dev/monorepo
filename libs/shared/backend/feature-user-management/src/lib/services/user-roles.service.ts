@@ -85,17 +85,19 @@ export class UserRolesService implements RoleResolver {
     assignedBy?: number | null
   ): Promise<void> {
     this.db.transaction((tx) => {
-      tx.delete(userRoles).where(eq(userRoles.userId, userId));
+      tx.delete(userRoles).where(eq(userRoles.userId, userId)).run();
 
       if (roleIds.length > 0) {
-        tx.insert(userRoles).values(
-          roleIds.map((roleId) => ({
-            userId,
-            roleId,
-            assignedAt: Date.now(),
-            assignedBy: assignedBy ?? null,
-          }))
-        );
+        tx.insert(userRoles)
+          .values(
+            roleIds.map((roleId) => ({
+              userId,
+              roleId,
+              assignedAt: Date.now(),
+              assignedBy: assignedBy ?? null,
+            }))
+          )
+          .run();
       }
     });
   }

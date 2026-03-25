@@ -2,7 +2,10 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useDispatch } from 'react-redux';
-import { useInvitationsControllerInviteMutation } from '@open-kingdom/shared-frontend-data-access-api-client';
+import {
+  useInvitationsControllerInviteMutation,
+  useRolesControllerFindAllQuery,
+} from '@open-kingdom/shared-frontend-data-access-api-client';
 import { showSuccessNotification } from '@open-kingdom/shared-frontend-data-access-notifications';
 import { ModalOverlay } from '../shared/ModalOverlay.component';
 import { FormField } from '../shared/FormField.component';
@@ -14,7 +17,7 @@ import {
 
 const inviteSchema = z.object({
   email: z.string().email('Invalid email address'),
-  role: z.enum(['guest', 'user', 'admin']),
+  role: z.string().min(1),
 });
 
 type InviteFormValues = z.infer<typeof inviteSchema>;
@@ -27,6 +30,9 @@ interface InviteUserModalProps {
 export function InviteUserModal({ isOpen, onClose }: InviteUserModalProps) {
   const dispatch = useDispatch();
   const [invite, { isLoading }] = useInvitationsControllerInviteMutation();
+  const { data: roles } = useRolesControllerFindAllQuery();
+
+  const roleList = (roles as { id: number; name: string }[]) ?? [];
 
   const {
     register,
@@ -91,9 +97,11 @@ export function InviteUserModal({ isOpen, onClose }: InviteUserModalProps) {
             className={inputStyles}
             {...register('role')}
           >
-            <option value="guest">Guest</option>
-            <option value="user">User</option>
-            <option value="admin">Admin</option>
+            {roleList.map((role) => (
+              <option key={role.id} value={role.name}>
+                {role.name.charAt(0).toUpperCase() + role.name.slice(1)}
+              </option>
+            ))}
           </select>
         </FormField>
         <div className="flex justify-end gap-3">

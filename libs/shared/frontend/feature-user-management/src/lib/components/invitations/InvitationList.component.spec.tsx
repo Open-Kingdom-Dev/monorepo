@@ -14,6 +14,13 @@ jest.mock('@open-kingdom/shared-frontend-data-access-api-client', () => ({
     mockCancelInvitation,
     { isLoading: false },
   ],
+  useRolesControllerFindAllQuery: () => ({
+    data: [
+      { id: 1, name: 'admin' },
+      { id: 2, name: 'user' },
+      { id: 3, name: 'guest' },
+    ],
+  }),
 }));
 
 jest.mock('@open-kingdom/shared-frontend-data-access-notifications', () => ({
@@ -116,7 +123,7 @@ const mockInvitations = [
     tokenExpiry: Date.now() + 86400000,
     invitedBy: 1,
     invitedAt: Date.now() - 86400000,
-    role: 'user',
+    roleId: 2,
     status: 'pending',
   },
   {
@@ -125,7 +132,7 @@ const mockInvitations = [
     tokenExpiry: Date.now() - 86400000,
     invitedBy: 1,
     invitedAt: Date.now() - 604800000,
-    role: 'guest',
+    roleId: 3,
     status: 'expired',
   },
 ];
@@ -208,7 +215,7 @@ describe('InvitationList', () => {
     });
     renderWithProviders(<InvitationList />);
 
-    const roleCol = capturedColumnDefs.find((c) => c.field === 'role');
+    const roleCol = capturedColumnDefs.find((c) => c.headerName === 'Role');
     const statusCol = capturedColumnDefs.find((c) => c.field === 'status');
     const invitedCol = capturedColumnDefs.find(
       (c) => c.headerName === 'Invited'

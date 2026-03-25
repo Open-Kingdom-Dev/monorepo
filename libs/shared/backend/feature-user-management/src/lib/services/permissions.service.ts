@@ -123,12 +123,16 @@ export class PermissionsService {
     permissionIds: number[]
   ): Promise<void> {
     this.db.transaction((tx) => {
-      tx.delete(rolePermissions).where(eq(rolePermissions.roleId, roleId));
+      tx.delete(rolePermissions)
+        .where(eq(rolePermissions.roleId, roleId))
+        .run();
 
       if (permissionIds.length > 0) {
-        tx.insert(rolePermissions).values(
-          permissionIds.map((permissionId) => ({ roleId, permissionId }))
-        );
+        tx.insert(rolePermissions)
+          .values(
+            permissionIds.map((permissionId) => ({ roleId, permissionId }))
+          )
+          .run();
       }
     });
   }
