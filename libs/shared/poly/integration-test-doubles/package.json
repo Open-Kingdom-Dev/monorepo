@@ -1,0 +1,57 @@
+{
+  "name": "@open-kingdom/shared-poly-integration-test-doubles",
+  "version": "0.0.2-16",
+  "publishConfig": {
+    "access": "public"
+  },
+  "type": "module",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    "./package.json": "./package.json",
+    ".": {
+      "@open-kingdom/source": "./src/index.ts",
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "README.md",
+    "dist",
+    "!**/*.tsbuildinfo"
+  ],
+  "nx": {
+    "name": "integration-test-doubles",
+    "sourceRoot": "libs/shared/poly/integration-test-doubles/src",
+    "tags": [
+      "scope:shared",
+      "type:library",
+      "environment:poly"
+    ],
+    "targets": {
+      "build": {
+        "executor": "@nx/js:swc",
+        "outputs": [
+          "{options.outputPath}"
+        ],
+        "options": {
+          "outputPath": "libs/shared/poly/integration-test-doubles/dist",
+          "main": "libs/shared/poly/integration-test-doubles/src/index.ts",
+          "tsConfig": "libs/shared/poly/integration-test-doubles/tsconfig.lib.json",
+          "skipTypeCheck": true,
+          "stripLeadingPaths": true
+        }
+      },
+      "start:twin": {
+        "command": "npx tsx libs/shared/poly/integration-test-doubles/scripts/start-twin.ts"
+      }
+    }
+  },
+  "dependencies": {
+    "@open-kingdom/shared-poly-util-env-config": "0.0.2-16",
+    "dockerode": "^4.0.6",
+    "tslib": "^2.3.0"
+  }
+}

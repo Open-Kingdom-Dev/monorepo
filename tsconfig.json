@@ -86,6 +86,9 @@
     },
     {
       "path": "./libs/shared/frontend/ui-primitives"
+    },
+    {
+      "path": "./libs/shared/poly/integration-test-doubles"
     }
   ]
 }
