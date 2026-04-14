@@ -23,6 +23,7 @@ const createMockDocker = (existingContainer = null) => {
       remove: jest.fn().mockResolvedValue(undefined),
     })),
     createContainer: jest.fn().mockResolvedValue(mockContainer),
+    listImages: jest.fn().mockResolvedValue([{ Id: 'fake-image-id' }]),
   };
   return { mockDocker, mockContainer };
 };
@@ -119,6 +120,7 @@ describe('GcsTwin (lifecycle)', () => {
       const mockDocker = {
         getContainer: jest.fn().mockReturnValue(existingContainer),
         createContainer: jest.fn().mockResolvedValue(createMockContainer()),
+        listImages: jest.fn().mockResolvedValue([{ Id: 'fake-image-id' }]),
       };
       const twin = new GcsTwin({ port: 9013 }, mockDocker as any);
       mockFetch.mockResolvedValue({ ok: true });

@@ -45,7 +45,8 @@
         }
       },
       "start:twin": {
-        "command": "npx tsx libs/shared/poly/integration-test-doubles/scripts/start-twin.ts"
+        "command": "npx tsx libs/shared/poly/integration-test-doubles/scripts/start-twin.ts",
+        "dependsOn": ["^build"]
       }
     }
   },
