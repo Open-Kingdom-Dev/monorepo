@@ -443,18 +443,22 @@ describe('Theme System Integration', () => {
       };
 
       render(
-        <ThemeProvider
-          initialTheme={mergeThemes(defaultLightTheme, brandTheme)}
-        >
+        <ThemeProvider initialTheme={brandTheme}>
           <FullThemeTestComponent />
         </ThemeProvider>
       );
 
+      // Brand overrides should be applied
       expect(screen.getByTestId('primary-500')).toHaveTextContent('#ef4444');
       expect(screen.getByTestId('font-sans')).toHaveTextContent(
         'Brand Font, Helvetica, Arial, sans-serif'
       );
       expect(screen.getByTestId('spacing-md')).toHaveTextContent('1.25rem');
+
+      // Non-overridden defaults should survive the auto-merge
+      expect(screen.getByTestId('neutral-900')).toHaveTextContent(
+        defaultLightTheme.colors?.neutral?.[900] as string
+      );
 
       // Should apply brand colors to DOM
       expect(mockDOM.setProperty).toHaveBeenCalledWith(
