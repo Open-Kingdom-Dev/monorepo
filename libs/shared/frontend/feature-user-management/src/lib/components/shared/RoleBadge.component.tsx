@@ -1,13 +1,13 @@
-const roleStyles: Record<string, string> = {
+const systemRoleStyles: Record<string, string> = {
   admin:
-    'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300',
+    'bg-secondary-100 text-secondary-800 dark:bg-secondary-900/30 dark:text-secondary-300',
   user: 'bg-primary-100 text-primary-800 dark:bg-primary-900/30 dark:text-primary-300',
   guest:
     'bg-neutral-100 text-neutral-700 dark:bg-neutral-700 dark:text-neutral-300',
 };
 
 const fallbackStyle =
-  'bg-secondary-100 text-secondary-800 dark:bg-secondary-900/30 dark:text-secondary-300';
+  'bg-primary-100 text-primary-800 dark:bg-primary-900/30 dark:text-primary-300';
 
 interface RoleBadgeProps {
   role: string | null;
@@ -19,7 +19,7 @@ export function RoleBadge({ role }: RoleBadgeProps) {
   return (
     <span
       className={`inline-block rounded-full px-2.5 py-0.5 text-xs font-medium ${
-        roleStyles[role] ?? fallbackStyle
+        systemRoleStyles[role] ?? fallbackStyle
       }`}
     >
       {label}
