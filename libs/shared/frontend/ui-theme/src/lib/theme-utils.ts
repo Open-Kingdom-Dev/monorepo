@@ -5,6 +5,7 @@ export const generateCSSVariables = (theme: Theme): Record<string, string> => {
 
   // Generate color variables
   Object.entries(theme.colors || {}).forEach(([colorName, colorPalette]) => {
+    if (!colorPalette) return;
     Object.entries(colorPalette).forEach(([shade, value]) => {
       variables[`--color-${colorName}-${shade}`] = value as string;
     });
@@ -63,29 +64,20 @@ export const mergeThemes = (
   return {
     ...baseTheme,
     ...overrideTheme,
-    colors: {
-      primary: {
-        ...baseTheme?.colors?.primary,
-        ...overrideTheme?.colors?.primary,
-      },
-      secondary: {
-        ...baseTheme?.colors?.secondary,
-        ...overrideTheme?.colors?.secondary,
-      },
-      neutral: {
-        ...baseTheme?.colors?.neutral,
-        ...overrideTheme?.colors?.neutral,
-      },
-      success: {
-        ...baseTheme?.colors?.success,
-        ...overrideTheme?.colors?.success,
-      },
-      warning: {
-        ...baseTheme?.colors?.warning,
-        ...overrideTheme?.colors?.warning,
-      },
-      error: { ...baseTheme?.colors?.error, ...overrideTheme?.colors?.error },
-    },
+    colors: Object.fromEntries(
+      [
+        ...new Set([
+          ...Object.keys(baseTheme?.colors ?? {}),
+          ...Object.keys(overrideTheme?.colors ?? {}),
+        ]),
+      ].map((key) => [
+        key,
+        {
+          ...baseTheme?.colors?.[key],
+          ...overrideTheme?.colors?.[key],
+        },
+      ])
+    ),
     typography: {
       ...baseTheme.typography,
       ...overrideTheme.typography,

@@ -65,6 +65,7 @@ export interface ThemeColors {
   success?: ColorPalette;
   warning?: ColorPalette;
   error?: ColorPalette;
+  [key: string]: ColorPalette | undefined;
 }
 
 export interface Theme {

@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
+import { useMountEffect, useUpdateEffect } from '@react-hookz/web';
 import { Theme, ThemeContextValue, ThemeMode } from './theme.types';
 import { defaultLightTheme, defaultDarkTheme } from './default-theme';
 import {
@@ -20,35 +21,39 @@ export const useTheme = (): ThemeContextValue => {
 
 interface ThemeProviderProps {
   children: React.ReactNode;
-  initialTheme?: Theme;
+  initialTheme?: Partial<Theme>;
   initialMode?: ThemeMode;
 }
 
 export const ThemeProvider: React.FC<ThemeProviderProps> = ({
   children,
-  initialTheme = defaultLightTheme,
+  initialTheme,
   initialMode = 'light',
 }) => {
-  const [theme, setThemeState] = useState<Theme>(initialTheme);
+  const [theme, setThemeState] = useState<Theme>(
+    initialTheme
+      ? mergeThemes(defaultLightTheme, initialTheme)
+      : defaultLightTheme
+  );
   const [mode, setModeState] = useState<ThemeMode>(initialMode);
 
   useEffect(() => {
     applyThemeToDOM(theme);
   }, [theme]);
 
-  useEffect(() => {
-    if (!initialTheme || initialTheme === defaultLightTheme) {
+  useUpdateEffect(() => {
+    if (!initialTheme) {
       const newTheme = mode === 'dark' ? defaultDarkTheme : defaultLightTheme;
       setThemeState(newTheme);
     }
   }, [mode, initialTheme]);
 
-  useEffect(() => {
+  useMountEffect(() => {
     const savedMode = loadThemeMode();
     if (savedMode) {
       setModeState(savedMode);
     }
-  }, []);
+  });
 
   const setMode = (newMode: ThemeMode) => {
     setModeState(newMode);
