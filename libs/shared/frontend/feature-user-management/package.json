@@ -25,6 +25,20 @@
   "dependencies": {
     "@open-kingdom/shared-poly-util-date": "*"
   },
+  "peerDependencies": {
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "react-redux": "^9.2.0",
+    "@reduxjs/toolkit": "^2.8.2",
+    "react-hook-form": "^7.0.0",
+    "@hookform/resolvers": "^5.0.0",
+    "zod": "^4.0.0",
+    "@react-hookz/web": "^25.0.0",
+    "@open-kingdom/shared-frontend-data-access-api-client": "*",
+    "@open-kingdom/shared-frontend-data-access-notifications": "*",
+    "@open-kingdom/shared-frontend-ui-theme": "*",
+    "@open-kingdom/shared-frontend-ui-datagrid": "*"
+  },
   "nx": {
     "tags": [
       "scope:shared",
