@@ -5,6 +5,7 @@ import { Home } from './routes/home';
 import Profile from './routes/profile';
 import UserManagement from './routes/user-management';
 import AcceptInvitationRoute from './routes/accept-invitation';
+import GcsDemo from './routes/gcs-demo';
 
 export const router = createBrowserRouter([
   {
@@ -16,6 +17,7 @@ export const router = createBrowserRouter([
       { path: 'profile', Component: Profile },
       { path: 'admin/users', Component: UserManagement },
       { path: 'accept-invitation', Component: AcceptInvitationRoute },
+      { path: 'gcs-demo', Component: GcsDemo },
     ],
   },
 ]);

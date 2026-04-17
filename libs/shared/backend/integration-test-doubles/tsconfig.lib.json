@@ -14,7 +14,7 @@
   "include": ["src/**/*.ts"],
   "references": [
     {
-      "path": "../util-env-config/tsconfig.lib.json"
+      "path": "../../poly/util-env-config/tsconfig.lib.json"
     }
   ],
   "exclude": [

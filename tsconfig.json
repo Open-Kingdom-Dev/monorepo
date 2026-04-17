@@ -85,7 +85,7 @@
       "path": "./libs/shared/backend/util-rbac"
     },
     {
-      "path": "./libs/shared/poly/integration-test-doubles"
+      "path": "./libs/shared/backend/integration-test-doubles"
     }
   ]
 }

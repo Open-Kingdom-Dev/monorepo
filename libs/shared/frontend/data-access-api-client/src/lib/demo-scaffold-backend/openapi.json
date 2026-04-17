@@ -1091,6 +1091,353 @@
           "GCP Resources"
         ]
       }
+    },
+    "/api/gcs/upload": {
+      "post": {
+        "description": "Upload a file to a GCS bucket. Content must be base64 encoded.",
+        "operationId": "GcsStorageController_uploadFile",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "description": "File upload details",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UploadFileDto"
+              },
+              "examples": {
+                "example": {
+                  "summary": "Upload a text file",
+                  "value": {
+                    "bucket": "app-assets",
+                    "fileName": "hello.txt",
+                    "content": "SGVsbG8gd29ybGQ=",
+                    "contentType": "text/plain"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "File uploaded successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FileMetadataDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request - missing fields or invalid data"
+          }
+        },
+        "summary": "Upload a file to GCS",
+        "tags": [
+          "GCS Storage"
+        ]
+      }
+    },
+    "/api/gcs/files": {
+      "get": {
+        "description": "List files in a GCS bucket, optionally filtered by prefix.",
+        "operationId": "GcsStorageController_listFiles",
+        "parameters": [
+          {
+            "name": "bucket",
+            "required": true,
+            "in": "query",
+            "description": "Bucket name",
+            "schema": {
+              "example": "app-assets",
+              "type": "string"
+            }
+          },
+          {
+            "name": "prefix",
+            "required": false,
+            "in": "query",
+            "description": "Prefix filter",
+            "schema": {
+              "example": "images/",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of files",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ListFilesResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Missing bucket name"
+          }
+        },
+        "summary": "List files in a bucket",
+        "tags": [
+          "GCS Storage"
+        ]
+      }
+    },
+    "/api/gcs/files/{bucket}/{fileName}/download": {
+      "get": {
+        "description": "Download a file from GCS as base64 encoded content.",
+        "operationId": "GcsStorageController_downloadFile",
+        "parameters": [
+          {
+            "name": "bucket",
+            "required": true,
+            "in": "path",
+            "description": "Bucket name",
+            "schema": {
+              "example": "app-assets",
+              "type": "string"
+            }
+          },
+          {
+            "name": "fileName",
+            "required": true,
+            "in": "path",
+            "description": "File name",
+            "schema": {
+              "example": "hello.txt",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "File content",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "content": {
+                      "type": "string",
+                      "description": "Base64 encoded file content"
+                    },
+                    "metadata": {
+                      "$ref": "#/components/schemas/FileMetadataDto"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Missing bucket or file name"
+          },
+          "404": {
+            "description": "File not found"
+          }
+        },
+        "summary": "Download a file",
+        "tags": [
+          "GCS Storage"
+        ]
+      }
+    },
+    "/api/gcs/files/{bucket}/{fileName}/delete": {
+      "post": {
+        "description": "Delete a file from GCS.",
+        "operationId": "GcsStorageController_deleteFile",
+        "parameters": [
+          {
+            "name": "bucket",
+            "required": true,
+            "in": "path",
+            "description": "Bucket name",
+            "schema": {
+              "example": "app-assets",
+              "type": "string"
+            }
+          },
+          {
+            "name": "fileName",
+            "required": true,
+            "in": "path",
+            "description": "File name",
+            "schema": {
+              "example": "hello.txt",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "File deleted successfully"
+          },
+          "400": {
+            "description": "Missing bucket or file name"
+          }
+        },
+        "summary": "Delete a file",
+        "tags": [
+          "GCS Storage"
+        ]
+      }
+    },
+    "/api/twin/status": {
+      "get": {
+        "description": "Get twin status",
+        "operationId": "TwinController_getStatus",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Returns twin status (running, healthy, port, url)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "running": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "healthy": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "port": {
+                      "type": "number",
+                      "example": 9013
+                    },
+                    "url": {
+                      "type": "string",
+                      "example": "http://localhost:9013",
+                      "nullable": true
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "summary": "Get twin status",
+        "tags": [
+          "Twin"
+        ]
+      }
+    },
+    "/api/twin/start": {
+      "post": {
+        "description": "Start the GCS twin",
+        "operationId": "TwinController_start",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Twin started successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "GCS twin started on port 9013"
+                    },
+                    "url": {
+                      "type": "string",
+                      "example": "http://localhost:9013",
+                      "nullable": true
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Failed to start twin",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Failed to start twin: some error"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "summary": "Start the GCS twin",
+        "tags": [
+          "Twin"
+        ]
+      }
+    },
+    "/api/twin/stop": {
+      "post": {
+        "description": "Stop the GCS twin",
+        "operationId": "TwinController_stop",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Twin stopped successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "GCS twin stopped"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Failed to stop twin",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Failed to stop twin: some error"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "summary": "Stop the GCS twin",
+        "tags": [
+          "Twin"
+        ]
+      }
     }
   },
   "info": {
@@ -1103,6 +1450,10 @@
     {
       "name": "demo-scaffold",
       "description": ""
+    },
+    {
+      "name": "Twin",
+      "description": "GCS twin control endpoints"
     }
   ],
   "servers": [],
@@ -1489,6 +1840,87 @@
         "required": [
           "name",
           "projectId"
+        ]
+      },
+      "UploadFileDto": {
+        "type": "object",
+        "properties": {
+          "bucket": {
+            "type": "string",
+            "description": "Bucket name",
+            "example": "app-assets"
+          },
+          "fileName": {
+            "type": "string",
+            "description": "File name",
+            "example": "test.txt"
+          },
+          "content": {
+            "type": "string",
+            "description": "File content as base64 string",
+            "example": "SGVsbG8gd29ybGQ="
+          },
+          "contentType": {
+            "type": "string",
+            "description": "Optional content type",
+            "example": "text/plain"
+          }
+        },
+        "required": [
+          "bucket",
+          "fileName",
+          "content"
+        ]
+      },
+      "FileMetadataDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "File name",
+            "example": "test.txt"
+          },
+          "bucket": {
+            "type": "string",
+            "description": "Bucket name",
+            "example": "app-assets"
+          },
+          "size": {
+            "type": "number",
+            "description": "File size in bytes",
+            "example": 11
+          },
+          "contentType": {
+            "type": "string",
+            "description": "Content type",
+            "example": "text/plain"
+          },
+          "updated": {
+            "format": "date-time",
+            "type": "string",
+            "description": "Last updated timestamp"
+          }
+        },
+        "required": [
+          "name",
+          "bucket",
+          "size",
+          "contentType",
+          "updated"
+        ]
+      },
+      "ListFilesResponseDto": {
+        "type": "object",
+        "properties": {
+          "files": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FileMetadataDto"
+            }
+          }
+        },
+        "required": [
+          "files"
         ]
       }
     }

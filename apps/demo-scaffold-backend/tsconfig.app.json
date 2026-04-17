@@ -27,6 +27,9 @@
       "path": "../../libs/shared/backend/data-access-users/tsconfig.lib.json"
     },
     {
+      "path": "../../libs/shared/backend/integration-test-doubles/tsconfig.lib.json"
+    },
+    {
       "path": "../../libs/shared/backend/util-rbac/tsconfig.lib.json"
     },
     {

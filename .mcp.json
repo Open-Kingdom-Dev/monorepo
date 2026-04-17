@@ -4,6 +4,39 @@
       "type": "stdio",
       "command": "npx",
       "args": ["nx", "mcp"]
+    },
+    "gsd-workflow": {
+      "command": "C:\\Program Files\\nodejs\\node.exe",
+      "args": [
+        "C:\\Program Files\\nodejs\\node_modules\\gsd-pi\\packages\\mcp-server\\dist\\cli.js"
+      ],
+      "cwd": "E:\\Code\\wonderwall",
+      "env": {
+        "GSD_CLI_PATH": "C:\\Program Files\\nodejs\\node_modules\\gsd-pi\\dist\\loader.js",
+        "GSD_WORKFLOW_EXECUTORS_MODULE": "C:\\Users\\MSI KATANA\\.gsd\\agent\\extensions\\gsd\\tools\\workflow-tool-executors.js",
+        "GSD_WORKFLOW_WRITE_GATE_MODULE": "C:\\Users\\MSI KATANA\\.gsd\\agent\\extensions\\gsd\\bootstrap\\write-gate.js",
+        "GSD_PERSIST_WRITE_GATE_STATE": "1",
+        "GSD_WORKFLOW_PROJECT_ROOT": "E:\\Code\\wonderwall"
+      }
+    },
+    "tavily-remote": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "mcp-remote",
+        "https://mcp.tavily.com/mcp/?tavilyApiKey=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"
+      ]
+    },
+    "read-website-fast": {
+      "command": "npx",
+      "args": ["-y", "@just-every/mcp-read-website-fast"]
+    },
+    "filesystem-with-morph": {
+      "env": {
+        "MORPH_API_KEY": "sk-JxFMwl5QK2CBqYysT9GAfzbUSVsmQ7PX5oguAtB0CLj1xpRN"
+      },
+      "command": "npx -y @morphllm/morphmcp",
+      "args": []
     }
   }
 }

@@ -10,6 +10,8 @@ export const addTagTypes = [
   "Permissions",
   "User Roles",
   "GCP Resources",
+  "GCS Storage",
+  "Twin",
 ] as const;
 const injectedRtkApi = api
   .enhanceEndpoints({
@@ -279,6 +281,70 @@ const injectedRtkApi = api
         }),
         invalidatesTags: ["GCP Resources"],
       }),
+      gcsStorageControllerUploadFile: build.mutation<
+        GcsStorageControllerUploadFileApiResponse,
+        GcsStorageControllerUploadFileApiArg
+      >({
+        query: (queryArg) => ({
+          url: `/api/gcs/upload`,
+          method: "POST",
+          body: queryArg.uploadFileDto,
+        }),
+        invalidatesTags: ["GCS Storage"],
+      }),
+      gcsStorageControllerListFiles: build.query<
+        GcsStorageControllerListFilesApiResponse,
+        GcsStorageControllerListFilesApiArg
+      >({
+        query: (queryArg) => ({
+          url: `/api/gcs/files`,
+          params: {
+            bucket: queryArg.bucket,
+            prefix: queryArg.prefix,
+          },
+        }),
+        providesTags: ["GCS Storage"],
+      }),
+      gcsStorageControllerDownloadFile: build.query<
+        GcsStorageControllerDownloadFileApiResponse,
+        GcsStorageControllerDownloadFileApiArg
+      >({
+        query: (queryArg) => ({
+          url: `/api/gcs/files/${queryArg.bucket}/${queryArg.fileName}/download`,
+        }),
+        providesTags: ["GCS Storage"],
+      }),
+      gcsStorageControllerDeleteFile: build.mutation<
+        GcsStorageControllerDeleteFileApiResponse,
+        GcsStorageControllerDeleteFileApiArg
+      >({
+        query: (queryArg) => ({
+          url: `/api/gcs/files/${queryArg.bucket}/${queryArg.fileName}/delete`,
+          method: "POST",
+        }),
+        invalidatesTags: ["GCS Storage"],
+      }),
+      twinControllerGetStatus: build.query<
+        TwinControllerGetStatusApiResponse,
+        TwinControllerGetStatusApiArg
+      >({
+        query: () => ({ url: `/api/twin/status` }),
+        providesTags: ["Twin"],
+      }),
+      twinControllerStart: build.mutation<
+        TwinControllerStartApiResponse,
+        TwinControllerStartApiArg
+      >({
+        query: () => ({ url: `/api/twin/start`, method: "POST" }),
+        invalidatesTags: ["Twin"],
+      }),
+      twinControllerStop: build.mutation<
+        TwinControllerStopApiResponse,
+        TwinControllerStopApiArg
+      >({
+        query: () => ({ url: `/api/twin/stop`, method: "POST" }),
+        invalidatesTags: ["Twin"],
+      }),
     }),
     overrideExisting: false,
   });
@@ -404,6 +470,60 @@ export type GcpProjectsControllerCreateProjectApiArg = {
   /** Project creation details */
   createProjectDto: CreateProjectDto;
 };
+export type GcsStorageControllerUploadFileApiResponse =
+  /** status 201 File uploaded successfully */ FileMetadataDto;
+export type GcsStorageControllerUploadFileApiArg = {
+  /** File upload details */
+  uploadFileDto: UploadFileDto;
+};
+export type GcsStorageControllerListFilesApiResponse =
+  /** status 200 List of files */ ListFilesResponseDto;
+export type GcsStorageControllerListFilesApiArg = {
+  /** Bucket name */
+  bucket: string;
+  /** Prefix filter */
+  prefix?: string;
+};
+export type GcsStorageControllerDownloadFileApiResponse =
+  /** status 200 File content */ {
+    /** Base64 encoded file content */
+    content?: string;
+    metadata?: FileMetadataDto;
+  };
+export type GcsStorageControllerDownloadFileApiArg = {
+  /** Bucket name */
+  bucket: string;
+  /** File name */
+  fileName: string;
+};
+export type GcsStorageControllerDeleteFileApiResponse = unknown;
+export type GcsStorageControllerDeleteFileApiArg = {
+  /** Bucket name */
+  bucket: string;
+  /** File name */
+  fileName: string;
+};
+export type TwinControllerGetStatusApiResponse =
+  /** status 200 Returns twin status (running, healthy, port, url) */ {
+    running?: boolean;
+    healthy?: boolean;
+    port?: number;
+    url?: string | null;
+  };
+export type TwinControllerGetStatusApiArg = void;
+export type TwinControllerStartApiResponse =
+  /** status 200 Twin started successfully */ {
+    success?: boolean;
+    message?: string;
+    url?: string | null;
+  };
+export type TwinControllerStartApiArg = void;
+export type TwinControllerStopApiResponse =
+  /** status 200 Twin stopped successfully */ {
+    success?: boolean;
+    message?: string;
+  };
+export type TwinControllerStopApiArg = void;
 export type LoginResponseDto = {
   /** JWT access token */
   access_token: string;
@@ -520,6 +640,31 @@ export type CreateProjectDto = {
   /** Parent resource: folders/{folder_id} or organizations/{org_id} */
   parent: string;
 };
+export type FileMetadataDto = {
+  /** File name */
+  name: string;
+  /** Bucket name */
+  bucket: string;
+  /** File size in bytes */
+  size: number;
+  /** Content type */
+  contentType: string;
+  /** Last updated timestamp */
+  updated: string;
+};
+export type UploadFileDto = {
+  /** Bucket name */
+  bucket: string;
+  /** File name */
+  fileName: string;
+  /** File content as base64 string */
+  content: string;
+  /** Optional content type */
+  contentType?: string;
+};
+export type ListFilesResponseDto = {
+  files: FileMetadataDto[];
+};
 export const {
   useAuthControllerLoginMutation,
   useAuthControllerGetProfileQuery,
@@ -549,4 +694,11 @@ export const {
   useUserRolesControllerRemoveRoleMutation,
   useGcpProjectsControllerListProjectsQuery,
   useGcpProjectsControllerCreateProjectMutation,
+  useGcsStorageControllerUploadFileMutation,
+  useGcsStorageControllerListFilesQuery,
+  useGcsStorageControllerDownloadFileQuery,
+  useGcsStorageControllerDeleteFileMutation,
+  useTwinControllerGetStatusQuery,
+  useTwinControllerStartMutation,
+  useTwinControllerStopMutation,
 } = injectedRtkApi;

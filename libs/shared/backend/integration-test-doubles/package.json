@@ -1,5 +1,5 @@
 {
-  "name": "@open-kingdom/shared-poly-integration-test-doubles",
+  "name": "@open-kingdom/shared-backend-integration-test-doubles",
   "version": "0.0.2-16",
   "publishConfig": {
     "access": "public"
@@ -24,11 +24,11 @@
   ],
   "nx": {
     "name": "integration-test-doubles",
-    "sourceRoot": "libs/shared/poly/integration-test-doubles/src",
+    "sourceRoot": "libs/shared/backend/integration-test-doubles/src",
     "tags": [
       "scope:shared",
       "type:library",
-      "environment:poly"
+      "environment:backend"
     ],
     "targets": {
       "build": {
@@ -37,15 +37,15 @@
           "{options.outputPath}"
         ],
         "options": {
-          "outputPath": "libs/shared/poly/integration-test-doubles/dist",
-          "main": "libs/shared/poly/integration-test-doubles/src/index.ts",
-          "tsConfig": "libs/shared/poly/integration-test-doubles/tsconfig.lib.json",
+          "outputPath": "libs/shared/backend/integration-test-doubles/dist",
+          "main": "libs/shared/backend/integration-test-doubles/src/index.ts",
+          "tsConfig": "libs/shared/backend/integration-test-doubles/tsconfig.lib.json",
           "skipTypeCheck": true,
           "stripLeadingPaths": true
         }
       },
       "start:twin": {
-        "command": "npx tsx libs/shared/poly/integration-test-doubles/scripts/start-twin.ts",
+        "command": "npx tsx libs/shared/backend/integration-test-doubles/scripts/start-twin.ts",
         "dependsOn": [
           "^build"
         ]
