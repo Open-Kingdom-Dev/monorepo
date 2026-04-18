@@ -30,11 +30,6 @@ jest.mock('@open-kingdom/shared-frontend-data-access-notifications', () => ({
   })),
 }));
 
-jest.mock('@open-kingdom/shared-frontend-ui-theme', () => ({
-  __esModule: true,
-  useTheme: () => ({ theme: {}, mode: 'light' }),
-}));
-
 let capturedColumnDefs: ColDef[] = [];
 jest.mock('@open-kingdom/shared-frontend-ui-datagrid', () => ({
   __esModule: true,

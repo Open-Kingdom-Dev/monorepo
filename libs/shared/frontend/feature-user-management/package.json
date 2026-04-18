@@ -37,7 +37,8 @@
     "@open-kingdom/shared-frontend-data-access-api-client": "*",
     "@open-kingdom/shared-frontend-data-access-notifications": "*",
     "@open-kingdom/shared-frontend-ui-theme": "*",
-    "@open-kingdom/shared-frontend-ui-datagrid": "*"
+    "@open-kingdom/shared-frontend-ui-datagrid": "*",
+    "@open-kingdom/shared-frontend-ui-primitives": "*"
   },
   "nx": {
     "tags": [

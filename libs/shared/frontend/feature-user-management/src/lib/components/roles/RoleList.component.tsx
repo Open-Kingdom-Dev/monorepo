@@ -9,9 +9,7 @@ import {
   DataGrid,
   type ColDef,
   type ICellRendererParams,
-  type DataGridTheme,
 } from '@open-kingdom/shared-frontend-ui-datagrid';
-import { useTheme } from '@open-kingdom/shared-frontend-ui-theme';
 import { ConfirmDialog } from '../shared/ConfirmDialog.component';
 import { RolePermissionsModal } from './RolePermissionsModal.component';
 import { useHasPermission } from '../../hooks/useHasPermission';
@@ -25,7 +23,6 @@ interface Role {
 
 export function RoleList() {
   const dispatch = useDispatch();
-  const { theme, mode } = useTheme();
   const { data, isLoading, error, refetch } = useRolesControllerFindAllQuery();
   const [deleteRole, { isLoading: isDeleting }] =
     useRolesControllerDeleteMutation();
@@ -72,7 +69,7 @@ export function RoleList() {
               {canEditPermissions && (
                 <button
                   onClick={() => params.data && setRoleToEdit(params.data)}
-                  className="rounded px-2 py-1 text-xs font-medium text-primary-600 transition-colors hover:bg-primary-50 dark:text-primary-400 dark:hover:bg-primary-900/20"
+                  className="rounded px-2 py-1 text-xs font-medium text-primary transition-colors hover:bg-primary/10"
                 >
                   Permissions
                 </button>
@@ -84,7 +81,7 @@ export function RoleList() {
                   title={
                     isSystem ? 'Cannot delete a system role' : 'Delete role'
                   }
-                  className="rounded px-2 py-1 text-xs font-medium text-error-600 transition-colors hover:bg-error-50 disabled:cursor-not-allowed disabled:opacity-40 dark:text-error-400 dark:hover:bg-error-900/20"
+                  className="rounded px-2 py-1 text-xs font-medium text-destructive transition-colors hover:bg-destructive/10 disabled:cursor-not-allowed disabled:opacity-40"
                 >
                   Delete
                 </button>
@@ -101,16 +98,14 @@ export function RoleList() {
     return (
       <div
         data-testid="roles-error"
-        className="rounded-lg bg-error-50 p-6 text-center dark:bg-error-900/20"
+        className="rounded-lg bg-destructive/10 p-6 text-center"
         role="alert"
       >
-        <p className="text-error-700 dark:text-error-300">
-          Failed to load roles.
-        </p>
+        <p className="text-destructive">Failed to load roles.</p>
         <button
           data-testid="roles-retry-btn"
           onClick={refetch}
-          className="mt-2 text-sm font-medium text-primary-600 hover:underline dark:text-primary-400"
+          className="mt-2 text-sm font-medium text-primary hover:underline"
         >
           Try again
         </button>
@@ -123,7 +118,7 @@ export function RoleList() {
       <div className="mb-4 flex items-center justify-between">
         <h2
           data-testid="roles-heading"
-          className="text-xl font-semibold text-neutral-900 dark:text-neutral-100"
+          className="text-xl font-semibold text-foreground"
         >
           Roles &amp; Permissions
         </h2>
@@ -132,8 +127,6 @@ export function RoleList() {
       <DataGrid
         rowData={roles}
         columnDefs={columnDefs}
-        mode={mode}
-        theme={theme as DataGridTheme}
         loading={isLoading}
       />
 

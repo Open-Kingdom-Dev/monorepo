@@ -7,13 +7,15 @@ import {
   useRolesControllerFindAllQuery,
 } from '@open-kingdom/shared-frontend-data-access-api-client';
 import { showSuccessNotification } from '@open-kingdom/shared-frontend-data-access-notifications';
-import { ModalOverlay } from '../shared/ModalOverlay.component';
-import { FormField } from '../shared/FormField.component';
 import {
-  inputStyles,
-  buttonPrimaryStyles,
-  buttonSecondaryStyles,
-} from '../../styles';
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  Input,
+  Button,
+} from '@open-kingdom/shared-frontend-ui-primitives';
+import { FormField } from '../shared/FormField.component';
 
 const inviteSchema = z.object({
   email: z.string().email('Invalid email address'),
@@ -44,8 +46,6 @@ export function InviteUserModal({ isOpen, onClose }: InviteUserModalProps) {
     defaultValues: { email: '', role: 'guest' },
   });
 
-  const titleId = 'invite-modal-title';
-
   const handleClose = () => {
     reset();
     onClose();
@@ -63,67 +63,60 @@ export function InviteUserModal({ isOpen, onClose }: InviteUserModalProps) {
   };
 
   return (
-    <ModalOverlay
-      isOpen={isOpen}
-      onClose={handleClose}
-      ariaLabelledBy={titleId}
-    >
-      <h3
-        id={titleId}
-        className="text-lg font-semibold text-neutral-900 dark:text-neutral-100"
-      >
-        Invite User
-      </h3>
-      <form onSubmit={handleSubmit(onSubmit)} className="mt-4 space-y-4">
-        <FormField
-          label="Email"
-          htmlFor="invite-email"
-          required
-          error={errors.email?.message}
-        >
-          <input
-            id="invite-email"
-            data-testid="invite-email-input"
-            type="email"
-            placeholder="user@example.com"
-            className={inputStyles}
-            {...register('email')}
-          />
-        </FormField>
-        <FormField label="Role" htmlFor="invite-role">
-          <select
-            id="invite-role"
-            data-testid="invite-role-select"
-            className={inputStyles}
-            {...register('role')}
+    <Dialog open={isOpen} onOpenChange={(open: boolean) => !open && handleClose()}>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Invite User</DialogTitle>
+        </DialogHeader>
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+          <FormField
+            label="Email"
+            htmlFor="invite-email"
+            required
+            error={errors.email?.message}
           >
-            {roleList.map((role) => (
-              <option key={role.id} value={role.name}>
-                {role.name.charAt(0).toUpperCase() + role.name.slice(1)}
-              </option>
-            ))}
-          </select>
-        </FormField>
-        <div className="flex justify-end gap-3">
-          <button
-            type="button"
-            data-testid="invite-cancel-btn"
-            onClick={handleClose}
-            disabled={isLoading}
-            className={buttonSecondaryStyles}
-          >
-            Cancel
-          </button>
-          <button
-            type="submit"
-            data-testid="invite-submit-btn"
-            disabled={isLoading}
-            className={buttonPrimaryStyles}
-          >
-            {isLoading ? 'Sending...' : 'Send Invitation'}
-          </button>
-        </div>
-      </form>
-    </ModalOverlay>
+            <Input
+              id="invite-email"
+              data-testid="invite-email-input"
+              type="email"
+              placeholder="user@example.com"
+              {...register('email')}
+            />
+          </FormField>
+          <FormField label="Role" htmlFor="invite-role">
+            <select
+              id="invite-role"
+              data-testid="invite-role-select"
+              className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+              {...register('role')}
+            >
+              {roleList.map((role) => (
+                <option key={role.id} value={role.name}>
+                  {role.name.charAt(0).toUpperCase() + role.name.slice(1)}
+                </option>
+              ))}
+            </select>
+          </FormField>
+          <div className="flex justify-end gap-3">
+            <Button
+              type="button"
+              variant="secondary"
+              data-testid="invite-cancel-btn"
+              onClick={handleClose}
+              disabled={isLoading}
+            >
+              Cancel
+            </Button>
+            <Button
+              type="submit"
+              data-testid="invite-submit-btn"
+              disabled={isLoading}
+            >
+              {isLoading ? 'Sending...' : 'Send Invitation'}
+            </Button>
+          </div>
+        </form>
+      </DialogContent>
+    </Dialog>
   );
 }

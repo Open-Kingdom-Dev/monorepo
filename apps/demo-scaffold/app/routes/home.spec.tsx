@@ -8,7 +8,6 @@ import {
   createConsoleLoggerMiddleware,
   LoggerState,
 } from '@open-kingdom/shared-frontend-data-access-logger';
-import { ThemeProvider } from '@open-kingdom/shared-frontend-ui-theme';
 import {
   NotificationKey,
   notificationReducer,
@@ -33,6 +32,17 @@ jest.mock('../components/AdvancedGridExample', () => ({
   AdvancedGridExample: () => (
     <div data-testid="advanced-grid-example">Advanced Grid Example</div>
   ),
+}));
+
+// Mock the theme module
+let mockColorMode = 'light';
+const mockSetMode = jest.fn((newMode: string) => {
+  mockColorMode = newMode;
+});
+jest.mock('@open-kingdom/shared-frontend-ui-theme', () => ({
+  __esModule: true,
+  useColorMode: () => ({ mode: mockColorMode, setMode: mockSetMode }),
+  cn: (...args: string[]) => args.join(' '),
 }));
 
 // Mock the external API hook
@@ -66,6 +76,8 @@ describe('App Component', () => {
           .concat(catFactsApiMiddleware),
     });
 
+    mockColorMode = 'light';
+    mockSetMode.mockClear();
     consoleInfoSpy = jest.spyOn(console, 'info').mockImplementation();
   });
 
@@ -76,10 +88,8 @@ describe('App Component', () => {
   const renderApp = () => {
     return render(
       <Provider store={store}>
-        <ThemeProvider>
-          <Home />
-          <SharedFeatureNotifications />
-        </ThemeProvider>
+        <Home />
+        <SharedFeatureNotifications />
       </Provider>
     );
   };
@@ -135,17 +145,17 @@ describe('App Component', () => {
     // Click toggle button
     fireEvent.click(screen.getByText('Toggle Dark Mode'));
 
-    // Should now show light mode toggle (meaning we're in dark mode)
-    expect(screen.getByText('Toggle Light Mode')).toBeInTheDocument();
+    // setMode should have been called with 'dark'
+    expect(mockSetMode).toHaveBeenCalledWith('dark');
   });
 
   it('should toggle from dark to light mode', () => {
     // Start with dark mode
+    mockColorMode = 'dark';
+
     render(
       <Provider store={store}>
-        <ThemeProvider initialMode="dark">
-          <Home />
-        </ThemeProvider>
+        <Home />
       </Provider>
     );
 
@@ -155,8 +165,8 @@ describe('App Component', () => {
     // Click toggle button
     fireEvent.click(screen.getByText('Toggle Light Mode'));
 
-    // Should now show dark mode toggle (meaning we're in light mode)
-    expect(screen.getByText('Toggle Dark Mode')).toBeInTheDocument();
+    // setMode should have been called with 'light'
+    expect(mockSetMode).toHaveBeenCalledWith('light');
   });
   it('should connect to the notification store', () => {
     renderApp();

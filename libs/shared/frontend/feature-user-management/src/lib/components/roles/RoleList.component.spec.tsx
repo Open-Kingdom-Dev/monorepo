@@ -29,11 +29,6 @@ jest.mock('@open-kingdom/shared-frontend-data-access-notifications', () => ({
   })),
 }));
 
-jest.mock('@open-kingdom/shared-frontend-ui-theme', () => ({
-  __esModule: true,
-  useTheme: () => ({ theme: {}, mode: 'light' }),
-}));
-
 const mockHasPermission = jest.fn();
 jest.mock('../../hooks/useHasPermission', () => ({
   __esModule: true,

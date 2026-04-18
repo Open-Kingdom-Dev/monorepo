@@ -17,5 +17,5 @@ module.exports = {
       // App-specific theme overrides can go here
     },
   },
-  plugins: [],
+  plugins: [require('tailwindcss-animate')],
 };

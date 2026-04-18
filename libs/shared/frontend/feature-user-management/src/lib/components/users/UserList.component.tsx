@@ -9,15 +9,13 @@ import {
   DataGrid,
   type ColDef,
   type ICellRendererParams,
-  type DataGridTheme,
 } from '@open-kingdom/shared-frontend-ui-datagrid';
-import { useTheme } from '@open-kingdom/shared-frontend-ui-theme';
+import { Button } from '@open-kingdom/shared-frontend-ui-primitives';
 import { ConfirmDialog } from '../shared/ConfirmDialog.component';
 import { RoleBadge } from '../shared/RoleBadge.component';
 import { InviteUserModal } from '../invitations';
 import { RoleChangeModal } from './RoleChangeModal.component';
 import { useHasPermission } from '../../hooks/useHasPermission';
-import { buttonPrimaryStyles } from '../../styles';
 import type { User } from '../../types';
 
 interface UserListProps {
@@ -26,7 +24,6 @@ interface UserListProps {
 
 export function UserList({ currentUserId }: UserListProps) {
   const dispatch = useDispatch();
-  const { theme, mode } = useTheme();
   const { data, isLoading, error, refetch } = useUsersControllerFindAllQuery();
   const [deleteUser, { isLoading: isDeleting }] =
     useUsersControllerDeleteMutation();
@@ -89,7 +86,7 @@ export function UserList({ currentUserId }: UserListProps) {
                   title={
                     isSelf ? 'Cannot change your own role' : 'Change user role'
                   }
-                  className="rounded px-2 py-1 text-xs font-medium text-primary-600 transition-colors hover:bg-primary-50 disabled:cursor-not-allowed disabled:opacity-40 dark:text-primary-400 dark:hover:bg-primary-900/20"
+                  className="rounded px-2 py-1 text-xs font-medium text-primary transition-colors hover:bg-primary/10 disabled:cursor-not-allowed disabled:opacity-40"
                 >
                   Change Role
                 </button>
@@ -101,7 +98,7 @@ export function UserList({ currentUserId }: UserListProps) {
                   title={
                     isSelf ? 'Cannot delete your own account' : 'Delete user'
                   }
-                  className="rounded px-2 py-1 text-xs font-medium text-error-600 transition-colors hover:bg-error-50 disabled:cursor-not-allowed disabled:opacity-40 dark:text-error-400 dark:hover:bg-error-900/20"
+                  className="rounded px-2 py-1 text-xs font-medium text-destructive transition-colors hover:bg-destructive/10 disabled:cursor-not-allowed disabled:opacity-40"
                 >
                   Delete
                 </button>
@@ -118,16 +115,14 @@ export function UserList({ currentUserId }: UserListProps) {
     return (
       <div
         data-testid="users-error"
-        className="rounded-lg bg-error-50 p-6 text-center dark:bg-error-900/20"
+        className="rounded-lg bg-destructive/10 p-6 text-center"
         role="alert"
       >
-        <p className="text-error-700 dark:text-error-300">
-          Failed to load users.
-        </p>
+        <p className="text-destructive">Failed to load users.</p>
         <button
           data-testid="users-retry-btn"
           onClick={refetch}
-          className="mt-2 text-sm font-medium text-primary-600 hover:underline dark:text-primary-400"
+          className="mt-2 text-sm font-medium text-primary hover:underline"
         >
           Try again
         </button>
@@ -140,24 +135,21 @@ export function UserList({ currentUserId }: UserListProps) {
       <div className="mb-4 flex items-center justify-between">
         <h2
           data-testid="users-heading"
-          className="text-xl font-semibold text-neutral-900 dark:text-neutral-100"
+          className="text-xl font-semibold text-foreground"
         >
           Users
         </h2>
-        <button
+        <Button
           data-testid="invite-user-btn"
           onClick={() => setShowInviteModal(true)}
-          className={buttonPrimaryStyles}
         >
           Invite User
-        </button>
+        </Button>
       </div>
 
       <DataGrid
         rowData={users}
         columnDefs={columnDefs}
-        mode={mode}
-        theme={theme as DataGridTheme}
         loading={isLoading}
       />
 

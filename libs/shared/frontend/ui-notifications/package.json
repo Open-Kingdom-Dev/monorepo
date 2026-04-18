@@ -31,7 +31,6 @@
   },
   "peerDependencies": {
     "tailwindcss": "^3.4.0",
-    "react": "^19.0.0",
-    "@open-kingdom/shared-frontend-ui-theme": "*"
+    "react": "^19.0.0"
   }
 }

@@ -1,6 +1,5 @@
 import { type AgGridReactProps } from 'ag-grid-react';
 import { type CSSProperties } from 'react';
-import { type DataGridTheme, type ThemeMode } from './theme';
 import { GridState } from 'ag-grid-community';
 
 export interface DataGridView {
@@ -29,12 +28,10 @@ export interface DataGridProps extends Omit<AgGridReactProps, 'theme'> {
   storageProvider?: StorageProvider;
   storageKey?: string;
 
-  // Theme
+  // Layout
   className?: string;
   containerStyle?: CSSProperties;
   enableRowSelection?: boolean;
-  mode?: ThemeMode;
-  theme?: DataGridTheme;
 
   // State callbacks
   onStateLoaded?: (state: GridState) => void;

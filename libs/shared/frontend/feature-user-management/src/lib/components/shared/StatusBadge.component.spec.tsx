@@ -2,44 +2,41 @@ import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { StatusBadge } from './StatusBadge.component';
 
+jest.mock('@open-kingdom/shared-frontend-ui-primitives', () => ({
+  Badge: ({ children, variant, ...props }: { children: React.ReactNode; variant?: string; [key: string]: unknown }) => (
+    <span data-variant={variant} {...props}>{children}</span>
+  ),
+}));
+
 describe('StatusBadge', () => {
   it('capitalizes "pending" to "Pending"', () => {
     render(<StatusBadge status="pending" />);
     expect(screen.getByText('Pending')).toBeInTheDocument();
-    expect(screen.queryByText('pending')).not.toBeInTheDocument();
   });
 
   it('capitalizes "accepted" to "Accepted"', () => {
     render(<StatusBadge status="accepted" />);
     expect(screen.getByText('Accepted')).toBeInTheDocument();
-    expect(screen.queryByText('accepted')).not.toBeInTheDocument();
   });
 
   it('capitalizes "expired" to "Expired"', () => {
     render(<StatusBadge status="expired" />);
     expect(screen.getByText('Expired')).toBeInTheDocument();
-    expect(screen.queryByText('expired')).not.toBeInTheDocument();
   });
 
-  it('applies warning styles for pending status', () => {
-    const { container } = render(<StatusBadge status="pending" />);
-    const badge = container.querySelector('span');
-    expect(badge).toHaveClass('bg-warning-100');
-    expect(badge).toHaveClass('text-warning-800');
+  it('applies warning variant for pending status', () => {
+    render(<StatusBadge status="pending" />);
+    expect(screen.getByText('Pending')).toHaveAttribute('data-variant', 'warning');
   });
 
-  it('applies success styles for accepted status', () => {
-    const { container } = render(<StatusBadge status="accepted" />);
-    const badge = container.querySelector('span');
-    expect(badge).toHaveClass('bg-success-100');
-    expect(badge).toHaveClass('text-success-800');
+  it('applies success variant for accepted status', () => {
+    render(<StatusBadge status="accepted" />);
+    expect(screen.getByText('Accepted')).toHaveAttribute('data-variant', 'success');
   });
 
-  it('applies neutral styles for expired status', () => {
-    const { container } = render(<StatusBadge status="expired" />);
-    const badge = container.querySelector('span');
-    expect(badge).toHaveClass('bg-neutral-100');
-    expect(badge).toHaveClass('text-neutral-700');
+  it('applies muted variant for expired status', () => {
+    render(<StatusBadge status="expired" />);
+    expect(screen.getByText('Expired')).toHaveAttribute('data-variant', 'muted');
   });
 
   it('renders nothing when status is empty', () => {

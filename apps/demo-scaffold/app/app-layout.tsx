@@ -5,7 +5,7 @@ export function AppLayout() {
   return (
     <>
       <AppNav />
-      <div className="min-h-screen bg-neutral-50 dark:bg-neutral-900 text-neutral-900 dark:text-neutral-100 p-8">
+      <div className="min-h-screen bg-background text-foreground p-8">
         <div className="max-w-7xl mx-auto">
           <Outlet />
         </div>

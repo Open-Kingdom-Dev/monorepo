@@ -11,8 +11,8 @@ import {
   ModuleRegistry,
   DataGridProps,
   GridApi,
+  themeQuartz,
 } from './datagrid.types';
-import { DataGridThemeAdapter } from './theme';
 import { useGridStatePersistence } from './hooks';
 
 ModuleRegistry.registerModules([AllCommunityModule]);
@@ -24,8 +24,6 @@ export const DataGrid = forwardRef<GridApi | null, DataGridProps>(
       rowSelection,
       containerStyle = containerDefaults,
       enableRowSelection = false,
-      mode,
-      theme,
       enableStatePersistence = false,
       storageProvider,
       storageKey = 'grid-state',
@@ -37,7 +35,6 @@ export const DataGrid = forwardRef<GridApi | null, DataGridProps>(
     }: DataGridProps,
     ref
   ) => {
-    // Memoize rowSelection to prevent AG Grid from resetting on re-renders
     const rowSelectionOptions = useMemo(
       () =>
         rowSelection ||
@@ -47,9 +44,6 @@ export const DataGrid = forwardRef<GridApi | null, DataGridProps>(
       [rowSelection, enableRowSelection]
     );
 
-    const currentTheme = DataGridThemeAdapter.adapt(theme, mode);
-
-    // Extract initialState from props
     const { initialState, ...restProps } = props;
 
     const { handleStateUpdated, handleGridReady } = useGridStatePersistence({
@@ -68,8 +62,7 @@ export const DataGrid = forwardRef<GridApi | null, DataGridProps>(
       <AgGridReact
         {...gridDefaults}
         {...restProps}
-        // initialState is handled via the Grid API in onGridReady
-        theme={currentTheme}
+        theme={themeQuartz}
         className={className}
         containerStyle={containerStyle}
         rowSelection={rowSelectionOptions}
