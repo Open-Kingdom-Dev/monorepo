@@ -22,10 +22,7 @@ export function FormField({
       </Label>
       {children}
       {error && (
-        <p
-          data-testid="field-error"
-          className="mt-1 text-sm text-destructive"
-        >
+        <p data-testid="field-error" className="mt-1 text-sm text-destructive">
           {error}
         </p>
       )}

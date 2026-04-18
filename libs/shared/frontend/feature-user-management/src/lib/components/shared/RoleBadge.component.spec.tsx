@@ -3,8 +3,18 @@ import '@testing-library/jest-dom';
 import { RoleBadge } from './RoleBadge.component';
 
 jest.mock('@open-kingdom/shared-frontend-ui-primitives', () => ({
-  Badge: ({ children, variant, ...props }: { children: React.ReactNode; variant?: string; [key: string]: unknown }) => (
-    <span data-variant={variant} {...props}>{children}</span>
+  Badge: ({
+    children,
+    variant,
+    ...props
+  }: {
+    children: React.ReactNode;
+    variant?: string;
+    [key: string]: unknown;
+  }) => (
+    <span data-variant={variant} {...props}>
+      {children}
+    </span>
   ),
 }));
 
@@ -16,7 +26,10 @@ describe('RoleBadge', () => {
 
   it('uses secondary variant for admin', () => {
     render(<RoleBadge role="admin" />);
-    expect(screen.getByText('Admin')).toHaveAttribute('data-variant', 'secondary');
+    expect(screen.getByText('Admin')).toHaveAttribute(
+      'data-variant',
+      'secondary'
+    );
   });
 
   it('uses default variant for user', () => {
@@ -31,7 +44,10 @@ describe('RoleBadge', () => {
 
   it('falls back to default variant for dynamic roles', () => {
     render(<RoleBadge role="moderator" />);
-    expect(screen.getByText('Moderator')).toHaveAttribute('data-variant', 'default');
+    expect(screen.getByText('Moderator')).toHaveAttribute(
+      'data-variant',
+      'default'
+    );
   });
 
   it('renders nothing when role is null', () => {

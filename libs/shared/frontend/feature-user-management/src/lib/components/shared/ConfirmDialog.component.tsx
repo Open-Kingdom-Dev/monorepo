@@ -29,7 +29,10 @@ export function ConfirmDialog({
   isLoading = false,
 }: ConfirmDialogProps) {
   return (
-    <AlertDialog open={isOpen} onOpenChange={(open: boolean) => !open && onCancel()}>
+    <AlertDialog
+      open={isOpen}
+      onOpenChange={(open: boolean) => !open && onCancel()}
+    >
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle>{title}</AlertDialogTitle>

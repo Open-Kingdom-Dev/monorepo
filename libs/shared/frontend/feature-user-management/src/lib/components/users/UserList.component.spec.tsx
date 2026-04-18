@@ -110,12 +110,35 @@ jest.mock('../shared/RoleBadge.component', () => ({
 
 jest.mock('../invitations', () => ({
   __esModule: true,
-  InviteUserModal: () => null,
+  InviteUserModal: ({
+    isOpen,
+    onClose,
+  }: {
+    isOpen: boolean;
+    onClose: () => void;
+  }) =>
+    isOpen ? (
+      <div data-testid="invite-modal">
+        <button onClick={onClose}>Close Invite</button>
+      </div>
+    ) : null,
 }));
 
 jest.mock('./RoleChangeModal.component', () => ({
   __esModule: true,
-  RoleChangeModal: () => null,
+  RoleChangeModal: ({
+    isOpen,
+    onClose,
+  }: {
+    isOpen: boolean;
+    onClose: () => void;
+    user: { id: number; email: string; role: string };
+  }) =>
+    isOpen ? (
+      <div data-testid="role-change-modal">
+        <button onClick={onClose}>Close Role Change</button>
+      </div>
+    ) : null,
 }));
 
 const store = configureStore({ reducer: {} });
@@ -287,6 +310,75 @@ describe('UserList', () => {
       </Provider>
     );
     expect(container.querySelectorAll('button')).toHaveLength(0);
+  });
+
+  it('lets the user back out of inviting a new teammate', () => {
+    mockFindAllQuery.mockReturnValue({
+      data: mockUsers,
+      isLoading: false,
+      error: null,
+      refetch: jest.fn(),
+    });
+    renderWithProviders(<UserList />);
+    fireEvent.click(screen.getByText('Invite User'));
+    expect(screen.getByTestId('invite-modal')).toBeInTheDocument();
+    fireEvent.click(screen.getByText('Close Invite'));
+    expect(screen.queryByTestId('invite-modal')).not.toBeInTheDocument();
+  });
+
+  it('lets the user back out of changing a teammate role', () => {
+    mockFindAllQuery.mockReturnValue({
+      data: mockUsers,
+      isLoading: false,
+      error: null,
+      refetch: jest.fn(),
+    });
+    renderWithProviders(<UserList currentUserId={1} />);
+
+    const actionsCol = capturedColumnDefs.find(
+      (c) => c.headerName === 'Actions'
+    );
+    const { container } = render(
+      <Provider store={store}>
+        {(actionsCol?.cellRenderer as CallableFunction)({ data: mockUsers[1] })}
+      </Provider>
+    );
+    const changeBtn = Array.from(container.querySelectorAll('button')).find(
+      (btn) => btn.textContent === 'Change Role'
+    );
+    fireEvent.click(changeBtn as HTMLElement);
+    expect(screen.getByTestId('role-change-modal')).toBeInTheDocument();
+    fireEvent.click(screen.getByText('Close Role Change'));
+    expect(screen.queryByTestId('role-change-modal')).not.toBeInTheDocument();
+  });
+
+  it('lets the user back out of deleting a teammate', async () => {
+    mockFindAllQuery.mockReturnValue({
+      data: mockUsers,
+      isLoading: false,
+      error: null,
+      refetch: jest.fn(),
+    });
+    renderWithProviders(<UserList currentUserId={1} />);
+
+    const actionsCol = capturedColumnDefs.find(
+      (c) => c.headerName === 'Actions'
+    );
+    const { container } = render(
+      <Provider store={store}>
+        {(actionsCol?.cellRenderer as CallableFunction)({ data: mockUsers[1] })}
+      </Provider>
+    );
+    const deleteBtn = Array.from(container.querySelectorAll('button')).find(
+      (btn) => btn.textContent === 'Delete'
+    );
+    fireEvent.click(deleteBtn as HTMLElement);
+    await waitFor(() => {
+      expect(screen.getByTestId('confirm-dialog')).toBeInTheDocument();
+    });
+    fireEvent.click(screen.getByText('Cancel'));
+    expect(mockDeleteUser).not.toHaveBeenCalled();
+    expect(screen.queryByTestId('confirm-dialog')).not.toBeInTheDocument();
   });
 
   it('shows the change role button when the user has role update permission', () => {

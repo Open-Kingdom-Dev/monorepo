@@ -147,11 +147,7 @@ export function UserList({ currentUserId }: UserListProps) {
         </Button>
       </div>
 
-      <DataGrid
-        rowData={users}
-        columnDefs={columnDefs}
-        loading={isLoading}
-      />
+      <DataGrid rowData={users} columnDefs={columnDefs} loading={isLoading} />
 
       <InviteUserModal
         isOpen={showInviteModal}

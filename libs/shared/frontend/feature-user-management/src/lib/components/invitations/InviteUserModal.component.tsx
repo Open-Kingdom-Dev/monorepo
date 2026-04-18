@@ -63,7 +63,10 @@ export function InviteUserModal({ isOpen, onClose }: InviteUserModalProps) {
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={(open: boolean) => !open && handleClose()}>
+    <Dialog
+      open={isOpen}
+      onOpenChange={(open: boolean) => !open && handleClose()}
+    >
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Invite User</DialogTitle>
