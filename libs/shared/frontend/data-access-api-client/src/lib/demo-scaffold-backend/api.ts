@@ -11,6 +11,14 @@ export const addTagTypes = [
   "User Roles",
   "GCP Resources",
   "GCS Storage",
+  "Lead Conversion",
+  "CRM Dashboard",
+  "Configurable Lookups",
+  "Activity Log",
+  "Companies",
+  "Contacts",
+  "Leads",
+  "Opportunities",
   "Twin",
 ] as const;
 const injectedRtkApi = api
@@ -290,6 +298,7 @@ const injectedRtkApi = api
           method: "POST",
           body: queryArg.uploadFileDto,
         }),
+        invalidatesTags: ["GCS Storage"],
       }),
       gcsStorageControllerListFiles: build.query<
         GcsStorageControllerListFilesApiResponse,
@@ -304,21 +313,21 @@ const injectedRtkApi = api
         }),
         providesTags: ["GCS Storage"],
       }),
+      gcsStorageControllerGenerateDownloadUrl: build.query<
+        GcsStorageControllerGenerateDownloadUrlApiResponse,
+        GcsStorageControllerGenerateDownloadUrlApiArg
+      >({
+        query: (queryArg) => ({
+          url: `/api/gcs/files/${queryArg.bucket}/${queryArg.fileName}/url`,
+        }),
+        providesTags: ["GCS Storage"],
+      }),
       gcsStorageControllerDownloadFile: build.query<
         GcsStorageControllerDownloadFileApiResponse,
         GcsStorageControllerDownloadFileApiArg
       >({
         query: (queryArg) => ({
           url: `/api/gcs/files/${queryArg.bucket}/${queryArg.fileName}/download`,
-        }),
-        providesTags: ["GCS Storage"],
-      }),
-      gcsStorageControllerGetDownloadUrl: build.query<
-        GcsStorageControllerGetDownloadUrlApiResponse,
-        GcsStorageControllerGetDownloadUrlApiArg
-      >({
-        query: (queryArg) => ({
-          url: `/api/gcs/files/${queryArg.bucket}/${queryArg.fileName}/url`,
         }),
         providesTags: ["GCS Storage"],
       }),
@@ -330,6 +339,393 @@ const injectedRtkApi = api
           url: `/api/gcs/files/${queryArg.bucket}/${queryArg.fileName}/delete`,
           method: "POST",
         }),
+        invalidatesTags: ["GCS Storage"],
+      }),
+      leadConversionControllerConvert: build.mutation<
+        LeadConversionControllerConvertApiResponse,
+        LeadConversionControllerConvertApiArg
+      >({
+        query: (queryArg) => ({
+          url: `/api/leads/${queryArg.id}/convert`,
+          method: "POST",
+          body: queryArg.convertLeadRequestDto,
+        }),
+        invalidatesTags: ["Lead Conversion"],
+      }),
+      dashboardControllerSnapshot: build.query<
+        DashboardControllerSnapshotApiResponse,
+        DashboardControllerSnapshotApiArg
+      >({
+        query: () => ({ url: `/api/crm/dashboard` }),
+        providesTags: ["CRM Dashboard"],
+      }),
+      configurableLookupsControllerFindAll: build.query<
+        ConfigurableLookupsControllerFindAllApiResponse,
+        ConfigurableLookupsControllerFindAllApiArg
+      >({
+        query: (queryArg) => ({
+          url: `/api/configurable-lookups`,
+          params: {
+            listKey: queryArg.listKey,
+            includeInactive: queryArg.includeInactive,
+          },
+        }),
+        providesTags: ["Configurable Lookups"],
+      }),
+      configurableLookupsControllerCreate: build.mutation<
+        ConfigurableLookupsControllerCreateApiResponse,
+        ConfigurableLookupsControllerCreateApiArg
+      >({
+        query: (queryArg) => ({
+          url: `/api/configurable-lookups`,
+          method: "POST",
+          body: queryArg.createConfigurableLookupDto,
+        }),
+        invalidatesTags: ["Configurable Lookups"],
+      }),
+      configurableLookupsControllerFindOne: build.query<
+        ConfigurableLookupsControllerFindOneApiResponse,
+        ConfigurableLookupsControllerFindOneApiArg
+      >({
+        query: (queryArg) => ({
+          url: `/api/configurable-lookups/${queryArg.id}`,
+        }),
+        providesTags: ["Configurable Lookups"],
+      }),
+      configurableLookupsControllerUpdate: build.mutation<
+        ConfigurableLookupsControllerUpdateApiResponse,
+        ConfigurableLookupsControllerUpdateApiArg
+      >({
+        query: (queryArg) => ({
+          url: `/api/configurable-lookups/${queryArg.id}`,
+          method: "PATCH",
+          body: queryArg.updateConfigurableLookupDto,
+        }),
+        invalidatesTags: ["Configurable Lookups"],
+      }),
+      configurableLookupsControllerDelete: build.mutation<
+        ConfigurableLookupsControllerDeleteApiResponse,
+        ConfigurableLookupsControllerDeleteApiArg
+      >({
+        query: (queryArg) => ({
+          url: `/api/configurable-lookups/${queryArg.id}`,
+          method: "DELETE",
+        }),
+        invalidatesTags: ["Configurable Lookups"],
+      }),
+      activityLogControllerFindAll: build.query<
+        ActivityLogControllerFindAllApiResponse,
+        ActivityLogControllerFindAllApiArg
+      >({
+        query: (queryArg) => ({
+          url: `/api/activities`,
+          params: {
+            relatedType: queryArg.relatedType,
+            relatedId: queryArg.relatedId,
+            scope: queryArg.scope,
+          },
+        }),
+        providesTags: ["Activity Log"],
+      }),
+      activityLogControllerCreate: build.mutation<
+        ActivityLogControllerCreateApiResponse,
+        ActivityLogControllerCreateApiArg
+      >({
+        query: (queryArg) => ({
+          url: `/api/activities`,
+          method: "POST",
+          body: queryArg.createActivityLogEntryDto,
+        }),
+        invalidatesTags: ["Activity Log"],
+      }),
+      activityLogControllerFindOne: build.query<
+        ActivityLogControllerFindOneApiResponse,
+        ActivityLogControllerFindOneApiArg
+      >({
+        query: (queryArg) => ({ url: `/api/activities/${queryArg.id}` }),
+        providesTags: ["Activity Log"],
+      }),
+      activityLogControllerUpdate: build.mutation<
+        ActivityLogControllerUpdateApiResponse,
+        ActivityLogControllerUpdateApiArg
+      >({
+        query: (queryArg) => ({
+          url: `/api/activities/${queryArg.id}`,
+          method: "PATCH",
+          body: queryArg.updateActivityLogEntryDto,
+        }),
+        invalidatesTags: ["Activity Log"],
+      }),
+      activityLogControllerDelete: build.mutation<
+        ActivityLogControllerDeleteApiResponse,
+        ActivityLogControllerDeleteApiArg
+      >({
+        query: (queryArg) => ({
+          url: `/api/activities/${queryArg.id}`,
+          method: "DELETE",
+        }),
+        invalidatesTags: ["Activity Log"],
+      }),
+      activityLogControllerComplete: build.mutation<
+        ActivityLogControllerCompleteApiResponse,
+        ActivityLogControllerCompleteApiArg
+      >({
+        query: (queryArg) => ({
+          url: `/api/activities/${queryArg.id}/complete`,
+          method: "POST",
+          body: queryArg.completeActivityLogEntryDto,
+        }),
+        invalidatesTags: ["Activity Log"],
+      }),
+      companiesControllerFindAll: build.query<
+        CompaniesControllerFindAllApiResponse,
+        CompaniesControllerFindAllApiArg
+      >({
+        query: (queryArg) => ({
+          url: `/api/companies`,
+          params: {
+            ownerId: queryArg.ownerId,
+            status: queryArg.status,
+            search: queryArg.search,
+            includeArchived: queryArg.includeArchived,
+          },
+        }),
+        providesTags: ["Companies"],
+      }),
+      companiesControllerCreate: build.mutation<
+        CompaniesControllerCreateApiResponse,
+        CompaniesControllerCreateApiArg
+      >({
+        query: (queryArg) => ({
+          url: `/api/companies`,
+          method: "POST",
+          body: queryArg.createCompanyDto,
+        }),
+        invalidatesTags: ["Companies"],
+      }),
+      companiesControllerFindOne: build.query<
+        CompaniesControllerFindOneApiResponse,
+        CompaniesControllerFindOneApiArg
+      >({
+        query: (queryArg) => ({ url: `/api/companies/${queryArg.id}` }),
+        providesTags: ["Companies"],
+      }),
+      companiesControllerUpdate: build.mutation<
+        CompaniesControllerUpdateApiResponse,
+        CompaniesControllerUpdateApiArg
+      >({
+        query: (queryArg) => ({
+          url: `/api/companies/${queryArg.id}`,
+          method: "PATCH",
+          body: queryArg.updateCompanyDto,
+        }),
+        invalidatesTags: ["Companies"],
+      }),
+      companiesControllerArchive: build.mutation<
+        CompaniesControllerArchiveApiResponse,
+        CompaniesControllerArchiveApiArg
+      >({
+        query: (queryArg) => ({
+          url: `/api/companies/${queryArg.id}/archive`,
+          method: "POST",
+        }),
+        invalidatesTags: ["Companies"],
+      }),
+      companiesControllerRestore: build.mutation<
+        CompaniesControllerRestoreApiResponse,
+        CompaniesControllerRestoreApiArg
+      >({
+        query: (queryArg) => ({
+          url: `/api/companies/${queryArg.id}/restore`,
+          method: "POST",
+        }),
+        invalidatesTags: ["Companies"],
+      }),
+      contactsControllerFindAll: build.query<
+        ContactsControllerFindAllApiResponse,
+        ContactsControllerFindAllApiArg
+      >({
+        query: (queryArg) => ({
+          url: `/api/contacts`,
+          params: {
+            ownerId: queryArg.ownerId,
+            companyId: queryArg.companyId,
+            status: queryArg.status,
+            search: queryArg.search,
+            includeArchived: queryArg.includeArchived,
+          },
+        }),
+        providesTags: ["Contacts"],
+      }),
+      contactsControllerCreate: build.mutation<
+        ContactsControllerCreateApiResponse,
+        ContactsControllerCreateApiArg
+      >({
+        query: (queryArg) => ({
+          url: `/api/contacts`,
+          method: "POST",
+          body: queryArg.createContactDto,
+        }),
+        invalidatesTags: ["Contacts"],
+      }),
+      contactsControllerFindOne: build.query<
+        ContactsControllerFindOneApiResponse,
+        ContactsControllerFindOneApiArg
+      >({
+        query: (queryArg) => ({ url: `/api/contacts/${queryArg.id}` }),
+        providesTags: ["Contacts"],
+      }),
+      contactsControllerUpdate: build.mutation<
+        ContactsControllerUpdateApiResponse,
+        ContactsControllerUpdateApiArg
+      >({
+        query: (queryArg) => ({
+          url: `/api/contacts/${queryArg.id}`,
+          method: "PATCH",
+          body: queryArg.updateContactDto,
+        }),
+        invalidatesTags: ["Contacts"],
+      }),
+      contactsControllerArchive: build.mutation<
+        ContactsControllerArchiveApiResponse,
+        ContactsControllerArchiveApiArg
+      >({
+        query: (queryArg) => ({
+          url: `/api/contacts/${queryArg.id}/archive`,
+          method: "POST",
+        }),
+        invalidatesTags: ["Contacts"],
+      }),
+      contactsControllerRestore: build.mutation<
+        ContactsControllerRestoreApiResponse,
+        ContactsControllerRestoreApiArg
+      >({
+        query: (queryArg) => ({
+          url: `/api/contacts/${queryArg.id}/restore`,
+          method: "POST",
+        }),
+        invalidatesTags: ["Contacts"],
+      }),
+      leadsControllerFindAll: build.query<
+        LeadsControllerFindAllApiResponse,
+        LeadsControllerFindAllApiArg
+      >({
+        query: (queryArg) => ({
+          url: `/api/leads`,
+          params: {
+            ownerId: queryArg.ownerId,
+            status: queryArg.status,
+            search: queryArg.search,
+          },
+        }),
+        providesTags: ["Leads"],
+      }),
+      leadsControllerCreate: build.mutation<
+        LeadsControllerCreateApiResponse,
+        LeadsControllerCreateApiArg
+      >({
+        query: (queryArg) => ({
+          url: `/api/leads`,
+          method: "POST",
+          body: queryArg.createLeadDto,
+        }),
+        invalidatesTags: ["Leads"],
+      }),
+      leadsControllerFindOne: build.query<
+        LeadsControllerFindOneApiResponse,
+        LeadsControllerFindOneApiArg
+      >({
+        query: (queryArg) => ({ url: `/api/leads/${queryArg.id}` }),
+        providesTags: ["Leads"],
+      }),
+      leadsControllerUpdate: build.mutation<
+        LeadsControllerUpdateApiResponse,
+        LeadsControllerUpdateApiArg
+      >({
+        query: (queryArg) => ({
+          url: `/api/leads/${queryArg.id}`,
+          method: "PATCH",
+          body: queryArg.updateLeadDto,
+        }),
+        invalidatesTags: ["Leads"],
+      }),
+      leadsControllerDelete: build.mutation<
+        LeadsControllerDeleteApiResponse,
+        LeadsControllerDeleteApiArg
+      >({
+        query: (queryArg) => ({
+          url: `/api/leads/${queryArg.id}`,
+          method: "DELETE",
+        }),
+        invalidatesTags: ["Leads"],
+      }),
+      opportunitiesControllerFindAll: build.query<
+        OpportunitiesControllerFindAllApiResponse,
+        OpportunitiesControllerFindAllApiArg
+      >({
+        query: (queryArg) => ({
+          url: `/api/opportunities`,
+          params: {
+            ownerId: queryArg.ownerId,
+            companyId: queryArg.companyId,
+            stage: queryArg.stage,
+            search: queryArg.search,
+            openOnly: queryArg.openOnly,
+          },
+        }),
+        providesTags: ["Opportunities"],
+      }),
+      opportunitiesControllerCreate: build.mutation<
+        OpportunitiesControllerCreateApiResponse,
+        OpportunitiesControllerCreateApiArg
+      >({
+        query: (queryArg) => ({
+          url: `/api/opportunities`,
+          method: "POST",
+          body: queryArg.createOpportunityDto,
+        }),
+        invalidatesTags: ["Opportunities"],
+      }),
+      opportunitiesControllerPipelineSummary: build.query<
+        OpportunitiesControllerPipelineSummaryApiResponse,
+        OpportunitiesControllerPipelineSummaryApiArg
+      >({
+        query: (queryArg) => ({
+          url: `/api/opportunities/pipeline-summary`,
+          params: {
+            ownerId: queryArg.ownerId,
+          },
+        }),
+        providesTags: ["Opportunities"],
+      }),
+      opportunitiesControllerFindOne: build.query<
+        OpportunitiesControllerFindOneApiResponse,
+        OpportunitiesControllerFindOneApiArg
+      >({
+        query: (queryArg) => ({ url: `/api/opportunities/${queryArg.id}` }),
+        providesTags: ["Opportunities"],
+      }),
+      opportunitiesControllerUpdate: build.mutation<
+        OpportunitiesControllerUpdateApiResponse,
+        OpportunitiesControllerUpdateApiArg
+      >({
+        query: (queryArg) => ({
+          url: `/api/opportunities/${queryArg.id}`,
+          method: "PATCH",
+          body: queryArg.updateOpportunityDto,
+        }),
+        invalidatesTags: ["Opportunities"],
+      }),
+      opportunitiesControllerClose: build.mutation<
+        OpportunitiesControllerCloseApiResponse,
+        OpportunitiesControllerCloseApiArg
+      >({
+        query: (queryArg) => ({
+          url: `/api/opportunities/${queryArg.id}/close`,
+          method: "POST",
+          body: queryArg.closeOpportunityDto,
+        }),
+        invalidatesTags: ["Opportunities"],
       }),
       twinControllerGetStatus: build.query<
         TwinControllerGetStatusApiResponse,
@@ -491,6 +887,14 @@ export type GcsStorageControllerListFilesApiArg = {
   /** Prefix filter */
   prefix?: string;
 };
+export type GcsStorageControllerGenerateDownloadUrlApiResponse =
+  /** status 200 Download URL generated successfully */ GetDownloadUrlResponseDto;
+export type GcsStorageControllerGenerateDownloadUrlApiArg = {
+  /** Bucket name */
+  bucket: string;
+  /** File name */
+  fileName: string;
+};
 export type GcsStorageControllerDownloadFileApiResponse =
   /** status 200 File content */ {
     /** Base64 encoded file content */
@@ -503,19 +907,6 @@ export type GcsStorageControllerDownloadFileApiArg = {
   /** File name */
   fileName: string;
 };
-export type GcsStorageControllerGetDownloadUrlApiResponse =
-  /** status 200 Download URL with expiration */ {
-    /** Download URL */
-    url?: string;
-    /** URL expiration timestamp */
-    expiresAt?: string;
-  };
-export type GcsStorageControllerGetDownloadUrlApiArg = {
-  /** Bucket name */
-  bucket: string;
-  /** File name */
-  fileName: string;
-};
 export type GcsStorageControllerDeleteFileApiResponse = unknown;
 export type GcsStorageControllerDeleteFileApiArg = {
   /** Bucket name */
@@ -523,19 +914,211 @@ export type GcsStorageControllerDeleteFileApiArg = {
   /** File name */
   fileName: string;
 };
+export type LeadConversionControllerConvertApiResponse = unknown;
+export type LeadConversionControllerConvertApiArg = {
+  id: number;
+  convertLeadRequestDto: ConvertLeadRequestDto;
+};
+export type DashboardControllerSnapshotApiResponse =
+  /** status 200  */ DashboardSnapshotDto;
+export type DashboardControllerSnapshotApiArg = void;
+export type ConfigurableLookupsControllerFindAllApiResponse =
+  /** status 200  */ ConfigurableLookupDto[];
+export type ConfigurableLookupsControllerFindAllApiArg = {
+  listKey: string;
+  includeInactive: string;
+};
+export type ConfigurableLookupsControllerCreateApiResponse =
+  /** status 201  */ ConfigurableLookupDto;
+export type ConfigurableLookupsControllerCreateApiArg = {
+  createConfigurableLookupDto: CreateConfigurableLookupDto;
+};
+export type ConfigurableLookupsControllerFindOneApiResponse =
+  /** status 200  */ ConfigurableLookupDto;
+export type ConfigurableLookupsControllerFindOneApiArg = {
+  id: number;
+};
+export type ConfigurableLookupsControllerUpdateApiResponse =
+  /** status 200  */ ConfigurableLookupDto;
+export type ConfigurableLookupsControllerUpdateApiArg = {
+  id: number;
+  updateConfigurableLookupDto: UpdateConfigurableLookupDto;
+};
+export type ConfigurableLookupsControllerDeleteApiResponse = unknown;
+export type ConfigurableLookupsControllerDeleteApiArg = {
+  id: number;
+};
+export type ActivityLogControllerFindAllApiResponse =
+  /** status 200  */ ActivityLogEntryDto[];
+export type ActivityLogControllerFindAllApiArg = {
+  relatedType: string;
+  relatedId: string;
+  scope: string;
+};
+export type ActivityLogControllerCreateApiResponse =
+  /** status 201  */ ActivityLogEntryDto;
+export type ActivityLogControllerCreateApiArg = {
+  createActivityLogEntryDto: CreateActivityLogEntryDto;
+};
+export type ActivityLogControllerFindOneApiResponse =
+  /** status 200  */ ActivityLogEntryDto;
+export type ActivityLogControllerFindOneApiArg = {
+  id: number;
+};
+export type ActivityLogControllerUpdateApiResponse =
+  /** status 200  */ ActivityLogEntryDto;
+export type ActivityLogControllerUpdateApiArg = {
+  id: number;
+  updateActivityLogEntryDto: UpdateActivityLogEntryDto;
+};
+export type ActivityLogControllerDeleteApiResponse = unknown;
+export type ActivityLogControllerDeleteApiArg = {
+  id: number;
+};
+export type ActivityLogControllerCompleteApiResponse =
+  /** status 200  */ ActivityLogEntryDto;
+export type ActivityLogControllerCompleteApiArg = {
+  id: number;
+  completeActivityLogEntryDto: CompleteActivityLogEntryDto;
+};
+export type CompaniesControllerFindAllApiResponse =
+  /** status 200  */ CompanyDto[];
+export type CompaniesControllerFindAllApiArg = {
+  ownerId: string;
+  status: string;
+  search: string;
+  includeArchived: string;
+};
+export type CompaniesControllerCreateApiResponse =
+  /** status 201  */ CompanyDto;
+export type CompaniesControllerCreateApiArg = {
+  createCompanyDto: CreateCompanyDto;
+};
+export type CompaniesControllerFindOneApiResponse =
+  /** status 200  */ CompanyDto;
+export type CompaniesControllerFindOneApiArg = {
+  id: number;
+};
+export type CompaniesControllerUpdateApiResponse =
+  /** status 200  */ CompanyDto;
+export type CompaniesControllerUpdateApiArg = {
+  id: number;
+  updateCompanyDto: UpdateCompanyDto;
+};
+export type CompaniesControllerArchiveApiResponse =
+  /** status 200  */ CompanyDto;
+export type CompaniesControllerArchiveApiArg = {
+  id: number;
+};
+export type CompaniesControllerRestoreApiResponse =
+  /** status 200  */ CompanyDto;
+export type CompaniesControllerRestoreApiArg = {
+  id: number;
+};
+export type ContactsControllerFindAllApiResponse =
+  /** status 200  */ ContactDto[];
+export type ContactsControllerFindAllApiArg = {
+  ownerId: string;
+  companyId: string;
+  status: string;
+  search: string;
+  includeArchived: string;
+};
+export type ContactsControllerCreateApiResponse = /** status 201  */ ContactDto;
+export type ContactsControllerCreateApiArg = {
+  createContactDto: CreateContactDto;
+};
+export type ContactsControllerFindOneApiResponse =
+  /** status 200  */ ContactDto;
+export type ContactsControllerFindOneApiArg = {
+  id: number;
+};
+export type ContactsControllerUpdateApiResponse = /** status 200  */ ContactDto;
+export type ContactsControllerUpdateApiArg = {
+  id: number;
+  updateContactDto: UpdateContactDto;
+};
+export type ContactsControllerArchiveApiResponse =
+  /** status 200  */ ContactDto;
+export type ContactsControllerArchiveApiArg = {
+  id: number;
+};
+export type ContactsControllerRestoreApiResponse =
+  /** status 200  */ ContactDto;
+export type ContactsControllerRestoreApiArg = {
+  id: number;
+};
+export type LeadsControllerFindAllApiResponse = /** status 200  */ LeadDto[];
+export type LeadsControllerFindAllApiArg = {
+  ownerId: string;
+  status: string;
+  search: string;
+};
+export type LeadsControllerCreateApiResponse = /** status 201  */ LeadDto;
+export type LeadsControllerCreateApiArg = {
+  createLeadDto: CreateLeadDto;
+};
+export type LeadsControllerFindOneApiResponse = /** status 200  */ LeadDto;
+export type LeadsControllerFindOneApiArg = {
+  id: number;
+};
+export type LeadsControllerUpdateApiResponse = /** status 200  */ LeadDto;
+export type LeadsControllerUpdateApiArg = {
+  id: number;
+  updateLeadDto: UpdateLeadDto;
+};
+export type LeadsControllerDeleteApiResponse = unknown;
+export type LeadsControllerDeleteApiArg = {
+  id: number;
+};
+export type OpportunitiesControllerFindAllApiResponse =
+  /** status 200  */ OpportunityDto[];
+export type OpportunitiesControllerFindAllApiArg = {
+  ownerId: string;
+  companyId: string;
+  stage: string;
+  search: string;
+  openOnly: string;
+};
+export type OpportunitiesControllerCreateApiResponse =
+  /** status 201  */ OpportunityDto;
+export type OpportunitiesControllerCreateApiArg = {
+  createOpportunityDto: CreateOpportunityDto;
+};
+export type OpportunitiesControllerPipelineSummaryApiResponse = unknown;
+export type OpportunitiesControllerPipelineSummaryApiArg = {
+  ownerId: string;
+};
+export type OpportunitiesControllerFindOneApiResponse =
+  /** status 200  */ OpportunityDto;
+export type OpportunitiesControllerFindOneApiArg = {
+  id: number;
+};
+export type OpportunitiesControllerUpdateApiResponse =
+  /** status 200  */ OpportunityDto;
+export type OpportunitiesControllerUpdateApiArg = {
+  id: number;
+  updateOpportunityDto: UpdateOpportunityDto;
+};
+export type OpportunitiesControllerCloseApiResponse =
+  /** status 200  */ OpportunityDto;
+export type OpportunitiesControllerCloseApiArg = {
+  id: number;
+  closeOpportunityDto: CloseOpportunityDto;
+};
 export type TwinControllerGetStatusApiResponse =
-  /** status 200 Returns twin status (running, healthy, port, url) */ {
+  /** status 200 Twin status retrieved successfully */ {
     running?: boolean;
     healthy?: boolean;
     port?: number;
-    url?: string | null;
+    url?: string;
   };
 export type TwinControllerGetStatusApiArg = void;
 export type TwinControllerStartApiResponse =
   /** status 200 Twin started successfully */ {
     success?: boolean;
     message?: string;
-    url?: string | null;
+    url?: string;
   };
 export type TwinControllerStartApiArg = void;
 export type TwinControllerStopApiResponse =
@@ -685,6 +1268,260 @@ export type UploadFileDto = {
 export type ListFilesResponseDto = {
   files: FileMetadataDto[];
 };
+export type GetDownloadUrlResponseDto = {
+  /** Download URL */
+  url: string;
+  /** URL expiration timestamp */
+  expiresAt: string;
+};
+export type ConvertLeadRequestDto = {
+  contactId?: number;
+  companyId?: number;
+  createOpportunity?: boolean;
+  opportunityTitle?: string;
+  opportunityEstimatedValue?: number;
+};
+export type StageSummaryDto = {
+  stage: string;
+  count: number;
+  totalValue: number;
+  weightedValue: number;
+};
+export type DashboardSnapshotDto = {
+  pipeline: StageSummaryDto[];
+  tasksOpen: number;
+  tasksOverdue: number;
+};
+export type ConfigurableLookupDto = {
+  id: number;
+  listKey: string;
+  value: string;
+  label: string;
+  sortOrder: number;
+  isSystem: boolean;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+};
+export type CreateConfigurableLookupDto = {
+  /** snake_case list key */
+  listKey: string;
+  /** snake_case canonical value */
+  value: string;
+  label: string;
+  sortOrder?: number;
+  isActive?: boolean;
+};
+export type UpdateConfigurableLookupDto = {
+  listKey?: string;
+  value?: string;
+  label?: string;
+  sortOrder?: number;
+  isActive?: boolean;
+};
+export type ActivityLogEntryDto = {
+  id: number;
+  relatedType: "contact" | "company" | "lead" | "opportunity";
+  relatedId: number;
+  type: "note" | "call" | "meeting" | "email" | "task";
+  subject: string;
+  description?: object | null;
+  dueAt?: string | null;
+  completedAt?: string | null;
+  ownerId: number;
+  createdAt: string;
+  updatedAt: string;
+};
+export type CreateActivityLogEntryDto = {
+  relatedType: "contact" | "company" | "lead" | "opportunity";
+  relatedId: number;
+  type: "note" | "call" | "meeting" | "email" | "task";
+  subject: string;
+  description?: string;
+  dueAt?: string;
+};
+export type UpdateActivityLogEntryDto = {
+  subject?: string;
+  description?: object;
+  dueAt?: string;
+};
+export type CompleteActivityLogEntryDto = {
+  outcomeNotes?: string;
+};
+export type CompanyDto = {
+  id: number;
+  name: string;
+  website?: object | null;
+  primaryPhone?: object | null;
+  industry?: object | null;
+  status: string;
+  location?: object | null;
+  companySize?: object | null;
+  revenueRange?: object | null;
+  notesSummary?: object | null;
+  ownerId: number;
+  isArchived: boolean;
+  createdAt: string;
+  updatedAt: string;
+};
+export type CreateCompanyDto = {
+  name: string;
+  website?: string;
+  primaryPhone?: string;
+  industry?: string;
+  status?: string;
+  location?: string;
+  companySize?: string;
+  revenueRange?: string;
+  notesSummary?: string;
+  /** Owner user id. Defaults to the authenticated user. */
+  ownerId?: number;
+};
+export type UpdateCompanyDto = {
+  name?: string;
+  website?: object;
+  primaryPhone?: object;
+  industry?: object;
+  status?: string;
+  location?: object;
+  companySize?: object;
+  revenueRange?: object;
+  notesSummary?: object;
+  ownerId?: number;
+};
+export type ContactDto = {
+  id: number;
+  firstName: string;
+  lastName: string;
+  email?: object | null;
+  phone?: object | null;
+  secondaryPhone?: object | null;
+  secondaryEmail?: object | null;
+  jobTitle?: object | null;
+  companyId?: object | null;
+  leadSource?: object | null;
+  tags?: object | null;
+  mailingAddress?: object | null;
+  notesSummary?: object | null;
+  status: string;
+  ownerId: number;
+  isArchived: boolean;
+  createdAt: string;
+  updatedAt: string;
+};
+export type CreateContactDto = {
+  firstName: string;
+  lastName: string;
+  email?: string;
+  phone?: string;
+  secondaryPhone?: string;
+  secondaryEmail?: string;
+  jobTitle?: string;
+  companyId?: number;
+  leadSource?: string;
+  tags?: string;
+  mailingAddress?: string;
+  notesSummary?: string;
+  status?: string;
+  /** Owner user id. Defaults to the authenticated user. */
+  ownerId?: number;
+};
+export type UpdateContactDto = {
+  firstName?: string;
+  lastName?: string;
+  email?: object;
+  phone?: object;
+  secondaryPhone?: object;
+  secondaryEmail?: object;
+  jobTitle?: object;
+  companyId?: object;
+  leadSource?: object;
+  tags?: object;
+  mailingAddress?: object;
+  notesSummary?: object;
+  status?: string;
+  ownerId?: number;
+};
+export type LeadDto = {
+  id: number;
+  name: string;
+  companyName?: object | null;
+  email?: object | null;
+  phone?: object | null;
+  source?: object | null;
+  status: "new" | "contacted" | "qualified" | "unqualified";
+  notes?: object | null;
+  contactId?: object | null;
+  companyId?: object | null;
+  convertedAt?: string | null;
+  convertedToContactId?: object | null;
+  convertedToCompanyId?: object | null;
+  ownerId: number;
+  createdAt: string;
+  updatedAt: string;
+};
+export type CreateLeadDto = {
+  name: string;
+  companyName?: string;
+  email?: string;
+  phone?: string;
+  source?: string;
+  status?: "new" | "contacted" | "qualified" | "unqualified";
+  notes?: string;
+  ownerId?: number;
+};
+export type UpdateLeadDto = {
+  name?: string;
+  companyName?: object;
+  email?: object;
+  phone?: object;
+  source?: object;
+  status?: "new" | "contacted" | "qualified" | "unqualified";
+  notes?: object;
+  ownerId?: number;
+};
+export type OpportunityDto = {
+  id: number;
+  title: string;
+  companyId: number;
+  primaryContactId?: object | null;
+  stage: "new" | "discovery" | "proposal" | "negotiation" | "won" | "lost";
+  estimatedValue?: object | null;
+  probability?: object | null;
+  expectedCloseDate?: string | null;
+  closedAt?: string | null;
+  lossReason?: object | null;
+  notes?: object | null;
+  ownerId: number;
+  createdAt: string;
+  updatedAt: string;
+};
+export type CreateOpportunityDto = {
+  title: string;
+  companyId: number;
+  primaryContactId?: number;
+  stage?: "new" | "discovery" | "proposal" | "negotiation" | "won" | "lost";
+  estimatedValue?: number;
+  probability?: number;
+  expectedCloseDate?: string;
+  notes?: string;
+  ownerId?: number;
+};
+export type UpdateOpportunityDto = {
+  title?: string;
+  companyId?: number;
+  primaryContactId?: object;
+  stage?: "new" | "discovery" | "proposal" | "negotiation" | "won" | "lost";
+  estimatedValue?: object;
+  probability?: object;
+  expectedCloseDate?: string;
+  notes?: object;
+  ownerId?: number;
+};
+export type CloseOpportunityDto = {
+  outcome: "won" | "lost";
+  lossReason?: string;
+};
 export const {
   useAuthControllerLoginMutation,
   useAuthControllerGetProfileQuery,
@@ -716,9 +1553,45 @@ export const {
   useGcpProjectsControllerCreateProjectMutation,
   useGcsStorageControllerUploadFileMutation,
   useGcsStorageControllerListFilesQuery,
+  useGcsStorageControllerGenerateDownloadUrlQuery,
   useGcsStorageControllerDownloadFileQuery,
-  useGcsStorageControllerGetDownloadUrlQuery,
   useGcsStorageControllerDeleteFileMutation,
+  useLeadConversionControllerConvertMutation,
+  useDashboardControllerSnapshotQuery,
+  useConfigurableLookupsControllerFindAllQuery,
+  useConfigurableLookupsControllerCreateMutation,
+  useConfigurableLookupsControllerFindOneQuery,
+  useConfigurableLookupsControllerUpdateMutation,
+  useConfigurableLookupsControllerDeleteMutation,
+  useActivityLogControllerFindAllQuery,
+  useActivityLogControllerCreateMutation,
+  useActivityLogControllerFindOneQuery,
+  useActivityLogControllerUpdateMutation,
+  useActivityLogControllerDeleteMutation,
+  useActivityLogControllerCompleteMutation,
+  useCompaniesControllerFindAllQuery,
+  useCompaniesControllerCreateMutation,
+  useCompaniesControllerFindOneQuery,
+  useCompaniesControllerUpdateMutation,
+  useCompaniesControllerArchiveMutation,
+  useCompaniesControllerRestoreMutation,
+  useContactsControllerFindAllQuery,
+  useContactsControllerCreateMutation,
+  useContactsControllerFindOneQuery,
+  useContactsControllerUpdateMutation,
+  useContactsControllerArchiveMutation,
+  useContactsControllerRestoreMutation,
+  useLeadsControllerFindAllQuery,
+  useLeadsControllerCreateMutation,
+  useLeadsControllerFindOneQuery,
+  useLeadsControllerUpdateMutation,
+  useLeadsControllerDeleteMutation,
+  useOpportunitiesControllerFindAllQuery,
+  useOpportunitiesControllerCreateMutation,
+  useOpportunitiesControllerPipelineSummaryQuery,
+  useOpportunitiesControllerFindOneQuery,
+  useOpportunitiesControllerUpdateMutation,
+  useOpportunitiesControllerCloseMutation,
   useTwinControllerGetStatusQuery,
   useTwinControllerStartMutation,
   useTwinControllerStopMutation,

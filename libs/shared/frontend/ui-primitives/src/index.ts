@@ -45,3 +45,4 @@ export {
   SelectItem,
   SelectSeparator,
 } from './lib/select';
+export { Tabs, TabsList, TabsTrigger, TabsContent } from './lib/tabs';

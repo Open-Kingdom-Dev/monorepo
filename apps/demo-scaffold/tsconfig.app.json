@@ -75,6 +75,9 @@
     },
     {
       "path": "../../libs/shared/frontend/ui-datagrid/tsconfig.lib.json"
+    },
+    {
+      "path": "../../libs/shared/frontend/feature-crm/tsconfig.lib.json"
     }
   ]
 }

@@ -9,6 +9,16 @@ import {
   invitations,
   userRoles,
 } from '@open-kingdom/shared-backend-feature-user-management';
+import { configurableLookups } from '@open-kingdom/shared-backend-data-access-configurable-lookups';
+import { activityLog } from '@open-kingdom/shared-backend-data-access-activity-log';
+import {
+  companies,
+  contacts,
+} from '@open-kingdom/shared-backend-data-access-contacts';
+import {
+  leads,
+  opportunities,
+} from '@open-kingdom/shared-backend-data-access-opportunities';
 
 // Compose schema from all packages used by this app
 const schema = {
@@ -18,6 +28,12 @@ const schema = {
   rolePermissions,
   invitations,
   userRoles,
+  configurableLookups,
+  activityLog,
+  companies,
+  contacts,
+  leads,
+  opportunities,
 };
 
 @Module({

@@ -1,0 +1,47 @@
+{
+  "name": "@open-kingdom/shared-frontend-feature-crm",
+  "version": "0.0.2-16",
+  "publishConfig": {
+    "access": "public"
+  },
+  "type": "module",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    "./package.json": "./package.json",
+    ".": {
+      "@open-kingdom/source": "./src/index.ts",
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "README.md",
+    "dist",
+    "!**/*.tsbuildinfo"
+  ],
+  "nx": {
+    "name": "shared-frontend-feature-crm",
+    "tags": [
+      "scope:shared",
+      "type:feature",
+      "environment:frontend"
+    ]
+  },
+  "peerDependencies": {
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "react-router": "^7.2.0",
+    "react-redux": "^9.2.0",
+    "@open-kingdom/shared-frontend-ui-theme": "*",
+    "@open-kingdom/shared-frontend-ui-primitives": "*",
+    "@open-kingdom/shared-frontend-ui-datagrid": "*",
+    "@open-kingdom/shared-frontend-ui-activity-timeline": "*",
+    "@open-kingdom/shared-frontend-ui-stage-board": "*",
+    "@open-kingdom/shared-frontend-ui-record-detail": "*",
+    "@open-kingdom/shared-frontend-data-access-api-client": "*",
+    "@open-kingdom/shared-poly-util-crm-domain": "*"
+  }
+}

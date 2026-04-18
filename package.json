@@ -123,6 +123,9 @@
     "libs/ui/shared/frontend/*"
   ],
   "dependencies": {
+    "@dnd-kit/core": "^6.3.1",
+    "@dnd-kit/sortable": "^10.0.0",
+    "@dnd-kit/utilities": "^3.2.2",
     "@google-cloud/resource-manager": "^6.0.0",
     "@hookform/resolvers": "^5.2.2",
     "@knaadh/nestjs-drizzle-better-sqlite3": "^1.2.0",
@@ -137,6 +140,7 @@
     "@radix-ui/react-label": "^2.1.8",
     "@radix-ui/react-select": "^2.2.6",
     "@radix-ui/react-slot": "^1.2.4",
+    "@radix-ui/react-tabs": "^1.1.13",
     "@react-hookz/web": "^25.2.0",
     "@react-router/node": "^7.2.0",
     "@react-router/serve": "^7.2.0",
@@ -161,6 +165,7 @@
     "react-redux": "^9.2.0",
     "react-router": "^7.2.0",
     "reflect-metadata": "^0.1.13",
+    "rxjs": "^7.8.0",
     "tailwind-merge": "^3.5.0",
     "tailwindcss-animate": "^1.0.7",
     "zod": "^4.3.6"
