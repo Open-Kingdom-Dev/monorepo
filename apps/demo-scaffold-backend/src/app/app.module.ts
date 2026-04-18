@@ -17,6 +17,7 @@ import {
   UserRolesService,
 } from '@open-kingdom/shared-backend-feature-user-management';
 import { FeatureGcpResourcesModule } from '@open-kingdom/shared-backend-feature-gcp-resources';
+import { FeatureCrmModule } from '@open-kingdom/shared-backend-feature-crm';
 import { TwinModule } from './twin/twin.module';
 import {
   PermissionGuard,
@@ -61,6 +62,7 @@ const configService = createConfigService(envKeys, nodeEnvAdapter);
       frontendBaseUrl: configService.get('BASE_URL', 'http://localhost:3000'),
     }),
     FeatureGcpResourcesModule,
+    FeatureCrmModule.forRoot({ seedDefaults: true }),
     TwinModule,
   ],
   controllers: [],

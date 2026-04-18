@@ -1187,6 +1187,53 @@
         ]
       }
     },
+    "/api/gcs/files/{bucket}/{fileName}/url": {
+      "get": {
+        "description": "Generate a download URL for a file. Returns an emulator URL when GCS_EMULATOR_URL is set, otherwise generates a GCS signed URL with 15-minute expiration.",
+        "operationId": "GcsStorageController_generateDownloadUrl",
+        "parameters": [
+          {
+            "name": "bucket",
+            "required": true,
+            "in": "path",
+            "description": "Bucket name",
+            "schema": {
+              "example": "app-assets",
+              "type": "string"
+            }
+          },
+          {
+            "name": "fileName",
+            "required": true,
+            "in": "path",
+            "description": "File name",
+            "schema": {
+              "example": "hello.txt",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Download URL generated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetDownloadUrlResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Missing bucket or file name"
+          }
+        },
+        "summary": "Get a download URL for a file",
+        "tags": [
+          "GCS Storage"
+        ]
+      }
+    },
     "/api/gcs/files/{bucket}/{fileName}/download": {
       "get": {
         "description": "Download a file from GCS as base64 encoded content.",
@@ -1286,14 +1333,1757 @@
         ]
       }
     },
+    "/api/leads/{id}/convert": {
+      "post": {
+        "operationId": "LeadConversionController_convert",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ConvertLeadRequestDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Insufficient permissions"
+          }
+        },
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ],
+        "summary": "Convert a lead into contact/company/opportunity records",
+        "tags": [
+          "Lead Conversion"
+        ]
+      }
+    },
+    "/api/crm/dashboard": {
+      "get": {
+        "operationId": "DashboardController_snapshot",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DashboardSnapshotDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Insufficient permissions"
+          }
+        },
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ],
+        "summary": "Snapshot of the current user’s pipeline and tasks",
+        "tags": [
+          "CRM Dashboard"
+        ]
+      }
+    },
+    "/api/configurable-lookups": {
+      "get": {
+        "operationId": "ConfigurableLookupsController_findAll",
+        "parameters": [
+          {
+            "name": "listKey",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "includeInactive",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ConfigurableLookupDto"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Insufficient permissions"
+          }
+        },
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ],
+        "summary": "List lookup entries, optionally filtered by listKey",
+        "tags": [
+          "Configurable Lookups"
+        ]
+      },
+      "post": {
+        "operationId": "ConfigurableLookupsController_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateConfigurableLookupDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConfigurableLookupDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Insufficient permissions"
+          }
+        },
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ],
+        "summary": "Create a lookup entry",
+        "tags": [
+          "Configurable Lookups"
+        ]
+      }
+    },
+    "/api/configurable-lookups/{id}": {
+      "get": {
+        "operationId": "ConfigurableLookupsController_findOne",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConfigurableLookupDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Insufficient permissions"
+          },
+          "404": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ],
+        "summary": "Get a lookup entry by id",
+        "tags": [
+          "Configurable Lookups"
+        ]
+      },
+      "patch": {
+        "operationId": "ConfigurableLookupsController_update",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateConfigurableLookupDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConfigurableLookupDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Insufficient permissions"
+          },
+          "404": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ],
+        "summary": "Update a lookup entry",
+        "tags": [
+          "Configurable Lookups"
+        ]
+      },
+      "delete": {
+        "operationId": "ConfigurableLookupsController_delete",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": ""
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Insufficient permissions"
+          },
+          "404": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ],
+        "summary": "Delete a non-system lookup entry",
+        "tags": [
+          "Configurable Lookups"
+        ]
+      }
+    },
+    "/api/activities": {
+      "get": {
+        "operationId": "ActivityLogController_findAll",
+        "parameters": [
+          {
+            "name": "relatedType",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "relatedId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "scope",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ActivityLogEntryDto"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Insufficient permissions"
+          }
+        },
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ],
+        "summary": "List activities for a related record or the current user",
+        "tags": [
+          "Activity Log"
+        ]
+      },
+      "post": {
+        "operationId": "ActivityLogController_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateActivityLogEntryDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ActivityLogEntryDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Insufficient permissions"
+          }
+        },
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ],
+        "summary": "Create an activity",
+        "tags": [
+          "Activity Log"
+        ]
+      }
+    },
+    "/api/activities/{id}": {
+      "get": {
+        "operationId": "ActivityLogController_findOne",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ActivityLogEntryDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Insufficient permissions"
+          },
+          "404": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ],
+        "summary": "Get an activity by id",
+        "tags": [
+          "Activity Log"
+        ]
+      },
+      "patch": {
+        "operationId": "ActivityLogController_update",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateActivityLogEntryDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ActivityLogEntryDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Insufficient permissions"
+          },
+          "404": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ],
+        "summary": "Update an activity",
+        "tags": [
+          "Activity Log"
+        ]
+      },
+      "delete": {
+        "operationId": "ActivityLogController_delete",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": ""
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Insufficient permissions"
+          },
+          "404": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ],
+        "summary": "Delete an activity",
+        "tags": [
+          "Activity Log"
+        ]
+      }
+    },
+    "/api/activities/{id}/complete": {
+      "post": {
+        "operationId": "ActivityLogController_complete",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CompleteActivityLogEntryDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ActivityLogEntryDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Insufficient permissions"
+          },
+          "404": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ],
+        "summary": "Mark an activity as complete",
+        "tags": [
+          "Activity Log"
+        ]
+      }
+    },
+    "/api/companies": {
+      "get": {
+        "operationId": "CompaniesController_findAll",
+        "parameters": [
+          {
+            "name": "ownerId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "status",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "search",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "includeArchived",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CompanyDto"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Insufficient permissions"
+          }
+        },
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ],
+        "summary": "List companies",
+        "tags": [
+          "Companies"
+        ]
+      },
+      "post": {
+        "operationId": "CompaniesController_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateCompanyDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CompanyDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Insufficient permissions"
+          }
+        },
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ],
+        "summary": "Create a company",
+        "tags": [
+          "Companies"
+        ]
+      }
+    },
+    "/api/companies/{id}": {
+      "get": {
+        "operationId": "CompaniesController_findOne",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CompanyDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Insufficient permissions"
+          },
+          "404": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ],
+        "summary": "Get a company by id",
+        "tags": [
+          "Companies"
+        ]
+      },
+      "patch": {
+        "operationId": "CompaniesController_update",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateCompanyDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CompanyDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Insufficient permissions"
+          },
+          "404": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ],
+        "summary": "Update a company",
+        "tags": [
+          "Companies"
+        ]
+      }
+    },
+    "/api/companies/{id}/archive": {
+      "post": {
+        "operationId": "CompaniesController_archive",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CompanyDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Insufficient permissions"
+          },
+          "404": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ],
+        "summary": "Archive a company",
+        "tags": [
+          "Companies"
+        ]
+      }
+    },
+    "/api/companies/{id}/restore": {
+      "post": {
+        "operationId": "CompaniesController_restore",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CompanyDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Insufficient permissions"
+          },
+          "404": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ],
+        "summary": "Restore an archived company",
+        "tags": [
+          "Companies"
+        ]
+      }
+    },
+    "/api/contacts": {
+      "get": {
+        "operationId": "ContactsController_findAll",
+        "parameters": [
+          {
+            "name": "ownerId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "companyId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "status",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "search",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "includeArchived",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ContactDto"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Insufficient permissions"
+          }
+        },
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ],
+        "summary": "List contacts",
+        "tags": [
+          "Contacts"
+        ]
+      },
+      "post": {
+        "operationId": "ContactsController_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateContactDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ContactDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Insufficient permissions"
+          }
+        },
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ],
+        "summary": "Create a contact",
+        "tags": [
+          "Contacts"
+        ]
+      }
+    },
+    "/api/contacts/{id}": {
+      "get": {
+        "operationId": "ContactsController_findOne",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ContactDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Insufficient permissions"
+          },
+          "404": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ],
+        "summary": "Get a contact by id",
+        "tags": [
+          "Contacts"
+        ]
+      },
+      "patch": {
+        "operationId": "ContactsController_update",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateContactDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ContactDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Insufficient permissions"
+          },
+          "404": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ],
+        "summary": "Update a contact",
+        "tags": [
+          "Contacts"
+        ]
+      }
+    },
+    "/api/contacts/{id}/archive": {
+      "post": {
+        "operationId": "ContactsController_archive",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ContactDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Insufficient permissions"
+          },
+          "404": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ],
+        "summary": "Archive a contact",
+        "tags": [
+          "Contacts"
+        ]
+      }
+    },
+    "/api/contacts/{id}/restore": {
+      "post": {
+        "operationId": "ContactsController_restore",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ContactDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Insufficient permissions"
+          },
+          "404": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ],
+        "summary": "Restore an archived contact",
+        "tags": [
+          "Contacts"
+        ]
+      }
+    },
+    "/api/leads": {
+      "get": {
+        "operationId": "LeadsController_findAll",
+        "parameters": [
+          {
+            "name": "ownerId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "status",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "search",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/LeadDto"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Insufficient permissions"
+          }
+        },
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ],
+        "summary": "List leads",
+        "tags": [
+          "Leads"
+        ]
+      },
+      "post": {
+        "operationId": "LeadsController_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateLeadDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LeadDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Insufficient permissions"
+          }
+        },
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ],
+        "summary": "Create a lead",
+        "tags": [
+          "Leads"
+        ]
+      }
+    },
+    "/api/leads/{id}": {
+      "get": {
+        "operationId": "LeadsController_findOne",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LeadDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Insufficient permissions"
+          },
+          "404": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ],
+        "summary": "Get a lead by id",
+        "tags": [
+          "Leads"
+        ]
+      },
+      "patch": {
+        "operationId": "LeadsController_update",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateLeadDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LeadDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Insufficient permissions"
+          },
+          "404": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ],
+        "summary": "Update a lead",
+        "tags": [
+          "Leads"
+        ]
+      },
+      "delete": {
+        "operationId": "LeadsController_delete",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": ""
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Insufficient permissions"
+          },
+          "404": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ],
+        "summary": "Delete a lead",
+        "tags": [
+          "Leads"
+        ]
+      }
+    },
+    "/api/opportunities": {
+      "get": {
+        "operationId": "OpportunitiesController_findAll",
+        "parameters": [
+          {
+            "name": "ownerId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "companyId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "stage",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "search",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "openOnly",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/OpportunityDto"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Insufficient permissions"
+          }
+        },
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ],
+        "summary": "List opportunities",
+        "tags": [
+          "Opportunities"
+        ]
+      },
+      "post": {
+        "operationId": "OpportunitiesController_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateOpportunityDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OpportunityDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Insufficient permissions"
+          }
+        },
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ],
+        "summary": "Create an opportunity",
+        "tags": [
+          "Opportunities"
+        ]
+      }
+    },
+    "/api/opportunities/pipeline-summary": {
+      "get": {
+        "operationId": "OpportunitiesController_pipelineSummary",
+        "parameters": [
+          {
+            "name": "ownerId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Insufficient permissions"
+          }
+        },
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ],
+        "summary": "Get aggregated pipeline counts and values by stage",
+        "tags": [
+          "Opportunities"
+        ]
+      }
+    },
+    "/api/opportunities/{id}": {
+      "get": {
+        "operationId": "OpportunitiesController_findOne",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OpportunityDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Insufficient permissions"
+          },
+          "404": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ],
+        "summary": "Get an opportunity by id",
+        "tags": [
+          "Opportunities"
+        ]
+      },
+      "patch": {
+        "operationId": "OpportunitiesController_update",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateOpportunityDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OpportunityDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Insufficient permissions"
+          },
+          "404": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ],
+        "summary": "Update an opportunity",
+        "tags": [
+          "Opportunities"
+        ]
+      }
+    },
+    "/api/opportunities/{id}/close": {
+      "post": {
+        "operationId": "OpportunitiesController_close",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CloseOpportunityDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OpportunityDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Insufficient permissions"
+          },
+          "404": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ],
+        "summary": "Mark an opportunity as won or lost",
+        "tags": [
+          "Opportunities"
+        ]
+      }
+    },
     "/api/twin/status": {
       "get": {
-        "description": "Get twin status",
+        "description": "Returns the current status of the GCS twin (running, healthy, port, and URL)",
         "operationId": "TwinController_getStatus",
         "parameters": [],
         "responses": {
           "200": {
-            "description": "Returns twin status (running, healthy, port, url)",
+            "description": "Twin status retrieved successfully",
             "content": {
               "application/json": {
                 "schema": {
@@ -1313,8 +3103,7 @@
                     },
                     "url": {
                       "type": "string",
-                      "example": "http://localhost:9013",
-                      "nullable": true
+                      "example": "http://localhost:9013"
                     }
                   }
                 }
@@ -1330,7 +3119,7 @@
     },
     "/api/twin/start": {
       "post": {
-        "description": "Start the GCS twin",
+        "description": "Starts the GCS twin Docker container and seeds initial data. Requires Docker to be running.",
         "operationId": "TwinController_start",
         "parameters": [],
         "responses": {
@@ -1351,8 +3140,7 @@
                     },
                     "url": {
                       "type": "string",
-                      "example": "http://localhost:9013",
-                      "nullable": true
+                      "example": "http://localhost:9013"
                     }
                   }
                 }
@@ -1372,7 +3160,7 @@
                     },
                     "message": {
                       "type": "string",
-                      "example": "Failed to start twin: some error"
+                      "example": "Failed to start GCS twin: Docker is not running"
                     }
                   }
                 }
@@ -1380,7 +3168,7 @@
             }
           }
         },
-        "summary": "Start the GCS twin",
+        "summary": "Start twin",
         "tags": [
           "Twin"
         ]
@@ -1388,7 +3176,7 @@
     },
     "/api/twin/stop": {
       "post": {
-        "description": "Stop the GCS twin",
+        "description": "Stops the GCS twin Docker container.",
         "operationId": "TwinController_stop",
         "parameters": [],
         "responses": {
@@ -1425,7 +3213,7 @@
                     },
                     "message": {
                       "type": "string",
-                      "example": "Failed to stop twin: some error"
+                      "example": "Failed to stop GCS twin: Container not found"
                     }
                   }
                 }
@@ -1433,7 +3221,7 @@
             }
           }
         },
-        "summary": "Stop the GCS twin",
+        "summary": "Stop twin",
         "tags": [
           "Twin"
         ]
@@ -1450,10 +3238,6 @@
     {
       "name": "demo-scaffold",
       "description": ""
-    },
-    {
-      "name": "Twin",
-      "description": "GCS twin control endpoints"
     }
   ],
   "servers": [],
@@ -1921,6 +3705,978 @@
         },
         "required": [
           "files"
+        ]
+      },
+      "GetDownloadUrlResponseDto": {
+        "type": "object",
+        "properties": {
+          "url": {
+            "type": "string",
+            "description": "Download URL",
+            "example": "https://storage.googleapis.com/app-assets/test.txt?X-Goog-Signature=..."
+          },
+          "expiresAt": {
+            "format": "date-time",
+            "type": "string",
+            "description": "URL expiration timestamp",
+            "example": "2024-01-01T00:15:00.000Z"
+          }
+        },
+        "required": [
+          "url",
+          "expiresAt"
+        ]
+      },
+      "ConvertLeadRequestDto": {
+        "type": "object",
+        "properties": {
+          "contactId": {
+            "type": "number"
+          },
+          "companyId": {
+            "type": "number"
+          },
+          "createOpportunity": {
+            "type": "boolean",
+            "default": true
+          },
+          "opportunityTitle": {
+            "type": "string"
+          },
+          "opportunityEstimatedValue": {
+            "type": "number"
+          }
+        }
+      },
+      "StageSummaryDto": {
+        "type": "object",
+        "properties": {
+          "stage": {
+            "type": "string"
+          },
+          "count": {
+            "type": "number"
+          },
+          "totalValue": {
+            "type": "number"
+          },
+          "weightedValue": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "stage",
+          "count",
+          "totalValue",
+          "weightedValue"
+        ]
+      },
+      "DashboardSnapshotDto": {
+        "type": "object",
+        "properties": {
+          "pipeline": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/StageSummaryDto"
+            }
+          },
+          "tasksOpen": {
+            "type": "number"
+          },
+          "tasksOverdue": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "pipeline",
+          "tasksOpen",
+          "tasksOverdue"
+        ]
+      },
+      "ConfigurableLookupDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number"
+          },
+          "listKey": {
+            "type": "string"
+          },
+          "value": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          },
+          "sortOrder": {
+            "type": "number"
+          },
+          "isSystem": {
+            "type": "boolean"
+          },
+          "isActive": {
+            "type": "boolean"
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "updatedAt": {
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "listKey",
+          "value",
+          "label",
+          "sortOrder",
+          "isSystem",
+          "isActive",
+          "createdAt",
+          "updatedAt"
+        ]
+      },
+      "CreateConfigurableLookupDto": {
+        "type": "object",
+        "properties": {
+          "listKey": {
+            "type": "string",
+            "example": "opportunity_stage",
+            "description": "snake_case list key"
+          },
+          "value": {
+            "type": "string",
+            "example": "discovery",
+            "description": "snake_case canonical value"
+          },
+          "label": {
+            "type": "string",
+            "example": "Discovery"
+          },
+          "sortOrder": {
+            "type": "number",
+            "default": 0
+          },
+          "isActive": {
+            "type": "boolean",
+            "default": true
+          }
+        },
+        "required": [
+          "listKey",
+          "value",
+          "label"
+        ]
+      },
+      "UpdateConfigurableLookupDto": {
+        "type": "object",
+        "properties": {
+          "listKey": {
+            "type": "string"
+          },
+          "value": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          },
+          "sortOrder": {
+            "type": "number"
+          },
+          "isActive": {
+            "type": "boolean"
+          }
+        }
+      },
+      "ActivityLogEntryDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number"
+          },
+          "relatedType": {
+            "type": "string",
+            "enum": [
+              "contact",
+              "company",
+              "lead",
+              "opportunity"
+            ]
+          },
+          "relatedId": {
+            "type": "number"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "note",
+              "call",
+              "meeting",
+              "email",
+              "task"
+            ]
+          },
+          "subject": {
+            "type": "string"
+          },
+          "description": {
+            "type": "object",
+            "nullable": true
+          },
+          "dueAt": {
+            "format": "date-time",
+            "type": "string",
+            "nullable": true
+          },
+          "completedAt": {
+            "format": "date-time",
+            "type": "string",
+            "nullable": true
+          },
+          "ownerId": {
+            "type": "number"
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "updatedAt": {
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "relatedType",
+          "relatedId",
+          "type",
+          "subject",
+          "ownerId",
+          "createdAt",
+          "updatedAt"
+        ]
+      },
+      "CreateActivityLogEntryDto": {
+        "type": "object",
+        "properties": {
+          "relatedType": {
+            "type": "string",
+            "enum": [
+              "contact",
+              "company",
+              "lead",
+              "opportunity"
+            ]
+          },
+          "relatedId": {
+            "type": "number"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "note",
+              "call",
+              "meeting",
+              "email",
+              "task"
+            ]
+          },
+          "subject": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "dueAt": {
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "relatedType",
+          "relatedId",
+          "type",
+          "subject"
+        ]
+      },
+      "UpdateActivityLogEntryDto": {
+        "type": "object",
+        "properties": {
+          "subject": {
+            "type": "string"
+          },
+          "description": {
+            "type": "object"
+          },
+          "dueAt": {
+            "format": "date-time",
+            "type": "string"
+          }
+        }
+      },
+      "CompleteActivityLogEntryDto": {
+        "type": "object",
+        "properties": {
+          "outcomeNotes": {
+            "type": "string"
+          }
+        }
+      },
+      "CompanyDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number"
+          },
+          "name": {
+            "type": "string"
+          },
+          "website": {
+            "type": "object",
+            "nullable": true
+          },
+          "primaryPhone": {
+            "type": "object",
+            "nullable": true
+          },
+          "industry": {
+            "type": "object",
+            "nullable": true
+          },
+          "status": {
+            "type": "string"
+          },
+          "location": {
+            "type": "object",
+            "nullable": true
+          },
+          "companySize": {
+            "type": "object",
+            "nullable": true
+          },
+          "revenueRange": {
+            "type": "object",
+            "nullable": true
+          },
+          "notesSummary": {
+            "type": "object",
+            "nullable": true
+          },
+          "ownerId": {
+            "type": "number"
+          },
+          "isArchived": {
+            "type": "boolean"
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "updatedAt": {
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "status",
+          "ownerId",
+          "isArchived",
+          "createdAt",
+          "updatedAt"
+        ]
+      },
+      "CreateCompanyDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "website": {
+            "type": "string"
+          },
+          "primaryPhone": {
+            "type": "string"
+          },
+          "industry": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "default": "active"
+          },
+          "location": {
+            "type": "string"
+          },
+          "companySize": {
+            "type": "string"
+          },
+          "revenueRange": {
+            "type": "string"
+          },
+          "notesSummary": {
+            "type": "string"
+          },
+          "ownerId": {
+            "type": "number",
+            "description": "Owner user id. Defaults to the authenticated user."
+          }
+        },
+        "required": [
+          "name"
+        ]
+      },
+      "UpdateCompanyDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "website": {
+            "type": "object"
+          },
+          "primaryPhone": {
+            "type": "object"
+          },
+          "industry": {
+            "type": "object"
+          },
+          "status": {
+            "type": "string"
+          },
+          "location": {
+            "type": "object"
+          },
+          "companySize": {
+            "type": "object"
+          },
+          "revenueRange": {
+            "type": "object"
+          },
+          "notesSummary": {
+            "type": "object"
+          },
+          "ownerId": {
+            "type": "number"
+          }
+        }
+      },
+      "ContactDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number"
+          },
+          "firstName": {
+            "type": "string"
+          },
+          "lastName": {
+            "type": "string"
+          },
+          "email": {
+            "type": "object",
+            "nullable": true
+          },
+          "phone": {
+            "type": "object",
+            "nullable": true
+          },
+          "secondaryPhone": {
+            "type": "object",
+            "nullable": true
+          },
+          "secondaryEmail": {
+            "type": "object",
+            "nullable": true
+          },
+          "jobTitle": {
+            "type": "object",
+            "nullable": true
+          },
+          "companyId": {
+            "type": "object",
+            "nullable": true
+          },
+          "leadSource": {
+            "type": "object",
+            "nullable": true
+          },
+          "tags": {
+            "type": "object",
+            "nullable": true
+          },
+          "mailingAddress": {
+            "type": "object",
+            "nullable": true
+          },
+          "notesSummary": {
+            "type": "object",
+            "nullable": true
+          },
+          "status": {
+            "type": "string"
+          },
+          "ownerId": {
+            "type": "number"
+          },
+          "isArchived": {
+            "type": "boolean"
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "updatedAt": {
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "firstName",
+          "lastName",
+          "status",
+          "ownerId",
+          "isArchived",
+          "createdAt",
+          "updatedAt"
+        ]
+      },
+      "CreateContactDto": {
+        "type": "object",
+        "properties": {
+          "firstName": {
+            "type": "string"
+          },
+          "lastName": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "phone": {
+            "type": "string"
+          },
+          "secondaryPhone": {
+            "type": "string"
+          },
+          "secondaryEmail": {
+            "type": "string"
+          },
+          "jobTitle": {
+            "type": "string"
+          },
+          "companyId": {
+            "type": "number"
+          },
+          "leadSource": {
+            "type": "string"
+          },
+          "tags": {
+            "type": "string"
+          },
+          "mailingAddress": {
+            "type": "string"
+          },
+          "notesSummary": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "default": "active"
+          },
+          "ownerId": {
+            "type": "number",
+            "description": "Owner user id. Defaults to the authenticated user."
+          }
+        },
+        "required": [
+          "firstName",
+          "lastName"
+        ]
+      },
+      "UpdateContactDto": {
+        "type": "object",
+        "properties": {
+          "firstName": {
+            "type": "string"
+          },
+          "lastName": {
+            "type": "string"
+          },
+          "email": {
+            "type": "object"
+          },
+          "phone": {
+            "type": "object"
+          },
+          "secondaryPhone": {
+            "type": "object"
+          },
+          "secondaryEmail": {
+            "type": "object"
+          },
+          "jobTitle": {
+            "type": "object"
+          },
+          "companyId": {
+            "type": "object"
+          },
+          "leadSource": {
+            "type": "object"
+          },
+          "tags": {
+            "type": "object"
+          },
+          "mailingAddress": {
+            "type": "object"
+          },
+          "notesSummary": {
+            "type": "object"
+          },
+          "status": {
+            "type": "string"
+          },
+          "ownerId": {
+            "type": "number"
+          }
+        }
+      },
+      "LeadDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number"
+          },
+          "name": {
+            "type": "string"
+          },
+          "companyName": {
+            "type": "object",
+            "nullable": true
+          },
+          "email": {
+            "type": "object",
+            "nullable": true
+          },
+          "phone": {
+            "type": "object",
+            "nullable": true
+          },
+          "source": {
+            "type": "object",
+            "nullable": true
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "new",
+              "contacted",
+              "qualified",
+              "unqualified"
+            ]
+          },
+          "notes": {
+            "type": "object",
+            "nullable": true
+          },
+          "contactId": {
+            "type": "object",
+            "nullable": true
+          },
+          "companyId": {
+            "type": "object",
+            "nullable": true
+          },
+          "convertedAt": {
+            "format": "date-time",
+            "type": "string",
+            "nullable": true
+          },
+          "convertedToContactId": {
+            "type": "object",
+            "nullable": true
+          },
+          "convertedToCompanyId": {
+            "type": "object",
+            "nullable": true
+          },
+          "ownerId": {
+            "type": "number"
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "updatedAt": {
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "status",
+          "ownerId",
+          "createdAt",
+          "updatedAt"
+        ]
+      },
+      "CreateLeadDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "companyName": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "phone": {
+            "type": "string"
+          },
+          "source": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "new",
+              "contacted",
+              "qualified",
+              "unqualified"
+            ],
+            "default": "new"
+          },
+          "notes": {
+            "type": "string"
+          },
+          "ownerId": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "name"
+        ]
+      },
+      "UpdateLeadDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "companyName": {
+            "type": "object"
+          },
+          "email": {
+            "type": "object"
+          },
+          "phone": {
+            "type": "object"
+          },
+          "source": {
+            "type": "object"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "new",
+              "contacted",
+              "qualified",
+              "unqualified"
+            ]
+          },
+          "notes": {
+            "type": "object"
+          },
+          "ownerId": {
+            "type": "number"
+          }
+        }
+      },
+      "OpportunityDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number"
+          },
+          "title": {
+            "type": "string"
+          },
+          "companyId": {
+            "type": "number"
+          },
+          "primaryContactId": {
+            "type": "object",
+            "nullable": true
+          },
+          "stage": {
+            "type": "string",
+            "enum": [
+              "new",
+              "discovery",
+              "proposal",
+              "negotiation",
+              "won",
+              "lost"
+            ]
+          },
+          "estimatedValue": {
+            "type": "object",
+            "nullable": true
+          },
+          "probability": {
+            "type": "object",
+            "nullable": true
+          },
+          "expectedCloseDate": {
+            "format": "date-time",
+            "type": "string",
+            "nullable": true
+          },
+          "closedAt": {
+            "format": "date-time",
+            "type": "string",
+            "nullable": true
+          },
+          "lossReason": {
+            "type": "object",
+            "nullable": true
+          },
+          "notes": {
+            "type": "object",
+            "nullable": true
+          },
+          "ownerId": {
+            "type": "number"
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "updatedAt": {
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "title",
+          "companyId",
+          "stage",
+          "ownerId",
+          "createdAt",
+          "updatedAt"
+        ]
+      },
+      "CreateOpportunityDto": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string"
+          },
+          "companyId": {
+            "type": "number"
+          },
+          "primaryContactId": {
+            "type": "number"
+          },
+          "stage": {
+            "type": "string",
+            "enum": [
+              "new",
+              "discovery",
+              "proposal",
+              "negotiation",
+              "won",
+              "lost"
+            ],
+            "default": "new"
+          },
+          "estimatedValue": {
+            "type": "number"
+          },
+          "probability": {
+            "type": "number"
+          },
+          "expectedCloseDate": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "notes": {
+            "type": "string"
+          },
+          "ownerId": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "title",
+          "companyId"
+        ]
+      },
+      "UpdateOpportunityDto": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string"
+          },
+          "companyId": {
+            "type": "number"
+          },
+          "primaryContactId": {
+            "type": "object"
+          },
+          "stage": {
+            "type": "string",
+            "enum": [
+              "new",
+              "discovery",
+              "proposal",
+              "negotiation",
+              "won",
+              "lost"
+            ]
+          },
+          "estimatedValue": {
+            "type": "object"
+          },
+          "probability": {
+            "type": "object"
+          },
+          "expectedCloseDate": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "notes": {
+            "type": "object"
+          },
+          "ownerId": {
+            "type": "number"
+          }
+        }
+      },
+      "CloseOpportunityDto": {
+        "type": "object",
+        "properties": {
+          "outcome": {
+            "type": "string",
+            "enum": [
+              "won",
+              "lost"
+            ]
+          },
+          "lossReason": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "outcome"
         ]
       }
     }

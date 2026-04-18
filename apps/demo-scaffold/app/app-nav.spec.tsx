@@ -38,7 +38,7 @@ describe('AppNav Component', () => {
     expect(nav).toBeTruthy();
 
     const links = screen.getAllByRole('link');
-    expect(links).toHaveLength(5);
+    expect(links).toHaveLength(10);
   });
 
   it('should handle different initial routes', () => {

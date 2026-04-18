@@ -76,6 +76,18 @@ jest.mock('@open-kingdom/shared-backend-feature-gcp-resources', () => ({
   FeatureGcpResourcesModule: class MockFeatureGcpResourcesModule {},
 }));
 
+jest.mock('@open-kingdom/shared-backend-feature-crm', () => ({
+  FeatureCrmModule: {
+    forRoot: jest.fn().mockReturnValue({
+      module: class MockFeatureCrmModule {},
+      imports: [],
+      providers: [],
+      controllers: [],
+      exports: [],
+    }),
+  },
+}));
+
 jest.mock('@open-kingdom/shared-backend-util-rbac', () => {
   class MockPermissionGuard {
     canActivate() {

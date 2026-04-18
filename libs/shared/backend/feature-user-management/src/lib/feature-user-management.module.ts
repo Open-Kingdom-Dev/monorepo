@@ -39,6 +39,7 @@ export class FeatureUserManagementModule {
   static forRoot(options: UserManagementModuleOptions): DynamicModule {
     return {
       module: FeatureUserManagementModule,
+      global: true,
       imports: [OpenKingdomDataAccessBackendUsersModule, DiscoveryModule],
       controllers: [
         InvitationsController,

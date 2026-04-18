@@ -1,4 +1,5 @@
 import { createBrowserRouter } from 'react-router';
+import { crmRoutes } from '@open-kingdom/shared-frontend-feature-crm';
 import { AppLayout } from './app-layout';
 import AboutComponent from './routes/about';
 import { Home } from './routes/home';
@@ -17,6 +18,7 @@ export const router = createBrowserRouter([
       { path: 'profile', Component: Profile },
       { path: 'admin/users', Component: UserManagement },
       { path: 'accept-invitation', Component: AcceptInvitationRoute },
+      ...crmRoutes,
       { path: 'gcs-demo', Component: GcsDemo },
     ],
   },

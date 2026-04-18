@@ -1,0 +1,44 @@
+{
+  "name": "@open-kingdom/shared-backend-feature-crm",
+  "version": "0.0.2-16",
+  "publishConfig": {
+    "access": "public"
+  },
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    "./package.json": "./package.json",
+    ".": {
+      "@open-kingdom/source": "./src/index.ts",
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "README.md",
+    "dist",
+    "!**/*.tsbuildinfo"
+  ],
+  "nx": {
+    "name": "feature-crm",
+    "tags": [
+      "scope:shared",
+      "type:feature",
+      "environment:backend"
+    ]
+  },
+  "dependencies": {
+    "tslib": "^2.3.0",
+    "@open-kingdom/shared-poly-util-crm-domain": "*",
+    "@open-kingdom/shared-backend-util-rbac": "*",
+    "@open-kingdom/shared-backend-data-access-configurable-lookups": "*",
+    "@open-kingdom/shared-backend-data-access-activity-log": "*",
+    "@open-kingdom/shared-backend-data-access-contacts": "*",
+    "@open-kingdom/shared-backend-data-access-opportunities": "*",
+    "@open-kingdom/shared-backend-feature-user-management": "*",
+    "@nestjs/common": "^11.0.0",
+    "@nestjs/swagger": "^11.0.0"
+  }
+}

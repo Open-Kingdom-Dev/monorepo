@@ -1,6 +1,7 @@
 export const SYSTEM_ROLES = {
   GUEST: 'guest',
   USER: 'user',
+  MANAGER: 'manager',
   ADMIN: 'admin',
 } as const;
 
@@ -14,6 +15,12 @@ export const DEFAULT_ROLES = [
     name: SYSTEM_ROLES.USER,
     isSystem: 1,
     description: 'Standard authenticated user',
+  },
+  {
+    name: SYSTEM_ROLES.MANAGER,
+    isSystem: 1,
+    description:
+      'Oversight role — read-only visibility across team records, dashboards, and activity',
   },
   {
     name: SYSTEM_ROLES.ADMIN,
@@ -70,6 +77,12 @@ export const DEFAULT_ROLE_PERMISSIONS: Record<
 > = {
   [SYSTEM_ROLES.GUEST]: [{ resource: 'profile', action: 'read' }],
   [SYSTEM_ROLES.USER]: [
+    { resource: 'users', action: 'read' },
+    { resource: 'roles', action: 'read' },
+    { resource: 'invitations', action: 'read' },
+    { resource: 'profile', action: 'read' },
+  ],
+  [SYSTEM_ROLES.MANAGER]: [
     { resource: 'users', action: 'read' },
     { resource: 'roles', action: 'read' },
     { resource: 'invitations', action: 'read' },
