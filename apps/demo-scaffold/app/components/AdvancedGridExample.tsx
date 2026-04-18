@@ -152,8 +152,8 @@ export const AdvancedGridExample = () => {
             {viewToDelete && (
               <>
                 <span className="text-sm text-muted-foreground">
-                  Delete "
-                  {savedViews.find((v) => v.id === viewToDelete)?.name}"?
+                  Delete "{savedViews.find((v) => v.id === viewToDelete)?.name}
+                  "?
                 </span>
                 <Button
                   variant="destructive"

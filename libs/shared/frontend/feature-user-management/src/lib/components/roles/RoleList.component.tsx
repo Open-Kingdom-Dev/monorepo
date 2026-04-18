@@ -124,11 +124,7 @@ export function RoleList() {
         </h2>
       </div>
 
-      <DataGrid
-        rowData={roles}
-        columnDefs={columnDefs}
-        loading={isLoading}
-      />
+      <DataGrid rowData={roles} columnDefs={columnDefs} loading={isLoading} />
 
       <RolePermissionsModal
         isOpen={!!roleToEdit}

@@ -44,13 +44,8 @@ jest.mock('@open-kingdom/shared-frontend-data-access-notifications', () => ({
 
 jest.mock('@open-kingdom/shared-frontend-ui-primitives', () => ({
   __esModule: true,
-  Dialog: ({
-    children,
-    open,
-  }: {
-    children: React.ReactNode;
-    open: boolean;
-  }) => (open ? <div data-testid="modal">{children}</div> : null),
+  Dialog: ({ children, open }: { children: React.ReactNode; open: boolean }) =>
+    open ? <div data-testid="modal">{children}</div> : null,
   DialogContent: ({ children }: { children: React.ReactNode }) => (
     <div>{children}</div>
   ),

@@ -9,7 +9,13 @@ import {
   logout,
 } from '@open-kingdom/shared-frontend-data-access-api-client';
 import { showSuccessNotification } from '@open-kingdom/shared-frontend-data-access-notifications';
-import { Button, Input, Label, Card, CardContent } from '@open-kingdom/shared-frontend-ui-primitives';
+import {
+  Button,
+  Input,
+  Label,
+  Card,
+  CardContent,
+} from '@open-kingdom/shared-frontend-ui-primitives';
 
 function EmailForm() {
   const dispatch = useDispatch();
@@ -35,9 +41,7 @@ function EmailForm() {
   return (
     <Card className="max-w-md mx-auto mt-8">
       <CardContent className="p-6">
-        <h2 className="text-2xl font-bold mb-4 text-foreground">
-          Send Email
-        </h2>
+        <h2 className="text-2xl font-bold mb-4 text-foreground">Send Email</h2>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <Label htmlFor="emailTo" className="mb-1">
@@ -80,9 +84,7 @@ function EmailForm() {
             />
           </div>
           {isSuccess && (
-            <p className="text-sm text-success">
-              Email sent successfully!
-            </p>
+            <p className="text-sm text-success">Email sent successfully!</p>
           )}
           {isError && (
             <p className="text-sm text-destructive">
@@ -119,9 +121,7 @@ function LoginForm() {
   return (
     <Card className="max-w-md mx-auto mt-8">
       <CardContent className="p-6">
-        <h1 className="text-2xl font-bold mb-4 text-foreground">
-          Login
-        </h1>
+        <h1 className="text-2xl font-bold mb-4 text-foreground">Login</h1>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <Label htmlFor="email" className="mb-1">
@@ -150,9 +150,7 @@ function LoginForm() {
             />
           </div>
           {error && (
-            <p className="text-destructive text-sm">
-              Invalid credentials
-            </p>
+            <p className="text-destructive text-sm">Invalid credentials</p>
           )}
           <Button type="submit" disabled={isLoading} className="w-full">
             {isLoading ? 'Logging in...' : 'Login'}
@@ -185,9 +183,7 @@ function ProfileCard() {
     return (
       <Card className="max-w-md mx-auto mt-8">
         <CardContent className="p-6">
-          <p className="text-destructive">
-            Error loading profile
-          </p>
+          <p className="text-destructive">Error loading profile</p>
         </CardContent>
       </Card>
     );
@@ -204,10 +200,12 @@ function ProfileCard() {
     <Card className="max-w-md mx-auto mt-8">
       <CardContent className="p-6">
         <div className="flex justify-between items-center mb-4">
-          <h1 className="text-2xl font-bold text-foreground">
-            Profile
-          </h1>
-          <Button variant="destructive" size="sm" onClick={() => dispatch(logout())}>
+          <h1 className="text-2xl font-bold text-foreground">Profile</h1>
+          <Button
+            variant="destructive"
+            size="sm"
+            onClick={() => dispatch(logout())}
+          >
             Logout
           </Button>
         </div>
@@ -217,9 +215,7 @@ function ProfileCard() {
               <span className="text-sm font-medium text-muted-foreground">
                 {label}:
               </span>
-              <span className="ml-2 text-foreground">
-                {value}
-              </span>
+              <span className="ml-2 text-foreground">{value}</span>
             </div>
           ))}
         </div>

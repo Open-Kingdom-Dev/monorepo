@@ -3,7 +3,10 @@ import { Provider, useDispatch } from 'react-redux';
 import { createRoot } from 'react-dom/client';
 import { useCallback } from 'react';
 
-import { setColorMode, getColorMode } from '@open-kingdom/shared-frontend-ui-theme';
+import {
+  setColorMode,
+  getColorMode,
+} from '@open-kingdom/shared-frontend-ui-theme';
 import { SharedFeatureNotifications } from '@open-kingdom/shared-feature-notifications';
 import { logError } from '@open-kingdom/shared-frontend-data-access-logger';
 import { showErrorNotification } from '@open-kingdom/shared-frontend-data-access-notifications';

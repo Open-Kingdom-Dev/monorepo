@@ -21,7 +21,11 @@ function subscribe(callback: () => void) {
 }
 
 export function useColorMode() {
-  const mode = useSyncExternalStore(subscribe, getColorMode, () => 'light' as ColorMode);
+  const mode = useSyncExternalStore(
+    subscribe,
+    getColorMode,
+    () => 'light' as ColorMode
+  );
   const setMode = useCallback((m: ColorMode) => setColorMode(m), []);
   return { mode, setMode } as const;
 }

@@ -36,9 +36,7 @@ export function Home() {
     <>
       <div className="flex justify-between items-center mb-8">
         <h1 className="text-4xl font-bold text-primary">Hello World</h1>
-        <Button
-          onClick={() => setMode(mode === 'light' ? 'dark' : 'light')}
-        >
+        <Button onClick={() => setMode(mode === 'light' ? 'dark' : 'light')}>
           Toggle {mode === 'light' ? 'Dark' : 'Light'} Mode
         </Button>
       </div>
