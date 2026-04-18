@@ -2,39 +2,36 @@ import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { RoleBadge } from './RoleBadge.component';
 
+jest.mock('@open-kingdom/shared-frontend-ui-primitives', () => ({
+  Badge: ({ children, variant, ...props }: { children: React.ReactNode; variant?: string; [key: string]: unknown }) => (
+    <span data-variant={variant} {...props}>{children}</span>
+  ),
+}));
+
 describe('RoleBadge', () => {
   it('displays the capitalised role name', () => {
     render(<RoleBadge role="admin" />);
     expect(screen.getByText('Admin')).toBeInTheDocument();
   });
 
-  it('uses secondary styles for admin', () => {
-    const { container } = render(<RoleBadge role="admin" />);
-    const badge = container.querySelector('span');
-    expect(badge).toHaveClass('bg-secondary-100');
-    expect(badge).toHaveClass('text-secondary-800');
+  it('uses secondary variant for admin', () => {
+    render(<RoleBadge role="admin" />);
+    expect(screen.getByText('Admin')).toHaveAttribute('data-variant', 'secondary');
   });
 
-  it('uses primary styles for user', () => {
-    const { container } = render(<RoleBadge role="user" />);
-    const badge = container.querySelector('span');
-    expect(badge).toHaveClass('bg-primary-100');
-    expect(badge).toHaveClass('text-primary-800');
+  it('uses default variant for user', () => {
+    render(<RoleBadge role="user" />);
+    expect(screen.getByText('User')).toHaveAttribute('data-variant', 'default');
   });
 
-  it('uses neutral styles for guest', () => {
-    const { container } = render(<RoleBadge role="guest" />);
-    const badge = container.querySelector('span');
-    expect(badge).toHaveClass('bg-neutral-100');
-    expect(badge).toHaveClass('text-neutral-700');
+  it('uses muted variant for guest', () => {
+    render(<RoleBadge role="guest" />);
+    expect(screen.getByText('Guest')).toHaveAttribute('data-variant', 'muted');
   });
 
-  it('falls back to primary styles for dynamic roles', () => {
-    const { container } = render(<RoleBadge role="moderator" />);
-    expect(screen.getByText('Moderator')).toBeInTheDocument();
-    const badge = container.querySelector('span');
-    expect(badge).toHaveClass('bg-primary-100');
-    expect(badge).toHaveClass('text-primary-800');
+  it('falls back to default variant for dynamic roles', () => {
+    render(<RoleBadge role="moderator" />);
+    expect(screen.getByText('Moderator')).toHaveAttribute('data-variant', 'default');
   });
 
   it('renders nothing when role is null', () => {

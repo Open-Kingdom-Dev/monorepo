@@ -11,6 +11,7 @@
   "exports": {
     "./package.json": "./package.json",
     "./tailwind.config.js": "./dist/tailwind.config.js",
+    "./styles/tokens.css": "./src/styles/tokens.css",
     ".": {
       "@open-kingdom/source": "./src/index.ts",
       "types": "./dist/index.d.ts",
@@ -21,6 +22,7 @@
   "files": [
     "README.md",
     "dist",
+    "src/styles",
     "!**/*.tsbuildinfo"
   ],
   "nx": {
@@ -31,7 +33,10 @@
     ]
   },
   "peerDependencies": {
+    "clsx": "^2.0.0",
+    "tailwind-merge": "^3.0.0",
     "tailwindcss": "^3.4.0",
+    "tailwindcss-animate": "^1.0.0",
     "react": "^19.0.0"
   }
 }

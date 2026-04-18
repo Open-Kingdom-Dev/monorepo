@@ -42,20 +42,33 @@ jest.mock('@open-kingdom/shared-frontend-data-access-notifications', () => ({
   })),
 }));
 
-jest.mock('@open-kingdom/shared-frontend-ui-theme', () => ({
+jest.mock('@open-kingdom/shared-frontend-ui-primitives', () => ({
   __esModule: true,
-  useTheme: () => ({ theme: {}, mode: 'light' }),
-}));
-
-jest.mock('../shared/ModalOverlay.component', () => ({
-  __esModule: true,
-  ModalOverlay: ({
-    isOpen,
+  Dialog: ({
     children,
+    open,
   }: {
-    isOpen: boolean;
     children: React.ReactNode;
-  }) => (isOpen ? <div data-testid="modal">{children}</div> : null),
+    open: boolean;
+  }) => (open ? <div data-testid="modal">{children}</div> : null),
+  DialogContent: ({ children }: { children: React.ReactNode }) => (
+    <div>{children}</div>
+  ),
+  DialogHeader: ({ children }: { children: React.ReactNode }) => (
+    <div>{children}</div>
+  ),
+  DialogTitle: ({ children }: { children: React.ReactNode }) => (
+    <div>{children}</div>
+  ),
+  DialogDescription: ({ children }: { children: React.ReactNode }) => (
+    <div>{children}</div>
+  ),
+  Button: ({
+    children,
+    ...props
+  }: React.ButtonHTMLAttributes<HTMLButtonElement> & {
+    children: React.ReactNode;
+  }) => <button {...props}>{children}</button>,
 }));
 
 const store = configureStore({ reducer: {} });

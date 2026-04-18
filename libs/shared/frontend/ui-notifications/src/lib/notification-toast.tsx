@@ -16,7 +16,6 @@ export function NotificationToast({
   const [isVisible, setIsVisible] = useState(false);
   const [isExiting, setIsExiting] = useState(false);
 
-  // Animate in on mount
   useEffect(() => {
     const timer = setTimeout(() => setIsVisible(true), 10);
     return () => clearTimeout(timer);
@@ -24,12 +23,9 @@ export function NotificationToast({
 
   const handleDismiss = () => {
     setIsExiting(true);
-    // Notify consumer of dismissed event
     onDismissed(notification.id);
 
-    // Remove from DOM after animation
     setTimeout(() => {
-      // Notify consumer of removed event
       onRemoved(notification.id);
     }, 300);
   };
@@ -40,11 +36,11 @@ export function NotificationToast({
 
     switch (type) {
       case 'success':
-        return `${baseStyles} bg-success-50 dark:bg-success-900/20 border-success-200 dark:border-success-700`;
+        return `${baseStyles} bg-success/10 border-success/20`;
       case 'warning':
-        return `${baseStyles} bg-warning-50 dark:bg-warning-900/20 border-warning-200 dark:border-warning-700`;
+        return `${baseStyles} bg-warning/10 border-warning/20`;
       case 'error':
-        return `${baseStyles} bg-error-50 dark:bg-error-900/20 border-error-200 dark:border-error-700`;
+        return `${baseStyles} bg-destructive/10 border-destructive/20`;
       default:
         return baseStyles;
     }
@@ -53,11 +49,11 @@ export function NotificationToast({
   const getNotificationTextStyles = (type: 'success' | 'warning' | 'error') => {
     switch (type) {
       case 'success':
-        return 'text-success-800 dark:text-success-200';
+        return 'text-success';
       case 'warning':
-        return 'text-warning-800 dark:text-warning-200';
+        return 'text-warning';
       case 'error':
-        return 'text-error-800 dark:text-error-200';
+        return 'text-destructive';
       default:
         return '';
     }
@@ -68,11 +64,11 @@ export function NotificationToast({
   ) => {
     switch (type) {
       case 'success':
-        return 'text-success-600 dark:text-success-400';
+        return 'text-success';
       case 'warning':
-        return 'text-warning-600 dark:text-warning-400';
+        return 'text-warning';
       case 'error':
-        return 'text-error-600 dark:text-error-400';
+        return 'text-destructive';
       default:
         return '';
     }
@@ -83,7 +79,7 @@ export function NotificationToast({
       case 'success':
         return (
           <svg
-            className="w-5 h-5 text-success-600 dark:text-success-400"
+            className="w-5 h-5 text-success"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -99,7 +95,7 @@ export function NotificationToast({
       case 'warning':
         return (
           <svg
-            className="w-5 h-5 text-warning-600 dark:text-warning-400"
+            className="w-5 h-5 text-warning"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -115,7 +111,7 @@ export function NotificationToast({
       case 'error':
         return (
           <svg
-            className="w-5 h-5 text-error-600 dark:text-error-400"
+            className="w-5 h-5 text-destructive"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -169,7 +165,7 @@ export function NotificationToast({
         <button
           data-testid="dismiss-button"
           onClick={handleDismiss}
-          className="flex-shrink-0 p-1 text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-300 transition-colors"
+          className="flex-shrink-0 p-1 text-muted-foreground hover:text-foreground transition-colors"
           aria-label="Dismiss notification"
         >
           <svg

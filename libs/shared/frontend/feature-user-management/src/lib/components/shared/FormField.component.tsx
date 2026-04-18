@@ -1,4 +1,4 @@
-import { labelStyles } from '../../styles';
+import { Label } from '@open-kingdom/shared-frontend-ui-primitives';
 
 interface FormFieldProps {
   label: string;
@@ -17,14 +17,14 @@ export function FormField({
 }: FormFieldProps) {
   return (
     <div>
-      <label htmlFor={htmlFor} className={labelStyles}>
-        {label} {required && <span className="text-error-500">*</span>}
-      </label>
+      <Label htmlFor={htmlFor} className="mb-1">
+        {label} {required && <span className="text-destructive">*</span>}
+      </Label>
       {children}
       {error && (
         <p
           data-testid="field-error"
-          className="mt-1 text-sm text-error-600 dark:text-error-400"
+          className="mt-1 text-sm text-destructive"
         >
           {error}
         </p>

@@ -10,13 +10,10 @@ import {
   DataGrid,
   type ColDef,
   type ICellRendererParams,
-  type DataGridTheme,
 } from '@open-kingdom/shared-frontend-ui-datagrid';
-import { useTheme } from '@open-kingdom/shared-frontend-ui-theme';
 import { ConfirmDialog } from '../shared/ConfirmDialog.component';
 import { RoleBadge } from '../shared/RoleBadge.component';
 import { StatusBadge } from '../shared/StatusBadge.component';
-import { buttonInlineDestructiveStyles } from '../../styles';
 import { formatDate } from '@open-kingdom/shared-poly-util-date';
 import type { Invitation } from '../../types';
 
@@ -70,7 +67,7 @@ function cancelColumn(
       return (
         <button
           onClick={() => params.data && onCancel(params.data)}
-          className={buttonInlineDestructiveStyles}
+          className="text-destructive text-xs font-medium rounded px-2 py-1 transition-colors hover:bg-destructive/10 disabled:cursor-not-allowed disabled:opacity-40"
         >
           Cancel
         </button>
@@ -95,7 +92,6 @@ function buildColumnDefs(
 
 export function InvitationList() {
   const dispatch = useDispatch();
-  const { theme, mode } = useTheme();
   const { data, isLoading, error, refetch } =
     useInvitationsControllerFindAllQuery();
   const [cancelInvitation, { isLoading: isCancelling }] =
@@ -134,16 +130,14 @@ export function InvitationList() {
     return (
       <div
         data-testid="invitations-error"
-        className="rounded-lg bg-error-50 p-6 text-center dark:bg-error-900/20"
+        className="rounded-lg bg-destructive/10 p-6 text-center"
         role="alert"
       >
-        <p className="text-error-700 dark:text-error-300">
-          Failed to load invitations.
-        </p>
+        <p className="text-destructive">Failed to load invitations.</p>
         <button
           data-testid="invitations-retry-btn"
           onClick={refetch}
-          className="mt-2 text-sm font-medium text-primary-600 hover:underline dark:text-primary-400"
+          className="mt-2 text-sm font-medium text-primary hover:underline"
         >
           Try again
         </button>
@@ -156,7 +150,7 @@ export function InvitationList() {
       <div className="mb-4 flex items-center justify-between">
         <h2
           data-testid="invitations-heading"
-          className="text-xl font-semibold text-neutral-900 dark:text-neutral-100"
+          className="text-xl font-semibold text-foreground"
         >
           Invitations
         </h2>
@@ -165,8 +159,6 @@ export function InvitationList() {
       <DataGrid
         rowData={invitations}
         columnDefs={columnDefs}
-        mode={mode}
-        theme={theme as DataGridTheme}
         loading={isLoading}
       />
 

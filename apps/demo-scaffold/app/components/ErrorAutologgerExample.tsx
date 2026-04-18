@@ -8,16 +8,19 @@ import {
   useErrorReporter,
 } from '@open-kingdom/shared-frontend-feature-error-autologger';
 import { useAuthControllerLoginMutation } from '@open-kingdom/shared-frontend-data-access-api-client';
+import {
+  Button,
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from '@open-kingdom/shared-frontend-ui-primitives';
 
 function BuggyCounter({ shouldThrow }: { shouldThrow: boolean }) {
   if (shouldThrow) {
     throw new Error('BuggyCounter crashed!');
   }
-  return (
-    <span className="text-success-600 dark:text-success-400">
-      Component is stable
-    </span>
-  );
+  return <span className="text-success">Component is stable</span>;
 }
 
 export function ErrorAutologgerExample() {
@@ -62,121 +65,126 @@ export function ErrorAutologgerExample() {
   };
 
   return (
-    <div className="bg-white dark:bg-neutral-800 rounded-lg shadow-lg p-6 mb-6">
-      <h2 className="text-2xl font-semibold mb-4 text-neutral-800 dark:text-neutral-200">
-        Error Autologger Demo
-      </h2>
+    <Card className="mb-6">
+      <CardHeader>
+        <CardTitle>Error Autologger Demo</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="bg-muted p-4 rounded-lg">
+            <h3 className="text-lg font-semibold text-foreground mb-3">
+              Manual Error Reporting
+            </h3>
+            <div className="flex flex-wrap gap-2">
+              <Button
+                data-testid="report-error-btn"
+                variant="destructive"
+                size="sm"
+                onClick={() => reportError(new Error('Manual error report'))}
+              >
+                Report Error
+              </Button>
+              <Button
+                data-testid="report-string-error-btn"
+                variant="warning"
+                size="sm"
+                onClick={() => reportError('String error message')}
+              >
+                Report String
+              </Button>
+              <Button
+                data-testid="report-with-context-btn"
+                size="sm"
+                onClick={() =>
+                  reportError(new Error('Error with context'), {
+                    context: { userId: '123', action: 'demo' },
+                    userMessage: 'Something went wrong in the demo!',
+                  })
+                }
+              >
+                With Context
+              </Button>
+            </div>
+          </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* Manual Error Reporting */}
-        <div className="bg-neutral-100 dark:bg-neutral-700 p-4 rounded-lg">
-          <h3 className="text-lg font-semibold text-neutral-900 dark:text-neutral-100 mb-3">
-            Manual Error Reporting
-          </h3>
-          <div className="flex flex-wrap gap-2">
-            <button
-              data-testid="report-error-btn"
-              onClick={() => reportError(new Error('Manual error report'))}
-              className="px-3 py-2 bg-error-500 hover:bg-error-600 text-white rounded-md transition-colors text-sm"
+          <div className="bg-muted p-4 rounded-lg">
+            <h3 className="text-lg font-semibold text-foreground mb-3">
+              Error Boundary
+            </h3>
+            <div className="mb-3 p-3 bg-card rounded border border-border">
+              <ErrorBoundary
+                logger={logger}
+                notificationHandler={notificationHandler}
+                fallback={
+                  <div className="text-destructive">
+                    Component crashed! Error was logged and reported.
+                  </div>
+                }
+              >
+                <BuggyCounter shouldThrow={shouldThrow} />
+              </ErrorBoundary>
+            </div>
+            <Button
+              data-testid="trigger-boundary-error-btn"
+              variant="destructive"
+              size="sm"
+              onClick={() => setShouldThrow(true)}
+              disabled={shouldThrow}
             >
-              Report Error
-            </button>
-            <button
-              data-testid="report-string-error-btn"
-              onClick={() => reportError('String error message')}
-              className="px-3 py-2 bg-warning-500 hover:bg-warning-600 text-white rounded-md transition-colors text-sm"
+              {shouldThrow ? 'Error Triggered' : 'Trigger Error'}
+            </Button>
+            {shouldThrow && (
+              <Button
+                variant="success"
+                size="sm"
+                className="ml-2"
+                onClick={() => setShouldThrow(false)}
+              >
+                Reset
+              </Button>
+            )}
+          </div>
+
+          <div className="bg-muted p-4 rounded-lg">
+            <h3 className="text-lg font-semibold text-foreground mb-3">
+              Global Error Listener
+            </h3>
+            <div className="flex flex-wrap gap-2">
+              <Button
+                data-testid="trigger-global-error-btn"
+                variant="destructive"
+                size="sm"
+                onClick={handleTriggerGlobalError}
+              >
+                Trigger Global Error
+              </Button>
+              <Button
+                data-testid="trigger-unhandled-rejection-btn"
+                variant="warning"
+                size="sm"
+                onClick={handleTriggerUnhandledRejection}
+              >
+                Unhandled Rejection
+              </Button>
+            </div>
+          </div>
+
+          <div className="bg-muted p-4 rounded-lg">
+            <h3 className="text-lg font-semibold text-foreground mb-3">
+              RTK Query Error Middleware
+            </h3>
+            <Button
+              data-testid="trigger-api-error-btn"
+              variant="destructive"
+              size="sm"
+              onClick={handleTriggerApiError}
+              disabled={isLoginLoading}
             >
-              Report String
-            </button>
-            <button
-              data-testid="report-with-context-btn"
-              onClick={() =>
-                reportError(new Error('Error with context'), {
-                  context: { userId: '123', action: 'demo' },
-                  userMessage: 'Something went wrong in the demo!',
-                })
-              }
-              className="px-3 py-2 bg-primary-500 hover:bg-primary-600 text-white rounded-md transition-colors text-sm"
-            >
-              With Context
-            </button>
+              {isLoginLoading ? 'Calling API...' : 'Trigger Failing API Call'}
+            </Button>
           </div>
         </div>
-
-        {/* Error Boundary Demo */}
-        <div className="bg-neutral-100 dark:bg-neutral-700 p-4 rounded-lg">
-          <h3 className="text-lg font-semibold text-neutral-900 dark:text-neutral-100 mb-3">
-            Error Boundary
-          </h3>
-          <div className="mb-3 p-3 bg-white dark:bg-neutral-800 rounded border border-neutral-200 dark:border-neutral-600">
-            <ErrorBoundary
-              logger={logger}
-              notificationHandler={notificationHandler}
-              fallback={
-                <div className="text-error-600 dark:text-error-400">
-                  Component crashed! Error was logged and reported.
-                </div>
-              }
-            >
-              <BuggyCounter shouldThrow={shouldThrow} />
-            </ErrorBoundary>
-          </div>
-          <button
-            data-testid="trigger-boundary-error-btn"
-            onClick={() => setShouldThrow(true)}
-            disabled={shouldThrow}
-            className="px-3 py-2 bg-error-500 hover:bg-error-600 disabled:bg-neutral-400 text-white rounded-md transition-colors text-sm"
-          >
-            {shouldThrow ? 'Error Triggered' : 'Trigger Error'}
-          </button>
-          {shouldThrow && (
-            <button
-              onClick={() => setShouldThrow(false)}
-              className="ml-2 px-3 py-2 bg-success-500 hover:bg-success-600 text-white rounded-md transition-colors text-sm"
-            >
-              Reset
-            </button>
-          )}
-        </div>
-
-        {/* Global Error Listener Demo */}
-        <div className="bg-neutral-100 dark:bg-neutral-700 p-4 rounded-lg">
-          <h3 className="text-lg font-semibold text-neutral-900 dark:text-neutral-100 mb-3">
-            Global Error Listener
-          </h3>
-          <div className="flex flex-wrap gap-2">
-            <button
-              data-testid="trigger-global-error-btn"
-              onClick={handleTriggerGlobalError}
-              className="px-3 py-2 bg-error-500 hover:bg-error-600 text-white rounded-md transition-colors text-sm"
-            >
-              Trigger Global Error
-            </button>
-            <button
-              data-testid="trigger-unhandled-rejection-btn"
-              onClick={handleTriggerUnhandledRejection}
-              className="px-3 py-2 bg-warning-500 hover:bg-warning-600 text-white rounded-md transition-colors text-sm"
-            >
-              Unhandled Rejection
-            </button>
-          </div>
-        </div>
-
-        {/* RTK Middleware Demo */}
-        <div className="bg-neutral-100 dark:bg-neutral-700 p-4 rounded-lg">
-          <h3 className="text-lg font-semibold text-neutral-900 dark:text-neutral-100 mb-3">
-            RTK Query Error Middleware
-          </h3>
-          <button
-            data-testid="trigger-api-error-btn"
-            onClick={handleTriggerApiError}
-            disabled={isLoginLoading}
-            className="px-4 py-2 bg-error-500 hover:bg-error-600 disabled:bg-neutral-400 text-white rounded-md transition-colors text-sm"
-          >
-            {isLoginLoading ? 'Calling API...' : 'Trigger Failing API Call'}
-          </button>
-        </div>
-      </div>
-    </div>
+      </CardContent>
+    </Card>
   );
 }

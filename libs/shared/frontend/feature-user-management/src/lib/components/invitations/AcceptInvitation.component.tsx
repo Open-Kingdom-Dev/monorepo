@@ -5,14 +5,14 @@ import {
   useInvitationsControllerValidateQuery,
   useInvitationsControllerAcceptMutation,
 } from '@open-kingdom/shared-frontend-data-access-api-client';
+import {
+  Card,
+  CardContent,
+  Input,
+  Button,
+} from '@open-kingdom/shared-frontend-ui-primitives';
 import { StatusCard } from '../shared/StatusCard.component';
 import { FormField } from '../shared/FormField.component';
-import {
-  inputStyles,
-  buttonPrimaryStyles,
-  cardStyles,
-  bodyTextStyles,
-} from '../../styles';
 
 const acceptSchema = z
   .object({
@@ -85,7 +85,7 @@ export function AcceptInvitation({ token, loginPath }: AcceptInvitationProps) {
           <a
             href={loginPath}
             data-testid="accept-login-link"
-            className="mt-4 inline-block text-sm font-medium text-primary-600 hover:underline dark:text-primary-400"
+            className="mt-4 inline-block text-sm font-medium text-primary hover:underline"
           >
             Go to login
           </a>
@@ -119,78 +119,76 @@ export function AcceptInvitation({ token, loginPath }: AcceptInvitationProps) {
   }
 
   return (
-    <div className={cardStyles}>
-      <h2
-        data-testid="accept-heading"
-        className="text-xl font-bold text-neutral-900 dark:text-neutral-100"
-      >
-        Accept Invitation
-      </h2>
-      <p className={`mt-1 text-sm ${bodyTextStyles}`}>
-        You've been invited with email{' '}
-        <strong data-testid="accept-email">{email}</strong>
-      </p>
+    <Card className="max-w-md mx-auto mt-8">
+      <CardContent className="pt-6">
+        <h2
+          data-testid="accept-heading"
+          className="text-xl font-bold text-foreground"
+        >
+          Accept Invitation
+        </h2>
+        <p className="mt-1 text-sm text-muted-foreground">
+          You've been invited with email{' '}
+          <strong data-testid="accept-email">{email}</strong>
+        </p>
 
-      <form onSubmit={handleSubmit(onSubmit)} className="mt-4 space-y-4">
-        <FormField label="First Name" htmlFor="accept-firstName">
-          <input
-            id="accept-firstName"
-            data-testid="accept-first-name-input"
-            type="text"
-            placeholder="John"
-            className={inputStyles}
-            {...register('firstName')}
-          />
-        </FormField>
-        <FormField label="Last Name" htmlFor="accept-lastName">
-          <input
-            id="accept-lastName"
-            data-testid="accept-last-name-input"
-            type="text"
-            placeholder="Doe"
-            className={inputStyles}
-            {...register('lastName')}
-          />
-        </FormField>
-        <FormField
-          label="Password"
-          htmlFor="accept-password"
-          required
-          error={errors.password?.message}
-        >
-          <input
-            id="accept-password"
-            data-testid="accept-password-input"
-            type="password"
-            placeholder="Min. 8 characters"
-            className={inputStyles}
-            {...register('password')}
-          />
-        </FormField>
-        <FormField
-          label="Confirm Password"
-          htmlFor="accept-confirmPassword"
-          required
-          error={errors.confirmPassword?.message}
-        >
-          <input
-            id="accept-confirmPassword"
-            data-testid="accept-confirm-password-input"
-            type="password"
-            placeholder="Repeat password"
-            className={inputStyles}
-            {...register('confirmPassword')}
-          />
-        </FormField>
-        <button
-          type="submit"
-          data-testid="accept-submit-btn"
-          disabled={isLoading}
-          className={`w-full ${buttonPrimaryStyles}`}
-        >
-          {isLoading ? 'Creating account...' : 'Create Account'}
-        </button>
-      </form>
-    </div>
+        <form onSubmit={handleSubmit(onSubmit)} className="mt-4 space-y-4">
+          <FormField label="First Name" htmlFor="accept-firstName">
+            <Input
+              id="accept-firstName"
+              data-testid="accept-first-name-input"
+              type="text"
+              placeholder="John"
+              {...register('firstName')}
+            />
+          </FormField>
+          <FormField label="Last Name" htmlFor="accept-lastName">
+            <Input
+              id="accept-lastName"
+              data-testid="accept-last-name-input"
+              type="text"
+              placeholder="Doe"
+              {...register('lastName')}
+            />
+          </FormField>
+          <FormField
+            label="Password"
+            htmlFor="accept-password"
+            required
+            error={errors.password?.message}
+          >
+            <Input
+              id="accept-password"
+              data-testid="accept-password-input"
+              type="password"
+              placeholder="Min. 8 characters"
+              {...register('password')}
+            />
+          </FormField>
+          <FormField
+            label="Confirm Password"
+            htmlFor="accept-confirmPassword"
+            required
+            error={errors.confirmPassword?.message}
+          >
+            <Input
+              id="accept-confirmPassword"
+              data-testid="accept-confirm-password-input"
+              type="password"
+              placeholder="Repeat password"
+              {...register('confirmPassword')}
+            />
+          </FormField>
+          <Button
+            type="submit"
+            data-testid="accept-submit-btn"
+            disabled={isLoading}
+            className="w-full"
+          >
+            {isLoading ? 'Creating account...' : 'Create Account'}
+          </Button>
+        </form>
+      </CardContent>
+    </Card>
   );
 }
