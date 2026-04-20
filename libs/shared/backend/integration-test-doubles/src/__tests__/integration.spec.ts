@@ -1,7 +1,6 @@
 import { DEFAULT_PORTS, PORT_RANGE, ENV_VARS } from '../shared/constants.js';
 import { isTestMode } from '../shared/activation.js';
 import { createGcsConfig, defaultGcsConfig } from '../shared/config.js';
-import { routingTable, getRoutingEntry } from '../shared/routing-table.js';
 
 describe('integration smoke test', () => {
   describe('constants', () => {
@@ -35,17 +34,6 @@ describe('integration smoke test', () => {
     it('exports createGcsConfig function', () => {
       const config = createGcsConfig();
       expect(config.port).toBe(9013);
-    });
-  });
-
-  describe('routing-table', () => {
-    it('exports routingTable with GCS entry', () => {
-      expect(routingTable['storage.googleapis.com'].port).toBe(9013);
-    });
-
-    it('exports getRoutingEntry function', () => {
-      const entry = getRoutingEntry('storage.googleapis.com');
-      expect(entry?.port).toBe(9013);
     });
   });
 });

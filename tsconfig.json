@@ -88,7 +88,7 @@
       "path": "./libs/shared/frontend/ui-primitives"
     },
     {
-      "path": "./libs/shared/poly/integration-test-doubles"
+      "path": "./libs/shared/backend/integration-test-doubles"
     }
   ]
 }

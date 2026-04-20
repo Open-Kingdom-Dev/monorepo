@@ -7,7 +7,7 @@ export default {
     '^.+\\.[tj]sx?$': ['babel-jest', { presets: ['@nx/react/babel'] }],
   },
   transformIgnorePatterns: [
-    'node_modules/(?!(@react-hookz/web|@ver0/deep-equal)/)',
+    'node_modules/(?!(@react-hookz/web|@ver0/deep-equal|@open-kingdom)/)',
   ],
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx'],
   coverageDirectory: 'test-output/jest/coverage',
@@ -41,4 +41,12 @@ export default {
       },
     ],
   ],
+  coverageThreshold: {
+    global: {
+      branches: 80,
+      functions: 75,
+      lines: 55,
+      statements: 55,
+    },
+  },
 };

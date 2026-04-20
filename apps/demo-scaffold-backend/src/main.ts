@@ -11,6 +11,7 @@ import {
   nodeEnvAdapter,
 } from '@open-kingdom/shared-poly-util-env-config';
 import { createSwaggerConfig, globalPrefix } from './config/swagger.config';
+import { json, urlencoded } from 'express';
 
 import { AppModule } from './app/app.module';
 
@@ -20,6 +21,11 @@ const configService = createConfigService(envKeys, nodeEnvAdapter);
 export async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.setGlobalPrefix(globalPrefix);
+
+  // Increase body size limits for file uploads (base64-encoded content)
+  app.use(json({ limit: '50mb' }));
+  app.use(urlencoded({ limit: '50mb', extended: true }));
+
   const port = configService.get('PORT', '3000');
 
   const config = createSwaggerConfig().build();

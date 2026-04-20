@@ -198,6 +198,9 @@ export class GcsTwin {
 
     for (let attempt = 0; attempt < maxAttempts; attempt++) {
       if (await this.isHealthy()) {
+        // Small delay after health check passes — the container may report
+        // healthy before all HTTP methods are ready (common with fake-gcs-server).
+        await new Promise((resolve) => setTimeout(resolve, 1000));
         return;
       }
       await new Promise((resolve) => setTimeout(resolve, intervalMs));
@@ -212,51 +215,96 @@ export class GcsTwin {
 
   /**
    * Internal: create buckets and upload seed files.
+   * Errors are logged but not thrown — the twin remains functional without seeds.
    */
   private async seedBuckets(): Promise<void> {
     console.log('Seeding buckets...');
     for (const bucket of this.config.buckets) {
-      // Create bucket
-      const createRes = await fetch(`${this.config.externalUrl}/storage/v1/b`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name: bucket.name }),
-      });
-      if (!createRes.ok && createRes.status !== 409) {
-        // 409 = bucket already exists (ok)
-        throw new Error(
-          `Failed to create bucket ${bucket.name}: ${createRes.statusText}`
+      try {
+        // Create bucket (with timeout)
+        const createRes = await this.fetchWithTimeout(
+          `${this.config.externalUrl}/storage/v1/b`,
+          {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name: bucket.name }),
+          },
+          10_000
         );
-      }
-
-      // Upload seed files if any
-      if (bucket.seedFiles && bucket.seedFiles.length > 0) {
-        for (const seedFile of bucket.seedFiles) {
-          const filePath = path.resolve(this.config.seedDataDir, seedFile);
-          const content = await fs.readFile(filePath);
-          const contentType = this.guessContentType(seedFile);
-          const uploadRes = await fetch(
-            `${this.config.externalUrl}/upload/storage/v1/b/${
-              bucket.name
-            }/o?uploadType=media&name=${encodeURIComponent(seedFile)}`,
-            {
-              method: 'POST',
-              headers: {
-                'Content-Type': contentType,
-              },
-              body: content,
-            }
+        if (!createRes.ok && createRes.status !== 409) {
+          console.warn(
+            `Warning: failed to create bucket ${bucket.name}: ${createRes.status} ${createRes.statusText}`
           );
-          if (!uploadRes.ok) {
-            throw new Error(
-              `Failed to upload ${seedFile} to bucket ${bucket.name}: ${uploadRes.statusText}`
-            );
-          }
-          console.log(`  Uploaded ${seedFile} to ${bucket.name}`);
+          continue;
         }
+
+        // Upload seed files if any
+        if (bucket.seedFiles && bucket.seedFiles.length > 0) {
+          for (const seedFile of bucket.seedFiles) {
+            try {
+              const filePath = path.resolve(this.config.seedDataDir, seedFile);
+              const content = await fs.readFile(filePath);
+              const contentType = this.guessContentType(seedFile);
+              const uploadRes = await this.fetchWithTimeout(
+                `${this.config.externalUrl}/upload/storage/v1/b/${
+                  bucket.name
+                }/o?uploadType=media&name=${encodeURIComponent(seedFile)}`,
+                {
+                  method: 'POST',
+                  headers: {
+                    'Content-Type': contentType,
+                  },
+                  body: content,
+                },
+                10_000
+              );
+              if (!uploadRes.ok) {
+                console.warn(
+                  `Warning: failed to upload ${seedFile} to ${bucket.name}: ${uploadRes.status} ${uploadRes.statusText}`
+                );
+              } else {
+                console.log(`  Uploaded ${seedFile} to ${bucket.name}`);
+              }
+            } catch (err) {
+              console.warn(
+                `Warning: failed to upload ${seedFile} to ${bucket.name}: ${
+                  err instanceof Error ? err.message : String(err)
+                }`
+              );
+            }
+          }
+        }
+      } catch (err) {
+        console.warn(
+          `Warning: failed to seed bucket ${bucket.name}: ${
+            err instanceof Error ? err.message : String(err)
+          }`
+        );
       }
     }
     console.log('Bucket seeding complete');
+  }
+
+  /**
+   * Fetch with a timeout. Aborts the request if it exceeds the given duration.
+   */
+  private async fetchWithTimeout(
+    url: string,
+    init: RequestInit,
+    timeoutMs: number
+  ): Promise<Response> {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), timeoutMs);
+    try {
+      return await fetch(url, { ...init, signal: controller.signal });
+    } catch (err) {
+      if (controller.signal.aborted) {
+        throw new Error(`Request to ${url} timed out after ${timeoutMs}ms`);
+      }
+      throw err;
+    } finally {
+      clearTimeout(timer);
+    }
   }
 
   private guessContentType(filename: string): string {

@@ -19,4 +19,12 @@ module.exports = {
   coverageDirectory: 'test-output/jest/coverage',
   passWithNoTests: true,
   forceExit: true,
+  coverageThreshold: {
+    global: {
+      branches: 50,
+      functions: 60,
+      lines: 55,
+      statements: 55,
+    },
+  },
 };
