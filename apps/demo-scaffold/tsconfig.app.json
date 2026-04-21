@@ -77,7 +77,7 @@
       "path": "../../libs/shared/frontend/ui-primitives/tsconfig.lib.json"
     },
     {
-      "path": "../../libs/shared/frontend/ui-datagrid/tsconfig.lib.json"
+      "path": "../../libs/shared/frontend/ui-data-table/tsconfig.lib.json"
     }
   ]
 }

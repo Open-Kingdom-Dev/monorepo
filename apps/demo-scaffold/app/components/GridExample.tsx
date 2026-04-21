@@ -1,58 +1,51 @@
-import { useDispatch, useSelector } from 'react-redux';
-import { useCallback, useMemo } from 'react';
+import { useMemo } from 'react';
 import {
-  DataGrid,
-  setGridState,
-  selectGridInstance,
-  type StorageProvider,
-  type StateUpdatedEvent,
-  type GridState,
-} from '@open-kingdom/shared-frontend-ui-datagrid';
+  DataTable,
+  type ColumnDef,
+} from '@open-kingdom/shared-frontend-ui-data-table';
 import carsData from '../data/cars.json';
 
-const localStorageProvider: StorageProvider = {
-  get: async (key) => localStorage.getItem(key),
-  set: async (key, value) => localStorage.setItem(key, value),
-  remove: async (key) => localStorage.removeItem(key),
-};
+interface Car {
+  make: string;
+  model: string;
+  price: number;
+  electric: boolean;
+}
+
+const formatPrice = (value: number) =>
+  value.toLocaleString('en-US', { style: 'currency', currency: 'USD' });
 
 export const GridExample = () => {
-  const dispatch = useDispatch();
-
-  const savedState = useSelector(selectGridInstance('car-grid'));
-
-  const rowData = useMemo(() => carsData.data, []);
-
-  const colDefs = useMemo(() => carsData.columns, []);
-
-  const handleStateUpdated = useCallback(
-    (event: StateUpdatedEvent) => {
-      const gridId = 'car-grid';
-      const gridState = event.state;
-
-      dispatch(setGridState({ id: gridId, gridState }));
-    },
-    [dispatch]
-  );
-
-  const handleStateLoaded = useCallback(
-    (gridState: GridState) => {
-      dispatch(setGridState({ id: 'car-grid', gridState }));
-    },
-    [dispatch]
+  const columns = useMemo<ColumnDef<Car>[]>(
+    () => [
+      { id: 'make', accessorKey: 'make', header: 'Make' },
+      { id: 'model', accessorKey: 'model', header: 'Model' },
+      {
+        id: 'price',
+        accessorKey: 'price',
+        header: 'Price',
+        cell: ({ row }) => formatPrice(row.original.price),
+        meta: { align: 'right' },
+      },
+      {
+        id: 'electric',
+        accessorKey: 'electric',
+        header: 'Electric',
+        cell: ({ row }) => (row.original.electric ? 'Yes' : 'No'),
+        meta: { align: 'center' },
+      },
+    ],
+    []
   );
 
   return (
-    <DataGrid
-      rowData={rowData}
-      columnDefs={colDefs}
-      enableRowSelection={true}
-      enableStatePersistence={true}
-      storageProvider={localStorageProvider}
-      storageKey="car-grid-state"
-      initialState={savedState}
-      onStateUpdated={handleStateUpdated}
-      onStateLoaded={handleStateLoaded}
+    <DataTable<Car>
+      data={carsData.data as Car[]}
+      columns={columns}
+      getRowId={(row) => `${row.make}-${row.model}`}
+      enablePagination
+      paginationPageSizes={[5, 10, 25]}
+      persistStateKey="car-grid"
     />
   );
 };

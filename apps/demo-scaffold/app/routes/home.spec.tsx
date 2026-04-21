@@ -14,10 +14,6 @@ import {
 } from '@open-kingdom/shared-frontend-data-access-notifications';
 import { SharedFeatureNotifications } from '@open-kingdom/shared-feature-notifications';
 import {
-  DataGridKey,
-  dataGridReducer,
-} from '@open-kingdom/shared-frontend-ui-datagrid';
-import {
   CatFactsApiKey,
   catFactsApiReducer,
   catFactsApiMiddleware,
@@ -67,7 +63,6 @@ describe('App Component', () => {
       reducer: {
         [LoggerKey]: loggerReducer,
         [NotificationKey]: notificationReducer,
-        [DataGridKey]: dataGridReducer,
         [CatFactsApiKey]: catFactsApiReducer,
       },
       middleware: (getDefaultMiddleware) =>

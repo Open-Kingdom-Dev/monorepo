@@ -119,6 +119,9 @@
     },
     {
       "path": "./libs/shared/backend/integration-test-doubles"
+    },
+    {
+      "path": "./libs/shared/frontend/ui-data-table"
     }
   ]
 }
