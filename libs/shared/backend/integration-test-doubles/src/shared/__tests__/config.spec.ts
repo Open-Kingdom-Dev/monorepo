@@ -28,20 +28,6 @@ describe('config', () => {
       expect(defaultGcsConfig.buckets[0].name).toBe('app-assets');
       expect(defaultGcsConfig.buckets[1].name).toBe('user-uploads');
     });
-
-    it('app-assets bucket has three seed files', () => {
-      const appAssets = defaultGcsConfig.buckets[0];
-      expect(appAssets.seedFiles).toEqual([
-        'sample-image-1.jpg',
-        'sample-image-2.png',
-        'sample-text.txt',
-      ]);
-    });
-
-    it('user-uploads bucket has no seed files', () => {
-      const userUploads = defaultGcsConfig.buckets[1];
-      expect(userUploads.seedFiles).toBeUndefined();
-    });
   });
 
   describe('createGcsConfig', () => {
@@ -55,12 +41,6 @@ describe('config', () => {
         process.env[ENV_VARS.GCS_TWIN_PORT] = '9012';
         const config = createGcsConfig();
         expect(config.port).toBe(9012);
-      });
-
-      it('overrides seedDataDir via GCS_TWIN_SEED_DIR', () => {
-        process.env[ENV_VARS.GCS_TWIN_SEED_DIR] = '/custom/seed/path';
-        const config = createGcsConfig();
-        expect(config.seedDataDir).toBe('/custom/seed/path');
       });
 
       it('sets optional dataDir via GCS_TWIN_DATA_DIR', () => {
@@ -86,11 +66,6 @@ describe('config', () => {
       it('overrides port explicitly', () => {
         const config = createGcsConfig({ port: 9011 });
         expect(config.port).toBe(9011);
-      });
-
-      it('overrides seedDataDir explicitly', () => {
-        const config = createGcsConfig({ seedDataDir: '/explicit/path' });
-        expect(config.seedDataDir).toBe('/explicit/path');
       });
 
       it('overrides dataDir explicitly', () => {
@@ -142,12 +117,6 @@ describe('config', () => {
     });
 
     describe('edge cases', () => {
-      it('handles empty string environment variable', () => {
-        process.env[ENV_VARS.GCS_TWIN_SEED_DIR] = '';
-        const config = createGcsConfig();
-        expect(config.seedDataDir).toBe('');
-      });
-
       it('handles undefined dataDir', () => {
         delete process.env[ENV_VARS.GCS_TWIN_DATA_DIR];
         const config = createGcsConfig();

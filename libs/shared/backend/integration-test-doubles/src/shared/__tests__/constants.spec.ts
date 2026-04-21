@@ -34,7 +34,6 @@ describe('constants', () => {
 
     it('exports GCS twin environment variable names', () => {
       expect(ENV_VARS.GCS_TWIN_PORT).toBe('GCS_TWIN_PORT');
-      expect(ENV_VARS.GCS_TWIN_SEED_DIR).toBe('GCS_TWIN_SEED_DIR');
       expect(ENV_VARS.GCS_TWIN_DATA_DIR).toBe('GCS_TWIN_DATA_DIR');
     });
   });

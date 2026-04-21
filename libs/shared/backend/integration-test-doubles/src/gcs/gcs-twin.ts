@@ -1,12 +1,10 @@
 import Docker from 'dockerode';
 import { createGcsConfig, GcsTwinConfig } from '../shared/config.js';
-import fs from 'fs/promises';
-import path from 'path';
 
 /**
  * GCS twin lifecycle manager.
  *
- * Starts/stops a fake‑gcs‑server Docker container, seeds buckets,
+ * Starts/stops a fake‑gcs‑server Docker container, creates buckets,
  * and sets the GCS_EMULATOR_URL environment variable.
  */
 export class GcsTwin {
@@ -28,9 +26,9 @@ export class GcsTwin {
   }
 
   /**
-   * Start the Docker container and seed initial data.
+   * Start the Docker container and create buckets.
    *
-   * @throws {Error} If the container fails to start or seed.
+   * @throws {Error} If the container fails to start.
    */
   async start(): Promise<void> {
     console.log(`Starting GCS twin on port ${this.config.port}...`);
@@ -39,8 +37,7 @@ export class GcsTwin {
     await this.createContainer();
     await this.startContainer();
     await this.waitForHealthy();
-    await this.seedBuckets();
-    // Set environment variable for Google Cloud Storage SDK
+    await this.createBuckets();
     process.env.GCS_EMULATOR_URL = this.config.externalUrl;
     console.log(`GCS twin ready at ${this.config.externalUrl}`);
   }
@@ -57,21 +54,18 @@ export class GcsTwin {
       await this.container.stop();
       await this.container.remove();
     } catch (err) {
-      // Container might already be stopped/removed
       console.warn('Error stopping container:', err);
     }
     this.container = null;
-    // Unset environment variable
     delete process.env.GCS_EMULATOR_URL;
     console.log('GCS twin stopped');
   }
 
   /**
-   * Reset all data to initial seed state (delete everything, re‑seed).
+   * Reset all data: delete buckets then re‑create them.
    */
   async reset(): Promise<void> {
-    console.log('Resetting GCS twin to seed state...');
-    // Delete all buckets (which deletes all objects)
+    console.log('Resetting GCS twin...');
     for (const bucket of this.config.buckets) {
       try {
         await fetch(`${this.config.externalUrl}/storage/v1/b/${bucket.name}`, {
@@ -81,8 +75,7 @@ export class GcsTwin {
         // Bucket may not exist; ignore
       }
     }
-    // Re‑create buckets and seed
-    await this.seedBuckets();
+    await this.createBuckets();
     console.log('GCS twin reset complete');
   }
 
@@ -214,14 +207,12 @@ export class GcsTwin {
   }
 
   /**
-   * Internal: create buckets and upload seed files.
-   * Errors are logged but not thrown — the twin remains functional without seeds.
+   * Internal: create buckets. Errors are logged but not thrown.
    */
-  private async seedBuckets(): Promise<void> {
-    console.log('Seeding buckets...');
+  private async createBuckets(): Promise<void> {
+    console.log('Creating buckets...');
     for (const bucket of this.config.buckets) {
       try {
-        // Create bucket (with timeout)
         const createRes = await this.fetchWithTimeout(
           `${this.config.externalUrl}/storage/v1/b`,
           {
@@ -235,54 +226,18 @@ export class GcsTwin {
           console.warn(
             `Warning: failed to create bucket ${bucket.name}: ${createRes.status} ${createRes.statusText}`
           );
-          continue;
-        }
-
-        // Upload seed files if any
-        if (bucket.seedFiles && bucket.seedFiles.length > 0) {
-          for (const seedFile of bucket.seedFiles) {
-            try {
-              const filePath = path.resolve(this.config.seedDataDir, seedFile);
-              const content = await fs.readFile(filePath);
-              const contentType = this.guessContentType(seedFile);
-              const uploadRes = await this.fetchWithTimeout(
-                `${this.config.externalUrl}/upload/storage/v1/b/${
-                  bucket.name
-                }/o?uploadType=media&name=${encodeURIComponent(seedFile)}`,
-                {
-                  method: 'POST',
-                  headers: {
-                    'Content-Type': contentType,
-                  },
-                  body: content,
-                },
-                10_000
-              );
-              if (!uploadRes.ok) {
-                console.warn(
-                  `Warning: failed to upload ${seedFile} to ${bucket.name}: ${uploadRes.status} ${uploadRes.statusText}`
-                );
-              } else {
-                console.log(`  Uploaded ${seedFile} to ${bucket.name}`);
-              }
-            } catch (err) {
-              console.warn(
-                `Warning: failed to upload ${seedFile} to ${bucket.name}: ${
-                  err instanceof Error ? err.message : String(err)
-                }`
-              );
-            }
-          }
+        } else {
+          console.log(`  Created bucket ${bucket.name}`);
         }
       } catch (err) {
         console.warn(
-          `Warning: failed to seed bucket ${bucket.name}: ${
+          `Warning: failed to create bucket ${bucket.name}: ${
             err instanceof Error ? err.message : String(err)
           }`
         );
       }
     }
-    console.log('Bucket seeding complete');
+    console.log('Bucket creation complete');
   }
 
   /**
@@ -304,25 +259,6 @@ export class GcsTwin {
       throw err;
     } finally {
       clearTimeout(timer);
-    }
-  }
-
-  private guessContentType(filename: string): string {
-    const ext = path.extname(filename).toLowerCase();
-    switch (ext) {
-      case '.jpg':
-      case '.jpeg':
-        return 'image/jpeg';
-      case '.png':
-        return 'image/png';
-      case '.gif':
-        return 'image/gif';
-      case '.txt':
-        return 'text/plain';
-      case '.json':
-        return 'application/json';
-      default:
-        return 'application/octet-stream';
     }
   }
 }

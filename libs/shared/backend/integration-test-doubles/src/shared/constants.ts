@@ -37,8 +37,6 @@ export const ENV_VARS = {
   TEST_MODE: 'TEST_MODE',
   /** GCS twin port override */
   GCS_TWIN_PORT: 'GCS_TWIN_PORT',
-  /** GCS twin seed data directory */
-  GCS_TWIN_SEED_DIR: 'GCS_TWIN_SEED_DIR',
   /** GCS twin persistent data directory (optional) */
   GCS_TWIN_DATA_DIR: 'GCS_TWIN_DATA_DIR',
 } as const;

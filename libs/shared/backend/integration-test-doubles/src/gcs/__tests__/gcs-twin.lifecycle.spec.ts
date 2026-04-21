@@ -1,5 +1,4 @@
 import { GcsTwin } from '../gcs-twin.js';
-import fs from 'fs/promises';
 
 // Minimal mock for Dockerode container
 const createMockContainer = () => {
@@ -30,14 +29,10 @@ const createMockDocker = (existingContainer = null) => {
 
 describe('GcsTwin (lifecycle)', () => {
   let mockFetch: jest.Mock;
-  let mockReadFile: jest.SpyInstance;
 
   beforeEach(() => {
     mockFetch = jest.fn();
     global.fetch = mockFetch;
-    mockReadFile = jest
-      .spyOn(fs, 'readFile')
-      .mockResolvedValue(Buffer.from('fake image content'));
   });
 
   afterEach(() => {
@@ -54,10 +49,6 @@ describe('GcsTwin (lifecycle)', () => {
         .mockResolvedValueOnce({ ok: false })
         .mockResolvedValueOnce({ ok: true })
         // Bucket creation: app-assets
-        .mockResolvedValueOnce({ ok: true })
-        // File uploads: three seed files
-        .mockResolvedValueOnce({ ok: true })
-        .mockResolvedValueOnce({ ok: true })
         .mockResolvedValueOnce({ ok: true })
         // Bucket creation: user-uploads
         .mockResolvedValueOnce({ ok: true });
@@ -89,8 +80,8 @@ describe('GcsTwin (lifecycle)', () => {
       });
       // Should have started the container
       expect(mockContainer.start).toHaveBeenCalled();
-      // Should have waited for health and seeded buckets
-      expect(mockFetch).toHaveBeenCalledTimes(7);
+      // Should have waited for health and created buckets
+      expect(mockFetch).toHaveBeenCalledTimes(4);
       expect(mockFetch).toHaveBeenNthCalledWith(
         1,
         'http://localhost:9013/storage/v1/b'
@@ -107,8 +98,6 @@ describe('GcsTwin (lifecycle)', () => {
           headers: { 'Content-Type': 'application/json' },
         })
       );
-      // Seed files read
-      expect(mockReadFile).toHaveBeenCalledTimes(3);
     });
 
     it('should remove existing container before creating new one', async () => {

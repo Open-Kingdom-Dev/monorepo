@@ -3,19 +3,13 @@ import {
   nodeEnvAdapter,
 } from '@open-kingdom/shared-poly-util-env-config';
 import { DEFAULT_PORTS, ENV_VARS, PORT_RANGE } from './constants.js';
-import { fileURLToPath } from 'url';
-import path from 'path';
-
-const _dirname = path.dirname(fileURLToPath(import.meta.url));
 
 /**
- * Configuration for a single bucket to be seeded.
+ * Configuration for a single bucket to create on startup.
  */
-export interface BucketSeedConfig {
+export interface BucketConfig {
   /** Bucket name */
   name: string;
-  /** Optional list of seed file names (relative to seedDataDir) */
-  seedFiles?: string[];
 }
 
 /**
@@ -26,12 +20,10 @@ export interface GcsTwinConfig {
   port: number;
   /** External URL the SDK will connect to (e.g., http://localhost:9013) */
   externalUrl: string;
-  /** Path to directory containing seed files */
-  seedDataDir: string;
   /** Optional persistent data directory (if not set, data is ephemeral) */
   dataDir?: string;
-  /** Buckets to create and optionally seed */
-  buckets: BucketSeedConfig[];
+  /** Buckets to create on startup */
+  buckets: BucketConfig[];
 }
 
 /**
@@ -42,21 +34,7 @@ export interface GcsTwinConfig {
 export const defaultGcsConfig: GcsTwinConfig = {
   port: DEFAULT_PORTS.GCS,
   externalUrl: `http://localhost:${DEFAULT_PORTS.GCS}`,
-  seedDataDir: path.resolve(_dirname, '../gcs/seed-data'),
-  buckets: [
-    {
-      name: 'app-assets',
-      seedFiles: [
-        'sample-image-1.jpg',
-        'sample-image-2.png',
-        'sample-text.txt',
-      ],
-    },
-    {
-      name: 'user-uploads',
-      // No seed files — populated by test flows
-    },
-  ],
+  buckets: [{ name: 'app-assets' }, { name: 'user-uploads' }],
 };
 
 /**
@@ -64,7 +42,6 @@ export const defaultGcsConfig: GcsTwinConfig = {
  */
 const _CONFIG_ENV_KEYS = [
   ENV_VARS.GCS_TWIN_PORT,
-  ENV_VARS.GCS_TWIN_SEED_DIR,
   ENV_VARS.GCS_TWIN_DATA_DIR,
 ] as const;
 
@@ -103,14 +80,11 @@ export function createGcsConfig(
 
   // Environment‑variable overrides
   const envPort = parseOptionalInt(env.get(ENV_VARS.GCS_TWIN_PORT));
-  const envSeedDir = env.get(ENV_VARS.GCS_TWIN_SEED_DIR);
   const envDataDir = env.get(ENV_VARS.GCS_TWIN_DATA_DIR);
 
   const baseConfig: GcsTwinConfig = {
     ...defaultGcsConfig,
-    // Environment overrides
     ...(envPort !== undefined && { port: envPort }),
-    ...(envSeedDir !== undefined && { seedDataDir: envSeedDir }),
     ...(envDataDir !== undefined && { dataDir: envDataDir }),
   };
 
