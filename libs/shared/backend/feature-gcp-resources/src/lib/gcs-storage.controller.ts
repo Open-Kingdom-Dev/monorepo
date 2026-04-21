@@ -133,7 +133,7 @@ export class GcsStorageController {
   @ApiOperation({
     summary: 'Get a download URL for a file',
     description:
-      'Generate a download URL for a file. Returns an emulator URL when STORAGE_EMULATOR_HOST is set, otherwise generates a GCS signed URL with 15-minute expiration.',
+      'Generate a download URL for a file. Returns an emulator URL when GCS_EMULATOR_URL is set, otherwise generates a GCS signed URL with 15-minute expiration.',
   })
   @ApiParam({
     name: 'bucket',

@@ -350,9 +350,9 @@ export default function GcsDemo() {
             <h2 className="text-xl font-semibold mb-4">Environment Status</h2>
             <div className="space-y-2">
               <div className="flex justify-between">
-                <span className="text-gray-700">STORAGE_EMULATOR_HOST</span>
+                <span className="text-gray-700">GCS_EMULATOR_URL</span>
                 <span className="font-mono text-sm bg-gray-200 px-2 py-1 rounded">
-                  {process.env.STORAGE_EMULATOR_HOST || '(not set)'}
+                  {process.env.GCS_EMULATOR_URL || '(not set)'}
                 </span>
               </div>
               <div className="flex justify-between">

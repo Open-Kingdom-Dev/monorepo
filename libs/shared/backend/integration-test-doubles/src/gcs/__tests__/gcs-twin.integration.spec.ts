@@ -46,9 +46,7 @@ describe('GcsTwin (integration)', () => {
     await twin.start();
 
     // Verify environment variable is set
-    expect(process.env.STORAGE_EMULATOR_HOST).toBe(
-      `http://localhost:${testPort}`
-    );
+    expect(process.env.GCS_EMULATOR_URL).toBe(`http://localhost:${testPort}`);
 
     // Set project ID environment variables (required by SDK)
     process.env.GOOGLE_CLOUD_PROJECT = 'test-project';
@@ -57,12 +55,19 @@ describe('GcsTwin (integration)', () => {
     // Small delay to ensure env vars are propagated
     await new Promise((resolve) => setTimeout(resolve, 100));
 
-    // Create a Storage client that will use the emulator via STORAGE_EMULATOR_HOST
+    // Create a Storage client that will use the emulator via apiEndpoint
     console.log('Creating Storage client with env:', {
-      STORAGE_EMULATOR_HOST: process.env.STORAGE_EMULATOR_HOST,
+      GCS_EMULATOR_URL: process.env.GCS_EMULATOR_URL,
       GOOGLE_CLOUD_PROJECT: process.env.GOOGLE_CLOUD_PROJECT,
     });
-    const storage = new Storage();
+    const storage = new Storage({
+      apiEndpoint: process.env.GCS_EMULATOR_URL,
+      projectId: 'test-project',
+      credentials: {
+        client_email: 'emulator@emulator.iam',
+        private_key: 'unused',
+      },
+    });
 
     const bucketName = 'app-assets'; // bucket seeded by twin
     const fileName = 'test-upload.txt';
@@ -80,9 +85,7 @@ describe('GcsTwin (integration)', () => {
     // Download the file using raw HTTP (SDK download has issues with fake-gcs-server)
     console.log('Downloading file via raw HTTP...');
     const downloadRes = await fetch(
-      `${
-        process.env.STORAGE_EMULATOR_HOST
-      }/download/storage/v1/b/${bucketName}/o/${encodeURIComponent(
+      `http://localhost:${testPort}/download/storage/v1/b/${bucketName}/o/${encodeURIComponent(
         fileName
       )}?alt=media`
     );
@@ -103,17 +106,15 @@ describe('GcsTwin (integration)', () => {
     console.log('Test completed');
   }, 60_000); // Increase timeout for image pull and container startup
 
-  it('should unset STORAGE_EMULATOR_HOST after stop', async () => {
+  it('should unset GCS_EMULATOR_URL after stop', async () => {
     if (!dockerAvailable) {
       console.warn('Skipping test: Docker not available');
       return;
     }
     await twin.start();
-    expect(process.env.STORAGE_EMULATOR_HOST).toBe(
-      `http://localhost:${testPort}`
-    );
+    expect(process.env.GCS_EMULATOR_URL).toBe(`http://localhost:${testPort}`);
 
     await twin.stop();
-    expect(process.env.STORAGE_EMULATOR_HOST).toBeUndefined();
+    expect(process.env.GCS_EMULATOR_URL).toBeUndefined();
   }, 60_000); // Increase timeout for image pull and container startup
 });

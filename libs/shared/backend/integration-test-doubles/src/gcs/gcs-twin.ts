@@ -7,7 +7,7 @@ import path from 'path';
  * GCS twin lifecycle manager.
  *
  * Starts/stops a fake‑gcs‑server Docker container, seeds buckets,
- * and sets the STORAGE_EMULATOR_HOST environment variable.
+ * and sets the GCS_EMULATOR_URL environment variable.
  */
 export class GcsTwin {
   private readonly config: GcsTwinConfig;
@@ -41,7 +41,7 @@ export class GcsTwin {
     await this.waitForHealthy();
     await this.seedBuckets();
     // Set environment variable for Google Cloud Storage SDK
-    process.env.STORAGE_EMULATOR_HOST = this.config.externalUrl;
+    process.env.GCS_EMULATOR_URL = this.config.externalUrl;
     console.log(`GCS twin ready at ${this.config.externalUrl}`);
   }
 
@@ -62,7 +62,7 @@ export class GcsTwin {
     }
     this.container = null;
     // Unset environment variable
-    delete process.env.STORAGE_EMULATOR_HOST;
+    delete process.env.GCS_EMULATOR_URL;
     console.log('GCS twin stopped');
   }
 

@@ -1,5 +1,10 @@
-import { Injectable, BadRequestException, Logger } from '@nestjs/common';
-import axios from 'axios';
+import {
+  Injectable,
+  BadRequestException,
+  Logger,
+  Inject,
+} from '@nestjs/common';
+import { Storage } from '@google-cloud/storage';
 
 export interface FileMetadata {
   name: string;
@@ -16,52 +21,80 @@ export interface UploadFileRequest {
   contentType?: string;
 }
 
+export const GCS_STORAGE_CLIENT = 'GCS_STORAGE_CLIENT';
+
+export function createGcsStorageClient(): Storage {
+  let emulatorUrl = process.env.GCS_EMULATOR_URL;
+
+  // STORAGE_EMULATOR_HOST is natively read by the SDK and used as-is
+  // (without appending /storage/v1), which causes 404s with fake-gcs-server.
+  // If set, convert it to apiEndpoint format and remove it so the SDK
+  // doesn't pick it up and override our apiEndpoint.
+  if (!emulatorUrl && process.env.STORAGE_EMULATOR_HOST) {
+    const host = process.env.STORAGE_EMULATOR_HOST.replace(/\/+$/, '');
+    // Strip /storage/v1 if present — the SDK appends this automatically
+    emulatorUrl = host.replace(/\/storage\/v1$/, '');
+    delete process.env.STORAGE_EMULATOR_HOST;
+    process.env.GCS_EMULATOR_URL = emulatorUrl;
+  }
+
+  // Strip any trailing /storage/v1 — the SDK appends it internally
+  if (emulatorUrl) {
+    emulatorUrl = emulatorUrl.replace(/\/storage\/v1$/, '');
+    return new Storage({
+      apiEndpoint: emulatorUrl,
+      projectId: process.env.GOOGLE_CLOUD_PROJECT || 'emulator-project',
+      credentials: {
+        client_email: 'emulator@emulator.iam',
+        private_key: 'unused',
+      },
+    });
+  }
+  return new Storage();
+}
+
 @Injectable()
 export class GcsStorageService {
   private readonly logger = new Logger(GcsStorageService.name);
 
-  private get emulatorHost(): string | null {
-    return process.env.STORAGE_EMULATOR_HOST || null;
+  constructor(@Inject(GCS_STORAGE_CLIENT) private readonly storage: Storage) {}
+
+  private get isEmulatorMode(): boolean {
+    return !!(
+      process.env.GCS_EMULATOR_URL || process.env.STORAGE_EMULATOR_HOST
+    );
   }
 
   private requireEmulator(): string {
-    const host = this.emulatorHost;
-    if (!host) {
+    const url =
+      process.env.GCS_EMULATOR_URL || process.env.STORAGE_EMULATOR_HOST;
+    if (!url) {
       throw new BadRequestException(
         'GCS emulator is not running. Start the twin first.'
       );
     }
-    return host;
+    return url;
   }
 
-  /**
-   * Ensure a bucket exists, creating it if necessary.
-   */
-  private async ensureBucket(host: string, bucketName: string): Promise<void> {
-    try {
-      const checkRes = await axios.get(`${host}/storage/v1/b/${bucketName}`, {
-        validateStatus: () => true,
-      });
-      if (checkRes.status === 200) return;
-
-      await axios.post(
-        `${host}/storage/v1/b`,
-        { name: bucketName },
-        { validateStatus: (s) => s === 200 || s === 409 }
-      );
-      this.logger.log(`Created bucket ${bucketName}`);
-    } catch (error) {
-      this.logger.warn(
-        `Bucket ensure failed for ${bucketName}: ${
-          error instanceof Error ? error.message : String(error)
-        }`
-      );
+  private async ensureBucket(bucketName: string): Promise<void> {
+    const bucket = this.storage.bucket(bucketName);
+    const [exists] = await bucket.exists();
+    if (!exists) {
+      try {
+        await this.storage.createBucket(bucketName);
+        this.logger.log(`Created bucket ${bucketName}`);
+      } catch (error: any) {
+        if (error?.code !== 409) {
+          this.logger.warn(
+            `Bucket creation failed for ${bucketName}: ${
+              error instanceof Error ? error.message : String(error)
+            }`
+          );
+        }
+      }
     }
   }
 
-  /**
-   * Upload a file to the emulator.
-   */
   async uploadFile(request: UploadFileRequest): Promise<FileMetadata> {
     const { bucket: bucketName, fileName, content, contentType } = request;
 
@@ -72,28 +105,30 @@ export class GcsStorageService {
     if (!content || content.length === 0)
       throw new BadRequestException('File content cannot be empty');
 
-    const host = this.requireEmulator();
-    await this.ensureBucket(host, bucketName);
+    if (!this.isEmulatorMode && !process.env.GOOGLE_CLOUD_PROJECT) {
+      throw new BadRequestException(
+        'GCS is not configured. Start the twin or set GOOGLE_CLOUD_PROJECT.'
+      );
+    }
+
+    await this.ensureBucket(bucketName);
 
     try {
-      await axios.post(`${host}/upload/storage/v1/b/${bucketName}/o`, content, {
-        params: { uploadType: 'media', name: fileName },
-        headers: { 'Content-Type': contentType || 'application/octet-stream' },
+      const file = this.storage.bucket(bucketName).file(fileName);
+      await file.save(content, {
+        metadata: contentType ? { contentType } : undefined,
+        resumable: false,
       });
 
-      const metaRes = await axios.get(
-        `${host}/storage/v1/b/${bucketName}/o/${encodeURIComponent(fileName)}`
-      );
-
-      const meta = metaRes.data;
+      const [metadata] = await file.getMetadata();
       this.logger.log(`Uploaded ${fileName} to bucket ${bucketName}`);
 
       return {
-        name: meta.name,
+        name: metadata.name || fileName,
         bucket: bucketName,
-        size: meta.size ? Number(meta.size) : content.length,
-        contentType: meta.contentType,
-        updated: meta.updated ? new Date(meta.updated) : undefined,
+        size: metadata.size ? Number(metadata.size) : content.length,
+        contentType: metadata.contentType || contentType,
+        updated: metadata.updated ? new Date(metadata.updated) : undefined,
       };
     } catch (error) {
       this.logger.error(`Failed to upload ${fileName}:`, error);
@@ -105,10 +140,6 @@ export class GcsStorageService {
     }
   }
 
-  /**
-   * List files in a bucket.
-   * Returns an empty array if the emulator is not running or the bucket doesn't exist.
-   */
   async listFiles(
     bucketName: string,
     prefix?: string
@@ -116,26 +147,25 @@ export class GcsStorageService {
     if (!bucketName?.trim())
       throw new BadRequestException('Bucket name is required');
 
-    const host = this.emulatorHost;
-    if (!host) return [];
+    if (!this.isEmulatorMode && !process.env.GOOGLE_CLOUD_PROJECT) {
+      return [];
+    }
 
     try {
-      const checkRes = await axios.get(`${host}/storage/v1/b/${bucketName}`, {
-        validateStatus: () => true,
-      });
-      if (checkRes.status !== 200) return [];
+      const bucket = this.storage.bucket(bucketName);
+      const [exists] = await bucket.exists();
+      if (!exists) return [];
 
-      const res = await axios.get(`${host}/storage/v1/b/${bucketName}/o`, {
-        params: prefix ? { prefix } : undefined,
-      });
+      const [files] = await bucket.getFiles(prefix ? { prefix } : undefined);
 
-      const items = res.data?.items || [];
-      return items.map((item: any) => ({
-        name: item.name,
+      return files.map((file) => ({
+        name: file.name,
         bucket: bucketName,
-        size: item.size ? Number(item.size) : undefined,
-        contentType: item.contentType,
-        updated: item.updated ? new Date(item.updated) : undefined,
+        size: file.metadata?.size ? Number(file.metadata.size) : undefined,
+        contentType: file.metadata?.contentType,
+        updated: file.metadata?.updated
+          ? new Date(file.metadata.updated)
+          : undefined,
       }));
     } catch (error) {
       this.logger.error(`Failed to list files in ${bucketName}:`, error);
@@ -145,25 +175,24 @@ export class GcsStorageService {
     }
   }
 
-  /**
-   * Download a file from the emulator.
-   */
   async downloadFile(bucketName: string, fileName: string): Promise<Buffer> {
     if (!bucketName?.trim())
       throw new BadRequestException('Bucket name is required');
     if (!fileName?.trim())
       throw new BadRequestException('File name is required');
 
-    const host = this.requireEmulator();
+    if (!this.isEmulatorMode && !process.env.GOOGLE_CLOUD_PROJECT) {
+      throw new BadRequestException(
+        'GCS is not configured. Start the twin or set GOOGLE_CLOUD_PROJECT.'
+      );
+    }
 
     try {
-      const res = await axios.get(
-        `${host}/download/storage/v1/b/${bucketName}/o/${encodeURIComponent(
-          fileName
-        )}`,
-        { params: { alt: 'media' }, responseType: 'arraybuffer' }
-      );
-      return Buffer.from(res.data);
+      const [content] = await this.storage
+        .bucket(bucketName)
+        .file(fileName)
+        .download();
+      return content;
     } catch (error) {
       this.logger.error(`Failed to download ${fileName}:`, error);
       throw new BadRequestException(
@@ -174,10 +203,6 @@ export class GcsStorageService {
     }
   }
 
-  /**
-   * Generate a download URL for a file.
-   * In emulator mode, returns a direct emulator URL.
-   */
   async generateDownloadUrl(
     bucketName: string,
     fileName: string
@@ -187,31 +212,62 @@ export class GcsStorageService {
     if (!fileName?.trim())
       throw new BadRequestException('File name is required');
 
-    const host = this.requireEmulator();
-    const url = `${host}/download/storage/v1/b/${bucketName}/o/${encodeURIComponent(
-      fileName
-    )}?alt=media`;
-    const expiresAt = new Date(Date.now() + 15 * 60 * 1000);
+    const expiresInMs = 15 * 60 * 1000;
+    const expiresAt = new Date(Date.now() + expiresInMs);
 
-    this.logger.log(`Generated download URL for ${bucketName}/${fileName}`);
-    return { url, expiresAt };
+    if (this.isEmulatorMode) {
+      const emulatorUrl = this.requireEmulator();
+      const host = emulatorUrl.replace(/\/storage\/v1$/, '');
+      const url = `${host}/download/storage/v1/b/${bucketName}/o/${encodeURIComponent(
+        fileName
+      )}?alt=media`;
+      this.logger.log(
+        `Generated emulator download URL for ${bucketName}/${fileName}`
+      );
+      return { url, expiresAt };
+    }
+
+    try {
+      const [url] = await this.storage
+        .bucket(bucketName)
+        .file(fileName)
+        .getSignedUrl({
+          version: 'v4',
+          action: 'read',
+          expires: expiresAt,
+        });
+
+      this.logger.log(
+        `Generated signed download URL for ${bucketName}/${fileName}`
+      );
+      return { url, expiresAt };
+    } catch (error) {
+      this.logger.error(
+        `Failed to generate download URL for ${fileName}:`,
+        error
+      );
+      throw new BadRequestException(
+        `Failed to generate download URL: ${
+          error instanceof Error ? error.message : String(error)
+        }`
+      );
+    }
   }
 
-  /**
-   * Delete a file from the emulator.
-   */
   async deleteFile(bucketName: string, fileName: string): Promise<void> {
     if (!bucketName?.trim())
       throw new BadRequestException('Bucket name is required');
     if (!fileName?.trim())
       throw new BadRequestException('File name is required');
 
-    const host = this.requireEmulator();
+    if (!this.isEmulatorMode && !process.env.GOOGLE_CLOUD_PROJECT) {
+      throw new BadRequestException(
+        'GCS is not configured. Start the twin or set GOOGLE_CLOUD_PROJECT.'
+      );
+    }
 
     try {
-      await axios.delete(
-        `${host}/storage/v1/b/${bucketName}/o/${encodeURIComponent(fileName)}`
-      );
+      await this.storage.bucket(bucketName).file(fileName).delete();
       this.logger.log(`Deleted ${fileName} from bucket ${bucketName}`);
     } catch (error) {
       this.logger.error(`Failed to delete ${fileName}:`, error);

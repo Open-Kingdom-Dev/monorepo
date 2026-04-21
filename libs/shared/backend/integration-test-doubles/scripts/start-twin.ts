@@ -62,7 +62,7 @@ async function main() {
 
     console.log(`\n✅ GCS twin started in ${startupTime}s`);
     console.log(`Twin URL: ${twin.getEmulatorHost()}`);
-    console.log(`\nSet STORAGE_EMULATOR_HOST=${twin.getEmulatorHost()}`);
+    console.log(`\nSet GCS_EMULATOR_URL=${twin.getEmulatorHost()}/storage/v1`);
     console.log('\nPress Ctrl+C to stop the twin.\n');
 
     // Keep the script running
