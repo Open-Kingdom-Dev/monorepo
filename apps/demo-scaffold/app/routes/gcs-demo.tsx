@@ -352,7 +352,7 @@ export default function GcsDemo() {
               <div className="flex justify-between">
                 <span className="text-gray-700">GCS_EMULATOR_URL</span>
                 <span className="font-mono text-sm bg-gray-200 px-2 py-1 rounded">
-                  {process.env.GCS_EMULATOR_URL || '(not set)'}
+                  {import.meta.env.VITE_GCS_EMULATOR_URL || '(not set)'}
                 </span>
               </div>
               <div className="flex justify-between">

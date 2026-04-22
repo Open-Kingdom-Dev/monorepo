@@ -62,13 +62,6 @@ test-report.html
 *~
 .idea/
 .vscode/
-*.code-workspace
-.env.*
-!.env.example
-node_modules/
-.next/
-dist/
-build/
 __pycache__/
 *.pyc
 .venv/
