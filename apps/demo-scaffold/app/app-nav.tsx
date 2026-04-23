@@ -11,6 +11,7 @@ export function AppNav() {
       </NavLink>
       <NavLink to="/profile">Profile</NavLink>
       <NavLink to="/admin/users">Users</NavLink>
+      <NavLink to="/gcs-demo">GCS Demo</NavLink>
     </nav>
   );
 }

@@ -38,6 +38,7 @@ describe('Main Module', () => {
     setGlobalPrefix: jest.Mock;
     enableCors: jest.Mock;
     listen: jest.Mock<Promise<void>>;
+    use: jest.Mock;
   };
   let NestFactory: {
     create: jest.Mock;
@@ -56,6 +57,7 @@ describe('Main Module', () => {
       setGlobalPrefix: jest.fn(),
       enableCors: jest.fn(),
       listen: jest.fn().mockResolvedValue(undefined),
+      use: jest.fn(),
     };
     NestFactory.create.mockResolvedValue(mockApp);
 
