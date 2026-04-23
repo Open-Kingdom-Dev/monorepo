@@ -1,78 +1,55 @@
 # Integration Test Doubles
 
-A library for creating integration test doubles (fakes) for external services. Provides local twins that can be used in place of real services during testing.
+A library for creating integration test doubles (fakes) for external services. Provides local twins that can be used in place of real services during testing and development.
 
 ## Features
 
 - **GCS Twin**: Local fake for Google Cloud Storage using `fsouza/fake-gcs-server`
-- **HTTP Interceptor**: Intercept and reroute HTTP/fetch requests to local twins
-- **Configuration**: Environment-based configuration with sensible defaults
+- **Configuration**: Environment-based configuration with sensible defaults and validation
 - **Lifecycle Management**: Start, stop, and reset twins programmatically
+- **NestJS Integration**: REST API controller for managing twins at runtime
 
 ## Quick Start
 
 ### Using GCS Twin
 
 ```typescript
-import { GcsTwin } from '@poly/integration-test-doubles';
+import { GcsTwin } from '@open-kingdom/shared-backend-integration-test-doubles';
 
-// Start the twin
+// Start the twin (default port 9013)
 const twin = new GcsTwin();
 await twin.start();
 
-// Use the twin URL in your tests
+// GCS_EMULATOR_URL is automatically set to http://localhost:9013
+// Use the twin URL in your SDK configuration
 const client = new Storage({
   apiEndpoint: twin.getEmulatorHost(),
+  projectId: 'emulator-project',
+  credentials: {
+    client_email: 'emulator@emulator.iam',
+    private_key: 'unused',
+  },
 });
 
 // Run your tests...
 
-// Clean up
+// Clean up (also unsets GCS_EMULATOR_URL)
 await twin.stop();
 ```
 
-### Using HTTP Interceptor
+### NestJS Integration
+
+Use the `TwinService` to manage the twin lifecycle within a NestJS application:
 
 ```typescript
-import { HttpInterceptor } from '@poly/integration-test-doubles';
+import { TwinService } from './twin/twin.service';
 
-// Create and configure interceptor
-const interceptor = new HttpInterceptor();
-interceptor.addRule({
-  from: 'https://storage.googleapis.com',
-  to: 'http://localhost:9019', // Your twin URL
-});
-
-// Install the interceptor
-await interceptor.install();
-
-// All fetch/http requests to storage.googleapis.com are now routed to localhost:9019
-
-// Clean up
-await interceptor.uninstall();
-```
-
-### Combined Usage
-
-```typescript
-import { GcsTwin, HttpInterceptor } from '@poly/integration-test-doubles';
-
-// Start twin and interceptor
-const twin = new GcsTwin();
-await twin.start();
-
-const interceptor = new HttpInterceptor();
-interceptor.addRule({
-  from: 'https://storage.googleapis.com',
-  to: twin.getEmulatorHost(),
-});
-await interceptor.install();
-
-// Run tests - all GCS requests are automatically routed to the twin
-
-// Clean up
-await interceptor.uninstall();
-await twin.stop();
+// The service wraps GcsTwin and exposes start/stop/status methods.
+// See the demo-scaffold-backend app for a full controller example.
+const twinService = new TwinService();
+await twinService.start();
+const status = await twinService.status();
+await twinService.stop();
 ```
 
 ## API Reference
@@ -82,92 +59,129 @@ await twin.stop();
 #### Constructor
 
 ```typescript
-constructor(config?: { port?: number; buckets?: string[] })
+constructor(overrides?: Partial<GcsTwinConfig>, docker?: Docker)
 ```
 
-- `port`: Port to run the twin on (default: 9019, or from `GCS_TWIN_PORT` env var)
-- `buckets`: Buckets to create and seed (default: ['app-assets'])
+- `overrides.port`: Port to run the twin on (default: 9013, or from `GCS_TWIN_PORT` env var; must be within 9010-9020)
+- `overrides.externalUrl`: External URL for the twin (default: `http://localhost:{port}`)
+- `overrides.dataDir`: Optional persistent data directory
+- `overrides.buckets`: Buckets to create and seed (default: `[{ name: 'app-assets' }, { name: 'user-uploads' }]`)
+- `docker`: Optional Docker instance (for testing)
+
+Config merges defaults, environment variables, and explicit overrides (explicit overrides take precedence).
 
 #### Methods
 
-- `start()`: Start the twin container and seed buckets
-- `stop()`: Stop and remove the container
+- `start()`: Start the twin container, create buckets, and set `GCS_EMULATOR_URL` env var
+- `stop()`: Stop and remove the container, unset `GCS_EMULATOR_URL`
 - `reset()`: Reset the twin to its initial seeded state
-- `getEmulatorHost()`: Get the twin URL (e.g., `http://localhost:9019`)
-- `getInternalUrl()`: Get the internal Docker network URL
+- `getEmulatorHost()`: Get the twin URL (e.g., `http://localhost:9013`)
 - `isHealthy()`: Check if the twin is running and responding
 
-### HttpInterceptor
-
-#### Constructor
+#### GcsTwinConfig
 
 ```typescript
-constructor(config?: { enabled?: boolean; verbose?: boolean; rules?: RoutingRule[] })
-```
+interface GcsTwinConfig {
+  port: number; // Port the fake-gcs-server listens on
+  externalUrl: string; // External URL for SDK configuration (e.g., http://localhost:9013)
+  dataDir?: string; // Optional persistent data directory
+  buckets: BucketConfig[]; // Buckets to create on startup
+}
 
-- `enabled`: Enable/disable interception (default: true)
-- `verbose`: Enable verbose logging (default: false)
-- `rules`: Initial routing rules
-
-#### Methods
-
-- `install()`: Install the interceptor
-- `uninstall()`: Remove the interceptor
-- `isHealthy()`: Check if the interceptor is installed
-- `addRule(rule)`: Add a routing rule
-- `removeRules(predicate)`: Remove rules matching a predicate
-- `clearRules()`: Remove all rules
-
-#### RoutingRule
-
-```typescript
-interface RoutingRule {
-  from: string; // URL to intercept (e.g., 'https://storage.googleapis.com')
-  to: string; // Twin URL to route to (e.g., 'http://localhost:9019')
+interface BucketConfig {
+  name: string; // Bucket name
 }
 ```
 
-### AgentInterceptor
-
-Low-level HTTP/HTTPS agent interceptor. Usually used via `HttpInterceptor`.
+### Exports
 
 ```typescript
-import { AgentInterceptor } from '@poly/integration-test-doubles';
+// GCS twin
+export { GcsTwin } from './gcs/gcs-twin.js';
+export type { GcsTwinConfig, BucketConfig } from './gcs/gcs-twin.config.js';
+export { defaultGcsConfig } from './gcs/gcs-twin.config.js';
 
-const agentInterceptor = new AgentInterceptor();
-agentInterceptor.setRules([...]);
-agentInterceptor.install();
-// ...
-agentInterceptor.uninstall();
+// Shared constants and utilities
+export { PORT_RANGE, DEFAULT_PORTS, ENV_VARS } from './shared/constants.js';
+export { isTestMode } from './shared/activation.js';
+export { createGcsConfig, defaultGcsConfig } from './shared/config.js';
 ```
 
 ## Configuration
 
 ### Environment Variables
 
-| Variable           | Description                      | Default                         |
-| ------------------ | -------------------------------- | ------------------------------- |
-| `GCS_TWIN_PORT`    | Port for GCS twin                | 9019                            |
-| `GCS_TWIN_IMAGE`   | Docker image for fake-gcs-server | `fsouza/fake-gcs-server:latest` |
-| `GCS_TWIN_ENABLED` | Enable/disable twins             | `true`                          |
+| Variable            | Description                           | Default                   |
+| ------------------- | ------------------------------------- | ------------------------- |
+| `GCS_TWIN_PORT`     | Port for GCS twin (must be 9010-9020) | 9013                      |
+| `GCS_TWIN_DATA_DIR` | Persistent data directory (optional)  | (ephemeral)               |
+| `GCS_EMULATOR_URL`  | Auto-set by `GcsTwin.start()`         | `http://localhost:{port}` |
+| `TEST_MODE`         | Activation gate; must be `'true'`     | (unset)                   |
 
-### Port Range
+### Port Assignments
 
-The library reserves ports 9010-9020 for test doubles. Configure in `constants.ts` if you need to change this range.
+The library reserves ports 9010-9020 for test doubles:
+
+| Twin            | Default Port  |
+| --------------- | ------------- |
+| GCS             | 9013          |
+| Gmail           | 9014 (future) |
+| Google Auth     | 9015 (future) |
+| YouTube         | 9016 (future) |
+| Google Calendar | 9017 (future) |
+| Spotify         | 9018 (future) |
+
+Configure in `constants.ts` if you need to change this range.
+
+### How Configuration Merging Works
+
+Configuration is resolved in this order (later takes precedence):
+
+1. **Defaults** (`defaultGcsConfig`)
+2. **Environment variables** (`GCS_TWIN_PORT`, `GCS_TWIN_DATA_DIR`)
+3. **Explicit overrides** (passed to constructor or `createGcsConfig()`)
+
+Port validation ensures the value is within the reserved range (9010-9020).
 
 ## Scripts
 
 ### Start Twin Manually
 
 ```bash
-# Start on default port
-tsx scripts/start-twin.ts
+# Start on default port (9013)
+npx tsx scripts/start-twin.ts
 
 # Start on specific port
-tsx scripts/start-twin.ts 9019
+npx tsx scripts/start-twin.ts 9013
 ```
 
-The script outputs the twin URL and keeps running until Ctrl+C.
+The script outputs the twin URL and sets `GCS_EMULATOR_URL`. Keeps running until Ctrl+C.
+
+## Architecture
+
+### Components
+
+```
+┌─────────────────┐     ┌────────────────────┐
+│  NestJS App     │     │  GcsTwin            │
+│  (GcsStorage    │────▶│  (fake-gcs-server   │
+│   Service)      │     │   Docker container) │
+└─────────────────┘     └────────────────────┘
+```
+
+### How It Works
+
+1. **GcsTwin** starts a Docker container running `fsouza/fake-gcs-server`
+2. `GCS_EMULATOR_URL` is automatically set in `process.env` on start and unset on stop
+3. **GcsStorageService** (in `feature-gcp-resources`) reads `GCS_EMULATOR_URL` or `STORAGE_EMULATOR_HOST` and configures the Google Cloud Storage SDK with `apiEndpoint` pointing to the twin
+4. When no emulator is configured, `GcsStorageService` falls back to real GCS with signed URLs
+
+### Default Buckets
+
+Two buckets are created by default:
+
+- **app-assets** - Application static assets
+- **user-uploads** - User-uploaded files
 
 ## Troubleshooting
 
@@ -182,13 +196,13 @@ Error: connect ENOENT /var/run/docker.sock
 ### Port Already in Use
 
 ```
-Error: Port 9019 is already in use
+Error: Port 9013 is already in use
 ```
 
 **Solution**:
 
-- Use a different port: `new GcsTwin({ port: 9020 })`
-- Or set `GCS_TWIN_PORT=9020`
+- Use a different port: `new GcsTwin({ port: 9014 })`
+- Or set `GCS_TWIN_PORT=9014`
 
 ### Container Won't Start
 
@@ -199,19 +213,16 @@ Error: (HTTP code 404) not found - No such image: fsouza/fake-gcs-server:latest
 **Solution**: Pull the image manually:
 
 ```bash
-docker pull fsouza/fake-gcs-server:latest
+docker pull fsouza/fake-gcs-server
 ```
 
-### Interceptor Not Working
+### Port Out of Range
 
-**Symptoms**: Requests not being rerouted.
+```
+Error: GCS twin port 9099 is outside the reserved range 9010-9020
+```
 
-**Solutions**:
-
-1. Verify interceptor is installed: `interceptor.isHealthy()`
-2. Check routing rules match the URL hostname exactly
-3. Enable verbose logging: `new HttpInterceptor({ verbose: true })`
-4. Ensure interceptor is installed before making requests
+**Solution**: Use a port within 9010-9020, or adjust `PORT_RANGE` in `constants.ts`.
 
 ### Tests Fail When Run Together
 
@@ -222,34 +233,9 @@ docker pull fsouza/fake-gcs-server:latest
 **Solution**: Use unique ports for each test suite:
 
 ```typescript
-const twin1 = new GcsTwin({ port: 9017 });
-const twin2 = new GcsTwin({ port: 9018 });
+const twin1 = new GcsTwin({ port: 9013 });
+const twin2 = new GcsTwin({ port: 9014 });
 ```
-
-## Architecture
-
-### Components
-
-```
-┌─────────────────┐     ┌──────────────────┐
-│  Your Code      │     │  GcsTwin         │
-│  (fetch/http)   │────▶│  (fake-gcs-server)│
-└─────────────────┘     └──────────────────┘
-         │                       │
-         ▼                       │
-┌─────────────────┐             │
-│ HttpInterceptor │─────────────┘
-│ (reroutes to    │
-│  local twin)    │
-└─────────────────┘
-```
-
-### How It Works
-
-1. **GcsTwin** starts a Docker container running `fsouza/fake-gcs-server`
-2. **HttpInterceptor** overrides `globalThis.fetch` and Node's `http/https` modules
-3. Requests matching routing rules are rewritten to the twin URL
-4. Non-matching requests pass through unchanged
 
 ## License
 
