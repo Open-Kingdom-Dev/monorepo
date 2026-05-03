@@ -2,7 +2,7 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { Provider } from 'react-redux';
 import { configureStore } from '@reduxjs/toolkit';
-import type { ColDef } from '@open-kingdom/shared-frontend-ui-datagrid';
+import type { ColumnDef } from '@open-kingdom/shared-frontend-ui-data-table';
 import { InvitationList } from './InvitationList.component';
 
 const mockFindAllQuery = jest.fn();
@@ -30,34 +30,43 @@ jest.mock('@open-kingdom/shared-frontend-data-access-notifications', () => ({
   })),
 }));
 
-let capturedColumnDefs: ColDef[] = [];
-jest.mock('@open-kingdom/shared-frontend-ui-datagrid', () => ({
+let capturedColumns: ColumnDef<Record<string, unknown>>[] = [];
+jest.mock('@open-kingdom/shared-frontend-ui-data-table', () => ({
   __esModule: true,
-  DataGrid: ({
-    rowData,
+  DataTable: ({
+    data,
     loading,
-    columnDefs,
+    columns,
   }: {
-    rowData: Record<string, unknown>[];
+    data: Record<string, unknown>[];
     loading: boolean;
-    columnDefs: ColDef[];
+    columns: ColumnDef<Record<string, unknown>>[];
   }) => {
-    capturedColumnDefs = columnDefs;
-    const rows = rowData ?? [];
+    capturedColumns = columns;
+    const rows = data ?? [];
     return (
       <div data-testid="data-grid">
         {loading && <span>Loading...</span>}
         {!loading &&
           rows.map((row, i) => (
             <div key={i} data-testid="grid-row">
-              {columnDefs.map((col, j) => {
-                const value = col.valueGetter
-                  ? (col.valueGetter as CallableFunction)({ data: row })
-                  : (row as Record<string, unknown>)[col.field as string];
-                const rendered = col.cellRenderer
-                  ? (col.cellRenderer as CallableFunction)({ data: row })
-                  : value;
-                return <span key={j}>{rendered}</span>;
+              {columns.map((col, j) => {
+                let rendered: unknown;
+                if ('cell' in col && typeof col.cell === 'function') {
+                  rendered = (col.cell as CallableFunction)({
+                    row: { original: row },
+                  });
+                } else if (
+                  'accessorFn' in col &&
+                  typeof col.accessorFn === 'function'
+                ) {
+                  rendered = (col.accessorFn as CallableFunction)(row, i);
+                } else if ('accessorKey' in col && col.accessorKey) {
+                  rendered = (row as Record<string, unknown>)[
+                    col.accessorKey as string
+                  ];
+                }
+                return <span key={j}>{rendered as React.ReactNode}</span>;
               })}
             </div>
           ))}
@@ -138,7 +147,7 @@ describe('InvitationList', () => {
     mockCancelInvitation.mockReturnValue({
       unwrap: () => Promise.resolve(),
     });
-    capturedColumnDefs = [];
+    capturedColumns = [];
   });
 
   it('shows a loading indicator while invitations are being fetched', () => {
@@ -188,16 +197,19 @@ describe('InvitationList', () => {
     });
     renderWithProviders(<InvitationList />);
 
-    const actionsCol = capturedColumnDefs.find(
-      (c) => c.headerName === 'Actions'
-    );
-    const renderAction = actionsCol?.cellRenderer as CallableFunction;
+    const actionsCol = capturedColumns.find((c) => c.id === 'actions');
+    const renderAction = (actionsCol as { cell: CallableFunction })
+      ?.cell as CallableFunction;
 
     // All invitation statuses have a cancel button
-    const pendingResult = renderAction({ data: mockInvitations[0] });
+    const pendingResult = renderAction({
+      row: { original: mockInvitations[0] },
+    });
     expect(pendingResult).not.toBeNull();
 
-    const expiredResult = renderAction({ data: mockInvitations[1] });
+    const expiredResult = renderAction({
+      row: { original: mockInvitations[1] },
+    });
     expect(expiredResult).not.toBeNull();
   });
 
@@ -210,33 +222,29 @@ describe('InvitationList', () => {
     });
     renderWithProviders(<InvitationList />);
 
-    const roleCol = capturedColumnDefs.find((c) => c.headerName === 'Role');
-    const statusCol = capturedColumnDefs.find((c) => c.field === 'status');
-    const invitedCol = capturedColumnDefs.find(
-      (c) => c.headerName === 'Invited'
+    const roleCol = capturedColumns.find((c) => c.id === 'role');
+    const statusCol = capturedColumns.find(
+      (c) => 'accessorKey' in c && c.accessorKey === 'status'
     );
-    const expiresCol = capturedColumnDefs.find(
-      (c) => c.headerName === 'Expires'
-    );
-    const actionsCol = capturedColumnDefs.find(
-      (c) => c.headerName === 'Actions'
-    );
+    const invitedCol = capturedColumns.find((c) => c.id === 'invited');
+    const expiresCol = capturedColumns.find((c) => c.id === 'expires');
+    const actionsCol = capturedColumns.find((c) => c.id === 'actions');
+
+    const nullRow = { row: { original: null } };
 
     // All renderers handle missing data without crashing
+    expect((roleCol as { cell: CallableFunction })?.cell?.(nullRow)).toBeNull();
     expect(
-      (roleCol?.cellRenderer as CallableFunction)({ data: null })
+      (statusCol as { cell: CallableFunction })?.cell?.(nullRow)
     ).toBeNull();
     expect(
-      (statusCol?.cellRenderer as CallableFunction)({ data: null })
-    ).toBeNull();
-    expect((invitedCol?.valueGetter as CallableFunction)({ data: null })).toBe(
-      '—'
-    );
-    expect((expiresCol?.valueGetter as CallableFunction)({ data: null })).toBe(
-      '—'
-    );
+      (invitedCol as { accessorFn: CallableFunction })?.accessorFn?.(null, 0)
+    ).toBe('—');
     expect(
-      (actionsCol?.cellRenderer as CallableFunction)({ data: null })
+      (expiresCol as { accessorFn: CallableFunction })?.accessorFn?.(null, 0)
+    ).toBe('—');
+    expect(
+      (actionsCol as { cell: CallableFunction })?.cell?.(nullRow)
     ).toBeNull();
   });
 
@@ -249,13 +257,11 @@ describe('InvitationList', () => {
     });
     renderWithProviders(<InvitationList />);
 
-    const actionsCol = capturedColumnDefs.find(
-      (c) => c.headerName === 'Actions'
-    );
+    const actionsCol = capturedColumns.find((c) => c.id === 'actions');
     const { container } = render(
       <Provider store={store}>
-        {(actionsCol?.cellRenderer as CallableFunction)({
-          data: mockInvitations[0],
+        {(actionsCol as { cell: CallableFunction })?.cell?.({
+          row: { original: mockInvitations[0] },
         })}
       </Provider>
     );
@@ -282,13 +288,11 @@ describe('InvitationList', () => {
     });
     renderWithProviders(<InvitationList />);
 
-    const actionsCol = capturedColumnDefs.find(
-      (c) => c.headerName === 'Actions'
-    );
+    const actionsCol = capturedColumns.find((c) => c.id === 'actions');
     const { container } = render(
       <Provider store={store}>
-        {(actionsCol?.cellRenderer as CallableFunction)({
-          data: mockInvitations[0],
+        {(actionsCol as { cell: CallableFunction })?.cell?.({
+          row: { original: mockInvitations[0] },
         })}
       </Provider>
     );
@@ -317,13 +321,11 @@ describe('InvitationList', () => {
     });
     renderWithProviders(<InvitationList />);
 
-    const actionsCol = capturedColumnDefs.find(
-      (c) => c.headerName === 'Actions'
-    );
+    const actionsCol = capturedColumns.find((c) => c.id === 'actions');
     const { container } = render(
       <Provider store={store}>
-        {(actionsCol?.cellRenderer as CallableFunction)({
-          data: mockInvitations[0],
+        {(actionsCol as { cell: CallableFunction })?.cell?.({
+          row: { original: mockInvitations[0] },
         })}
       </Provider>
     );

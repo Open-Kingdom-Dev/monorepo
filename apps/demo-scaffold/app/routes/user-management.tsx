@@ -8,9 +8,9 @@ export default function UserManagement() {
   const { data: profile } = useAuthControllerGetProfileQuery();
 
   return (
-    <>
+    <div className="flex flex-col gap-y-8">
       <UserList currentUserId={profile?.id} />
       <InvitationList />
-    </>
+    </div>
   );
 }

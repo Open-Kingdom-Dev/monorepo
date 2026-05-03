@@ -7,66 +7,65 @@ import {
 } from '@open-kingdom/shared-frontend-data-access-api-client';
 import { showSuccessNotification } from '@open-kingdom/shared-frontend-data-access-notifications';
 import {
-  DataGrid,
-  type ColDef,
-  type ICellRendererParams,
-} from '@open-kingdom/shared-frontend-ui-datagrid';
+  DataTable,
+  type ColumnDef,
+  type CellContext,
+} from '@open-kingdom/shared-frontend-ui-data-table';
 import { ConfirmDialog } from '../shared/ConfirmDialog.component';
 import { RoleBadge } from '../shared/RoleBadge.component';
 import { StatusBadge } from '../shared/StatusBadge.component';
 import { formatDate } from '@open-kingdom/shared-poly-util-date';
 import type { Invitation } from '../../types';
 
-const emailColumn: ColDef<Invitation> = {
-  field: 'email',
-  headerName: 'Email',
-  flex: 2,
+const emailColumn: ColumnDef<Invitation> = {
+  accessorKey: 'email',
+  header: 'Email',
 };
 
-function roleColumn(rolesMap: Map<number, string>): ColDef<Invitation> {
+function roleColumn(rolesMap: Map<number, string>): ColumnDef<Invitation> {
   return {
-    headerName: 'Role',
-    flex: 1,
-    cellRenderer: (params: ICellRendererParams<Invitation>) =>
-      params.data ? (
-        <RoleBadge role={rolesMap.get(params.data.roleId) ?? null} />
+    id: 'role',
+    header: 'Role',
+    cell: ({ row }: CellContext<Invitation, unknown>) =>
+      row.original ? (
+        <RoleBadge role={rolesMap.get(row.original.roleId) ?? null} />
       ) : null,
   };
 }
 
-const statusColumn: ColDef<Invitation> = {
-  field: 'status',
-  headerName: 'Status',
-  flex: 1,
-  cellRenderer: (params: ICellRendererParams<Invitation>) =>
-    params.data ? <StatusBadge status={params.data.status} /> : null,
+const statusColumn: ColumnDef<Invitation> = {
+  accessorKey: 'status',
+  header: 'Status',
+  cell: ({ row }: CellContext<Invitation, unknown>) =>
+    row.original ? <StatusBadge status={row.original.status} /> : null,
 };
 
-const invitedColumn: ColDef<Invitation> = {
-  headerName: 'Invited',
-  flex: 1,
-  valueGetter: (params) => formatDate(params.data?.invitedAt),
+const invitedColumn: ColumnDef<Invitation> = {
+  id: 'invited',
+  header: 'Invited',
+  accessorFn: (row) => formatDate(row?.invitedAt),
 };
 
-const expiresColumn: ColDef<Invitation> = {
-  headerName: 'Expires',
-  flex: 1,
-  valueGetter: (params) => formatDate(params.data?.tokenExpiry),
+const expiresColumn: ColumnDef<Invitation> = {
+  id: 'expires',
+  header: 'Expires',
+  accessorFn: (row) => formatDate(row?.tokenExpiry),
 };
 
 function cancelColumn(
   onCancel: (invitation: Invitation) => void
-): ColDef<Invitation> {
+): ColumnDef<Invitation> {
   return {
-    headerName: 'Actions',
-    flex: 1,
-    sortable: false,
-    filter: false,
-    cellRenderer: (params: ICellRendererParams<Invitation>) => {
-      if (!params.data) return null;
+    id: 'actions',
+    header: 'Actions',
+    enableSorting: false,
+    enableColumnFilter: false,
+    cell: ({ row }: CellContext<Invitation, unknown>) => {
+      if (!row.original) return null;
+
       return (
         <button
-          onClick={() => params.data && onCancel(params.data)}
+          onClick={() => row.original && onCancel(row.original)}
           className="text-destructive text-xs font-medium rounded px-2 py-1 transition-colors hover:bg-destructive/10 disabled:cursor-not-allowed disabled:opacity-40"
         >
           Cancel
@@ -79,7 +78,7 @@ function cancelColumn(
 function buildColumnDefs(
   onCancel: (invitation: Invitation) => void,
   rolesMap: Map<number, string>
-): ColDef<Invitation>[] {
+): ColumnDef<Invitation>[] {
   return [
     emailColumn,
     roleColumn(rolesMap),
@@ -121,7 +120,7 @@ export function InvitationList() {
     }
   }
 
-  const columnDefs = useMemo(
+  const columns = useMemo(
     () => buildColumnDefs(setInvitationToCancel, rolesMap),
     [rolesMap]
   );
@@ -156,10 +155,12 @@ export function InvitationList() {
         </h2>
       </div>
 
-      <DataGrid
-        rowData={invitations}
-        columnDefs={columnDefs}
+      <DataTable
+        data={invitations}
+        columns={columns}
         loading={isLoading}
+        enableSorting={false}
+        enableColumnResizing={false}
       />
 
       <ConfirmDialog

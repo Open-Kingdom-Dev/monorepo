@@ -2,7 +2,7 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { Provider } from 'react-redux';
 import { configureStore } from '@reduxjs/toolkit';
-import type { ColDef } from '@open-kingdom/shared-frontend-ui-datagrid';
+import type { ColumnDef } from '@open-kingdom/shared-frontend-ui-data-table';
 import { RoleList } from './RoleList.component';
 
 const mockFindAllQuery = jest.fn();
@@ -35,34 +35,43 @@ jest.mock('../../hooks/useHasPermission', () => ({
   useHasPermission: (...args: string[]) => mockHasPermission(...args),
 }));
 
-let capturedColumnDefs: ColDef[] = [];
-jest.mock('@open-kingdom/shared-frontend-ui-datagrid', () => ({
+let capturedColumns: ColumnDef<Record<string, unknown>>[] = [];
+jest.mock('@open-kingdom/shared-frontend-ui-data-table', () => ({
   __esModule: true,
-  DataGrid: ({
-    rowData,
+  DataTable: ({
+    data,
     loading,
-    columnDefs,
+    columns,
   }: {
-    rowData: Record<string, unknown>[];
+    data: Record<string, unknown>[];
     loading: boolean;
-    columnDefs: ColDef[];
+    columns: ColumnDef<Record<string, unknown>>[];
   }) => {
-    capturedColumnDefs = columnDefs;
-    const rows = rowData ?? [];
+    capturedColumns = columns;
+    const rows = data ?? [];
     return (
       <div data-testid="data-grid">
         {loading && <span>Loading...</span>}
         {!loading &&
           rows.map((row, i) => (
             <div key={i} data-testid="grid-row">
-              {columnDefs.map((col, j) => {
-                const value = col.valueGetter
-                  ? (col.valueGetter as CallableFunction)({ data: row })
-                  : (row as Record<string, unknown>)[col.field as string];
-                const rendered = col.cellRenderer
-                  ? (col.cellRenderer as CallableFunction)({ data: row })
-                  : value;
-                return <span key={j}>{rendered}</span>;
+              {columns.map((col, j) => {
+                let rendered: unknown;
+                if ('cell' in col && typeof col.cell === 'function') {
+                  rendered = (col.cell as CallableFunction)({
+                    row: { original: row },
+                  });
+                } else if (
+                  'accessorFn' in col &&
+                  typeof col.accessorFn === 'function'
+                ) {
+                  rendered = (col.accessorFn as CallableFunction)(row, i);
+                } else if ('accessorKey' in col && col.accessorKey) {
+                  rendered = (row as Record<string, unknown>)[
+                    col.accessorKey as string
+                  ];
+                }
+                return <span key={j}>{rendered as React.ReactNode}</span>;
               })}
             </div>
           ))}
@@ -130,7 +139,7 @@ describe('RoleList', () => {
     mockDeleteRole.mockReset();
     mockDeleteRole.mockReturnValue({ unwrap: () => Promise.resolve() });
     mockHasPermission.mockReturnValue(true);
-    capturedColumnDefs = [];
+    capturedColumns = [];
   });
 
   it('shows a loading indicator while roles are being fetched', () => {
@@ -181,11 +190,9 @@ describe('RoleList', () => {
     });
     renderWithProviders(<RoleList />);
 
-    const actionsCol = capturedColumnDefs.find(
-      (c) => c.headerName === 'Actions'
-    );
-    const rendered = (actionsCol?.cellRenderer as CallableFunction)({
-      data: mockRoles[0],
+    const actionsCol = capturedColumns.find((c) => c.id === 'actions');
+    const rendered = (actionsCol as { cell: CallableFunction })?.cell?.({
+      row: { original: mockRoles[0] },
     });
     const { container } = render(<Provider store={store}>{rendered}</Provider>);
     expect(container.querySelectorAll('button')).toHaveLength(0);
@@ -200,11 +207,9 @@ describe('RoleList', () => {
     });
     renderWithProviders(<RoleList />);
 
-    const actionsCol = capturedColumnDefs.find(
-      (c) => c.headerName === 'Actions'
-    );
-    const rendered = (actionsCol?.cellRenderer as CallableFunction)({
-      data: mockRoles[0],
+    const actionsCol = capturedColumns.find((c) => c.id === 'actions');
+    const rendered = (actionsCol as { cell: CallableFunction })?.cell?.({
+      row: { original: mockRoles[0] },
     });
     const { container } = render(<Provider store={store}>{rendered}</Provider>);
     const deleteBtn = Array.from(container.querySelectorAll('button')).find(
@@ -222,13 +227,11 @@ describe('RoleList', () => {
     });
     renderWithProviders(<RoleList />);
 
-    const actionsCol = capturedColumnDefs.find(
-      (c) => c.headerName === 'Actions'
-    );
+    const actionsCol = capturedColumns.find((c) => c.id === 'actions');
     const { container } = render(
       <Provider store={store}>
-        {(actionsCol?.cellRenderer as CallableFunction)({
-          data: mockRoles[2],
+        {(actionsCol as { cell: CallableFunction })?.cell?.({
+          row: { original: mockRoles[2] },
         })}
       </Provider>
     );
@@ -251,13 +254,18 @@ describe('RoleList', () => {
     });
     renderWithProviders(<RoleList />);
 
-    const actionsCol = capturedColumnDefs.find(
-      (c) => c.headerName === 'Actions'
-    );
+    const actionsCol = capturedColumns.find((c) => c.id === 'actions');
     const { container } = render(
       <Provider store={store}>
-        {(actionsCol?.cellRenderer as CallableFunction)({
-          data: { id: 10, name: 'custom', description: 'Custom', isSystem: 0 },
+        {(actionsCol as { cell: CallableFunction })?.cell?.({
+          row: {
+            original: {
+              id: 10,
+              name: 'custom',
+              description: 'Custom',
+              isSystem: 0,
+            },
+          },
         })}
       </Provider>
     );
