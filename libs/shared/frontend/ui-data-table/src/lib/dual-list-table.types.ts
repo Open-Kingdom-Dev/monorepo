@@ -2,6 +2,15 @@ import type { ReactNode } from 'react';
 import type { RowData } from '@tanstack/react-table';
 import type { DataTableProps } from './data-table.types';
 
+export type DualListBulkActionsRenderer<
+  TPrimary extends RowData,
+  TSecondary extends RowData
+> = (args: {
+  primarySelected: TPrimary[];
+  secondarySelected: TSecondary[];
+  clearAll: () => void;
+}) => ReactNode;
+
 /**
  * Per-side props. The wrapper owns row selection, so the selection-related
  * fields are stripped — consumers configure everything else (`data`, `columns`,
@@ -27,5 +36,11 @@ export type DualListTableProps<
    * `'independent'`: both sides hold selection at once.
    */
   selectionMode?: 'exclusive' | 'independent';
+  /**
+   * Unified bulk action bar rendered above both tables when either side has
+   * selection — for flows like intake-2 where actions span both lists.
+   * Per-side `bulkActions` slots still work; pick one model.
+   */
+  bulkActions?: DualListBulkActionsRenderer<TPrimary, TSecondary>;
   className?: string;
 };

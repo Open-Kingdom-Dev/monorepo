@@ -114,6 +114,37 @@ describe('Coordinating selection between the two lists', () => {
     expect(screen.getByText('Reserved')).toBeTruthy();
   });
 
+  it('shows a unified bulk action bar that knows what is selected on each side', () => {
+    render(
+      <DualListTable<Item, Item>
+        selectionMode="independent"
+        primary={{
+          data: AVAILABLE,
+          columns: COLUMNS,
+          getRowId: (row) => row.id,
+        }}
+        secondary={{
+          data: RESERVED,
+          columns: COLUMNS,
+          getRowId: (row) => row.id,
+        }}
+        bulkActions={({ primarySelected, secondarySelected }) => (
+          <span data-testid="unified">
+            top:{primarySelected.length} bottom:{secondarySelected.length}
+          </span>
+        )}
+      />
+    );
+
+    expect(screen.queryByTestId('unified')).toBeNull();
+
+    const checkboxes = screen.getAllByLabelText('Select row');
+    fireEvent.click(checkboxes[0]);
+    fireEvent.click(checkboxes[2]);
+
+    expect(screen.getByTestId('unified').textContent).toBe('top:1 bottom:1');
+  });
+
   it('lets both lists hold their own selection when independent mode is on', () => {
     render(
       <DualListTable<Item, Item>

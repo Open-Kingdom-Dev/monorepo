@@ -9,6 +9,7 @@ export type {
 export type {
   DualListTableProps,
   DualListSideProps,
+  DualListBulkActionsRenderer,
 } from './lib/dual-list-table.types';
 export type {
   ColumnDef,
