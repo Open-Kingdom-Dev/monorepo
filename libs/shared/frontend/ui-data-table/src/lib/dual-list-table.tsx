@@ -33,9 +33,11 @@ export function DualListTable<
     (updater) => {
       setPrimarySelection((prev) => {
         const next = typeof updater === 'function' ? updater(prev) : updater;
+
         if (selectionMode === 'exclusive' && Object.keys(next).length > 0) {
           setSecondarySelection({});
         }
+
         return next;
       });
     },
@@ -46,9 +48,11 @@ export function DualListTable<
     (updater) => {
       setSecondarySelection((prev) => {
         const next = typeof updater === 'function' ? updater(prev) : updater;
+
         if (selectionMode === 'exclusive' && Object.keys(next).length > 0) {
           setPrimarySelection({});
         }
+
         return next;
       });
     },
@@ -96,13 +100,16 @@ function useSelectedItems<T extends RowData>(
   selection: RowSelectionState
 ): T[] {
   const { data, getRowId } = side;
+
   return useMemo(() => {
     const selectedKeys = new Set(
       Object.entries(selection)
         .filter(([, isSelected]) => isSelected)
         .map(([key]) => key)
     );
+
     if (selectedKeys.size === 0) return [];
+
     return data.filter((row, index) => {
       const id = getRowId ? getRowId(row, index) : String(index);
       return selectedKeys.has(id);
@@ -129,6 +136,7 @@ function UnifiedBulkActionBar<
   clearAll: () => void;
 }) {
   const total = primaryCount + secondaryCount;
+
   return (
     <div
       role="region"
@@ -157,6 +165,7 @@ function ListSection<T extends RowData>({
   onSelectionChange: OnChangeFn<RowSelectionState>;
 }) {
   const { label, ...sideProps } = side;
+
   return (
     <div className="flex min-h-0 flex-col">
       {label !== undefined && (
