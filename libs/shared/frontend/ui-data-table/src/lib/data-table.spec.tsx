@@ -1,7 +1,12 @@
 import { useState } from 'react';
 import { act, fireEvent, render, screen } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import type { ColumnDef, TableState, Updater } from '@tanstack/react-table';
+import type {
+  ColumnDef,
+  RowSelectionState,
+  TableState,
+  Updater,
+} from '@tanstack/react-table';
 import { DataTable } from './data-table';
 
 interface Person {
@@ -323,6 +328,73 @@ describe('When the parent owns the state', () => {
         .getByRole('columnheader', { name: /name/i })
         .getAttribute('aria-sort')
     ).toBe('descending');
+  });
+});
+
+describe('When the parent owns row selection', () => {
+  it('updates the controlled rowSelection when a row is clicked', () => {
+    function ControlledSelection() {
+      const [selection, setSelection] = useState<RowSelectionState>({});
+      const onChange = (updater: Updater<RowSelectionState>) =>
+        setSelection((prev) =>
+          typeof updater === 'function' ? updater(prev) : updater
+        );
+
+      return (
+        <>
+          <DataTable<Person>
+            data={PEOPLE}
+            columns={COLUMNS}
+            getRowId={(row) => row.id}
+            enableRowSelection
+            rowSelection={selection}
+            onRowSelectionChange={onChange}
+          />
+          <span data-testid="selected-count">
+            {Object.keys(selection).length}
+          </span>
+        </>
+      );
+    }
+    render(<ControlledSelection />);
+    expect(screen.getByTestId('selected-count').textContent).toBe('0');
+    fireEvent.click(screen.getAllByLabelText('Select row')[0]);
+    expect(screen.getByTestId('selected-count').textContent).toBe('1');
+  });
+
+  it('does not save the selected rows even when preferences are persisted', async () => {
+    vi.useFakeTimers();
+    function ControlledSelection() {
+      const [selection, setSelection] = useState<RowSelectionState>({});
+      const onChange = (updater: Updater<RowSelectionState>) =>
+        setSelection((prev) =>
+          typeof updater === 'function' ? updater(prev) : updater
+        );
+
+      return (
+        <DataTable<Person>
+          data={PEOPLE}
+          columns={COLUMNS}
+          getRowId={(row) => row.id}
+          enableRowSelection
+          rowSelection={selection}
+          onRowSelectionChange={onChange}
+          persistStateKey="controlled-selection"
+        />
+      );
+    }
+    render(<ControlledSelection />);
+    fireEvent.click(screen.getAllByLabelText('Select row')[0]);
+    await act(async () => {
+      vi.advanceTimersByTime(250);
+    });
+    const saved = JSON.parse(
+      globalThis.localStorage.getItem(
+        'ok-data-table:v1:controlled-selection'
+      ) ?? '{}'
+    );
+    expect(saved.rowSelection).toBeUndefined();
+    vi.useRealTimers();
   });
 });
 
