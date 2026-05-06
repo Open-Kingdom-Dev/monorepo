@@ -5,6 +5,7 @@ import { CompaniesListPage } from './pages/companies-list-page';
 import { LeadsListPage } from './pages/leads-list-page';
 import { LeadDetailPage } from './pages/lead-detail-page';
 import { OpportunitiesPipelinePage } from './pages/opportunities-pipeline-page';
+import { CrmLayout } from './components/crm-layout';
 
 /**
  * Route table for the CRM feature. Host applications splice this into their
@@ -13,6 +14,7 @@ import { OpportunitiesPipelinePage } from './pages/opportunities-pipeline-page';
 export const crmRoutes: RouteObject[] = [
   {
     path: 'crm',
+    element: <CrmLayout />,
     children: [
       { index: true, element: <CrmDashboardPage /> },
       { path: 'contacts', element: <ContactsListPage /> },

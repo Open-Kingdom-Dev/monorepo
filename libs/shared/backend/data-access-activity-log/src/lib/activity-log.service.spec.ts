@@ -37,7 +37,7 @@ describe('ActivityLogService', () => {
   };
 
   beforeEach(async () => {
-    mockQuery = { activity_log: { findFirst: jest.fn() } };
+    mockQuery = { activityLog: { findFirst: jest.fn() } };
     mockDb = {
       query: mockQuery,
       select: jest.fn(() => selectChain([row()])),
@@ -82,7 +82,7 @@ describe('ActivityLogService', () => {
   });
 
   it('findById delegates to drizzle query helper', async () => {
-    mockQuery.activity_log.findFirst.mockResolvedValue(row());
+    mockQuery.activityLog.findFirst.mockResolvedValue(row());
     const r = await service.findById(1);
     expect(r?.id).toBe(1);
   });
@@ -122,20 +122,20 @@ describe('ActivityLogService', () => {
   });
 
   it('updates an existing activity', async () => {
-    mockQuery.activity_log.findFirst.mockResolvedValue(row());
+    mockQuery.activityLog.findFirst.mockResolvedValue(row());
     const result = await service.update(1, { subject: 'Updated' });
     expect(result.subject).toBe('Updated');
   });
 
   it('update throws when activity does not exist', async () => {
-    mockQuery.activity_log.findFirst.mockResolvedValue(undefined);
+    mockQuery.activityLog.findFirst.mockResolvedValue(undefined);
     await expect(service.update(99, {})).rejects.toBeInstanceOf(
       NotFoundException
     );
   });
 
   it('complete appends outcome notes and stamps completedAt', async () => {
-    mockQuery.activity_log.findFirst.mockResolvedValue(
+    mockQuery.activityLog.findFirst.mockResolvedValue(
       row({ description: 'existing' })
     );
     await service.complete(1, { outcomeNotes: 'done' });
@@ -143,18 +143,18 @@ describe('ActivityLogService', () => {
   });
 
   it('complete throws when activity does not exist', async () => {
-    mockQuery.activity_log.findFirst.mockResolvedValue(undefined);
+    mockQuery.activityLog.findFirst.mockResolvedValue(undefined);
     await expect(service.complete(99)).rejects.toBeInstanceOf(NotFoundException);
   });
 
   it('deletes an existing activity', async () => {
-    mockQuery.activity_log.findFirst.mockResolvedValue(row());
+    mockQuery.activityLog.findFirst.mockResolvedValue(row());
     await service.delete(1);
     expect(mockDb.delete).toHaveBeenCalled();
   });
 
   it('delete throws when activity does not exist', async () => {
-    mockQuery.activity_log.findFirst.mockResolvedValue(undefined);
+    mockQuery.activityLog.findFirst.mockResolvedValue(undefined);
     await expect(service.delete(99)).rejects.toBeInstanceOf(NotFoundException);
   });
 });

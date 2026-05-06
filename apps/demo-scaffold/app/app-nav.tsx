@@ -1,5 +1,4 @@
 import { NavLink } from 'react-router';
-import { crmNavEntries } from '@open-kingdom/shared-frontend-feature-crm';
 
 export function AppNav() {
   return (
@@ -12,11 +11,7 @@ export function AppNav() {
       </NavLink>
       <NavLink to="/profile">Profile</NavLink>
       <NavLink to="/admin/users">Users</NavLink>
-      {crmNavEntries.map((entry) => (
-        <NavLink key={entry.path} to={entry.path} end={entry.path === '/crm'}>
-          {entry.label}
-        </NavLink>
-      ))}
+      <NavLink to="/crm">CRM</NavLink>
       <NavLink to="/gcs-demo">GCS Demo</NavLink>
     </nav>
   );

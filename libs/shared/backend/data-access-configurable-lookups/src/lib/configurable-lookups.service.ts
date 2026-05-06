@@ -9,18 +9,14 @@ import { BetterSQLite3Database } from 'drizzle-orm/better-sqlite3';
 import { and, asc, eq } from 'drizzle-orm';
 
 import { DB_TAG } from '@open-kingdom/shared-poly-util-constants';
-import {
-  ConfigurableLookup,
-  ConfigurableLookupsTableName,
-  configurableLookups,
-} from './schemas';
+import { ConfigurableLookup, configurableLookups } from './schemas';
 import {
   CreateConfigurableLookupDto,
   UpdateConfigurableLookupDto,
 } from './dtos';
 
 type schema = {
-  [ConfigurableLookupsTableName]: typeof configurableLookups;
+  configurableLookups: typeof configurableLookups;
 };
 
 @Injectable()
@@ -53,7 +49,7 @@ export class ConfigurableLookupsService {
   }
 
   async findById(id: number): Promise<ConfigurableLookup | undefined> {
-    return this.db.query.configurable_lookups.findFirst({
+    return this.db.query.configurableLookups.findFirst({
       where: eq(configurableLookups.id, id),
     });
   }
@@ -62,7 +58,7 @@ export class ConfigurableLookupsService {
     listKey: string,
     value: string
   ): Promise<ConfigurableLookup | undefined> {
-    return this.db.query.configurable_lookups.findFirst({
+    return this.db.query.configurableLookups.findFirst({
       where: and(
         eq(configurableLookups.listKey, listKey),
         eq(configurableLookups.value, value)
