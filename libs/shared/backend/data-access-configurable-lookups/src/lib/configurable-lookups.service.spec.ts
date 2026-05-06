@@ -31,7 +31,7 @@ describe('ConfigurableLookupsService', () => {
 
   beforeEach(async () => {
     mockQuery = {
-      configurable_lookups: { findFirst: jest.fn() },
+      configurableLookups: { findFirst: jest.fn() },
     };
 
     const selectChain = () => {
@@ -73,7 +73,7 @@ describe('ConfigurableLookupsService', () => {
   });
 
   it('creates a new lookup when none clashes', async () => {
-    mockQuery.configurable_lookups.findFirst.mockResolvedValue(undefined);
+    mockQuery.configurableLookups.findFirst.mockResolvedValue(undefined);
     const result = await service.create({
       listKey: 'opportunity_stage',
       value: 'discovery',
@@ -84,7 +84,7 @@ describe('ConfigurableLookupsService', () => {
   });
 
   it('throws ConflictException when a lookup with the same listKey+value exists', async () => {
-    mockQuery.configurable_lookups.findFirst.mockResolvedValue(row());
+    mockQuery.configurableLookups.findFirst.mockResolvedValue(row());
     await expect(
       service.create({
         listKey: 'opportunity_stage',
@@ -95,33 +95,33 @@ describe('ConfigurableLookupsService', () => {
   });
 
   it('throws NotFoundException when updating a missing lookup', async () => {
-    mockQuery.configurable_lookups.findFirst.mockResolvedValue(undefined);
+    mockQuery.configurableLookups.findFirst.mockResolvedValue(undefined);
     await expect(service.update(99, { label: 'x' })).rejects.toBeInstanceOf(
       NotFoundException
     );
   });
 
   it('forbids renaming the canonical value of a system lookup', async () => {
-    mockQuery.configurable_lookups.findFirst.mockResolvedValue(row({ isSystem: 1 }));
+    mockQuery.configurableLookups.findFirst.mockResolvedValue(row({ isSystem: 1 }));
     await expect(
       service.update(1, { value: 'different' })
     ).rejects.toBeInstanceOf(ForbiddenException);
   });
 
   it('forbids deactivating a system lookup', async () => {
-    mockQuery.configurable_lookups.findFirst.mockResolvedValue(row({ isSystem: 1 }));
+    mockQuery.configurableLookups.findFirst.mockResolvedValue(row({ isSystem: 1 }));
     await expect(
       service.update(1, { isActive: false })
     ).rejects.toBeInstanceOf(ForbiddenException);
   });
 
   it('forbids deleting a system lookup', async () => {
-    mockQuery.configurable_lookups.findFirst.mockResolvedValue(row({ isSystem: 1 }));
+    mockQuery.configurableLookups.findFirst.mockResolvedValue(row({ isSystem: 1 }));
     await expect(service.delete(1)).rejects.toBeInstanceOf(ForbiddenException);
   });
 
   it('deletes non-system lookups', async () => {
-    mockQuery.configurable_lookups.findFirst.mockResolvedValue(row());
+    mockQuery.configurableLookups.findFirst.mockResolvedValue(row());
     await service.delete(1);
     expect(mockDb.delete).toHaveBeenCalled();
   });
@@ -157,24 +157,24 @@ describe('ConfigurableLookupsService', () => {
   });
 
   it('findById delegates to drizzle query helper', async () => {
-    mockQuery.configurable_lookups.findFirst.mockResolvedValue(row());
+    mockQuery.configurableLookups.findFirst.mockResolvedValue(row());
     const r = await service.findById(1);
     expect(r?.id).toBe(1);
   });
 
   it('findByListAndValue delegates to drizzle query helper', async () => {
-    mockQuery.configurable_lookups.findFirst.mockResolvedValue(row());
+    mockQuery.configurableLookups.findFirst.mockResolvedValue(row());
     const r = await service.findByListAndValue('opportunity_stage', 'discovery');
     expect(r?.value).toBe('discovery');
   });
 
   it('throws NotFoundException when deleting a missing lookup', async () => {
-    mockQuery.configurable_lookups.findFirst.mockResolvedValue(undefined);
+    mockQuery.configurableLookups.findFirst.mockResolvedValue(undefined);
     await expect(service.delete(1)).rejects.toBeInstanceOf(NotFoundException);
   });
 
   it('updates a non-system lookup with new listKey/value when no clash', async () => {
-    mockQuery.configurable_lookups.findFirst
+    mockQuery.configurableLookups.findFirst
       .mockResolvedValueOnce(row())
       .mockResolvedValueOnce(undefined);
     const result = await service.update(1, {
@@ -186,7 +186,7 @@ describe('ConfigurableLookupsService', () => {
   });
 
   it('throws ConflictException when update causes a listKey+value clash', async () => {
-    mockQuery.configurable_lookups.findFirst
+    mockQuery.configurableLookups.findFirst
       .mockResolvedValueOnce(row())
       .mockResolvedValueOnce(row({ id: 42 }));
     await expect(
@@ -195,7 +195,7 @@ describe('ConfigurableLookupsService', () => {
   });
 
   it('seedDefaults skips existing entries', async () => {
-    mockQuery.configurable_lookups.findFirst
+    mockQuery.configurableLookups.findFirst
       .mockResolvedValueOnce(row())
       .mockResolvedValueOnce(undefined);
     await service.seedDefaults([

@@ -9,11 +9,7 @@ import {
   isRelatedEntityType,
 } from '@open-kingdom/shared-poly-util-crm-domain';
 
-import {
-  ActivityLogEntry,
-  ActivityLogTableName,
-  activityLog,
-} from './schemas';
+import { ActivityLogEntry, activityLog } from './schemas';
 import {
   CompleteActivityLogEntryDto,
   CreateActivityLogEntryDto,
@@ -21,7 +17,7 @@ import {
 } from './dtos';
 
 type schema = {
-  [ActivityLogTableName]: typeof activityLog;
+  activityLog: typeof activityLog;
 };
 
 @Injectable()
@@ -75,7 +71,7 @@ export class ActivityLogService {
   }
 
   async findById(id: number): Promise<ActivityLogEntry | undefined> {
-    return this.db.query.activity_log.findFirst({
+    return this.db.query.activityLog.findFirst({
       where: eq(activityLog.id, id),
     });
   }
