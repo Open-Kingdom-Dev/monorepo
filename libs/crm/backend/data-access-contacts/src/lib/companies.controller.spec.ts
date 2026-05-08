@@ -63,9 +63,9 @@ describe('CompaniesController', () => {
   });
 
   it('rejects create without authenticated user', async () => {
-    await expect(controller.create({}, { name: 'Acme' })).rejects.toBeInstanceOf(
-      ForbiddenException
-    );
+    await expect(
+      controller.create({}, { name: 'Acme' })
+    ).rejects.toBeInstanceOf(ForbiddenException);
   });
 
   it('delegates findOne, update, archive, restore', async () => {

@@ -38,7 +38,9 @@ export class ConfigurableLookupsController {
 
   @Get()
   @RequirePermission('lookups', 'read')
-  @ApiOperation({ summary: 'List lookup entries, optionally filtered by listKey' })
+  @ApiOperation({
+    summary: 'List lookup entries, optionally filtered by listKey',
+  })
   @ApiResponse({ status: 200, type: [ConfigurableLookupDto] })
   async findAll(
     @Query('listKey') listKey?: string,

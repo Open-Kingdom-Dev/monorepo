@@ -1,9 +1,10 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { BetterSQLite3Database } from 'drizzle-orm/better-sqlite3';
-import { NotFoundException } from '@nestjs/common';
+import { BadRequestException, NotFoundException } from '@nestjs/common';
 
 import { DB_TAG } from '@open-kingdom/shared-poly-util-constants';
 import { ActivityLogService } from './activity-log.service';
+import { ACTIVITY_LOG_OPTIONS } from './data-access-activity-log.options';
 
 describe('ActivityLogService', () => {
   let service: ActivityLogService;
@@ -49,7 +50,9 @@ describe('ActivityLogService', () => {
       update: jest.fn(() => ({
         set: jest.fn(() => ({
           where: jest.fn(() => ({
-            returning: jest.fn().mockResolvedValue([row({ subject: 'Updated' })]),
+            returning: jest
+              .fn()
+              .mockResolvedValue([row({ subject: 'Updated' })]),
           })),
         })),
       })),
@@ -61,6 +64,13 @@ describe('ActivityLogService', () => {
       providers: [
         ActivityLogService,
         { provide: DB_TAG, useValue: mockDb as BetterSQLite3Database<never> },
+        {
+          provide: ACTIVITY_LOG_OPTIONS,
+          useValue: {
+            allowedRelatedTypes: ['contact', 'company', 'lead', 'opportunity'],
+            allowedActivityTypes: ['note', 'call', 'meeting', 'email', 'task'],
+          },
+        },
       ],
     }).compile();
     service = module.get(ActivityLogService);
@@ -104,21 +114,19 @@ describe('ActivityLogService', () => {
   it('rejects an unknown relatedType', async () => {
     await expect(
       service.create(
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        { relatedType: 'horse' as any, relatedId: 1, type: 'note', subject: 's' },
+        { relatedType: 'horse', relatedId: 1, type: 'note', subject: 's' },
         42
       )
-    ).rejects.toBeInstanceOf(NotFoundException);
+    ).rejects.toBeInstanceOf(BadRequestException);
   });
 
   it('rejects an unknown activity type', async () => {
     await expect(
       service.create(
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        { relatedType: 'contact', relatedId: 1, type: 'gossip' as any, subject: 's' },
+        { relatedType: 'contact', relatedId: 1, type: 'gossip', subject: 's' },
         42
       )
-    ).rejects.toBeInstanceOf(NotFoundException);
+    ).rejects.toBeInstanceOf(BadRequestException);
   });
 
   it('updates an existing activity', async () => {
@@ -144,7 +152,9 @@ describe('ActivityLogService', () => {
 
   it('complete throws when activity does not exist', async () => {
     mockQuery.activityLog.findFirst.mockResolvedValue(undefined);
-    await expect(service.complete(99)).rejects.toBeInstanceOf(NotFoundException);
+    await expect(service.complete(99)).rejects.toBeInstanceOf(
+      NotFoundException
+    );
   });
 
   it('deletes an existing activity', async () => {

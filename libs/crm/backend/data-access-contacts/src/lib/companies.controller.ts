@@ -22,11 +22,7 @@ import {
 import { RequirePermission } from '@open-kingdom/shared-backend-util-rbac';
 
 import { CompaniesService } from './companies.service';
-import {
-  CompanyDto,
-  CreateCompanyDto,
-  UpdateCompanyDto,
-} from './dtos';
+import { CompanyDto, CreateCompanyDto, UpdateCompanyDto } from './dtos';
 
 interface AuthenticatedRequest {
   user?: { id: number; role?: string };

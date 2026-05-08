@@ -5,21 +5,27 @@ import { DataAccessActivityLogModule } from '@open-kingdom/shared-backend-data-a
 import { DataAccessContactsModule } from '@open-kingdom/crm-backend-data-access-contacts';
 import { DataAccessOpportunitiesModule } from '@open-kingdom/crm-backend-data-access-opportunities';
 import { FeatureUserManagementModule } from '@open-kingdom/shared-backend-feature-user-management';
+import {
+  ACTIVITY_TYPES,
+  RELATED_ENTITY_TYPES,
+} from '@open-kingdom/crm-poly-util-domain';
 
 import { LeadConversionService } from './services/lead-conversion.service';
 import { DashboardService } from './services/dashboard.service';
 import { CrmSeedService } from './services/crm-seed.service';
 import { LeadConversionController } from './controllers/lead-conversion.controller';
 import { DashboardController } from './controllers/dashboard.controller';
-import {
-  CRM_FEATURE_OPTIONS,
-  CrmFeatureOptions,
-} from './crm-feature.options';
+import { CRM_FEATURE_OPTIONS, CrmFeatureOptions } from './crm-feature.options';
+
+const activityLogModuleForCrm = DataAccessActivityLogModule.forRoot({
+  allowedRelatedTypes: RELATED_ENTITY_TYPES,
+  allowedActivityTypes: ACTIVITY_TYPES,
+});
 
 @Module({
   imports: [
     DataAccessConfigurableLookupsModule,
-    DataAccessActivityLogModule,
+    activityLogModuleForCrm,
     DataAccessContactsModule,
     DataAccessOpportunitiesModule,
   ],
@@ -33,7 +39,7 @@ export class FeatureCrmModule {
       module: FeatureCrmModule,
       imports: [
         DataAccessConfigurableLookupsModule,
-        DataAccessActivityLogModule,
+        activityLogModuleForCrm,
         DataAccessContactsModule,
         DataAccessOpportunitiesModule,
         // user-management is needed so CrmSeedService can look up roles +

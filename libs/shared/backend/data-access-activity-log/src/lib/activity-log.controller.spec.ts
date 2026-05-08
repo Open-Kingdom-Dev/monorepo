@@ -12,6 +12,8 @@ describe('ActivityLogController', () => {
 
   beforeEach(async () => {
     service = {
+      isAllowedRelatedType: jest.fn().mockReturnValue(true),
+      isAllowedActivityType: jest.fn().mockReturnValue(true),
       findForRecord: jest.fn(),
       findOpenForOwner: jest.fn(),
       findOverdueForOwner: jest.fn(),
@@ -35,9 +37,10 @@ describe('ActivityLogController', () => {
   });
 
   it('rejects an invalid relatedType', async () => {
-    await expect(
-      controller.findAll(req, 'horse', '10')
-    ).rejects.toBeInstanceOf(ForbiddenException);
+    service.isAllowedRelatedType.mockReturnValueOnce(false);
+    await expect(controller.findAll(req, 'horse', '10')).rejects.toBeInstanceOf(
+      ForbiddenException
+    );
   });
 
   it('defaults to open activities for the current user', async () => {
@@ -53,7 +56,9 @@ describe('ActivityLogController', () => {
   });
 
   it('throws ForbiddenException when request has no authenticated user', async () => {
-    await expect(controller.findAll({})).rejects.toBeInstanceOf(ForbiddenException);
+    await expect(controller.findAll({})).rejects.toBeInstanceOf(
+      ForbiddenException
+    );
   });
 
   it('creates an activity owned by the current user', async () => {

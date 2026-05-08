@@ -61,7 +61,9 @@ export function RecordDetail({
             {subtitle && <CardDescription>{subtitle}</CardDescription>}
           </div>
           {actionsSlot && (
-            <div className="flex shrink-0 items-center gap-2">{actionsSlot}</div>
+            <div className="flex shrink-0 items-center gap-2">
+              {actionsSlot}
+            </div>
           )}
         </CardHeader>
         {(statusSlot || nextActionSlot) && (
@@ -87,7 +89,9 @@ export function RecordDetail({
                 <p className="text-xs uppercase tracking-wide text-muted-foreground">
                   Next action
                 </p>
-                <div className="mt-1 text-sm text-foreground">{nextActionSlot}</div>
+                <div className="mt-1 text-sm text-foreground">
+                  {nextActionSlot}
+                </div>
               </section>
             )}
           </CardContent>

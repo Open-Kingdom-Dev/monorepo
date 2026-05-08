@@ -28,9 +28,6 @@
       "path": "../util-rbac/tsconfig.lib.json"
     },
     {
-      "path": "../../../crm/poly/util-domain/tsconfig.lib.json"
-    },
-    {
       "path": "../../poly/util-constants/tsconfig.lib.json"
     }
   ]

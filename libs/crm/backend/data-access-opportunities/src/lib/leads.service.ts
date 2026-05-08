@@ -24,7 +24,9 @@ export interface LeadFilter {
 
 @Injectable()
 export class LeadsService {
-  constructor(@Inject(DB_TAG) private readonly db: BetterSQLite3Database<schema>) {}
+  constructor(
+    @Inject(DB_TAG) private readonly db: BetterSQLite3Database<schema>
+  ) {}
 
   async findAll(filter: LeadFilter = {}): Promise<Lead[]> {
     const conditions = [];

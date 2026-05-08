@@ -14,13 +14,24 @@ import {
 
 describe('util-crm-domain', () => {
   it('exposes the canonical related-entity types', () => {
-    expect(RELATED_ENTITY_TYPES).toEqual(['contact', 'company', 'lead', 'opportunity']);
+    expect(RELATED_ENTITY_TYPES).toEqual([
+      'contact',
+      'company',
+      'lead',
+      'opportunity',
+    ]);
     expect(isRelatedEntityType('contact')).toBe(true);
     expect(isRelatedEntityType('horse')).toBe(false);
   });
 
   it('exposes the canonical activity types and due-date support', () => {
-    expect(ACTIVITY_TYPES).toEqual(['note', 'call', 'meeting', 'email', 'task']);
+    expect(ACTIVITY_TYPES).toEqual([
+      'note',
+      'call',
+      'meeting',
+      'email',
+      'task',
+    ]);
     expect(isActivityType('note')).toBe(true);
     expect(supportsDueDate('task')).toBe(true);
     expect(supportsDueDate('note')).toBe(false);

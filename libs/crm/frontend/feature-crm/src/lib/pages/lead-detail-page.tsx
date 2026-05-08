@@ -1,9 +1,6 @@
 import * as React from 'react';
 import { useNavigate, useParams } from 'react-router';
-import {
-  Badge,
-  Button,
-} from '@open-kingdom/shared-frontend-ui-primitives';
+import { Badge, Button } from '@open-kingdom/shared-frontend-ui-primitives';
 import { RecordDetail } from '@open-kingdom/shared-frontend-ui-record-detail';
 import {
   ActivityTimeline,
@@ -13,9 +10,17 @@ import {
   useLeadsControllerFindOneQuery,
   useActivityLogControllerFindAllQuery,
 } from '@open-kingdom/shared-frontend-data-access-api-client';
-import { isTerminalLeadStatus, type ActivityType, type LeadStatus } from '@open-kingdom/crm-poly-util-domain';
+import {
+  isTerminalLeadStatus,
+  type ActivityType,
+  type LeadStatus,
+} from '@open-kingdom/crm-poly-util-domain';
 
 import { ConvertLeadModal } from '../components/convert-lead-modal';
+import {
+  CRM_ACTIVITY_ICON_MAP,
+  CRM_ACTIVITY_LABEL_MAP,
+} from '../activity-icons';
 
 interface ActivityRow {
   id: number;
@@ -30,7 +35,7 @@ interface ActivityRow {
 const str = (v: unknown): string | null =>
   typeof v === 'string' && v.length > 0 ? v : null;
 
-function toTimelineEntry(a: ActivityRow): ActivityTimelineEntry {
+function toTimelineEntry(a: ActivityRow): ActivityTimelineEntry<ActivityType> {
   return {
     id: a.id,
     type: a.type as ActivityType,
@@ -93,7 +98,8 @@ export function LeadDetailPage() {
         nextActionSlot={
           alreadyConverted ? (
             <span className="text-muted-foreground">
-              Converted on {new Date(l.convertedAt as string).toLocaleDateString()}
+              Converted on{' '}
+              {new Date(l.convertedAt as string).toLocaleDateString()}
             </span>
           ) : (
             'Review lead and decide whether to qualify or disqualify.'
@@ -104,10 +110,7 @@ export function LeadDetailPage() {
             <Button variant="outline" onClick={() => navigate('/crm/leads')}>
               Back
             </Button>
-            <Button
-              disabled={!canConvert}
-              onClick={() => setModalOpen(true)}
-            >
+            <Button disabled={!canConvert} onClick={() => setModalOpen(true)}>
               Convert
             </Button>
           </>
@@ -119,23 +122,33 @@ export function LeadDetailPage() {
             content: (
               <dl className="grid gap-3 p-4 text-sm sm:grid-cols-2">
                 <div>
-                  <dt className="text-xs uppercase text-muted-foreground">Email</dt>
+                  <dt className="text-xs uppercase text-muted-foreground">
+                    Email
+                  </dt>
                   <dd>{str(l.email) ?? '—'}</dd>
                 </div>
                 <div>
-                  <dt className="text-xs uppercase text-muted-foreground">Phone</dt>
+                  <dt className="text-xs uppercase text-muted-foreground">
+                    Phone
+                  </dt>
                   <dd>{str(l.phone) ?? '—'}</dd>
                 </div>
                 <div>
-                  <dt className="text-xs uppercase text-muted-foreground">Company</dt>
+                  <dt className="text-xs uppercase text-muted-foreground">
+                    Company
+                  </dt>
                   <dd>{str(l.companyName) ?? '—'}</dd>
                 </div>
                 <div>
-                  <dt className="text-xs uppercase text-muted-foreground">Source</dt>
+                  <dt className="text-xs uppercase text-muted-foreground">
+                    Source
+                  </dt>
                   <dd>{str(l.source) ?? '—'}</dd>
                 </div>
                 <div className="sm:col-span-2">
-                  <dt className="text-xs uppercase text-muted-foreground">Notes</dt>
+                  <dt className="text-xs uppercase text-muted-foreground">
+                    Notes
+                  </dt>
                   <dd className="whitespace-pre-wrap">{str(l.notes) ?? '—'}</dd>
                 </div>
               </dl>
@@ -150,6 +163,8 @@ export function LeadDetailPage() {
                   entries={((activities.data ?? []) as ActivityRow[]).map(
                     toTimelineEntry
                   )}
+                  iconMap={CRM_ACTIVITY_ICON_MAP}
+                  labelMap={CRM_ACTIVITY_LABEL_MAP}
                   emptyState="No activity logged on this lead yet."
                 />
               </div>

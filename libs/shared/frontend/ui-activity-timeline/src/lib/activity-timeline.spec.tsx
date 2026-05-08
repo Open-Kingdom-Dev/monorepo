@@ -1,5 +1,8 @@
 import { render, screen } from '@testing-library/react';
-import { ActivityTimeline, type ActivityTimelineEntry } from './activity-timeline';
+import {
+  ActivityTimeline,
+  type ActivityTimelineEntry,
+} from './activity-timeline';
 
 describe('ActivityTimeline', () => {
   const now = new Date('2026-04-18T10:00:00Z');

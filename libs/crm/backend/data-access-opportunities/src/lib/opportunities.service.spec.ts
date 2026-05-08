@@ -84,7 +84,10 @@ describe('OpportunitiesService', () => {
 
   it('openOnly filters out terminal stages in memory', async () => {
     mockDb.select = jest.fn(() =>
-      buildSelectMock([row({ stage: 'won' }), row({ id: 2, stage: 'discovery' })])
+      buildSelectMock([
+        row({ stage: 'won' }),
+        row({ id: 2, stage: 'discovery' }),
+      ])
     );
     const result = await service.findAll({ openOnly: true });
     expect(result).toHaveLength(1);
@@ -107,7 +110,9 @@ describe('OpportunitiesService', () => {
 
   it('update throws when missing', async () => {
     mockQuery.opportunities.findFirst.mockResolvedValue(undefined);
-    await expect(service.update(99, {})).rejects.toBeInstanceOf(NotFoundException);
+    await expect(service.update(99, {})).rejects.toBeInstanceOf(
+      NotFoundException
+    );
   });
 
   it('close stamps closedAt and sets stage to won', async () => {
@@ -127,9 +132,9 @@ describe('OpportunitiesService', () => {
 
   it('close throws when missing', async () => {
     mockQuery.opportunities.findFirst.mockResolvedValue(undefined);
-    await expect(
-      service.close(99, { outcome: 'won' })
-    ).rejects.toBeInstanceOf(NotFoundException);
+    await expect(service.close(99, { outcome: 'won' })).rejects.toBeInstanceOf(
+      NotFoundException
+    );
   });
 
   it('findById delegates to drizzle query helper', async () => {
@@ -141,7 +146,12 @@ describe('OpportunitiesService', () => {
   it('pipelineSummary returns aggregated rows per stage', async () => {
     mockDb.select = jest.fn(() =>
       buildSelectMock([
-        { stage: 'discovery', count: 2, totalValue: 20000, weightedValue: 10000 },
+        {
+          stage: 'discovery',
+          count: 2,
+          totalValue: 20000,
+          weightedValue: 10000,
+        },
         { stage: 'won', count: 1, totalValue: 5000, weightedValue: 5000 },
       ])
     );

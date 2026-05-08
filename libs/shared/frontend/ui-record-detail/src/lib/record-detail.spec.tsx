@@ -30,19 +30,15 @@ describe('RecordDetail', () => {
 
   it('throws when no tabs are provided', () => {
     const spy = vi.spyOn(console, 'error').mockImplementation(() => undefined);
-    expect(() =>
-      render(<RecordDetail title="Acme Corp" tabs={[]} />)
-    ).toThrow(/at least one tab/);
+    expect(() => render(<RecordDetail title="Acme Corp" tabs={[]} />)).toThrow(
+      /at least one tab/
+    );
     spy.mockRestore();
   });
 
   it('honors the defaultTabId prop', () => {
     render(
-      <RecordDetail
-        title="Acme Corp"
-        tabs={baseTabs}
-        defaultTabId="activity"
-      />
+      <RecordDetail title="Acme Corp" tabs={baseTabs} defaultTabId="activity" />
     );
     expect(screen.getByText('Activity body')).toBeTruthy();
   });

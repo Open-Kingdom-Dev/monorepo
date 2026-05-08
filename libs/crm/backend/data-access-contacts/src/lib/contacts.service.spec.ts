@@ -55,7 +55,9 @@ describe('ContactsService', () => {
       update: jest.fn(() => ({
         set: jest.fn(() => ({
           where: jest.fn(() => ({
-            returning: jest.fn().mockResolvedValue([row({ firstName: 'Updated' })]),
+            returning: jest
+              .fn()
+              .mockResolvedValue([row({ firstName: 'Updated' })]),
           })),
         })),
       })),
@@ -101,9 +103,9 @@ describe('ContactsService', () => {
 
   it('throws NotFoundException when updating a missing contact', async () => {
     mockQuery.contacts.findFirst.mockResolvedValue(undefined);
-    await expect(
-      service.update(99, { firstName: 'x' })
-    ).rejects.toBeInstanceOf(NotFoundException);
+    await expect(service.update(99, { firstName: 'x' })).rejects.toBeInstanceOf(
+      NotFoundException
+    );
   });
 
   it('updates an existing contact', async () => {

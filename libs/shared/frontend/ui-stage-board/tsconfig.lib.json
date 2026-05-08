@@ -40,9 +40,6 @@
   "references": [
     {
       "path": "../ui-theme/tsconfig.lib.json"
-    },
-    {
-      "path": "../ui-primitives/tsconfig.lib.json"
     }
   ]
 }

@@ -1,20 +1,10 @@
 import * as React from 'react';
-import {
-  CheckCircle2,
-  Circle,
-  FileText,
-  Mail,
-  Phone,
-  StickyNote,
-  Users,
-  type LucideIcon,
-} from 'lucide-react';
+import { CheckCircle2, Circle, type LucideIcon } from 'lucide-react';
 import { cn } from '@open-kingdom/shared-frontend-ui-theme';
-import type { ActivityType } from '@open-kingdom/crm-poly-util-domain';
 
-export interface ActivityTimelineEntry {
+export interface ActivityTimelineEntry<TType extends string = string> {
   id: string | number;
-  type: ActivityType;
+  type: TType;
   subject: string;
   description?: string | null;
   timestamp: Date;
@@ -23,40 +13,38 @@ export interface ActivityTimelineEntry {
   ownerLabel?: string;
 }
 
-export interface ActivityTimelineProps {
-  entries: ReadonlyArray<ActivityTimelineEntry>;
+export interface ActivityTimelineProps<TType extends string = string> {
+  entries: ReadonlyArray<ActivityTimelineEntry<TType>>;
+  /**
+   * Optional map from `entry.type` to the icon rendered in the entry's
+   * bullet. Types with no entry in the map fall back to a plain `Circle`.
+   */
+  iconMap?: Partial<Record<TType, LucideIcon>>;
+  /**
+   * Map from `entry.type` to the human-readable label rendered next to the
+   * bullet (e.g. `'Call'`, `'Meeting'`). Falls back to `entry.type` itself
+   * when a label is not registered.
+   */
+  labelMap?: Partial<Record<TType, string>>;
   className?: string;
   emptyState?: React.ReactNode;
   formatTimestamp?: (date: Date) => string;
+  ref?: React.Ref<HTMLOListElement>;
 }
-
-const TYPE_ICONS: Record<ActivityType, LucideIcon> = {
-  note: StickyNote,
-  call: Phone,
-  meeting: Users,
-  email: Mail,
-  task: FileText,
-};
-
-const TYPE_LABELS: Record<ActivityType, string> = {
-  note: 'Note',
-  call: 'Call',
-  meeting: 'Meeting',
-  email: 'Email',
-  task: 'Task',
-};
 
 function defaultFormatTimestamp(date: Date): string {
   return date.toLocaleString();
 }
 
-export const ActivityTimeline = React.forwardRef<
-  HTMLOListElement,
-  ActivityTimelineProps
->(function ActivityTimeline(
-  { entries, className, emptyState, formatTimestamp = defaultFormatTimestamp },
-  ref
-) {
+export function ActivityTimeline<TType extends string = string>({
+  entries,
+  iconMap,
+  labelMap,
+  className,
+  emptyState,
+  formatTimestamp = defaultFormatTimestamp,
+  ref,
+}: ActivityTimelineProps<TType>) {
   if (entries.length === 0) {
     return (
       <div
@@ -72,13 +60,19 @@ export const ActivityTimeline = React.forwardRef<
   }
 
   return (
-    <ol ref={ref} className={cn('space-y-3', className)} data-testid="activity-timeline">
+    <ol
+      ref={ref}
+      className={cn('space-y-3', className)}
+      data-testid="activity-timeline"
+    >
       {entries.map((entry) => {
-        const Icon = TYPE_ICONS[entry.type];
+        const Icon = iconMap?.[entry.type] ?? Circle;
+        const label = labelMap?.[entry.type] ?? entry.type;
         const isPlanned = Boolean(entry.dueAt && !entry.completedAt);
         const isOverdue =
           isPlanned && entry.dueAt ? entry.dueAt.getTime() < Date.now() : false;
-        const primaryTimestamp = entry.completedAt ?? entry.dueAt ?? entry.timestamp;
+        const primaryTimestamp =
+          entry.completedAt ?? entry.dueAt ?? entry.timestamp;
 
         return (
           <li
@@ -115,12 +109,14 @@ export const ActivityTimeline = React.forwardRef<
                   ) : isPlanned ? (
                     <Circle className="h-3 w-3" />
                   ) : null}
-                  {TYPE_LABELS[entry.type]}
+                  {label}
                 </span>
                 {entry.ownerLabel && <span>·</span>}
                 {entry.ownerLabel && <span>{entry.ownerLabel}</span>}
                 {isOverdue && (
-                  <span className="font-medium text-destructive">· Overdue</span>
+                  <span className="font-medium text-destructive">
+                    · Overdue
+                  </span>
                 )}
               </div>
               {entry.description && (
@@ -134,4 +130,4 @@ export const ActivityTimeline = React.forwardRef<
       })}
     </ol>
   );
-});
+}

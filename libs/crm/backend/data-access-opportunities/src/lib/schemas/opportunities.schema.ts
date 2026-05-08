@@ -18,9 +18,7 @@ export const opportunities = table(
       .int('company_id')
       .notNull()
       .references(() => companies.id),
-    primaryContactId: t
-      .int('primary_contact_id')
-      .references(() => contacts.id),
+    primaryContactId: t.int('primary_contact_id').references(() => contacts.id),
     stage: t.text().notNull().default('new'),
     estimatedValue: t.real('estimated_value'),
     probability: t.real(),

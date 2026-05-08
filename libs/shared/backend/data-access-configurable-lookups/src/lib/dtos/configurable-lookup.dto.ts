@@ -30,10 +30,16 @@ export class ConfigurableLookupDto {
 }
 
 export class CreateConfigurableLookupDto {
-  @ApiProperty({ example: 'opportunity_stage', description: 'snake_case list key' })
+  @ApiProperty({
+    example: 'opportunity_stage',
+    description: 'snake_case list key',
+  })
   listKey!: string;
 
-  @ApiProperty({ example: 'discovery', description: 'snake_case canonical value' })
+  @ApiProperty({
+    example: 'discovery',
+    description: 'snake_case canonical value',
+  })
   value!: string;
 
   @ApiProperty({ example: 'Discovery' })

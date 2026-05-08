@@ -63,11 +63,11 @@ export class OpportunitiesController {
 
   @Get('pipeline-summary')
   @RequirePermission('opportunities', 'read')
-  @ApiOperation({ summary: 'Get aggregated pipeline counts and values by stage' })
+  @ApiOperation({
+    summary: 'Get aggregated pipeline counts and values by stage',
+  })
   async pipelineSummary(@Query('ownerId') ownerId?: string) {
-    return this.service.pipelineSummary(
-      ownerId ? Number(ownerId) : undefined
-    );
+    return this.service.pipelineSummary(ownerId ? Number(ownerId) : undefined);
   }
 
   @Get(':id')

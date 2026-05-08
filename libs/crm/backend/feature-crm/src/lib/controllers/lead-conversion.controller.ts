@@ -1,10 +1,4 @@
-import {
-  Body,
-  Controller,
-  Param,
-  ParseIntPipe,
-  Post,
-} from '@nestjs/common';
+import { Body, Controller, Param, ParseIntPipe, Post } from '@nestjs/common';
 import {
   ApiBearerAuth,
   ApiForbiddenResponse,

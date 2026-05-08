@@ -18,6 +18,10 @@ import { cn } from '@open-kingdom/shared-frontend-ui-theme';
 import type { ActivityType } from '@open-kingdom/crm-poly-util-domain';
 
 import { PageHeader } from '../components/page-header';
+import {
+  CRM_ACTIVITY_ICON_MAP,
+  CRM_ACTIVITY_LABEL_MAP,
+} from '../activity-icons';
 
 const currency = new Intl.NumberFormat(undefined, {
   style: 'currency',
@@ -35,7 +39,7 @@ interface ActivityRow {
   completedAt?: string | null;
 }
 
-function toTimelineEntry(a: ActivityRow): ActivityTimelineEntry {
+function toTimelineEntry(a: ActivityRow): ActivityTimelineEntry<ActivityType> {
   return {
     id: a.id,
     type: a.type as ActivityType,
@@ -131,7 +135,10 @@ export function CrmDashboardPage() {
           ) : (
             <ul className="divide-y divide-border">
               {snapshot.data?.pipeline.map((s) => (
-                <li key={s.stage} className="flex items-center justify-between py-2 text-sm">
+                <li
+                  key={s.stage}
+                  className="flex items-center justify-between py-2 text-sm"
+                >
                   <span className="capitalize text-foreground">{s.stage}</span>
                   <span className="text-muted-foreground">
                     {s.count} · {currency.format(s.totalValue)}
@@ -151,6 +158,8 @@ export function CrmDashboardPage() {
         <CardContent>
           <ActivityTimeline
             entries={(overdue.data ?? []).map(toTimelineEntry)}
+            iconMap={CRM_ACTIVITY_ICON_MAP}
+            labelMap={CRM_ACTIVITY_LABEL_MAP}
             emptyState="Nothing overdue. Nice work."
           />
         </CardContent>

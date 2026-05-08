@@ -59,7 +59,9 @@ describe('LeadsService', () => {
           })),
         })),
       })),
-      delete: jest.fn(() => ({ where: jest.fn().mockResolvedValue(undefined) })),
+      delete: jest.fn(() => ({
+        where: jest.fn().mockResolvedValue(undefined),
+      })),
     };
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -107,7 +109,9 @@ describe('LeadsService', () => {
 
   it('update throws when missing', async () => {
     mockQuery.leads.findFirst.mockResolvedValue(undefined);
-    await expect(service.update(99, {})).rejects.toBeInstanceOf(NotFoundException);
+    await expect(service.update(99, {})).rejects.toBeInstanceOf(
+      NotFoundException
+    );
   });
 
   it('markConverted stamps converted fields and sets status to qualified', async () => {

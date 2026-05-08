@@ -102,21 +102,27 @@ describe('ConfigurableLookupsService', () => {
   });
 
   it('forbids renaming the canonical value of a system lookup', async () => {
-    mockQuery.configurableLookups.findFirst.mockResolvedValue(row({ isSystem: 1 }));
+    mockQuery.configurableLookups.findFirst.mockResolvedValue(
+      row({ isSystem: 1 })
+    );
     await expect(
       service.update(1, { value: 'different' })
     ).rejects.toBeInstanceOf(ForbiddenException);
   });
 
   it('forbids deactivating a system lookup', async () => {
-    mockQuery.configurableLookups.findFirst.mockResolvedValue(row({ isSystem: 1 }));
-    await expect(
-      service.update(1, { isActive: false })
-    ).rejects.toBeInstanceOf(ForbiddenException);
+    mockQuery.configurableLookups.findFirst.mockResolvedValue(
+      row({ isSystem: 1 })
+    );
+    await expect(service.update(1, { isActive: false })).rejects.toBeInstanceOf(
+      ForbiddenException
+    );
   });
 
   it('forbids deleting a system lookup', async () => {
-    mockQuery.configurableLookups.findFirst.mockResolvedValue(row({ isSystem: 1 }));
+    mockQuery.configurableLookups.findFirst.mockResolvedValue(
+      row({ isSystem: 1 })
+    );
     await expect(service.delete(1)).rejects.toBeInstanceOf(ForbiddenException);
   });
 
@@ -164,7 +170,10 @@ describe('ConfigurableLookupsService', () => {
 
   it('findByListAndValue delegates to drizzle query helper', async () => {
     mockQuery.configurableLookups.findFirst.mockResolvedValue(row());
-    const r = await service.findByListAndValue('opportunity_stage', 'discovery');
+    const r = await service.findByListAndValue(
+      'opportunity_stage',
+      'discovery'
+    );
     expect(r?.value).toBe('discovery');
   });
 

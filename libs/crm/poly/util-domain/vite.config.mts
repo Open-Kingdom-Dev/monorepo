@@ -5,7 +5,7 @@ import * as path from 'path';
 
 export default defineConfig(() => ({
   root: import.meta.dirname,
-  cacheDir: '../../../../node_modules/.vite/libs/shared/poly/util-crm-domain',
+  cacheDir: '../../../../node_modules/.vite/libs/crm/poly/util-domain',
   plugins: [
     dts({
       entryRoot: 'src',
@@ -28,7 +28,7 @@ export default defineConfig(() => ({
     lib: {
       // Could also be a dictionary or array of multiple entry points.
       entry: 'src/index.ts',
-      name: 'util-crm-domain',
+      name: '@open-kingdom/crm-poly-util-domain',
       fileName: 'index',
       // Change this to the formats you want to support.
       // Don't forget to update your package.json as well.
