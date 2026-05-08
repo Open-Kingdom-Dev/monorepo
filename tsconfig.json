@@ -88,7 +88,7 @@
       "path": "./libs/shared/frontend/ui-primitives"
     },
     {
-      "path": "./libs/shared/poly/util-crm-domain"
+      "path": "./libs/crm/poly/util-domain"
     },
     {
       "path": "./libs/shared/backend/data-access-configurable-lookups"
@@ -106,16 +106,16 @@
       "path": "./libs/shared/frontend/ui-record-detail"
     },
     {
-      "path": "./libs/shared/backend/data-access-contacts"
+      "path": "./libs/crm/backend/data-access-contacts"
     },
     {
-      "path": "./libs/shared/backend/data-access-opportunities"
+      "path": "./libs/crm/backend/data-access-opportunities"
     },
     {
-      "path": "./libs/shared/backend/feature-crm"
+      "path": "./libs/crm/backend/feature-crm"
     },
     {
-      "path": "./libs/shared/frontend/feature-crm"
+      "path": "./libs/crm/frontend/feature-crm"
     },
     {
       "path": "./libs/shared/backend/integration-test-doubles"

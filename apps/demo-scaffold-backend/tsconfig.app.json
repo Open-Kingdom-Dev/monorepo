@@ -24,6 +24,18 @@
   ],
   "references": [
     {
+      "path": "../../libs/crm/backend/data-access-opportunities/tsconfig.lib.json"
+    },
+    {
+      "path": "../../libs/crm/backend/data-access-contacts/tsconfig.lib.json"
+    },
+    {
+      "path": "../../libs/shared/backend/data-access-activity-log/tsconfig.lib.json"
+    },
+    {
+      "path": "../../libs/shared/backend/data-access-configurable-lookups/tsconfig.lib.json"
+    },
+    {
       "path": "../../libs/shared/backend/data-access-users/tsconfig.lib.json"
     },
     {
@@ -33,22 +45,10 @@
       "path": "../../libs/shared/backend/util-rbac/tsconfig.lib.json"
     },
     {
-      "path": "../../libs/shared/backend/data-access-opportunities/tsconfig.lib.json"
-    },
-    {
-      "path": "../../libs/shared/backend/data-access-contacts/tsconfig.lib.json"
-    },
-    {
-      "path": "../../libs/shared/backend/data-access-activity-log/tsconfig.lib.json"
-    },
-    {
-      "path": "../../libs/shared/backend/data-access-configurable-lookups/tsconfig.lib.json"
+      "path": "../../libs/crm/backend/feature-crm/tsconfig.lib.json"
     },
     {
       "path": "../../libs/shared/backend/feature-gcp-resources/tsconfig.lib.json"
-    },
-    {
-      "path": "../../libs/shared/backend/feature-crm/tsconfig.lib.json"
     },
     {
       "path": "../../libs/shared/backend/feature-user-management/tsconfig.lib.json"

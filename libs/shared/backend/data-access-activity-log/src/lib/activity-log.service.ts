@@ -7,7 +7,7 @@ import {
   RelatedEntityType,
   isActivityType,
   isRelatedEntityType,
-} from '@open-kingdom/shared-poly-util-crm-domain';
+} from '@open-kingdom/crm-poly-util-domain';
 
 import { ActivityLogEntry, activityLog } from './schemas';
 import {

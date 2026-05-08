@@ -10,7 +10,8 @@
     ],
     "rootDir": "src",
     "jsx": "react-jsx",
-    "tsBuildInfoFile": "dist/tsconfig.lib.tsbuildinfo"
+    "tsBuildInfoFile": "dist/tsconfig.lib.tsbuildinfo",
+    "lib": ["dom", "dom.iterable", "es2022"]
   },
   "exclude": [
     "out-tsc",
@@ -39,13 +40,28 @@
   "include": ["src/**/*.js", "src/**/*.jsx", "src/**/*.ts", "src/**/*.tsx"],
   "references": [
     {
-      "path": "../../../crm/poly/util-domain/tsconfig.lib.json"
+      "path": "../../poly/util-domain/tsconfig.lib.json"
     },
     {
-      "path": "../ui-primitives/tsconfig.lib.json"
+      "path": "../../../shared/frontend/data-access-api-client/tsconfig.lib.json"
     },
     {
-      "path": "../ui-theme/tsconfig.lib.json"
+      "path": "../../../shared/frontend/ui-record-detail/tsconfig.lib.json"
+    },
+    {
+      "path": "../../../shared/frontend/ui-stage-board/tsconfig.lib.json"
+    },
+    {
+      "path": "../../../shared/frontend/ui-activity-timeline/tsconfig.lib.json"
+    },
+    {
+      "path": "../../../shared/frontend/ui-datagrid/tsconfig.lib.json"
+    },
+    {
+      "path": "../../../shared/frontend/ui-primitives/tsconfig.lib.json"
+    },
+    {
+      "path": "../../../shared/frontend/ui-theme/tsconfig.lib.json"
     }
   ]
 }

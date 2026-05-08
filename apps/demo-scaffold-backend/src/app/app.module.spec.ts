@@ -76,7 +76,7 @@ jest.mock('@open-kingdom/shared-backend-feature-gcp-resources', () => ({
   FeatureGcpResourcesModule: class MockFeatureGcpResourcesModule {},
 }));
 
-jest.mock('@open-kingdom/shared-backend-feature-crm', () => ({
+jest.mock('@open-kingdom/crm-backend-feature-crm', () => ({
   FeatureCrmModule: {
     forRoot: jest.fn().mockReturnValue({
       module: class MockFeatureCrmModule {},

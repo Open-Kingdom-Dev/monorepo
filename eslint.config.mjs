@@ -44,7 +44,15 @@ export default [
             },
             {
               sourceTag: 'scope:demo-scaffold',
-              onlyDependOnLibsWithTags: ['scope:demo-scaffold', 'scope:shared'],
+              onlyDependOnLibsWithTags: [
+                'scope:demo-scaffold',
+                'scope:shared',
+                'scope:crm',
+              ],
+            },
+            {
+              sourceTag: 'scope:crm',
+              onlyDependOnLibsWithTags: ['scope:crm', 'scope:shared'],
             },
             {
               sourceTag: 'scope:shared',

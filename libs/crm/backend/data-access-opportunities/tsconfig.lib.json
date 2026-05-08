@@ -5,11 +5,11 @@
     "rootDir": "src",
     "outDir": "dist",
     "tsBuildInfoFile": "dist/tsconfig.lib.tsbuildinfo",
-    "emitDeclarationOnly": true,
-    "forceConsistentCasingInFileNames": true,
-    "types": ["node"],
+    "emitDeclarationOnly": false,
     "module": "nodenext",
     "moduleResolution": "nodenext",
+    "forceConsistentCasingInFileNames": true,
+    "types": ["node"],
     "target": "es2021",
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
@@ -22,25 +22,16 @@
   "exclude": ["src/**/*.spec.ts", "src/**/*.test.ts"],
   "references": [
     {
-      "path": "../../../crm/backend/data-access-opportunities/tsconfig.lib.json"
-    },
-    {
-      "path": "../../../crm/backend/data-access-contacts/tsconfig.lib.json"
-    },
-    {
-      "path": "../../../shared/backend/data-access-activity-log/tsconfig.lib.json"
-    },
-    {
-      "path": "../../../shared/backend/data-access-configurable-lookups/tsconfig.lib.json"
-    },
-    {
-      "path": "../../../shared/backend/feature-user-management/tsconfig.lib.json"
+      "path": "../data-access-contacts/tsconfig.lib.json"
     },
     {
       "path": "../../../shared/backend/data-access-users/tsconfig.lib.json"
     },
     {
-      "path": "../../../shared/backend/data-access-database-setup/tsconfig.lib.json"
+      "path": "../../../shared/backend/util-rbac/tsconfig.lib.json"
+    },
+    {
+      "path": "../../poly/util-domain/tsconfig.lib.json"
     },
     {
       "path": "../../../shared/poly/util-constants/tsconfig.lib.json"

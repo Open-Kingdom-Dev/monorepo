@@ -14,11 +14,11 @@ import { activityLog } from '@open-kingdom/shared-backend-data-access-activity-l
 import {
   companies,
   contacts,
-} from '@open-kingdom/shared-backend-data-access-contacts';
+} from '@open-kingdom/crm-backend-data-access-contacts';
 import {
   leads,
   opportunities,
-} from '@open-kingdom/shared-backend-data-access-opportunities';
+} from '@open-kingdom/crm-backend-data-access-opportunities';
 
 // Compose schema from all packages used by this app
 const schema = {

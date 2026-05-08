@@ -10,7 +10,7 @@ import {
   type LucideIcon,
 } from 'lucide-react';
 import { cn } from '@open-kingdom/shared-frontend-ui-theme';
-import type { ActivityType } from '@open-kingdom/shared-poly-util-crm-domain';
+import type { ActivityType } from '@open-kingdom/crm-poly-util-domain';
 
 export interface ActivityTimelineEntry {
   id: string | number;

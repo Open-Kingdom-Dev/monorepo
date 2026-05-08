@@ -1,9 +1,10 @@
 {
-  "name": "@open-kingdom/shared-backend-data-access-activity-log",
+  "name": "@open-kingdom/crm-poly-util-domain",
   "version": "0.0.2-16",
   "publishConfig": {
     "access": "public"
   },
+  "type": "module",
   "main": "./dist/index.js",
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -22,21 +23,14 @@
     "!**/*.tsbuildinfo"
   ],
   "nx": {
-    "name": "data-access-activity-log",
+    "name": "crm-poly-util-domain",
     "tags": [
-      "scope:shared",
-      "type:data-access",
-      "environment:backend"
+      "scope:crm",
+      "type:util",
+      "environment:poly"
     ]
   },
   "dependencies": {
-    "tslib": "^2.3.0",
-    "@open-kingdom/shared-poly-util-constants": "*",
-    "@open-kingdom/crm-poly-util-domain": "*",
-    "@open-kingdom/shared-backend-util-rbac": "*",
-    "@open-kingdom/shared-backend-data-access-users": "*",
-    "@nestjs/common": "^11.0.0",
-    "@nestjs/swagger": "^11.0.0",
-    "drizzle-orm": "^0.44.5"
+    "tslib": "^2.3.0"
   }
 }
