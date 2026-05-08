@@ -5,7 +5,12 @@ import { PageHeader } from '../components/page-header';
 
 const columnDefs = [
   { field: 'lastName', headerName: 'Last name', sortable: true, filter: true },
-  { field: 'firstName', headerName: 'First name', sortable: true, filter: true },
+  {
+    field: 'firstName',
+    headerName: 'First name',
+    sortable: true,
+    filter: true,
+  },
   { field: 'email', headerName: 'Email', sortable: true, filter: true },
   { field: 'phone', headerName: 'Phone' },
   { field: 'jobTitle', headerName: 'Title' },

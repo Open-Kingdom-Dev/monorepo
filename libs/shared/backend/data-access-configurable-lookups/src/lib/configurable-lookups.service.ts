@@ -21,7 +21,9 @@ type schema = {
 
 @Injectable()
 export class ConfigurableLookupsService {
-  constructor(@Inject(DB_TAG) private readonly db: BetterSQLite3Database<schema>) {}
+  constructor(
+    @Inject(DB_TAG) private readonly db: BetterSQLite3Database<schema>
+  ) {}
 
   async findByListKey(
     listKey: string,
@@ -66,7 +68,9 @@ export class ConfigurableLookupsService {
     });
   }
 
-  async create(input: CreateConfigurableLookupDto): Promise<ConfigurableLookup> {
+  async create(
+    input: CreateConfigurableLookupDto
+  ): Promise<ConfigurableLookup> {
     const existing = await this.findByListAndValue(input.listKey, input.value);
     if (existing) {
       throw new ConflictException(
@@ -130,8 +134,8 @@ export class ConfigurableLookupsService {
           input.isActive === undefined
             ? current.isActive
             : input.isActive
-              ? 1
-              : 0,
+            ? 1
+            : 0,
         updatedAt: new Date(),
       })
       .where(eq(configurableLookups.id, id))
@@ -163,7 +167,10 @@ export class ConfigurableLookupsService {
     }>
   ): Promise<void> {
     for (const entry of defaults) {
-      const existing = await this.findByListAndValue(entry.listKey, entry.value);
+      const existing = await this.findByListAndValue(
+        entry.listKey,
+        entry.value
+      );
       if (existing) continue;
       await this.db.insert(configurableLookups).values({
         listKey: entry.listKey,

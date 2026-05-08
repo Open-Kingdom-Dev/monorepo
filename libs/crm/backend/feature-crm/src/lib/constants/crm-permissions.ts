@@ -32,5 +32,8 @@ export const CRM_ROLE_PERMISSIONS: Record<
     ]),
     { resource: 'lookups', action: 'read' },
   ],
-  manager: CRM_RESOURCES.map((resource) => ({ resource, action: 'read' as const })),
+  manager: CRM_RESOURCES.map((resource) => ({
+    resource,
+    action: 'read' as const,
+  })),
 };

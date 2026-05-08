@@ -52,7 +52,7 @@ describe('CrmSeedService', () => {
     );
     permissions.findByResourceAction.mockResolvedValue(undefined);
     permissions.create.mockImplementation(
-      async () => ({ id: Math.floor(Math.random() * 10000) }) as never
+      async () => ({ id: Math.floor(Math.random() * 10000) } as never)
     );
 
     await service.onModuleInit();
@@ -111,7 +111,7 @@ describe('CrmSeedService', () => {
       return existing as never;
     });
     permissions.findByResourceAction.mockImplementation(
-      async () => ({ id: 1 }) as never
+      async () => ({ id: 1 } as never)
     );
 
     await service.onModuleInit();

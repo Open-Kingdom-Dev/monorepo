@@ -14,9 +14,7 @@ describe('LeadConversionController', () => {
 
     const module: TestingModule = await Test.createTestingModule({
       controllers: [LeadConversionController],
-      providers: [
-        { provide: LeadConversionService, useValue: conversion },
-      ],
+      providers: [{ provide: LeadConversionService, useValue: conversion }],
     }).compile();
     controller = module.get(LeadConversionController);
   });

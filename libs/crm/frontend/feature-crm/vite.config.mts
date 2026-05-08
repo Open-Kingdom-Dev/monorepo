@@ -6,8 +6,7 @@ import * as path from 'path';
 
 export default defineConfig(() => ({
   root: import.meta.dirname,
-  cacheDir:
-    '../../../../node_modules/.vite/libs/shared/frontend/feature-crm',
+  cacheDir: '../../../../node_modules/.vite/libs/crm/frontend/feature-crm',
   plugins: [
     react(),
     dts({
@@ -45,6 +44,7 @@ export default defineConfig(() => ({
         'react/jsx-runtime',
         'react-router',
         'react-redux',
+        'lucide-react',
         /^@open-kingdom\/.*/,
       ],
     },

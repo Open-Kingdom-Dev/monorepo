@@ -33,8 +33,7 @@
   "peerDependencies": {
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "@open-kingdom/shared-frontend-ui-theme": "*",
-    "@open-kingdom/shared-frontend-ui-primitives": "*",
-    "@open-kingdom/crm-poly-util-domain": "*"
+    "lucide-react": ">=0.400.0",
+    "@open-kingdom/shared-frontend-ui-theme": "*"
   }
 }

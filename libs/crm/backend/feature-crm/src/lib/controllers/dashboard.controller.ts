@@ -1,9 +1,4 @@
-import {
-  Controller,
-  ForbiddenException,
-  Get,
-  Req,
-} from '@nestjs/common';
+import { Controller, ForbiddenException, Get, Req } from '@nestjs/common';
 import {
   ApiBearerAuth,
   ApiForbiddenResponse,
@@ -31,9 +26,13 @@ export class DashboardController {
 
   @Get()
   @RequirePermission('opportunities', 'read')
-  @ApiOperation({ summary: 'Snapshot of the current user’s pipeline and tasks' })
+  @ApiOperation({
+    summary: 'Snapshot of the current user’s pipeline and tasks',
+  })
   @ApiResponse({ status: 200, type: DashboardSnapshotDto })
-  async snapshot(@Req() req: AuthenticatedRequest): Promise<DashboardSnapshotDto> {
+  async snapshot(
+    @Req() req: AuthenticatedRequest
+  ): Promise<DashboardSnapshotDto> {
     const userId = req.user?.id;
     if (!userId) throw new ForbiddenException('Missing authenticated user');
     return this.dashboard.snapshotForUser(userId);

@@ -8,11 +8,7 @@ import { BetterSQLite3Database } from 'drizzle-orm/better-sqlite3';
 import { and, asc, eq, like, or } from 'drizzle-orm';
 
 import { DB_TAG } from '@open-kingdom/shared-poly-util-constants';
-import {
-  Company,
-  CompaniesTableName,
-  companies,
-} from './schemas';
+import { Company, CompaniesTableName, companies } from './schemas';
 import { CreateCompanyDto, UpdateCompanyDto } from './dtos';
 
 type schema = {
@@ -28,7 +24,9 @@ export interface CompanyFilter {
 
 @Injectable()
 export class CompaniesService {
-  constructor(@Inject(DB_TAG) private readonly db: BetterSQLite3Database<schema>) {}
+  constructor(
+    @Inject(DB_TAG) private readonly db: BetterSQLite3Database<schema>
+  ) {}
 
   async findAll(filter: CompanyFilter = {}): Promise<Company[]> {
     const conditions = [];
@@ -118,7 +116,11 @@ export class CompaniesService {
     return row;
   }
 
-  async assertOwnerOrAdmin(id: number, userId: number, isAdmin: boolean): Promise<Company> {
+  async assertOwnerOrAdmin(
+    id: number,
+    userId: number,
+    isAdmin: boolean
+  ): Promise<Company> {
     const current = await this.findById(id);
     if (!current) throw new NotFoundException(`Company ${id} not found`);
     if (!isAdmin && current.ownerId !== userId) {

@@ -1,21 +1,23 @@
 import { ApiProperty } from '@nestjs/swagger';
-import type {
-  RelatedEntityType,
-  ActivityType,
-} from '@open-kingdom/crm-poly-util-domain';
 
 export class ActivityLogEntryDto {
   @ApiProperty()
   id!: number;
 
-  @ApiProperty({ enum: ['contact', 'company', 'lead', 'opportunity'] })
-  relatedType!: RelatedEntityType;
+  @ApiProperty({
+    description:
+      'Polymorphic identifier for the related record kind. Validated against the allowed-types list registered via DataAccessActivityLogModule.forRoot().',
+  })
+  relatedType!: string;
 
   @ApiProperty()
   relatedId!: number;
 
-  @ApiProperty({ enum: ['note', 'call', 'meeting', 'email', 'task'] })
-  type!: ActivityType;
+  @ApiProperty({
+    description:
+      'Activity type. Validated against the allowed-types list registered via DataAccessActivityLogModule.forRoot().',
+  })
+  type!: string;
 
   @ApiProperty()
   subject!: string;
@@ -40,14 +42,14 @@ export class ActivityLogEntryDto {
 }
 
 export class CreateActivityLogEntryDto {
-  @ApiProperty({ enum: ['contact', 'company', 'lead', 'opportunity'] })
-  relatedType!: RelatedEntityType;
+  @ApiProperty()
+  relatedType!: string;
 
   @ApiProperty()
   relatedId!: number;
 
-  @ApiProperty({ enum: ['note', 'call', 'meeting', 'email', 'task'] })
-  type!: ActivityType;
+  @ApiProperty()
+  type!: string;
 
   @ApiProperty()
   subject!: string;

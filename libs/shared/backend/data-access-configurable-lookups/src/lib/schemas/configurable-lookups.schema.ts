@@ -22,7 +22,11 @@ export const configurableLookups = table(
       .notNull()
       .$defaultFn(() => new Date()),
   },
-  (tbl) => [t.uniqueIndex('configurable_lookups_list_value_uq').on(tbl.listKey, tbl.value)]
+  (tbl) => [
+    t
+      .uniqueIndex('configurable_lookups_list_value_uq')
+      .on(tbl.listKey, tbl.value),
+  ]
 );
 
 export type ConfigurableLookup = typeof configurableLookups.$inferSelect;

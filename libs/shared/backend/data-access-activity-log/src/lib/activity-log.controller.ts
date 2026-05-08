@@ -22,10 +22,6 @@ import {
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 import { RequirePermission } from '@open-kingdom/shared-backend-util-rbac';
-import {
-  RelatedEntityType,
-  isRelatedEntityType,
-} from '@open-kingdom/crm-poly-util-domain';
 
 import { ActivityLogService } from './activity-log.service';
 import {
@@ -49,7 +45,9 @@ export class ActivityLogController {
 
   @Get()
   @RequirePermission('activities', 'read')
-  @ApiOperation({ summary: 'List activities for a related record or the current user' })
+  @ApiOperation({
+    summary: 'List activities for a related record or the current user',
+  })
   @ApiResponse({ status: 200, type: [ActivityLogEntryDto] })
   async findAll(
     @Req() req: AuthenticatedRequest,
@@ -58,13 +56,10 @@ export class ActivityLogController {
     @Query('scope') scope?: 'open' | 'overdue'
   ) {
     if (relatedType && relatedId) {
-      if (!isRelatedEntityType(relatedType)) {
+      if (!this.service.isAllowedRelatedType(relatedType)) {
         throw new ForbiddenException(`Unknown relatedType '${relatedType}'`);
       }
-      return this.service.findForRecord(
-        relatedType as RelatedEntityType,
-        Number(relatedId)
-      );
+      return this.service.findForRecord(relatedType, Number(relatedId));
     }
     const ownerId = req.user?.id;
     if (!ownerId) {

@@ -1,13 +1,14 @@
-import { Inject, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Inject,
+  Injectable,
+  NotFoundException,
+  Optional,
+} from '@nestjs/common';
 import { BetterSQLite3Database } from 'drizzle-orm/better-sqlite3';
 import { and, asc, desc, eq, isNull, lte } from 'drizzle-orm';
 
 import { DB_TAG } from '@open-kingdom/shared-poly-util-constants';
-import {
-  RelatedEntityType,
-  isActivityType,
-  isRelatedEntityType,
-} from '@open-kingdom/crm-poly-util-domain';
 
 import { ActivityLogEntry, activityLog } from './schemas';
 import {
@@ -15,6 +16,10 @@ import {
   CreateActivityLogEntryDto,
   UpdateActivityLogEntryDto,
 } from './dtos';
+import {
+  ACTIVITY_LOG_OPTIONS,
+  DataAccessActivityLogOptions,
+} from './data-access-activity-log.options';
 
 type schema = {
   activityLog: typeof activityLog;
@@ -22,10 +27,37 @@ type schema = {
 
 @Injectable()
 export class ActivityLogService {
-  constructor(@Inject(DB_TAG) private readonly db: BetterSQLite3Database<schema>) {}
+  private readonly allowedRelatedTypes: ReadonlySet<string> | null;
+  private readonly allowedActivityTypes: ReadonlySet<string> | null;
+
+  constructor(
+    @Inject(DB_TAG) private readonly db: BetterSQLite3Database<schema>,
+    @Optional()
+    @Inject(ACTIVITY_LOG_OPTIONS)
+    options: DataAccessActivityLogOptions | null = null
+  ) {
+    this.allowedRelatedTypes = options?.allowedRelatedTypes
+      ? new Set(options.allowedRelatedTypes)
+      : null;
+    this.allowedActivityTypes = options?.allowedActivityTypes
+      ? new Set(options.allowedActivityTypes)
+      : null;
+  }
+
+  isAllowedRelatedType(value: string): boolean {
+    return (
+      this.allowedRelatedTypes === null || this.allowedRelatedTypes.has(value)
+    );
+  }
+
+  isAllowedActivityType(value: string): boolean {
+    return (
+      this.allowedActivityTypes === null || this.allowedActivityTypes.has(value)
+    );
+  }
 
   async findForRecord(
-    relatedType: RelatedEntityType,
+    relatedType: string,
     relatedId: number
   ): Promise<ActivityLogEntry[]> {
     return this.db
@@ -80,13 +112,13 @@ export class ActivityLogService {
     input: CreateActivityLogEntryDto,
     ownerId: number
   ): Promise<ActivityLogEntry> {
-    if (!isRelatedEntityType(input.relatedType)) {
-      throw new NotFoundException(
+    if (!this.isAllowedRelatedType(input.relatedType)) {
+      throw new BadRequestException(
         `Unknown relatedType '${input.relatedType}'`
       );
     }
-    if (!isActivityType(input.type)) {
-      throw new NotFoundException(`Unknown activity type '${input.type}'`);
+    if (!this.isAllowedActivityType(input.type)) {
+      throw new BadRequestException(`Unknown activity type '${input.type}'`);
     }
     const [row] = await this.db
       .insert(activityLog)
@@ -116,7 +148,9 @@ export class ActivityLogService {
       .set({
         subject: input.subject ?? current.subject,
         description:
-          input.description === undefined ? current.description : input.description,
+          input.description === undefined
+            ? current.description
+            : input.description,
         dueAt: input.dueAt === undefined ? current.dueAt : input.dueAt,
         updatedAt: new Date(),
       })

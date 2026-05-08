@@ -1,8 +1,4 @@
-import {
-  Inject,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { BetterSQLite3Database } from 'drizzle-orm/better-sqlite3';
 import { and, asc, eq, like, or, sql } from 'drizzle-orm';
 
@@ -11,11 +7,7 @@ import {
   isTerminalOpportunityStage,
   OpportunityStage,
 } from '@open-kingdom/crm-poly-util-domain';
-import {
-  Opportunity,
-  OpportunitiesTableName,
-  opportunities,
-} from './schemas';
+import { Opportunity, OpportunitiesTableName, opportunities } from './schemas';
 import {
   CloseOpportunityDto,
   CreateOpportunityDto,
@@ -43,7 +35,9 @@ export interface StageSummary {
 
 @Injectable()
 export class OpportunitiesService {
-  constructor(@Inject(DB_TAG) private readonly db: BetterSQLite3Database<schema>) {}
+  constructor(
+    @Inject(DB_TAG) private readonly db: BetterSQLite3Database<schema>
+  ) {}
 
   async findAll(filter: OpportunityFilter = {}): Promise<Opportunity[]> {
     const conditions = [];
@@ -71,7 +65,9 @@ export class OpportunitiesService {
       .orderBy(asc(opportunities.expectedCloseDate), asc(opportunities.id))
       .all();
     if (filter.openOnly) {
-      return rows.filter((r) => !isTerminalOpportunityStage(r.stage as OpportunityStage));
+      return rows.filter(
+        (r) => !isTerminalOpportunityStage(r.stage as OpportunityStage)
+      );
     }
     return rows;
   }
@@ -122,7 +118,7 @@ export class OpportunitiesService {
       .set({
         stage: input.outcome,
         closedAt: new Date(),
-        lossReason: input.outcome === 'lost' ? (input.lossReason ?? null) : null,
+        lossReason: input.outcome === 'lost' ? input.lossReason ?? null : null,
         updatedAt: new Date(),
       })
       .where(eq(opportunities.id, id))
@@ -139,12 +135,14 @@ export class OpportunitiesService {
       .select({
         stage: opportunities.stage,
         count: sql<number>`count(*)`.as('count'),
-        totalValue: sql<number>`coalesce(sum(${opportunities.estimatedValue}), 0)`.as(
-          'total_value'
-        ),
-        weightedValue: sql<number>`coalesce(sum(${opportunities.estimatedValue} * coalesce(${opportunities.probability}, 0) / 100.0), 0)`.as(
-          'weighted_value'
-        ),
+        totalValue:
+          sql<number>`coalesce(sum(${opportunities.estimatedValue}), 0)`.as(
+            'total_value'
+          ),
+        weightedValue:
+          sql<number>`coalesce(sum(${opportunities.estimatedValue} * coalesce(${opportunities.probability}, 0) / 100.0), 0)`.as(
+            'weighted_value'
+          ),
       })
       .from(opportunities)
       .where(conditions.length ? and(...conditions) : undefined)

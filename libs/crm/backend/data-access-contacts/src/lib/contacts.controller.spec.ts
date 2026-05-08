@@ -52,7 +52,13 @@ describe('ContactsController', () => {
 
   it('list accepts includeArchived=true as truthy', async () => {
     service.findAll.mockResolvedValue([]);
-    await controller.findAll(undefined, undefined, undefined, undefined, 'true');
+    await controller.findAll(
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      'true'
+    );
     expect(service.findAll).toHaveBeenCalledWith(
       expect.objectContaining({ includeArchived: true })
     );

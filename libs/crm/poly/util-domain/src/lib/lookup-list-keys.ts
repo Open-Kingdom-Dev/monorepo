@@ -9,6 +9,8 @@ export const LOOKUP_LIST_KEYS = {
   LOSS_REASON: 'loss_reason',
 } as const;
 
-export type LookupListKey = (typeof LOOKUP_LIST_KEYS)[keyof typeof LOOKUP_LIST_KEYS];
+export type LookupListKey =
+  (typeof LOOKUP_LIST_KEYS)[keyof typeof LOOKUP_LIST_KEYS];
 
-export const ALL_LOOKUP_LIST_KEYS: readonly LookupListKey[] = Object.values(LOOKUP_LIST_KEYS);
+export const ALL_LOOKUP_LIST_KEYS: readonly LookupListKey[] =
+  Object.values(LOOKUP_LIST_KEYS);

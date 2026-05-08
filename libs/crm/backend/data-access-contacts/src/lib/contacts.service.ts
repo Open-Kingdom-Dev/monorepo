@@ -1,17 +1,9 @@
-import {
-  Inject,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { BetterSQLite3Database } from 'drizzle-orm/better-sqlite3';
 import { and, asc, eq, like, or } from 'drizzle-orm';
 
 import { DB_TAG } from '@open-kingdom/shared-poly-util-constants';
-import {
-  Contact,
-  ContactsTableName,
-  contacts,
-} from './schemas';
+import { Contact, ContactsTableName, contacts } from './schemas';
 import { CreateContactDto, UpdateContactDto } from './dtos';
 
 type schema = {
@@ -28,7 +20,9 @@ export interface ContactFilter {
 
 @Injectable()
 export class ContactsService {
-  constructor(@Inject(DB_TAG) private readonly db: BetterSQLite3Database<schema>) {}
+  constructor(
+    @Inject(DB_TAG) private readonly db: BetterSQLite3Database<schema>
+  ) {}
 
   async findAll(filter: ContactFilter = {}): Promise<Contact[]> {
     const conditions = [];

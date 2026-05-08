@@ -14,10 +14,7 @@ import {
 
 import { DEFAULT_CRM_LOOKUPS } from '../constants/default-lookups';
 import { CRM_ROLE_PERMISSIONS } from '../constants/crm-permissions';
-import {
-  CRM_FEATURE_OPTIONS,
-  CrmFeatureOptions,
-} from '../crm-feature.options';
+import { CRM_FEATURE_OPTIONS, CrmFeatureOptions } from '../crm-feature.options';
 
 @Injectable()
 export class CrmSeedService implements OnModuleInit {
@@ -57,9 +54,9 @@ export class CrmSeedService implements OnModuleInit {
         );
         continue;
       }
-      const existingPermissionIds = (await this.permissions.findByRole(role.id)).map(
-        (p) => p.id
-      );
+      const existingPermissionIds = (
+        await this.permissions.findByRole(role.id)
+      ).map((p) => p.id);
       const mergedIds = new Set<number>(existingPermissionIds);
       for (const perm of perms) {
         const existing = await this.permissions.findByResourceAction(
@@ -78,9 +75,14 @@ export class CrmSeedService implements OnModuleInit {
         }
       }
       if (mergedIds.size > existingPermissionIds.length) {
-        await this.permissions.setRolePermissions(role.id, Array.from(mergedIds));
+        await this.permissions.setRolePermissions(
+          role.id,
+          Array.from(mergedIds)
+        );
         this.logger.log(
-          `Mapped ${mergedIds.size - existingPermissionIds.length} new CRM permissions to role: ${roleName}`
+          `Mapped ${
+            mergedIds.size - existingPermissionIds.length
+          } new CRM permissions to role: ${roleName}`
         );
       }
     }

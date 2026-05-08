@@ -56,8 +56,11 @@ export function ConvertLeadModal({
         id: leadId,
         convertLeadRequestDto: {
           createOpportunity,
-          opportunityTitle: createOpportunity && title.trim() ? title.trim() : undefined,
-          opportunityEstimatedValue: createOpportunity ? parsedValue : undefined,
+          opportunityTitle:
+            createOpportunity && title.trim() ? title.trim() : undefined,
+          opportunityEstimatedValue: createOpportunity
+            ? parsedValue
+            : undefined,
         },
       }).unwrap();
       onOpenChange(false);
@@ -67,8 +70,8 @@ export function ConvertLeadModal({
         e instanceof Error
           ? e.message
           : typeof e === 'object' && e !== null && 'data' in e
-            ? String((e as { data?: unknown }).data ?? 'Conversion failed')
-            : 'Conversion failed';
+          ? String((e as { data?: unknown }).data ?? 'Conversion failed')
+          : 'Conversion failed';
       setError(message);
     }
   };
