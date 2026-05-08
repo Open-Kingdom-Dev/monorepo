@@ -1,6 +1,6 @@
 {
   "name": "@open-kingdom/shared-backend-data-access-configurable-lookups",
-  "version": "0.0.2-16",
+  "version": "0.0.2-17",
   "publishConfig": {
     "access": "public"
   },
@@ -31,8 +31,8 @@
   },
   "dependencies": {
     "tslib": "^2.3.0",
-    "@open-kingdom/shared-poly-util-constants": "*",
-    "@open-kingdom/shared-backend-util-rbac": "*",
+    "@open-kingdom/shared-poly-util-constants": "0.0.2-17",
+    "@open-kingdom/shared-backend-util-rbac": "0.0.2-17",
     "@nestjs/common": "^11.0.0",
     "@nestjs/swagger": "^11.0.0",
     "drizzle-orm": "^0.44.5"

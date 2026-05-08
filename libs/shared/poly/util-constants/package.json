@@ -1,6 +1,6 @@
 {
   "name": "@open-kingdom/shared-poly-util-constants",
-  "version": "0.0.2-16",
+  "version": "0.0.2-17",
   "publishConfig": {
     "access": "public"
   },

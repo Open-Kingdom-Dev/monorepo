@@ -1,6 +1,6 @@
 {
   "name": "@open-kingdom/shared-backend-feature-authentication",
-  "version": "0.0.2-16",
+  "version": "0.0.2-17",
   "publishConfig": {
     "access": "public"
   },
@@ -33,8 +33,8 @@
     "@nestjs/passport": "^11.0.0",
     "@nestjs/jwt": "^11.0.0",
     "@nestjs/swagger": "^11.0.0",
-    "@open-kingdom/shared-backend-data-access-users": "0.0.2-16",
-    "@open-kingdom/shared-backend-util-rbac": "0.0.2-14",
+    "@open-kingdom/shared-backend-data-access-users": "0.0.2-17",
+    "@open-kingdom/shared-backend-util-rbac": "0.0.2-17",
     "bcrypt": "^5.1.1",
     "express": "^5.1.0",
     "passport-jwt": "^4.0.1",
