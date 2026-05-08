@@ -2,7 +2,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import type {
   RelatedEntityType,
   ActivityType,
-} from '@open-kingdom/shared-poly-util-crm-domain';
+} from '@open-kingdom/crm-poly-util-domain';
 
 export class ActivityLogEntryDto {
   @ApiProperty()

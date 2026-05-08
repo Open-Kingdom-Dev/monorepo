@@ -14,8 +14,8 @@ export { activityLog } from '@open-kingdom/shared-backend-data-access-activity-l
 export {
   companies,
   contacts,
-} from '@open-kingdom/shared-backend-data-access-contacts';
+} from '@open-kingdom/crm-backend-data-access-contacts';
 export {
   leads,
   opportunities,
-} from '@open-kingdom/shared-backend-data-access-opportunities';
+} from '@open-kingdom/crm-backend-data-access-opportunities';

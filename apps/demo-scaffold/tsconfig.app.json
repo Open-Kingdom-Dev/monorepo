@@ -47,13 +47,13 @@
       "path": "../../libs/demo-scaffold/frontend/feature-root-store/tsconfig.lib.json"
     },
     {
-      "path": "../../libs/shared/frontend/ui-primitives/tsconfig.lib.json"
-    },
-    {
       "path": "../../libs/shared/frontend/data-access-external-api/tsconfig.lib.json"
     },
     {
       "path": "../../libs/shared/frontend/feature-user-management/tsconfig.lib.json"
+    },
+    {
+      "path": "../../libs/crm/frontend/feature-crm/tsconfig.lib.json"
     },
     {
       "path": "../../libs/shared/frontend/feature-notifications/tsconfig.lib.json"
@@ -74,10 +74,10 @@
       "path": "../../libs/shared/frontend/data-access-logger/tsconfig.lib.json"
     },
     {
-      "path": "../../libs/shared/frontend/ui-datagrid/tsconfig.lib.json"
+      "path": "../../libs/shared/frontend/ui-primitives/tsconfig.lib.json"
     },
     {
-      "path": "../../libs/shared/frontend/feature-crm/tsconfig.lib.json"
+      "path": "../../libs/shared/frontend/ui-datagrid/tsconfig.lib.json"
     }
   ]
 }

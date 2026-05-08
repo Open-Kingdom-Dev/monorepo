@@ -25,7 +25,7 @@ import { RequirePermission } from '@open-kingdom/shared-backend-util-rbac';
 import {
   RelatedEntityType,
   isRelatedEntityType,
-} from '@open-kingdom/shared-poly-util-crm-domain';
+} from '@open-kingdom/crm-poly-util-domain';
 
 import { ActivityLogService } from './activity-log.service';
 import {

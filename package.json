@@ -119,6 +119,9 @@
     "libs/demo-scaffold/frontend/*",
     "libs/demo-scaffold/backend/*",
     "libs/demo-scaffold/poly/*",
+    "libs/crm/frontend/*",
+    "libs/crm/backend/*",
+    "libs/crm/poly/*",
     "tools/plugin-openapi",
     "libs/ui/shared/frontend/*"
   ],

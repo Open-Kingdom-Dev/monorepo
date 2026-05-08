@@ -1,5 +1,5 @@
 {
-  "name": "@open-kingdom/shared-backend-data-access-activity-log",
+  "name": "@open-kingdom/crm-backend-data-access-contacts",
   "version": "0.0.2-16",
   "publishConfig": {
     "access": "public"
@@ -22,9 +22,9 @@
     "!**/*.tsbuildinfo"
   ],
   "nx": {
-    "name": "data-access-activity-log",
+    "name": "crm-backend-data-access-contacts",
     "tags": [
-      "scope:shared",
+      "scope:crm",
       "type:data-access",
       "environment:backend"
     ]
@@ -32,7 +32,6 @@
   "dependencies": {
     "tslib": "^2.3.0",
     "@open-kingdom/shared-poly-util-constants": "*",
-    "@open-kingdom/crm-poly-util-domain": "*",
     "@open-kingdom/shared-backend-util-rbac": "*",
     "@open-kingdom/shared-backend-data-access-users": "*",
     "@nestjs/common": "^11.0.0",

@@ -1,5 +1,5 @@
 import { createBrowserRouter } from 'react-router';
-import { crmRoutes } from '@open-kingdom/shared-frontend-feature-crm';
+import { crmRoutes } from '@open-kingdom/crm-frontend-feature-crm';
 import { AppLayout } from './app-layout';
 import AboutComponent from './routes/about';
 import { Home } from './routes/home';
