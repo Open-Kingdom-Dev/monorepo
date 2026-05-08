@@ -114,7 +114,10 @@
     "projects": [
       "libs/shared/frontend/*",
       "libs/shared/backend/*",
-      "libs/shared/poly/*"
+      "libs/shared/poly/*",
+      "libs/crm/frontend/*",
+      "libs/crm/backend/*",
+      "libs/crm/poly/*"
     ],
     "version": {
       "preVersionCommand": "npx nx run-many -t build",
