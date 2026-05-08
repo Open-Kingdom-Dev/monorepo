@@ -1,6 +1,6 @@
 {
   "name": "@open-kingdom/shared-backend-integration-test-doubles",
-  "version": "0.0.2-16",
+  "version": "0.0.2-17",
   "publishConfig": {
     "access": "public"
   },
@@ -53,7 +53,7 @@
     }
   },
   "dependencies": {
-    "@open-kingdom/shared-poly-util-env-config": "0.0.2-16",
+    "@open-kingdom/shared-poly-util-env-config": "0.0.2-17",
     "dockerode": "^4.0.6",
     "tslib": "^2.3.0"
   }

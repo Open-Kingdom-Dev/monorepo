@@ -1,6 +1,6 @@
 {
   "name": "@open-kingdom/shared-frontend-feature-user-management",
-  "version": "0.0.2-16",
+  "version": "0.0.2-17",
   "publishConfig": {
     "access": "public"
   },
@@ -23,7 +23,7 @@
     "!**/*.tsbuildinfo"
   ],
   "dependencies": {
-    "@open-kingdom/shared-poly-util-date": "*"
+    "@open-kingdom/shared-poly-util-date": "0.0.2-17"
   },
   "peerDependencies": {
     "react": "^19.0.0",
@@ -34,11 +34,11 @@
     "@hookform/resolvers": "^5.0.0",
     "zod": "^4.0.0",
     "@react-hookz/web": "^25.0.0",
-    "@open-kingdom/shared-frontend-data-access-api-client": "*",
-    "@open-kingdom/shared-frontend-data-access-notifications": "*",
-    "@open-kingdom/shared-frontend-ui-theme": "*",
-    "@open-kingdom/shared-frontend-ui-datagrid": "*",
-    "@open-kingdom/shared-frontend-ui-primitives": "*"
+    "@open-kingdom/shared-frontend-data-access-api-client": "0.0.2-17",
+    "@open-kingdom/shared-frontend-data-access-notifications": "0.0.2-17",
+    "@open-kingdom/shared-frontend-ui-theme": "0.0.2-17",
+    "@open-kingdom/shared-frontend-ui-datagrid": "0.0.2-17",
+    "@open-kingdom/shared-frontend-ui-primitives": "0.0.2-17"
   },
   "nx": {
     "tags": [
