@@ -1,6 +1,6 @@
 {
   "name": "@open-kingdom/shared-frontend-ui-activity-timeline",
-  "version": "0.0.2-16",
+  "version": "0.0.2-17",
   "publishConfig": {
     "access": "public"
   },
@@ -34,6 +34,6 @@
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "lucide-react": ">=0.400.0",
-    "@open-kingdom/shared-frontend-ui-theme": "*"
+    "@open-kingdom/shared-frontend-ui-theme": "0.0.2-17"
   }
 }

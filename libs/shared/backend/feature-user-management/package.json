@@ -1,6 +1,6 @@
 {
   "name": "@open-kingdom/shared-backend-feature-user-management",
-  "version": "0.0.2-16",
+  "version": "0.0.2-17",
   "publishConfig": {
     "access": "public"
   },
@@ -33,10 +33,10 @@
     "@nestjs/common": "^11.0.0",
     "@nestjs/core": "^11.0.0",
     "@nestjs/swagger": "^11.2.3",
-    "@open-kingdom/shared-backend-data-access-users": "0.0.2-16",
-    "@open-kingdom/shared-backend-feature-email": "0.0.2-16",
-    "@open-kingdom/shared-backend-util-rbac": "0.0.2-14",
-    "@open-kingdom/shared-poly-util-constants": "0.0.2-16",
+    "@open-kingdom/shared-backend-data-access-users": "0.0.2-17",
+    "@open-kingdom/shared-backend-feature-email": "0.0.2-17",
+    "@open-kingdom/shared-backend-util-rbac": "0.0.2-17",
+    "@open-kingdom/shared-poly-util-constants": "0.0.2-17",
     "drizzle-orm": "^0.44.5",
     "express": "5.2.1"
   }
