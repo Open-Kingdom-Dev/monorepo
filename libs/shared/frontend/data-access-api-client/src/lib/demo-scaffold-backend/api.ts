@@ -727,6 +727,24 @@ const injectedRtkApi = api
         }),
         invalidatesTags: ["Opportunities"],
       }),
+      gcsStorageControllerActivateErrorMode: build.mutation<
+        GcsStorageControllerActivateErrorModeApiResponse,
+        GcsStorageControllerActivateErrorModeApiArg
+      >({
+        query: (queryArg) => ({
+          url: `/api/gcs/error-mode`,
+          method: "POST",
+          body: queryArg.activateErrorModeDto,
+        }),
+        invalidatesTags: ["GCS Storage"],
+      }),
+      gcsStorageControllerDeactivateErrorMode: build.mutation<
+        GcsStorageControllerDeactivateErrorModeApiResponse,
+        GcsStorageControllerDeactivateErrorModeApiArg
+      >({
+        query: () => ({ url: `/api/gcs/error-mode`, method: "DELETE" }),
+        invalidatesTags: ["GCS Storage"],
+      }),
       twinControllerGetStatus: build.query<
         TwinControllerGetStatusApiResponse,
         TwinControllerGetStatusApiArg
@@ -1106,13 +1124,6 @@ export type OpportunitiesControllerCloseApiArg = {
   id: number;
   closeOpportunityDto: CloseOpportunityDto;
 };
-export type TwinControllerGetStatusApiResponse =
-  /** status 200 Twin status retrieved successfully */ {
-    running?: boolean;
-    healthy?: boolean;
-    port?: number;
-    url?: string;
-  };
 export type TwinControllerGetStatusApiArg = void;
 export type TwinControllerStartApiResponse =
   /** status 200 Twin started successfully */ {
@@ -1120,12 +1131,19 @@ export type TwinControllerStartApiResponse =
     message?: string;
     url?: string;
   };
+export type GcsStorageControllerActivateErrorModeApiResponse =
+  /** status 200 Error mode activated */ ErrorModeStateDto;
+export type GcsStorageControllerActivateErrorModeApiArg = {
+  activateErrorModeDto: ActivateErrorModeDto;
+};
+export type GcsStorageControllerDeactivateErrorModeApiResponse =
+  /** status 200 Error mode deactivated */ ErrorModeStateDto;
+export type GcsStorageControllerDeactivateErrorModeApiArg = void;
+export type TwinControllerGetStatusApiResponse =
+  /** status 200 Twin status retrieved successfully */ TwinStatusDto;
 export type TwinControllerStartApiArg = void;
 export type TwinControllerStopApiResponse =
-  /** status 200 Twin stopped successfully */ {
-    success?: boolean;
-    message?: string;
-  };
+  /** status 200 Twin stopped successfully */ TwinStopResponseDto;
 export type TwinControllerStopApiArg = void;
 export type LoginResponseDto = {
   /** JWT access token */
@@ -1521,6 +1539,48 @@ export type UpdateOpportunityDto = {
 export type CloseOpportunityDto = {
   outcome: "won" | "lost";
   lossReason?: string;
+}
+export type GcsErrorModeType =
+  | "bucket-not-found"
+  | "quota-exceeded"
+  | "permission-denied"
+  | "intermittent-failure";
+export type ErrorModeStateDto = {
+  /** Whether an error mode is currently active */
+  active: boolean;
+  /** The active error mode type */
+  type?: GcsErrorModeType;
+  /** Human-readable description of what the error mode does */
+  description?: string;
+};
+export type ActivateErrorModeDto = {
+  /** The error mode to activate */
+  type: GcsErrorModeType;
+  /** Bucket name for bucket-not-found mode. Required when type is bucket-not-found. */
+  bucketName?: string;
+  /** Fail every Nth request for intermittent-failure mode. Defaults to 2. */
+  failEveryN?: number;
+};
+export type TwinStatusDto = {
+  /** Whether the twin emulator is currently running */
+  running: boolean;
+  /** Whether the twin emulator is healthy */
+  healthy: boolean;
+  /** The port the twin emulator is listening on */
+  port: number;
+  /** The URL of the twin emulator */
+  url?: string;
+  /** Current error simulation mode state */
+  errorMode: ErrorModeStateDto;
+};
+export type TwinStartResponseDto = {
+  success: boolean;
+  message: string;
+  url?: string;
+};
+export type TwinStopResponseDto = {
+  success: boolean;
+  message: string;
 };
 export const {
   useAuthControllerLoginMutation,
@@ -1592,6 +1652,8 @@ export const {
   useOpportunitiesControllerFindOneQuery,
   useOpportunitiesControllerUpdateMutation,
   useOpportunitiesControllerCloseMutation,
+  useGcsStorageControllerActivateErrorModeMutation,
+  useGcsStorageControllerDeactivateErrorModeMutation,
   useTwinControllerGetStatusQuery,
   useTwinControllerStartMutation,
   useTwinControllerStopMutation,

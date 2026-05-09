@@ -1,5 +1,9 @@
 import { Injectable, OnModuleDestroy, Logger } from '@nestjs/common';
 import { GcsTwin } from '@open-kingdom/shared-backend-integration-test-doubles';
+import { GcsStorageService } from '@open-kingdom/shared-backend-feature-gcp-resources';
+import { ErrorModeStateDto } from '@open-kingdom/shared-backend-feature-gcp-resources';
+
+const DEFAULT_BUCKETS = ['app-assets', 'user-uploads'];
 
 @Injectable()
 export class TwinService implements OnModuleDestroy {
@@ -7,6 +11,8 @@ export class TwinService implements OnModuleDestroy {
   private twin: GcsTwin | null = null;
   private started = false;
   private readonly port = parseInt(process.env.GCS_TWIN_PORT || '9013', 10);
+
+  constructor(private readonly gcsStorage: GcsStorageService) {}
 
   async start(): Promise<{ success: boolean; message: string; url?: string }> {
     // Reuse existing twin or create a new one
@@ -36,6 +42,10 @@ export class TwinService implements OnModuleDestroy {
   }
 
   async stop(): Promise<{ success: boolean; message: string }> {
+    // Clear error mode before stopping
+    this.gcsStorage.resetErrorMode();
+    this.logger.log('Error mode cleared on twin stop');
+
     if (!this.twin) {
       this.started = false;
       return { success: true, message: 'GCS twin was not running' };
@@ -65,9 +75,11 @@ export class TwinService implements OnModuleDestroy {
     healthy: boolean;
     port: number;
     url?: string;
+    errorMode: ErrorModeStateDto;
   }> {
+    const errorMode = this.gcsStorage.getErrorModeState();
     if (!this.twin || !this.started) {
-      return { running: false, healthy: false, port: this.port };
+      return { running: false, healthy: false, port: this.port, errorMode };
     }
 
     try {
@@ -76,19 +88,32 @@ export class TwinService implements OnModuleDestroy {
       if (!healthy) {
         this.started = false;
         this.twin = null;
-        return { running: false, healthy: false, port: this.port };
+        return { running: false, healthy: false, port: this.port, errorMode };
       }
       return {
         running: true,
         healthy: true,
         port: this.port,
         url: this.twin.getEmulatorHost(),
+        errorMode,
       };
     } catch {
       this.started = false;
       this.twin = null;
-      return { running: false, healthy: false, port: this.port };
+      return { running: false, healthy: false, port: this.port, errorMode };
     }
+  }
+
+  /**
+   * Reset twin data and clear error mode state.
+   * Uses GcsStorageService (official SDK) instead of raw fetch —
+   * routes to emulator automatically when configured.
+   */
+  async reset(): Promise<void> {
+    this.gcsStorage.resetErrorMode();
+    this.logger.log('Error mode cleared on twin reset');
+
+    await this.gcsStorage.resetBuckets(DEFAULT_BUCKETS);
   }
 
   async onModuleDestroy() {

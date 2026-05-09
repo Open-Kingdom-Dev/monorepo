@@ -10,7 +10,7 @@ const runExecutor: PromiseExecutor<SwaggerGenerateAllExecutorSchema> = async (
   const scriptPath = join(__dirname, 'generate-backends.ts');
 
   try {
-    execSync(`npx tsx "${scriptPath}" "${context.root}"`, {
+    execSync(`npx jiti "${scriptPath}" "${context.root}"`, {
       cwd: context.root,
       stdio: 'inherit',
     });

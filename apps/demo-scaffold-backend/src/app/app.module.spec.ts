@@ -72,9 +72,59 @@ jest.mock('@open-kingdom/shared-backend-feature-user-management', () => {
   };
 });
 
-jest.mock('@open-kingdom/shared-backend-feature-gcp-resources', () => ({
-  FeatureGcpResourcesModule: class MockFeatureGcpResourcesModule {},
-}));
+jest.mock('@open-kingdom/shared-backend-feature-gcp-resources', () => {
+  const { Module, Injectable } = require('@nestjs/common');
+  @Injectable()
+  class MockGcsStorageService {
+    setErrorMode = jest
+      .fn()
+      .mockReturnValue({ active: true, type: null, description: null });
+    clearErrorMode = jest
+      .fn()
+      .mockReturnValue({ active: false, type: null, description: null });
+    getErrorModeState = jest
+      .fn()
+      .mockReturnValue({ active: false, type: null, description: null });
+    resetErrorMode = jest.fn();
+    resetBuckets = jest.fn().mockResolvedValue(undefined);
+    uploadFile = jest.fn();
+    listFiles = jest.fn().mockResolvedValue([]);
+    downloadFile = jest.fn();
+    generateDownloadUrl = jest.fn();
+    deleteFile = jest.fn();
+  }
+  @Module({
+    providers: [MockGcsStorageService],
+    exports: [MockGcsStorageService],
+  })
+  class MockFeatureGcpResourcesModule {}
+  return {
+    FeatureGcpResourcesModule: MockFeatureGcpResourcesModule,
+    GcsStorageService: MockGcsStorageService,
+  };
+});
+
+jest.mock('@open-kingdom/shared-backend-integration-test-doubles', () => {
+  const { Injectable } = require('@nestjs/common');
+  @Injectable()
+  class MockGcsErrorSimulationInterceptor {
+    intercept(_context: any, next: any) {
+      return next.handle();
+    }
+  }
+  @Injectable()
+  class MockGcsErrorModeManager {
+    getMode = jest.fn().mockReturnValue(null);
+    setMode = jest.fn();
+    clearMode = jest.fn();
+    reset = jest.fn();
+    matchRequest = jest.fn().mockReturnValue(null);
+  }
+  return {
+    GcsErrorSimulationInterceptor: MockGcsErrorSimulationInterceptor,
+    GcsErrorModeManager: MockGcsErrorModeManager,
+  };
+});
 
 jest.mock('@open-kingdom/crm-backend-feature-crm', () => ({
   FeatureCrmModule: {

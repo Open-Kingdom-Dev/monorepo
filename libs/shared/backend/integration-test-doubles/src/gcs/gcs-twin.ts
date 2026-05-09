@@ -139,9 +139,9 @@ export class GcsTwin {
           );
         this.docker.modem.followProgress(
           stream,
-          (err: Error | null, output: any) =>
-            err ? reject(err) : resolve(output),
-          (event: any) => {
+          (err: Error | null, _output: unknown) =>
+            err ? reject(err) : resolve(),
+          (event: { status?: string }) => {
             if (
               event.status === 'Downloading' ||
               event.status === 'Extracting'

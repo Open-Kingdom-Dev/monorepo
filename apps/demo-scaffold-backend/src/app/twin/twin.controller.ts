@@ -1,7 +1,12 @@
-import { Controller, Get, Post, HttpCode, HttpStatus } from '@nestjs/common';
+import { Controller, Get, Post } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { Public } from '@open-kingdom/shared-backend-util-rbac';
 import { TwinService } from './twin.service';
+import {
+  TwinStatusDto,
+  TwinStartResponseDto,
+  TwinStopResponseDto,
+} from './twin.dto';
 
 @ApiTags('Twin')
 @Controller('twin')
@@ -13,28 +18,19 @@ export class TwinController {
   @ApiOperation({
     summary: 'Get twin status',
     description:
-      'Returns the current status of the GCS twin (running, healthy, port, and URL)',
+      'Returns the current status of the GCS twin (running, healthy, port, URL) and the active error mode state.',
   })
   @ApiResponse({
     status: 200,
     description: 'Twin status retrieved successfully',
-    schema: {
-      type: 'object',
-      properties: {
-        running: { type: 'boolean', example: true },
-        healthy: { type: 'boolean', example: true },
-        port: { type: 'number', example: 9013 },
-        url: { type: 'string', example: 'http://localhost:9013' },
-      },
-    },
+    type: TwinStatusDto,
   })
-  async getStatus() {
+  async getStatus(): Promise<TwinStatusDto> {
     return await this.twinService.status();
   }
 
   @Public()
   @Post('start')
-  @HttpCode(HttpStatus.OK)
   @ApiOperation({
     summary: 'Start twin',
     description:
@@ -43,36 +39,19 @@ export class TwinController {
   @ApiResponse({
     status: 200,
     description: 'Twin started successfully',
-    schema: {
-      type: 'object',
-      properties: {
-        success: { type: 'boolean', example: true },
-        message: { type: 'string', example: 'GCS twin started on port 9013' },
-        url: { type: 'string', example: 'http://localhost:9013' },
-      },
-    },
+    type: TwinStartResponseDto,
   })
   @ApiResponse({
     status: 500,
     description: 'Failed to start twin',
-    schema: {
-      type: 'object',
-      properties: {
-        success: { type: 'boolean', example: false },
-        message: {
-          type: 'string',
-          example: 'Failed to start GCS twin: Docker is not running',
-        },
-      },
-    },
+    type: TwinStartResponseDto,
   })
-  async start() {
+  async start(): Promise<TwinStartResponseDto> {
     return await this.twinService.start();
   }
 
   @Public()
   @Post('stop')
-  @HttpCode(HttpStatus.OK)
   @ApiOperation({
     summary: 'Stop twin',
     description: 'Stops the GCS twin Docker container.',
@@ -80,29 +59,14 @@ export class TwinController {
   @ApiResponse({
     status: 200,
     description: 'Twin stopped successfully',
-    schema: {
-      type: 'object',
-      properties: {
-        success: { type: 'boolean', example: true },
-        message: { type: 'string', example: 'GCS twin stopped' },
-      },
-    },
+    type: TwinStopResponseDto,
   })
   @ApiResponse({
     status: 500,
     description: 'Failed to stop twin',
-    schema: {
-      type: 'object',
-      properties: {
-        success: { type: 'boolean', example: false },
-        message: {
-          type: 'string',
-          example: 'Failed to stop GCS twin: Container not found',
-        },
-      },
-    },
+    type: TwinStopResponseDto,
   })
-  async stop() {
+  async stop(): Promise<TwinStopResponseDto> {
     return await this.twinService.stop();
   }
 }

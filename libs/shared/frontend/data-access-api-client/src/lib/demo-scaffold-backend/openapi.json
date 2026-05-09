@@ -8,7 +8,7 @@
         "parameters": [],
         "requestBody": {
           "required": true,
-          "description": "User login credentials",
+        "description": "User login credentials",
           "content": {
             "application/json": {
               "schema": {
@@ -1465,6 +1465,10 @@
       },
       "post": {
         "operationId": "ConfigurableLookupsController_create",
+    "/api/gcs/error-mode": {
+      "post": {
+        "description": "Activates a GCS error simulation mode. Only one mode can be active at a time — activating a new mode replaces the previous one. Only functional when the twin is running.",
+        "operationId": "GcsStorageController_activateErrorMode",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -1566,7 +1570,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/UpdateConfigurableLookupDto"
+                "$ref": "#/components/schemas/ActivateErrorModeDto"
               }
             }
           }
@@ -3073,12 +3077,47 @@
         "summary": "Mark an opportunity as won or lost",
         "tags": [
           "Opportunities"
+          ],
+            "description": "Error mode activated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorModeStateDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Activate a GCS error mode",
+        "tags": [
+          "GCS Storage"
+        ]
+      },
+      "delete": {
+        "description": "Deactivates the current GCS error simulation mode, returning to normal pass-through behavior.",
+        "operationId": "GcsStorageController_deactivateErrorMode",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Error mode deactivated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorModeStateDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Deactivate current GCS error mode",
+        "tags": [
+          "GCS Storage"
         ]
       }
     },
     "/api/twin/status": {
       "get": {
-        "description": "Returns the current status of the GCS twin (running, healthy, port, and URL)",
+        "description": "Returns the current status of the GCS twin (running, healthy, port, URL) and the active error mode state.",
         "operationId": "TwinController_getStatus",
         "parameters": [],
         "responses": {
@@ -3105,7 +3144,8 @@
                       "type": "string",
                       "example": "http://localhost:9013"
                     }
-                  }
+                  },
+                  "$ref": "#/components/schemas/TwinStatusDto"
                 }
               }
             }
@@ -3142,7 +3182,8 @@
                       "type": "string",
                       "example": "http://localhost:9013"
                     }
-                  }
+                  },
+                  "$ref": "#/components/schemas/TwinStartResponseDto"
                 }
               }
             }
@@ -3162,7 +3203,8 @@
                       "type": "string",
                       "example": "Failed to start GCS twin: Docker is not running"
                     }
-                  }
+                  },
+                  "$ref": "#/components/schemas/TwinStartResponseDto"
                 }
               }
             }
@@ -3185,17 +3227,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "properties": {
-                    "success": {
-                      "type": "boolean",
-                      "example": true
-                    },
-                    "message": {
-                      "type": "string",
-                      "example": "GCS twin stopped"
-                    }
-                  }
+                  "$ref": "#/components/schemas/TwinStopResponseDto"
                 }
               }
             }
@@ -3215,7 +3247,8 @@
                       "type": "string",
                       "example": "Failed to stop GCS twin: Container not found"
                     }
-                  }
+                  },
+                  "$ref": "#/components/schemas/TwinStopResponseDto"
                 }
               }
             }
@@ -4677,8 +4710,147 @@
         },
         "required": [
           "outcome"
+        ],
+      "GcsErrorModeType": {
+        "type": "string",
+        "enum": [
+          "bucket-not-found",
+          "quota-exceeded",
+          "permission-denied",
+          "intermittent-failure"
+        ],
+        "description": "The error mode to activate"
+      },
+      "ActivateErrorModeDto": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "description": "The error mode to activate",
+            "example": "quota-exceeded",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/GcsErrorModeType"
+              }
+            ]
+          },
+          "bucketName": {
+            "type": "string",
+            "description": "Bucket name for bucket-not-found mode. Required when type is bucket-not-found.",
+            "example": "app-assets"
+          },
+          "failEveryN": {
+            "type": "number",
+            "description": "Fail every Nth request for intermittent-failure mode. Defaults to 2.",
+            "example": 3
+          }
+        },
+        "required": [
+          "type"
+        ]
+      },
+      "ErrorModeStateDto": {
+        "type": "object",
+        "properties": {
+          "active": {
+            "type": "boolean",
+            "description": "Whether an error mode is currently active",
+            "example": true
+          },
+          "type": {
+            "description": "The active error mode type",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/GcsErrorModeType"
+              }
+            ]
+          },
+          "description": {
+            "type": "string",
+            "description": "Human-readable description of what the error mode does"
+          }
+        },
+        "required": [
+          "active"
+        ]
+      },
+      "TwinStatusDto": {
+        "type": "object",
+        "properties": {
+          "running": {
+            "type": "boolean",
+            "description": "Whether the twin emulator is currently running",
+            "example": true
+          },
+          "healthy": {
+            "type": "boolean",
+            "description": "Whether the twin emulator is healthy",
+            "example": true
+          },
+          "port": {
+            "type": "number",
+            "description": "The port the twin emulator is listening on",
+            "example": 9013
+          },
+          "url": {
+            "type": "string",
+            "description": "The URL of the twin emulator",
+            "example": "http://localhost:9013"
+          },
+          "errorMode": {
+            "description": "Current error simulation mode state",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ErrorModeStateDto"
+              }
+            ]
+          }
+        },
+        "required": [
+          "running",
+          "healthy",
+          "port",
+          "errorMode"
+        ]
+      },
+      "TwinStartResponseDto": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "example": true
+          },
+          "message": {
+            "type": "string",
+            "example": "GCS twin started on port 9013"
+          },
+          "url": {
+            "type": "string",
+            "example": "http://localhost:9013"
+          }
+        },
+        "required": [
+          "success",
+          "message"
+        ]
+      },
+      "TwinStopResponseDto": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "example": true
+          },
+          "message": {
+            "type": "string",
+            "example": "GCS twin stopped"
+          }
+        },
+        "required": [
+          "success",
+          "message"
         ]
       }
     }
   }
+}
 }

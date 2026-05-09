@@ -12,7 +12,7 @@ import {
   showSuccessNotification,
   showErrorNotification,
 } from '@open-kingdom/shared-frontend-data-access-notifications';
-import { TwinStatus } from '../components';
+import { TwinStatus, ErrorSimulatorPanel, ErrorBanner } from '../components';
 
 const DEFAULT_BUCKET = 'app-assets';
 
@@ -48,117 +48,29 @@ function fileToBase64(file: File): Promise<string> {
   });
 }
 
-function GcsFileList({
-  files,
-  onDownload,
-  onDelete,
-}: {
-  files: FileMetadata[];
-  onDownload?: (file: FileMetadata) => void;
-  onDelete?: (file: FileMetadata) => void;
-}) {
-  return (
-    <div className="border rounded-lg overflow-hidden">
-      <table className="min-w-full divide-y divide-gray-200">
-        <thead className="bg-gray-50">
-          <tr>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              Name
-            </th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              Size
-            </th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              Type
-            </th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              Updated
-            </th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              Actions
-            </th>
-          </tr>
-        </thead>
-        <tbody className="bg-white divide-y divide-gray-200">
-          {files.map((file) => (
-            <tr key={file.name}>
-              <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                {file.name}
-              </td>
-              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                {file.size ? `${(file.size / 1024).toFixed(1)} KB` : '-'}
-              </td>
-              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                {file.contentType || '-'}
-              </td>
-              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                {file.updated?.toLocaleDateString() || '-'}
-              </td>
-              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 space-x-2">
-                <button
-                  onClick={() => onDownload?.(file)}
-                  className="px-3 py-1 text-xs bg-blue-100 text-blue-700 rounded hover:bg-blue-200 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  Download
-                </button>
-                <button
-                  onClick={() => onDelete?.(file)}
-                  className="px-3 py-1 text-xs bg-red-100 text-red-700 rounded hover:bg-red-200 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  Delete
-                </button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
-  );
-}
-
-function GcsUploadForm({
-  onUpload,
-  uploading,
-}: {
-  onUpload: (file: File) => void;
-  uploading: boolean;
-}) {
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (selectedFile) {
-      onUpload(selectedFile);
-      setSelectedFile(null);
-      (e.target as HTMLFormElement).reset();
+/**
+ * Extract a human-readable error message from an RTK Query error response.
+ */
+function extractErrorMessage(err: unknown): string {
+  if (err && typeof err === 'object' && 'data' in err) {
+    const data = (
+      err as {
+        data?: {
+          error?: { message?: string; errors?: Array<{ message?: string }> };
+        };
+      }
+    ).data;
+    if (data?.error?.message) {
+      return data.error.message;
     }
-  };
-
-  return (
-    <form onSubmit={handleSubmit} className="space-y-4">
-      <div>
-        <label
-          htmlFor="file-upload"
-          className="block text-sm font-medium text-gray-700"
-        >
-          Choose a file
-        </label>
-        <input
-          id="file-upload"
-          type="file"
-          onChange={(e) => setSelectedFile(e.target.files?.[0] || null)}
-          className="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
-        />
-      </div>
-      <button
-        type="submit"
-        disabled={!selectedFile || uploading}
-        className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
-      >
-        {uploading ? 'Uploading...' : 'Upload'}
-      </button>
-    </form>
-  );
+    if (data?.error?.errors?.[0]?.message) {
+      return data.error.errors[0].message;
+    }
+  }
+  if (err instanceof Error) {
+    return err.message;
+  }
+  return 'Unknown error';
 }
 
 export default function GcsDemo() {
@@ -171,6 +83,7 @@ export default function GcsDemo() {
 
   const twinRunning = twinStatus?.running ?? false;
   const twinHealthy = twinStatus?.healthy ?? false;
+  const errorMode = twinStatus?.errorMode ?? null;
 
   const {
     data: listFilesResponse,
@@ -187,7 +100,13 @@ export default function GcsDemo() {
   const files: FileMetadata[] =
     listFilesResponse?.files?.map(fileDtoToMetadata) || [];
 
-  const handleUpload = async (file: File) => {
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+
+  const handleUpload = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedFile) return;
+    const file = selectedFile;
+
     try {
       const content = await fileToBase64(file);
       await uploadFile({
@@ -199,20 +118,20 @@ export default function GcsDemo() {
         },
       }).unwrap();
       dispatch(showSuccessNotification(`Uploaded "${file.name}" successfully`));
+      setSelectedFile(null);
+      (e.target as HTMLFormElement).reset();
       if (twinRunning && twinHealthy) {
         refetch();
       }
-    } catch (err) {
-      console.error('Upload failed', err);
+    } catch (err: unknown) {
       dispatch(
-        showErrorNotification(`Upload failed: ${(err as Error).message}`)
+        showErrorNotification(`Upload failed: ${extractErrorMessage(err)}`)
       );
     }
   };
 
   const handleDownload = async (file: FileMetadata) => {
     try {
-      // Fetch download URL from the backend (returns signed URL or emulator URL)
       const urlResponse = await fetch(
         `/api/gcs/files/${file.bucket}/${encodeURIComponent(file.name)}/url`
       );
@@ -225,7 +144,6 @@ export default function GcsDemo() {
       if (!url) {
         throw new Error('No download URL returned');
       }
-      // Trigger browser download via anchor element with download attribute
       const a = document.createElement('a');
       a.href = url;
       a.download = file.name;
@@ -233,9 +151,10 @@ export default function GcsDemo() {
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
-    } catch (err) {
-      console.error('Download failed', err);
-      alert('Download failed: ' + (err as Error).message);
+    } catch (err: unknown) {
+      dispatch(
+        showErrorNotification(`Download failed: ${extractErrorMessage(err)}`)
+      );
     }
   };
 
@@ -250,16 +169,18 @@ export default function GcsDemo() {
       if (twinRunning && twinHealthy) {
         refetch();
       }
-    } catch (err) {
-      console.error('Delete failed', err);
+    } catch (err: unknown) {
       dispatch(
-        showErrorNotification(`Delete failed: ${(err as Error).message}`)
+        showErrorNotification(`Delete failed: ${extractErrorMessage(err)}`)
       );
     }
   };
 
   return (
     <div className="p-6 max-w-6xl mx-auto">
+      {/* Error simulation banner — only shown when a mode is active */}
+      {errorMode?.active && <ErrorBanner mode={errorMode} />}
+
       {!twinRunning && (
         <div className="mb-6 p-4 bg-amber-50 border border-amber-200 rounded-lg flex items-center justify-between gap-4">
           <div className="flex items-center gap-3">
@@ -297,6 +218,7 @@ export default function GcsDemo() {
           </button>
         </div>
       )}
+
       <h1 className="text-3xl font-bold mb-2">GCS Twin Demo</h1>
       <p className="text-gray-600 mb-8">
         Upload, list, and download files from Google Cloud Storage using the
@@ -319,20 +241,72 @@ export default function GcsDemo() {
               Refresh
             </button>
           </div>
+
           {loadingFiles ? (
             <div className="border rounded-lg p-8 text-center text-gray-500">
               Loading files...
             </div>
-          ) : (
-            <GcsFileList
-              files={files}
-              onDownload={handleDownload}
-              onDelete={handleDelete}
-            />
-          )}
-          {!loadingFiles && files.length === 0 && (
+          ) : files.length === 0 ? (
             <div className="border rounded-lg p-8 text-center text-gray-500">
               No files found.
+            </div>
+          ) : (
+            <div className="border rounded-lg overflow-hidden">
+              <table className="min-w-full divide-y divide-gray-200">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Name
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Size
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Type
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Updated
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Actions
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="bg-white divide-y divide-gray-200">
+                  {files.map((file) => (
+                    <tr key={file.name}>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                        {file.name}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {file.size
+                          ? `${(file.size / 1024).toFixed(1)} KB`
+                          : '-'}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {file.contentType || '-'}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {file.updated?.toLocaleDateString() || '-'}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 space-x-2">
+                        <button
+                          onClick={() => handleDownload(file)}
+                          className="px-3 py-1 text-xs bg-blue-100 text-blue-700 rounded hover:bg-blue-200"
+                        >
+                          Download
+                        </button>
+                        <button
+                          onClick={() => handleDelete(file)}
+                          className="px-3 py-1 text-xs bg-red-100 text-red-700 rounded hover:bg-red-200"
+                        >
+                          Delete
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
           )}
         </div>
@@ -340,10 +314,29 @@ export default function GcsDemo() {
         <div className="space-y-8">
           <div className="border rounded-lg p-6 bg-white shadow-sm">
             <h2 className="text-xl font-semibold mb-4">Upload a file</h2>
-            <GcsUploadForm onUpload={handleUpload} uploading={uploading} />
-            {uploading && (
-              <p className="mt-4 text-sm text-blue-600">Uploading...</p>
-            )}
+            <form onSubmit={handleUpload} className="space-y-4">
+              <div>
+                <label
+                  htmlFor="file-upload"
+                  className="block text-sm font-medium text-gray-700"
+                >
+                  Choose a file
+                </label>
+                <input
+                  id="file-upload"
+                  type="file"
+                  onChange={(e) => setSelectedFile(e.target.files?.[0] || null)}
+                  className="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                />
+              </div>
+              <button
+                type="submit"
+                disabled={!selectedFile || uploading}
+                className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {uploading ? 'Uploading...' : 'Upload'}
+              </button>
+            </form>
           </div>
 
           <div className="border rounded-lg p-6 bg-gray-50">
@@ -368,6 +361,8 @@ export default function GcsDemo() {
             <h2 className="text-xl font-semibold mb-4">GCS Twin Status</h2>
             <TwinStatus />
           </div>
+
+          <ErrorSimulatorPanel />
         </div>
       </div>
     </div>
