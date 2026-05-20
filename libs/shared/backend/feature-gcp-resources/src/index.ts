@@ -5,3 +5,4 @@ export * from './lib/gcp-projects.dto.js';
 export * from './lib/gcs-storage.service.js';
 export * from './lib/gcs-storage.controller.js';
 export * from './lib/gcs-storage.dto.js';
+export * from './lib/gcs-error-mode.dto.js';

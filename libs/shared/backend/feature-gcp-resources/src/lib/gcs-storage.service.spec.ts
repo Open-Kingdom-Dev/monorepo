@@ -4,6 +4,7 @@ import {
   GcsStorageService,
   GCS_STORAGE_CLIENT,
 } from './gcs-storage.service.js';
+import { GcsErrorModeManager } from '@open-kingdom/shared-backend-integration-test-doubles';
 
 describe('GcsStorageService', () => {
   let service: GcsStorageService;
@@ -61,6 +62,16 @@ describe('GcsStorageService', () => {
         {
           provide: GCS_STORAGE_CLIENT,
           useValue: mockStorage,
+        },
+        {
+          provide: GcsErrorModeManager,
+          useValue: {
+            getMode: jest.fn().mockReturnValue(null),
+            setMode: jest.fn(),
+            clearMode: jest.fn(),
+            reset: jest.fn(),
+            matchRequest: jest.fn().mockReturnValue(null),
+          },
         },
       ],
     }).compile();

@@ -5,6 +5,11 @@ import {
   Inject,
 } from '@nestjs/common';
 import { Storage } from '@google-cloud/storage';
+import {
+  GcsErrorModeManager,
+  GcsErrorModeConfig,
+} from '@open-kingdom/shared-backend-integration-test-doubles';
+import { ErrorModeStateDto } from './gcs-error-mode.dto.js';
 
 export interface FileMetadata {
   name: string;
@@ -57,7 +62,10 @@ export function createGcsStorageClient(): Storage {
 export class GcsStorageService {
   private readonly logger = new Logger(GcsStorageService.name);
 
-  constructor(@Inject(GCS_STORAGE_CLIENT) private readonly storage: Storage) {}
+  constructor(
+    @Inject(GCS_STORAGE_CLIENT) private readonly storage: Storage,
+    private readonly errorModeManager: GcsErrorModeManager
+  ) {}
 
   private get isEmulatorMode(): boolean {
     return !!(
@@ -92,6 +100,102 @@ export class GcsStorageService {
           );
         }
       }
+    }
+  }
+
+  /**
+   * Delete and recreate buckets, clearing all objects.
+   * Uses the official GCS SDK (routes to emulator when configured).
+   */
+  async resetBuckets(bucketNames: string[]): Promise<void> {
+    for (const name of bucketNames) {
+      try {
+        await this.storage.bucket(name).delete();
+        this.logger.log(`Deleted bucket ${name}`);
+      } catch (error: any) {
+        if (error?.code !== 404) {
+          this.logger.warn(
+            `Failed to delete bucket ${name}: ${
+              error instanceof Error ? error.message : String(error)
+            }`
+          );
+        }
+      }
+    }
+    for (const name of bucketNames) {
+      await this.ensureBucket(name);
+    }
+  }
+
+  // --- Error mode delegation ---
+
+  setErrorMode(dto: {
+    type: string;
+    bucketName?: string;
+    failEveryN?: number;
+  }): ErrorModeStateDto {
+    let config: GcsErrorModeConfig;
+
+    switch (dto.type) {
+      case 'bucket-not-found':
+        config = {
+          type: 'bucket-not-found',
+          bucketName: dto.bucketName ?? 'app-assets',
+        };
+        break;
+      case 'quota-exceeded':
+        config = { type: 'quota-exceeded' };
+        break;
+      case 'permission-denied':
+        config = { type: 'permission-denied' };
+        break;
+      case 'intermittent-failure':
+        config = { type: 'intermittent-failure', every: dto.failEveryN ?? 2 };
+        break;
+      default:
+        throw new BadRequestException(`Unknown error mode type: ${dto.type}`);
+    }
+
+    this.errorModeManager.setMode(config);
+    this.logger.log(`Error mode activated: ${dto.type}`);
+    return this.getErrorModeState();
+  }
+
+  clearErrorMode(): ErrorModeStateDto {
+    this.errorModeManager.clearMode();
+    this.logger.log('Error mode deactivated');
+    return this.getErrorModeState();
+  }
+
+  getErrorModeState(): ErrorModeStateDto {
+    const mode = this.errorModeManager.getMode();
+    if (!mode) {
+      return { active: false, type: null, description: null };
+    }
+    return {
+      active: true,
+      type: mode.type,
+      description: this.describeMode(mode),
+    };
+  }
+
+  resetErrorMode(): void {
+    this.errorModeManager.reset();
+    this.logger.log('Error mode cleared');
+  }
+
+  private describeMode(mode: GcsErrorModeConfig): string {
+    switch (mode.type) {
+      case 'bucket-not-found':
+        return `Returns 404 for bucket "${mode.bucketName}". All other buckets work normally.`;
+      case 'quota-exceeded':
+        return 'Returns 403 on all upload (POST) operations. Reads and deletes still work.';
+      case 'permission-denied':
+        return 'Returns 403 on all GCS data operations. No bucket or object access allowed.';
+      case 'intermittent-failure':
+        return `Returns 500 every ${
+          mode.every ?? 2
+        }nd request (deterministic counter). Other requests succeed normally.`;
     }
   }
 

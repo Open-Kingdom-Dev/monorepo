@@ -1,6 +1,6 @@
 /* eslint-disable @nx/enforce-module-boundaries -- static imports for app module */
 import { Module } from '@nestjs/common';
-import { APP_GUARD } from '@nestjs/core';
+import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 import {
   createConfigService,
   nodeEnvAdapter,
@@ -23,6 +23,7 @@ import {
   PermissionGuard,
   ROLE_RESOLVER,
 } from '@open-kingdom/shared-backend-util-rbac';
+import { GcsErrorSimulationInterceptor } from '@open-kingdom/shared-backend-integration-test-doubles';
 
 // Define the environment keys that this app uses
 const envKeys = [
@@ -70,6 +71,7 @@ const configService = createConfigService(envKeys, nodeEnvAdapter);
     { provide: ROLE_RESOLVER, useExisting: UserRolesService },
     { provide: APP_GUARD, useClass: JwtAuthGuard },
     { provide: APP_GUARD, useClass: PermissionGuard },
+    { provide: APP_INTERCEPTOR, useClass: GcsErrorSimulationInterceptor },
   ],
 })
 export class AppModule {}

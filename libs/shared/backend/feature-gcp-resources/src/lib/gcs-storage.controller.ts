@@ -4,8 +4,11 @@ import {
   Controller,
   Get,
   Post,
+  Delete,
   Param,
   Query,
+  HttpCode,
+  HttpStatus,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -23,6 +26,10 @@ import {
   ListFilesResponseDto,
   GetDownloadUrlResponseDto,
 } from './gcs-storage.dto.js';
+import {
+  ActivateErrorModeDto,
+  ErrorModeStateDto,
+} from './gcs-error-mode.dto.js';
 
 @ApiTags('GCS Storage')
 @Controller('gcs')
@@ -282,5 +289,43 @@ export class GcsStorageController {
     }
 
     await this.gcsStorageService.deleteFile(bucket.trim(), fileName.trim());
+  }
+
+  // --- Error mode simulation endpoints ---
+
+  @Public()
+  @Post('error-mode')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    summary: 'Activate a GCS error mode',
+    description:
+      'Activates a GCS error simulation mode. Only one mode can be active at a time — activating a new mode replaces the previous one. Only functional when the twin is running.',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Error mode activated',
+    type: ErrorModeStateDto,
+  })
+  async activateErrorMode(
+    @Body() dto: ActivateErrorModeDto
+  ): Promise<ErrorModeStateDto> {
+    return this.gcsStorageService.setErrorMode(dto);
+  }
+
+  @Public()
+  @Delete('error-mode')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    summary: 'Deactivate current GCS error mode',
+    description:
+      'Deactivates the current GCS error simulation mode, returning to normal pass-through behavior.',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Error mode deactivated',
+    type: ErrorModeStateDto,
+  })
+  async deactivateErrorMode(): Promise<ErrorModeStateDto> {
+    return this.gcsStorageService.clearErrorMode();
   }
 }
