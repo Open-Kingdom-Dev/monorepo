@@ -140,4 +140,197 @@ describe('GmailTwin', () => {
     const afterResetEmails = (await afterResetRes.json()) as CapturedEmailJson[];
     expect(afterResetEmails).toHaveLength(0);
   });
+
+  describe('Milestone 3 - Error Simulation Integration', () => {
+    interface GoogleApiErrorResponse {
+      error: {
+        code: number;
+        message: string;
+        errors?: Array<{
+          message: string;
+          domain: string;
+          reason: string;
+        }>;
+      };
+    }
+
+    it('should set and clear error simulation mode via control plane', async () => {
+      const host = twin.getEmulatorHost();
+
+      // 1. Set mode to rate-limit
+      const setRes = await fetch(`${host}/test/gmail/error-mode`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ mode: 'rate-limit' }),
+      });
+      expect(setRes.status).toBe(200);
+      const setJson = (await setRes.json()) as { success: boolean; mode: string };
+      expect(setJson.success).toBe(true);
+      expect(setJson.mode).toBe('rate-limit');
+
+      // 2. Clear mode via DELETE
+      const deleteRes = await fetch(`${host}/test/gmail/error-mode`, {
+        method: 'DELETE',
+      });
+      expect(deleteRes.status).toBe(200);
+      const deleteJson = (await deleteRes.json()) as { success: boolean; mode: null };
+      expect(deleteJson.success).toBe(true);
+      expect(deleteJson.mode).toBeNull();
+    });
+
+    it('should validate error-mode input payloads on control plane', async () => {
+      const host = twin.getEmulatorHost();
+
+      const badRes = await fetch(`${host}/test/gmail/error-mode`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ mode: 'unsupported-fault' }),
+      });
+      expect(badRes.status).toBe(400);
+    });
+
+    it('should simulate a 403 Forbidden insufficient-permissions fault', async () => {
+      const host = twin.getEmulatorHost();
+
+      // Activate insufficient-permissions mode
+      await fetch(`${host}/test/gmail/error-mode`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ mode: 'insufficient-permissions' }),
+      });
+
+      // Try sending an email
+      const rawEmail = buildRawEmail({
+        to: 'recipient@example.com',
+        from: 'sender@example.com',
+        subject: 'Forbidden Simulation',
+        text: 'Hello world',
+      });
+
+      const res = await fetch(`${host}/gmail/v1/users/me/messages/send`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: 'Bearer header.payload.signature',
+        },
+        body: JSON.stringify({ raw: rawEmail }),
+      });
+
+      expect(res.status).toBe(403);
+      const errorJson = (await res.json()) as GoogleApiErrorResponse;
+      expect(errorJson.error.code).toBe(403);
+      expect(errorJson.error.message).toBe('Insufficient Permission');
+      expect(errorJson.error.errors).toBeDefined();
+      expect(errorJson.error.errors?.[0].reason).toBe('insufficientPermissions');
+      expect(errorJson.error.errors?.[0].domain).toBe('global');
+    });
+
+    it('should simulate a 429 Too Many Requests rate-limit fault and set Retry-After header', async () => {
+      const host = twin.getEmulatorHost();
+
+      // Activate rate-limit mode
+      await fetch(`${host}/test/gmail/error-mode`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ mode: 'rate-limit' }),
+      });
+
+      // Try sending an email
+      const rawEmail = buildRawEmail({
+        to: 'recipient@example.com',
+        from: 'sender@example.com',
+        subject: 'Rate Limit Simulation',
+        text: 'Hello world',
+      });
+
+      const res = await fetch(`${host}/gmail/v1/users/me/messages/send`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: 'Bearer header.payload.signature',
+        },
+        body: JSON.stringify({ raw: rawEmail }),
+      });
+
+      expect(res.status).toBe(429);
+      expect(res.headers.get('retry-after')).toBe('60');
+
+      const errorJson = (await res.json()) as GoogleApiErrorResponse;
+      expect(errorJson.error.code).toBe(429);
+      expect(errorJson.error.message).toBe('User Rate Limit Exceeded');
+      expect(errorJson.error.errors?.[0].reason).toBe('userRateLimitExceeded');
+      expect(errorJson.error.errors?.[0].domain).toBe('usageLimits');
+    });
+
+    it('should simulate a 400 Bad Request invalid-recipient fault', async () => {
+      const host = twin.getEmulatorHost();
+
+      // Activate invalid-recipient mode
+      await fetch(`${host}/test/gmail/error-mode`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ mode: 'invalid-recipient' }),
+      });
+
+      // Try sending an email
+      const rawEmail = buildRawEmail({
+        to: 'recipient@example.com',
+        from: 'sender@example.com',
+        subject: 'Invalid Recipient Simulation',
+        text: 'Hello world',
+      });
+
+      const res = await fetch(`${host}/gmail/v1/users/me/messages/send`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: 'Bearer header.payload.signature',
+        },
+        body: JSON.stringify({ raw: rawEmail }),
+      });
+
+      expect(res.status).toBe(400);
+      const errorJson = (await res.json()) as GoogleApiErrorResponse;
+      expect(errorJson.error.code).toBe(400);
+      expect(errorJson.error.message).toBe('Invalid recipient address format');
+      expect(errorJson.error.errors?.[0].reason).toBe('invalidArgument');
+      expect(errorJson.error.errors?.[0].domain).toBe('global');
+    });
+
+    it('should clear active error modes when reset is triggered', async () => {
+      const host = twin.getEmulatorHost();
+
+      // Activate invalid-recipient mode
+      await fetch(`${host}/test/gmail/error-mode`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ mode: 'invalid-recipient' }),
+      });
+
+      // Reset the control plane
+      const resetRes = await fetch(`${host}/test/gmail/reset`, {
+        method: 'POST',
+      });
+      expect(resetRes.status).toBe(200);
+
+      // Verify email sending works again (fault was cleared)
+      const rawEmail = buildRawEmail({
+        to: 'recipient@example.com',
+        from: 'sender@example.com',
+        subject: 'Fault Cleared Simulation',
+        text: 'Hello world',
+      });
+
+      const sendRes = await fetch(`${host}/gmail/v1/users/me/messages/send`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: 'Bearer header.payload.signature',
+        },
+        body: JSON.stringify({ raw: rawEmail }),
+      });
+
+      expect(sendRes.status).toBe(200);
+    });
+  });
 });

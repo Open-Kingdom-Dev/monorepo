@@ -1,6 +1,7 @@
 import {
   Controller,
   Post,
+  Delete,
   Get,
   Body,
   HttpException,
@@ -8,13 +9,19 @@ import {
   Query,
   HttpCode,
   UseGuards,
+  Res,
 } from '@nestjs/common';
-import { GmailTwinService } from './gmail-twin.service.js';
+import type { Response } from 'express';
+import { GmailTwinService, GmailErrorMode } from './gmail-twin.service.js';
 import { BearerJwtGuard } from './bearer-jwt.guard.js';
 import { CapturedEmail } from './email-store.js';
 
 interface SendEmailBody {
   raw?: string;
+}
+
+interface ErrorModeBody {
+  mode: GmailErrorMode | null;
 }
 
 @Controller()
@@ -25,7 +32,8 @@ export class GmailTwinController {
   @UseGuards(BearerJwtGuard)
   @HttpCode(HttpStatus.OK)
   async sendEmail(
-    @Body() body: SendEmailBody
+    @Body() body: SendEmailBody,
+    @Res({ passthrough: true }) res: Response
   ): Promise<{ id: string; threadId: string; labelIds: string[] }> {
     const { raw } = body;
     if (!raw) {
@@ -41,13 +49,16 @@ export class GmailTwinController {
     }
 
     try {
-      const email = await this.service.sendEmail(raw);
+      const email = await this.service.sendEmail(raw, res);
       return {
         id: email.id,
         threadId: email.threadId,
         labelIds: ['SENT'],
       };
     } catch (err) {
+      if (err instanceof HttpException) {
+        throw err;
+      }
       throw new HttpException(
         {
           error: {
@@ -58,6 +69,40 @@ export class GmailTwinController {
         HttpStatus.INTERNAL_SERVER_ERROR
       );
     }
+  }
+
+  @Post('/test/gmail/error-mode')
+  @HttpCode(HttpStatus.OK)
+  setErrorMode(@Body() body: ErrorModeBody): { success: boolean; mode: GmailErrorMode | null } {
+    const { mode } = body;
+    const validModes: (GmailErrorMode | null)[] = [
+      'insufficient-permissions',
+      'rate-limit',
+      'invalid-recipient',
+      null,
+    ];
+
+    if (!validModes.includes(mode)) {
+      throw new HttpException(
+        {
+          error: {
+            code: HttpStatus.BAD_REQUEST,
+            message: `Invalid error mode. Supported modes: 'insufficient-permissions', 'rate-limit', 'invalid-recipient', null`,
+          },
+        },
+        HttpStatus.BAD_REQUEST
+      );
+    }
+
+    this.service.setErrorMode(mode);
+    return { success: true, mode };
+  }
+
+  @Delete('/test/gmail/error-mode')
+  @HttpCode(HttpStatus.OK)
+  clearErrorMode(): { success: boolean; mode: null } {
+    this.service.setErrorMode(null);
+    return { success: true, mode: null };
   }
 
   @Get('/test/gmail/health')
@@ -77,3 +122,4 @@ export class GmailTwinController {
     return this.service.getEmails(to);
   }
 }
+
