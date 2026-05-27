@@ -21,8 +21,8 @@ export class EmailStore {
     const parsed = await simpleParser(mimeBuffer);
 
     const to = parsed.to
-      ? (Array.isArray(parsed.to) ? parsed.to : [parsed.to]).flatMap(addr =>
-          addr.value.map(v => v.address || '')
+      ? (Array.isArray(parsed.to) ? parsed.to : [parsed.to]).flatMap((addr) =>
+          addr.value.map((v) => v.address || '')
         )
       : [];
     const from = parsed.from?.value?.[0]?.address || '';
@@ -53,8 +53,8 @@ export class EmailStore {
       return [...this.emails];
     }
     const filterAddr = toAddress.toLowerCase();
-    return this.emails.filter(email =>
-      email.to.some(addr => addr.toLowerCase() === filterAddr)
+    return this.emails.filter((email) =>
+      email.to.some((addr) => addr.toLowerCase() === filterAddr)
     );
   }
 

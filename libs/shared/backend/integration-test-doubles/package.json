@@ -54,12 +54,8 @@
   },
   "dependencies": {
     "@open-kingdom/shared-poly-util-env-config": "0.0.2-17",
-    "@nestjs/jwt": "^11.0.0",
     "dockerode": "^4.0.6",
-    "mailparser": "^3.6.4",
     "tslib": "^2.3.0"
   },
-  "devDependencies": {
-    "@types/mailparser": "^3.4.0"
-  }
+  "devDependencies": {}
 }

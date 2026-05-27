@@ -1,4 +1,11 @@
-import { Controller, Get, Post } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  HttpCode,
+  HttpStatus,
+  Query,
+} from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { Public } from '@open-kingdom/shared-backend-util-rbac';
 import { TwinService } from './twin.service';
@@ -18,7 +25,7 @@ export class TwinController {
   @ApiOperation({
     summary: 'Get twin status',
     description:
-      'Returns the current status of the GCS twin (running, healthy, port, URL) and the active error mode state.',
+      'Returns the current status of the GCS twin (running, healthy, port, URL) along with active error mode state, Gmail REST mock, and global interception hooks.',
   })
   @ApiResponse({
     status: 200,
@@ -32,18 +39,18 @@ export class TwinController {
   @Public()
   @Post('start')
   @ApiOperation({
-    summary: 'Start twin',
+    summary: 'Start twin environment',
     description:
-      'Starts the GCS twin Docker container and seeds initial data. Requires Docker to be running.',
+      'Starts GCS twin Docker container, NestJS Gmail mock server, and installs global interception hooks. Requires Docker to be running.',
   })
   @ApiResponse({
     status: 200,
-    description: 'Twin started successfully',
+    description: 'Twin environment started successfully',
     type: TwinStartResponseDto,
   })
   @ApiResponse({
     status: 500,
-    description: 'Failed to start twin',
+    description: 'Failed to start twin environment',
     type: TwinStartResponseDto,
   })
   async start(): Promise<TwinStartResponseDto> {
@@ -53,20 +60,71 @@ export class TwinController {
   @Public()
   @Post('stop')
   @ApiOperation({
-    summary: 'Stop twin',
-    description: 'Stops the GCS twin Docker container.',
+    summary: 'Stop twin environment',
+    description:
+      'Gracefully cleans up GCS container, Gmail mock server, and removes interceptor hook.',
   })
   @ApiResponse({
     status: 200,
-    description: 'Twin stopped successfully',
+    description: 'Twin environment stopped successfully',
     type: TwinStopResponseDto,
   })
   @ApiResponse({
     status: 500,
-    description: 'Failed to stop twin',
+    description: 'Failed to stop twin environment',
     type: TwinStopResponseDto,
   })
   async stop(): Promise<TwinStopResponseDto> {
     return await this.twinService.stop();
+  }
+
+  @Public()
+  @Get('gmail/emails')
+  @ApiOperation({
+    summary: 'Get intercepted emails',
+    description:
+      'Fetches structured emails intercepted in-memory by Gmail digital twin.',
+  })
+  async getGmailEmails() {
+    return await this.twinService.getGmailEmails();
+  }
+
+  @Public()
+  @Post('gmail/reset')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    summary: 'Reset mailbox',
+    description: 'Clears the list of stored emails inside the local twin.',
+  })
+  async resetGmail() {
+    await this.twinService.resetGmail();
+    return { success: true, message: 'Gmail mailbox reset successfully' };
+  }
+
+  @Public()
+  @Post('gmail/error-mode')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    summary: 'Configure error injection mode',
+    description:
+      'Changes the active simulated error state for standard REST endpoint handlers.',
+  })
+  async setGmailErrorMode(
+    @Query('mode') mode: 'none' | 'rate-limit' | 'auth-error' | 'bad-request'
+  ) {
+    let mappedMode:
+      | 'insufficient-permissions'
+      | 'rate-limit'
+      | 'invalid-recipient'
+      | null = null;
+    if (mode === 'rate-limit') mappedMode = 'rate-limit';
+    else if (mode === 'auth-error') mappedMode = 'insufficient-permissions';
+    else if (mode === 'bad-request') mappedMode = 'invalid-recipient';
+
+    await this.twinService.setGmailErrorMode(mappedMode);
+    return {
+      success: true,
+      message: `Gmail twin error mode configured to: ${mode}`,
+    };
   }
 }

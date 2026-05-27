@@ -1,11 +1,11 @@
-import { GmailTwin } from '../gmail-twin.js';
+import { GmailTwinServer } from '../gmail-twin-server.js';
 import { buildRawEmail } from '../test-utils.js';
 
-describe('GmailTwin', () => {
-  let twin: GmailTwin;
+describe('GmailTwinServer', () => {
+  let twin: GmailTwinServer;
 
   beforeAll(async () => {
-    twin = new GmailTwin({ port: 9014 });
+    twin = new GmailTwinServer({ port: 9014, disableAuth: false });
     await twin.start();
   });
 
@@ -127,7 +127,8 @@ describe('GmailTwin', () => {
     const unfilteredRes = await fetch(
       `${host}/test/gmail/emails?to=other@example.com`
     );
-    const unfilteredEmails = (await unfilteredRes.json()) as CapturedEmailJson[];
+    const unfilteredEmails =
+      (await unfilteredRes.json()) as CapturedEmailJson[];
     expect(unfilteredEmails).toHaveLength(0);
 
     // Reset control plane
@@ -137,11 +138,12 @@ describe('GmailTwin', () => {
     expect(resetRes.status).toBe(200);
 
     const afterResetRes = await fetch(`${host}/test/gmail/emails`);
-    const afterResetEmails = (await afterResetRes.json()) as CapturedEmailJson[];
+    const afterResetEmails =
+      (await afterResetRes.json()) as CapturedEmailJson[];
     expect(afterResetEmails).toHaveLength(0);
   });
 
-  describe('Milestone 3 - Error Simulation Integration', () => {
+  describe('Error Simulation Integration', () => {
     interface GoogleApiErrorResponse {
       error: {
         code: number;
@@ -164,7 +166,10 @@ describe('GmailTwin', () => {
         body: JSON.stringify({ mode: 'rate-limit' }),
       });
       expect(setRes.status).toBe(200);
-      const setJson = (await setRes.json()) as { success: boolean; mode: string };
+      const setJson = (await setRes.json()) as {
+        success: boolean;
+        mode: string;
+      };
       expect(setJson.success).toBe(true);
       expect(setJson.mode).toBe('rate-limit');
 
@@ -173,7 +178,10 @@ describe('GmailTwin', () => {
         method: 'DELETE',
       });
       expect(deleteRes.status).toBe(200);
-      const deleteJson = (await deleteRes.json()) as { success: boolean; mode: null };
+      const deleteJson = (await deleteRes.json()) as {
+        success: boolean;
+        mode: null;
+      };
       expect(deleteJson.success).toBe(true);
       expect(deleteJson.mode).toBeNull();
     });
@@ -221,7 +229,9 @@ describe('GmailTwin', () => {
       expect(errorJson.error.code).toBe(403);
       expect(errorJson.error.message).toBe('Insufficient Permission');
       expect(errorJson.error.errors).toBeDefined();
-      expect(errorJson.error.errors?.[0].reason).toBe('insufficientPermissions');
+      expect(errorJson.error.errors?.[0].reason).toBe(
+        'insufficientPermissions'
+      );
       expect(errorJson.error.errors?.[0].domain).toBe('global');
     });
 

@@ -14,7 +14,7 @@ export function TwinStatus() {
     error,
     refetch,
   } = useTwinControllerGetStatusQuery(undefined, {
-    pollingInterval: 10000, // poll every 10 seconds
+    pollingInterval: 10000,
   });
 
   const [startTwin, { isLoading: starting }] = useTwinControllerStartMutation();
@@ -23,7 +23,12 @@ export function TwinStatus() {
   const handleStart = async () => {
     try {
       await startTwin().unwrap();
-      dispatch(showSuccessNotification('GCS Twin started'));
+      dispatch(
+        showSuccessNotification(
+          'Digital Twin Environment started successfully!'
+        )
+      );
+      refetch();
     } catch (err) {
       console.error('Failed to start twin:', err);
     }
@@ -32,7 +37,10 @@ export function TwinStatus() {
   const handleStop = async () => {
     try {
       await stopTwin().unwrap();
-      dispatch(showSuccessNotification('GCS Twin stopped'));
+      dispatch(
+        showSuccessNotification('Digital Twin Environment stopped cleanly.')
+      );
+      refetch();
     } catch (err) {
       console.error('Failed to stop twin:', err);
     }
@@ -40,105 +48,135 @@ export function TwinStatus() {
 
   if (isLoading) {
     return (
-      <div className="border rounded-lg p-4 bg-gray-50">
-        <div className="flex items-center justify-between">
-          <div>
-            <h3 className="font-medium text-gray-900">GCS Twin</h3>
-            <p className="text-sm text-gray-500">Checking status...</p>
-          </div>
-          <div className="h-4 w-4 border-2 border-gray-300 border-t-blue-600 rounded-full animate-spin"></div>
-        </div>
+      <div className="border rounded-lg p-4 bg-gray-50 flex items-center justify-between">
+        <span className="text-sm text-gray-500 font-medium">
+          Checking Digital Twins...
+        </span>
+        <div className="h-4 w-4 border-2 border-gray-300 border-t-blue-600 rounded-full animate-spin"></div>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="border rounded-lg p-4 bg-red-50">
-        <div className="flex items-center justify-between">
-          <div>
-            <h3 className="font-medium text-red-900">GCS Twin</h3>
-            <p className="text-sm text-red-700">Failed to load status</p>
-          </div>
-          <button
-            onClick={() => refetch()}
-            className="px-3 py-1 text-sm bg-red-100 text-red-700 rounded hover:bg-red-200"
-          >
-            Retry
-          </button>
-        </div>
+      <div className="border rounded-lg p-4 bg-red-50 flex items-center justify-between">
+        <span className="text-sm text-red-700 font-medium">
+          Failed to retrieve status
+        </span>
+        <button
+          onClick={() => refetch()}
+          className="px-2 py-1 text-xs bg-red-100 text-red-700 rounded hover:bg-red-200"
+        >
+          Retry
+        </button>
       </div>
     );
   }
 
   const running = status?.running ?? false;
-  const healthy = status?.healthy ?? false;
   const port = status?.port ?? 9013;
-  const url = status?.url;
+
+  // Gmail digital twin specific fields
+  const gmail = (status as any)?.gmail;
+  const interceptorActive = (status as any)?.interceptorActive ?? false;
 
   return (
-    <div className="border rounded-lg p-4 bg-white shadow-sm">
-      <div className="flex items-center justify-between mb-4">
-        <div>
-          <h3 className="font-medium text-gray-900">GCS Twin</h3>
-          <p className="text-sm text-gray-500">
-            Port {port} •{' '}
-            {running ? (healthy ? 'Healthy' : 'Unhealthy') : 'Stopped'}
-          </p>
+    <div className="border rounded-lg p-5 bg-white shadow-sm space-y-4">
+      <div className="border-b pb-3 flex justify-between items-center">
+        <h3 className="font-semibold text-gray-900 text-md">
+          Twin Environment Launcher
+        </h3>
+        <span
+          className={`px-2 py-0.5 text-xs font-bold rounded-full transition-colors duration-300 ${
+            running
+              ? 'bg-green-100 text-green-800'
+              : 'bg-gray-100 text-gray-800'
+          }`}
+        >
+          {running ? 'ENVIRONMENT UP' : 'ENVIRONMENT DOWN'}
+        </span>
+      </div>
+
+      <div className="space-y-2.5">
+        {/* GCS Twin Row */}
+        <div className="flex justify-between items-center text-sm">
+          <span className="text-gray-600 font-medium">
+            GCS Storage Emulator:
+          </span>
+          <div className="flex items-center gap-2">
+            <span
+              className={`h-2.5 w-2.5 rounded-full transition-all duration-500 ${
+                running
+                  ? 'bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.6)] animate-pulse'
+                  : 'bg-gray-300'
+              }`}
+            ></span>
+            <span className="font-mono text-xs">
+              {running ? `Port ${port}` : 'Stopped'}
+            </span>
+          </div>
         </div>
-        <div className="flex items-center space-x-2">
-          <div
-            className={`h-3 w-3 rounded-full ${
-              running
-                ? healthy
-                  ? 'bg-green-500'
-                  : 'bg-yellow-500'
-                : 'bg-gray-400'
+
+        {/* Gmail Twin Row */}
+        <div className="flex justify-between items-center text-sm">
+          <span className="text-gray-600 font-medium">
+            Gmail REST Mock Server:
+          </span>
+          <div className="flex items-center gap-2">
+            <span
+              className={`h-2.5 w-2.5 rounded-full transition-all duration-500 ${
+                gmail?.running
+                  ? 'bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.6)] animate-pulse'
+                  : 'bg-gray-300'
+              }`}
+            ></span>
+            <span className="font-mono text-xs">
+              {gmail?.running ? `Port ${gmail?.port ?? 9014}` : 'Stopped'}
+            </span>
+          </div>
+        </div>
+
+        {/* Global Interception Layer */}
+        <div className="flex justify-between items-center text-sm">
+          <span className="text-gray-600 font-medium">
+            Global Network Interception:
+          </span>
+          <span
+            className={`text-xs px-2 py-0.5 rounded font-semibold transition-all duration-300 ${
+              interceptorActive
+                ? 'bg-blue-100 text-blue-800 border border-blue-200'
+                : 'bg-gray-100 text-gray-600 border border-gray-200'
             }`}
-            title={
-              running
-                ? healthy
-                  ? 'Running and healthy'
-                  : 'Running but unhealthy'
-                : 'Stopped'
-            }
-          ></div>
-          <span className="text-sm font-medium">
-            {running ? (healthy ? 'Running' : 'Unhealthy') : 'Stopped'}
+          >
+            {interceptorActive ? 'ACTIVE (Zero-Config)' : 'INACTIVE'}
           </span>
         </div>
       </div>
 
-      <div className="space-y-3">
-        <div className="grid grid-cols-2 gap-2">
-          <button
-            onClick={handleStart}
-            disabled={running || starting}
-            className="px-3 py-2 bg-blue-600 text-white text-sm rounded hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {starting ? 'Starting...' : 'Start Twin'}
-          </button>
-          <button
-            onClick={handleStop}
-            disabled={!running || stopping}
-            className="px-3 py-2 bg-red-600 text-white text-sm rounded hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {stopping ? 'Stopping...' : 'Stop Twin'}
-          </button>
-        </div>
-        {url && (
-          <div className="text-xs text-gray-500 truncate" title={url}>
-            URL: <code className="bg-gray-100 px-1 rounded">{url}</code>
-          </div>
-        )}
-        <div className="flex justify-end">
-          <button
-            onClick={() => refetch()}
-            className="text-xs text-gray-500 hover:text-gray-700"
-          >
-            Refresh
-          </button>
-        </div>
+      <div className="grid grid-cols-2 gap-3 pt-2">
+        <button
+          onClick={handleStart}
+          disabled={running || starting}
+          className="px-4 py-2 bg-blue-600 text-white text-sm font-semibold rounded hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition duration-150 ease-in-out shadow-sm"
+        >
+          {starting ? 'Starting...' : 'Boot All'}
+        </button>
+        <button
+          onClick={handleStop}
+          disabled={!running || stopping}
+          className="px-4 py-2 bg-red-600 text-white text-sm font-semibold rounded hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed transition duration-150 ease-in-out shadow-sm"
+        >
+          {stopping ? 'Stopping...' : 'Shutdown'}
+        </button>
+      </div>
+
+      <div className="flex justify-end text-xs pt-1 border-t">
+        <button
+          onClick={() => refetch()}
+          className="text-gray-400 hover:text-gray-600 font-medium transition duration-150"
+        >
+          🔄 Refresh Status
+        </button>
       </div>
     </div>
   );

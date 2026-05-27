@@ -1,27 +1,26 @@
 import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
-import { Response } from 'express';
+import type { Response } from 'express';
 import { EmailStore, CapturedEmail } from './email-store.js';
-
-export type GmailErrorMode = 'insufficient-permissions' | 'rate-limit' | 'invalid-recipient';
+import { GmailTwinErrorMode } from '../email.types.js';
 
 @Injectable()
-export class GmailTwinService {
+export class GmailTwinServerService {
   private readonly emailStore = new EmailStore();
-  private activeErrorMode: GmailErrorMode | null = null;
+  private activeErrorMode: GmailTwinErrorMode | null = null;
 
   getEmailStore(): EmailStore {
     return this.emailStore;
   }
 
-  setErrorMode(mode: GmailErrorMode | null): void {
+  setErrorMode(mode: GmailTwinErrorMode | null): void {
     this.activeErrorMode = mode;
   }
 
-  getErrorMode(): GmailErrorMode | null {
+  getErrorMode(): GmailTwinErrorMode | null {
     return this.activeErrorMode;
   }
 
-  triggerSimulatedError(mode: GmailErrorMode, res: Response): never {
+  triggerSimulatedError(mode: GmailTwinErrorMode, res: Response): never {
     if (mode === 'insufficient-permissions') {
       throw new HttpException(
         {
@@ -107,4 +106,3 @@ export class GmailTwinService {
     this.activeErrorMode = null;
   }
 }
-

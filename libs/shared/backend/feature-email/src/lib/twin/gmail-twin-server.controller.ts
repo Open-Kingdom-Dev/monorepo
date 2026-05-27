@@ -12,21 +12,22 @@ import {
   Res,
 } from '@nestjs/common';
 import type { Response } from 'express';
-import { GmailTwinService, GmailErrorMode } from './gmail-twin.service.js';
+import { GmailTwinServerService } from './gmail-twin-server.service.js';
 import { BearerJwtGuard } from './bearer-jwt.guard.js';
 import { CapturedEmail } from './email-store.js';
+import { GmailTwinErrorMode } from '../email.types.js';
 
 interface SendEmailBody {
   raw?: string;
 }
 
 interface ErrorModeBody {
-  mode: GmailErrorMode | null;
+  mode: GmailTwinErrorMode | null;
 }
 
 @Controller()
-export class GmailTwinController {
-  constructor(private readonly service: GmailTwinService) {}
+export class GmailTwinServerController {
+  constructor(private readonly service: GmailTwinServerService) {}
 
   @Post('/gmail/v1/users/me/messages/send')
   @UseGuards(BearerJwtGuard)
@@ -73,9 +74,12 @@ export class GmailTwinController {
 
   @Post('/test/gmail/error-mode')
   @HttpCode(HttpStatus.OK)
-  setErrorMode(@Body() body: ErrorModeBody): { success: boolean; mode: GmailErrorMode | null } {
+  setErrorMode(@Body() body: ErrorModeBody): {
+    success: boolean;
+    mode: GmailTwinErrorMode | null;
+  } {
     const { mode } = body;
-    const validModes: (GmailErrorMode | null)[] = [
+    const validModes: (GmailTwinErrorMode | null)[] = [
       'insufficient-permissions',
       'rate-limit',
       'invalid-recipient',
@@ -121,5 +125,14 @@ export class GmailTwinController {
   getEmails(@Query('to') to?: string): CapturedEmail[] {
     return this.service.getEmails(to);
   }
-}
 
+  @Post(['/token', '/oauth2/v4/token', '/oauth2/v3/token'])
+  @HttpCode(HttpStatus.OK)
+  mockToken() {
+    return {
+      access_token: 'mock-twin-access-token',
+      token_type: 'Bearer',
+      expires_in: 3600,
+    };
+  }
+}

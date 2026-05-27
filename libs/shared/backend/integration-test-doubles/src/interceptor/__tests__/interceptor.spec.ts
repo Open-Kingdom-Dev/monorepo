@@ -7,7 +7,9 @@ describe('RoutingTable', () => {
       { hostname: 'gmail.googleapis.com', target: 'http://localhost:9014' },
     ]);
 
-    const resolved = table.resolve('https://gmail.googleapis.com/v1/users/me/messages');
+    const resolved = table.resolve(
+      'https://gmail.googleapis.com/v1/users/me/messages'
+    );
     expect(resolved).toBe('http://localhost:9014/v1/users/me/messages');
   });
 
@@ -16,8 +18,12 @@ describe('RoutingTable', () => {
       { hostname: 'gmail.googleapis.com', target: 'http://localhost:9014' },
     ]);
 
-    const resolved = table.resolve('https://gmail.googleapis.com/messages?maxResults=10&draft=true');
-    expect(resolved).toBe('http://localhost:9014/messages?maxResults=10&draft=true');
+    const resolved = table.resolve(
+      'https://gmail.googleapis.com/messages?maxResults=10&draft=true'
+    );
+    expect(resolved).toBe(
+      'http://localhost:9014/messages?maxResults=10&draft=true'
+    );
   });
 
   it('should perform case-insensitive host matching', () => {
@@ -31,7 +37,11 @@ describe('RoutingTable', () => {
 
   it('should restrict resolution by pathPrefix if provided', () => {
     const table = new RoutingTable([
-      { hostname: 'example.com', target: 'http://localhost:8080', pathPrefix: '/api' },
+      {
+        hostname: 'example.com',
+        target: 'http://localhost:8080',
+        pathPrefix: '/api',
+      },
     ]);
 
     // Matches pathPrefix
@@ -120,8 +130,13 @@ describe('NodeInterceptor', () => {
   it('should forward non-matching URLs untouched to original fetch', async () => {
     interceptor.install();
 
-    const response = await fetch('https://google.com/search', { method: 'GET' });
-    expect(mockOriginalFetch).toHaveBeenCalledWith('https://google.com/search', { method: 'GET' });
+    const response = await fetch('https://google.com/search', {
+      method: 'GET',
+    });
+    expect(mockOriginalFetch).toHaveBeenCalledWith(
+      'https://google.com/search',
+      { method: 'GET' }
+    );
     expect(response.status).toBe(200);
   });
 
@@ -163,12 +178,15 @@ describe('NodeInterceptor', () => {
   it('should support and correctly rewrite native Request parameters', async () => {
     interceptor.install();
 
-    const originalRequest = new Request('https://gmail.googleapis.com/v1/users/me/send', {
-      method: 'PUT',
-      headers: {
-        'Authorization': 'Bearer test-token',
-      },
-    });
+    const originalRequest = new Request(
+      'https://gmail.googleapis.com/v1/users/me/send',
+      {
+        method: 'PUT',
+        headers: {
+          Authorization: 'Bearer test-token',
+        },
+      }
+    );
 
     await fetch(originalRequest);
 
@@ -177,7 +195,11 @@ describe('NodeInterceptor', () => {
     const forwardedRequest = mockOriginalFetch.mock.calls[0][0] as Request;
     expect(forwardedRequest.url).toBe('http://localhost:9014/v1/users/me/send');
     expect(forwardedRequest.method).toBe('PUT');
-    expect(forwardedRequest.headers.get('Authorization')).toBe('Bearer test-token');
-    expect(forwardedRequest.headers.get('X-Original-Host')).toBe('gmail.googleapis.com');
+    expect(forwardedRequest.headers.get('Authorization')).toBe(
+      'Bearer test-token'
+    );
+    expect(forwardedRequest.headers.get('X-Original-Host')).toBe(
+      'gmail.googleapis.com'
+    );
   });
 });

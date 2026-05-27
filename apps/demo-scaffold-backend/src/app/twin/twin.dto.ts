@@ -1,6 +1,32 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { ErrorModeStateDto } from '@open-kingdom/shared-backend-feature-gcp-resources';
 
+export class GmailTwinStatusDto {
+  @ApiProperty({
+    description: 'Whether the Gmail mock server is currently running',
+    example: true,
+  })
+  running!: boolean;
+
+  @ApiProperty({
+    description: 'Whether the Gmail mock server is healthy',
+    example: true,
+  })
+  healthy!: boolean;
+
+  @ApiProperty({
+    description: 'The port the Gmail mock server is listening on',
+    example: 9014,
+  })
+  port!: number;
+
+  @ApiPropertyOptional({
+    description: 'The URL of the Gmail mock server',
+    example: 'http://localhost:9014',
+  })
+  url?: string;
+}
+
 export class TwinStatusDto {
   @ApiProperty({
     description: 'Whether the twin emulator is currently running',
@@ -31,6 +57,24 @@ export class TwinStatusDto {
     type: ErrorModeStateDto,
   })
   errorMode?: ErrorModeStateDto;
+
+  @ApiPropertyOptional({
+    description: 'Status of the Gmail twin emulator',
+    type: GmailTwinStatusDto,
+  })
+  gmail?: GmailTwinStatusDto;
+
+  @ApiProperty({
+    description: 'Whether the global fetch/HTTP request interceptor is active',
+    example: true,
+  })
+  interceptorActive?: boolean;
+
+  @ApiProperty({
+    description: 'Whether real Gmail credentials are fully configured in the environment',
+    example: false,
+  })
+  realGmailConfigured?: boolean;
 }
 
 export class TwinStartResponseDto {

@@ -10,7 +10,3 @@ export * from './gcs/index.js';
 
 // Interceptor layer
 export * from './interceptor/index.js';
-
-// Gmail twin
-export * from './gmail/index.js';
-
