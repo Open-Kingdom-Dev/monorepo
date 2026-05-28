@@ -342,5 +342,133 @@ describe('GmailTwinServer', () => {
 
       expect(sendRes.status).toBe(200);
     });
+
+    it('should return 500 when active error mode is unknown', async () => {
+      const service = (twin as any).service;
+      service.setErrorMode('unknown-mode' as any);
+
+      try {
+        const host = twin.getEmulatorHost();
+        const res = await fetch(`${host}/gmail/v1/users/me/messages/send`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: 'Bearer header.payload.signature',
+          },
+          body: JSON.stringify({ raw: 'some-raw' }),
+        });
+        expect(res.status).toBe(500);
+        const json = (await res.json()) as any;
+        expect(json.error.message).toBe('Unknown simulated error mode');
+      } finally {
+        service.reset();
+      }
+    });
+
+    it('should return 500 when service throws non-HttpException', async () => {
+      const service = (twin as any).service;
+      const originalSend = service.sendEmail;
+      service.sendEmail = jest
+        .fn()
+        .mockRejectedValue(new Error('Internal Database Error'));
+
+      try {
+        const host = twin.getEmulatorHost();
+        const res = await fetch(`${host}/gmail/v1/users/me/messages/send`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: 'Bearer header.payload.signature',
+          },
+          body: JSON.stringify({ raw: 'some-raw' }),
+        });
+        expect(res.status).toBe(500);
+        const json = (await res.json()) as any;
+        expect(json.error.message).toContain('Internal Database Error');
+      } finally {
+        service.sendEmail = originalSend;
+      }
+    });
+  });
+
+  describe('Control Plane Endpoints', () => {
+    it('should respond to token endpoints', async () => {
+      const host = twin.getEmulatorHost();
+      for (const path of ['/token', '/oauth2/v4/token', '/oauth2/v3/token']) {
+        const res = await fetch(`${host}${path}`, { method: 'POST' });
+        expect(res.status).toBe(200);
+        const json = (await res.json()) as any;
+        expect(json.access_token).toBe('mock-twin-access-token');
+      }
+    });
+
+    it('should return 400 when sending message with missing raw field', async () => {
+      const host = twin.getEmulatorHost();
+      const res = await fetch(`${host}/gmail/v1/users/me/messages/send`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: 'Bearer header.payload.signature',
+        },
+        body: JSON.stringify({}),
+      });
+      expect(res.status).toBe(400);
+    });
+  });
+
+  describe('Unstarted Server', () => {
+    it('should throw errors when accessing service properties before start', () => {
+      const unstartedTwin = new GmailTwinServer({ port: 9016 });
+      expect(() => unstartedTwin.getEmailStore()).toThrow(
+        'GmailTwinServer has not been started yet'
+      );
+      expect(() => unstartedTwin.getEmails()).toThrow(
+        'GmailTwinServer has not been started yet'
+      );
+      expect(() => unstartedTwin.setErrorMode(null)).toThrow(
+        'GmailTwinServer has not been started yet'
+      );
+      expect(() => unstartedTwin.getErrorMode()).toThrow(
+        'GmailTwinServer has not been started yet'
+      );
+    });
+
+    it('should return false for health check when unstarted', async () => {
+      const unstartedTwin = new GmailTwinServer({
+        port: 9017,
+        externalUrl: 'http://localhost:9017',
+      });
+      const healthy = await unstartedTwin.isHealthy();
+      expect(healthy).toBe(false);
+    });
+  });
+
+  describe('Disable Auth Server', () => {
+    let noAuthTwin: GmailTwinServer;
+    beforeAll(async () => {
+      noAuthTwin = new GmailTwinServer({ port: 9018, disableAuth: true });
+      await noAuthTwin.start();
+    });
+    afterAll(async () => {
+      await noAuthTwin.stop();
+    });
+
+    it('should allow sending emails without Authorization header', async () => {
+      const rawEmail = buildRawEmail({
+        to: 'recipient@example.com',
+        from: 'sender@example.com',
+        subject: 'No Auth Test',
+        text: 'No auth',
+      });
+      const res = await fetch(
+        `${noAuthTwin.getEmulatorHost()}/gmail/v1/users/me/messages/send`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ raw: rawEmail }),
+        }
+      );
+      expect(res.status).toBe(200);
+    });
   });
 });

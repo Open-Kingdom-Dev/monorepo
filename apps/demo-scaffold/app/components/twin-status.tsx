@@ -50,7 +50,7 @@ export function TwinStatus() {
     return (
       <div className="border rounded-lg p-4 bg-gray-50 flex items-center justify-between">
         <span className="text-sm text-gray-500 font-medium">
-          Checking Digital Twins...
+          Checking status...
         </span>
         <div className="h-4 w-4 border-2 border-gray-300 border-t-blue-600 rounded-full animate-spin"></div>
       </div>
@@ -61,7 +61,7 @@ export function TwinStatus() {
     return (
       <div className="border rounded-lg p-4 bg-red-50 flex items-center justify-between">
         <span className="text-sm text-red-700 font-medium">
-          Failed to retrieve status
+          Failed to load status
         </span>
         <button
           onClick={() => refetch()}
@@ -74,6 +74,7 @@ export function TwinStatus() {
   }
 
   const running = status?.running ?? false;
+  const healthy = status?.healthy ?? false;
   const port = status?.port ?? 9013;
 
   // Gmail digital twin specific fields
@@ -89,11 +90,13 @@ export function TwinStatus() {
         <span
           className={`px-2 py-0.5 text-xs font-bold rounded-full transition-colors duration-300 ${
             running
-              ? 'bg-green-100 text-green-800'
-              : 'bg-gray-100 text-gray-800'
+              ? healthy
+                ? 'bg-green-500 text-white'
+                : 'bg-yellow-500 text-white'
+              : 'bg-gray-400 text-white'
           }`}
         >
-          {running ? 'ENVIRONMENT UP' : 'ENVIRONMENT DOWN'}
+          {running ? (healthy ? 'Running' : 'Unhealthy') : 'Stopped'}
         </span>
       </div>
 
@@ -112,7 +115,22 @@ export function TwinStatus() {
               }`}
             ></span>
             <span className="font-mono text-xs">
-              {running ? `Port ${port}` : 'Stopped'}
+              {running ? (
+                status?.url ? (
+                  <a
+                    href={status.url}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="text-blue-600 hover:underline"
+                  >
+                    {status.url}
+                  </a>
+                ) : (
+                  `Port ${port}`
+                )
+              ) : (
+                'Stopped'
+              )}
             </span>
           </div>
         </div>
@@ -131,7 +149,22 @@ export function TwinStatus() {
               }`}
             ></span>
             <span className="font-mono text-xs">
-              {gmail?.running ? `Port ${gmail?.port ?? 9014}` : 'Stopped'}
+              {gmail?.running ? (
+                gmail?.url ? (
+                  <a
+                    href={gmail.url}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="text-blue-600 hover:underline"
+                  >
+                    {gmail.url}
+                  </a>
+                ) : (
+                  `Port ${gmail?.port ?? 9014}`
+                )
+              ) : (
+                'Stopped'
+              )}
             </span>
           </div>
         </div>

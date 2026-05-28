@@ -107,8 +107,8 @@ describe('TwinStatus', () => {
 
       render(<TwinStatus />);
 
-      const startButton = screen.getByRole('button', { name: /Start Twin/i });
-      const stopButton = screen.getByRole('button', { name: /Stop Twin/i });
+      const startButton = screen.getByRole('button', { name: /Boot All/i });
+      const stopButton = screen.getByRole('button', { name: /Shutdown/i });
 
       expect(startButton).not.toBeDisabled();
       expect(stopButton).toBeDisabled();
@@ -160,8 +160,8 @@ describe('TwinStatus', () => {
 
       render(<TwinStatus />);
 
-      const startButton = screen.getByRole('button', { name: /Start Twin/i });
-      const stopButton = screen.getByRole('button', { name: /Stop Twin/i });
+      const startButton = screen.getByRole('button', { name: /Boot All/i });
+      const stopButton = screen.getByRole('button', { name: /Shutdown/i });
 
       expect(startButton).toBeDisabled();
       expect(stopButton).not.toBeDisabled();

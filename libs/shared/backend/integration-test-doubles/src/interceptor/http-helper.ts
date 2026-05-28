@@ -174,6 +174,7 @@ export function forwardToOriginalRequest(
       return callRequestWithUrl(originalRequest, arg1, cb);
     }
   } else {
-    return callRequestWithOptions(originalRequest, arg1, callback);
+    const cb = typeof arg2 === 'function' ? arg2 : callback;
+    return callRequestWithOptions(originalRequest, arg1, cb);
   }
 }
