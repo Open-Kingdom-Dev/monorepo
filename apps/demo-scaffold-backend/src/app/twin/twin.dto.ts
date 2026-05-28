@@ -71,7 +71,8 @@ export class TwinStatusDto {
   interceptorActive?: boolean;
 
   @ApiProperty({
-    description: 'Whether real Gmail credentials are fully configured in the environment',
+    description:
+      'Whether real Gmail credentials are fully configured in the environment',
     example: false,
   })
   realGmailConfigured?: boolean;

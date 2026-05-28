@@ -22,6 +22,31 @@ interface InterceptedEmail {
   headers?: Record<string, string>;
 }
 
+interface GmailTwinStatus {
+  running: boolean;
+  healthy: boolean;
+  port: number;
+  url?: string;
+}
+
+interface ExtendedTwinStatusDto {
+  running?: boolean;
+  healthy?: boolean;
+  port?: number;
+  url?: string;
+  errorMode?: any;
+  gmail?: GmailTwinStatus;
+  interceptorActive?: boolean;
+  realGmailConfigured?: boolean;
+}
+
+interface RTKQueryError {
+  data?: {
+    message?: string;
+  };
+  message?: string;
+}
+
 export default function GmailDemo() {
   const dispatch = useDispatch();
   const { data: twinStatus, refetch: refetchStatus } =
@@ -47,9 +72,10 @@ export default function GmailDemo() {
     'Hello Team, this email is automatically intercepted at the network level by our NodeInterceptor layer!'
   );
 
-  const twinRunning = twinStatus?.running ?? false;
-  const twinHealthy = twinStatus?.healthy ?? false;
-  const realGmailConfigured = (twinStatus as any)?.realGmailConfigured ?? false;
+  const status = twinStatus as ExtendedTwinStatusDto | undefined;
+  const twinRunning = status?.running ?? false;
+  const twinHealthy = status?.healthy ?? false;
+  const realGmailConfigured = status?.realGmailConfigured ?? false;
 
   let buttonText = 'Send via Gmail SDK API';
   let buttonColorClass = 'bg-blue-600 hover:bg-blue-700';
@@ -154,10 +180,11 @@ export default function GmailDemo() {
         );
       }
     } catch (err) {
+      const rtkErr = err as RTKQueryError;
       dispatch(
         showErrorNotification(
           `Execution error: ${
-            (err as any)?.data?.message || (err as Error).message
+            rtkErr.data?.message || rtkErr.message || 'Unknown error'
           }`
         )
       );
@@ -171,8 +198,8 @@ export default function GmailDemo() {
         try {
           const response = await fetch('/api/twin/status');
           if (response.ok) {
-            const data = await response.json();
-            // Optional: load error mode status if returned, but setting errorMode directly is clean
+            const data = (await response.json()) as ExtendedTwinStatusDto;
+            console.debug('Digital Twin status synced:', data);
           }
         } catch (e) {
           console.error(e);
@@ -193,7 +220,7 @@ export default function GmailDemo() {
   return (
     <div className="p-6 max-w-7xl mx-auto space-y-6 animate-fade-in">
       {/* Alert if not running */}
-      {!twinRunning && !(twinStatus as any)?.realGmailConfigured && (
+      {!twinRunning && !status?.realGmailConfigured && (
         <div className="p-4 bg-red-50 border border-red-200 rounded-lg flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-sm transition-all duration-300">
           <div className="flex items-start md:items-center gap-3">
             <span
@@ -239,7 +266,7 @@ export default function GmailDemo() {
         </div>
       )}
 
-      {!twinRunning && (twinStatus as any)?.realGmailConfigured && (
+      {!twinRunning && status?.realGmailConfigured && (
         <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-sm transition-all duration-300">
           <div className="flex items-start md:items-center gap-3">
             <span role="img" aria-label="Info" className="text-2xl">
@@ -298,6 +325,17 @@ export default function GmailDemo() {
               <div>
                 <h2 className="text-xl font-bold text-gray-900 flex items-center gap-2">
                   <span>📬 Mock Inbox</span>
+                  {twinRunning && (
+                    <span
+                      className={`text-xs px-2 py-0.5 rounded-full font-bold ${
+                        twinHealthy
+                          ? 'bg-green-100 text-green-800'
+                          : 'bg-red-100 text-red-800 animate-pulse'
+                      }`}
+                    >
+                      {twinHealthy ? '● Healthy' : '● Unhealthy'}
+                    </span>
+                  )}
                   {emails.length > 0 && (
                     <span className="bg-blue-100 text-blue-800 text-xs px-2 py-0.5 rounded-full font-bold">
                       {emails.length} intercepted
