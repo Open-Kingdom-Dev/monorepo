@@ -42,11 +42,19 @@ describe('RoutingTable', () => {
         target: 'http://localhost:8080',
         pathPrefix: '/api',
       },
+      {
+        hostname: 'www.googleapis.com',
+        target: 'http://localhost:9016',
+        pathPrefix: '/youtube/',
+      },
     ]);
 
     // Matches pathPrefix
     const resolvedApi = table.resolve('https://example.com/api/v1/users');
     expect(resolvedApi).toBe('http://localhost:8080/api/v1/users');
+
+    const resolvedYoutube = table.resolve('https://www.googleapis.com/youtube/v3/search');
+    expect(resolvedYoutube).toBe('http://localhost:9016/youtube/v3/search');
 
     // Does not match pathPrefix
     const resolvedWeb = table.resolve('https://example.com/web/home');
@@ -201,5 +209,35 @@ describe('NodeInterceptor', () => {
     expect(forwardedRequest.headers.get('X-Original-Host')).toBe(
       'gmail.googleapis.com'
     );
+  });
+
+  it('should support and correctly rewrite native Request parameters including body', async () => {
+    interceptor.install();
+
+    const originalRequest = new Request(
+      'https://gmail.googleapis.com/v1/users/me/send',
+      {
+        method: 'POST',
+        headers: {
+          Authorization: 'Bearer test-token',
+        },
+        body: 'test-body',
+      }
+    );
+
+    await fetch(originalRequest);
+
+    expect(mockOriginalFetch).toHaveBeenCalledWith(expect.any(Request));
+
+    const forwardedRequest = mockOriginalFetch.mock.calls[0][0] as Request;
+    expect(forwardedRequest.url).toBe('http://localhost:9014/v1/users/me/send');
+    expect(forwardedRequest.method).toBe('POST');
+    expect(forwardedRequest.headers.get('Authorization')).toBe(
+      'Bearer test-token'
+    );
+    expect(forwardedRequest.headers.get('X-Original-Host')).toBe(
+      'gmail.googleapis.com'
+    );
+    expect(forwardedRequest.body).toBeDefined();
   });
 });

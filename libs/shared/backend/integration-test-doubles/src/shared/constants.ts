@@ -41,4 +41,6 @@ export const ENV_VARS = {
   GCS_TWIN_DATA_DIR: 'GCS_TWIN_DATA_DIR',
   /** Gmail twin port override */
   GMAIL_TWIN_PORT: 'GMAIL_TWIN_PORT',
+  /** YouTube twin port override */
+  YOUTUBE_TWIN_PORT: 'YOUTUBE_TWIN_PORT',
 } as const;
