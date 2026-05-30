@@ -6,19 +6,19 @@ export class GmailTwinStatusDto {
     description: 'Whether the Gmail mock server is currently running',
     example: true,
   })
-  running!: boolean;
+  running?: boolean;
 
   @ApiProperty({
     description: 'Whether the Gmail mock server is healthy',
     example: true,
   })
-  healthy!: boolean;
+  healthy?: boolean;
 
   @ApiProperty({
     description: 'The port the Gmail mock server is listening on',
     example: 9014,
   })
-  port!: number;
+  port?: number;
 
   @ApiPropertyOptional({
     description: 'The URL of the Gmail mock server',

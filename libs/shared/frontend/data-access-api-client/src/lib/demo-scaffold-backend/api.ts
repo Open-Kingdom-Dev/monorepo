@@ -341,6 +341,24 @@ const injectedRtkApi = api
         }),
         invalidatesTags: ["GCS Storage"],
       }),
+      gcsStorageControllerActivateErrorMode: build.mutation<
+        GcsStorageControllerActivateErrorModeApiResponse,
+        GcsStorageControllerActivateErrorModeApiArg
+      >({
+        query: (queryArg) => ({
+          url: `/api/gcs/error-mode`,
+          method: "POST",
+          body: queryArg.activateErrorModeDto,
+        }),
+        invalidatesTags: ["GCS Storage"],
+      }),
+      gcsStorageControllerDeactivateErrorMode: build.mutation<
+        GcsStorageControllerDeactivateErrorModeApiResponse,
+        GcsStorageControllerDeactivateErrorModeApiArg
+      >({
+        query: () => ({ url: `/api/gcs/error-mode`, method: "DELETE" }),
+        invalidatesTags: ["GCS Storage"],
+      }),
       leadConversionControllerConvert: build.mutation<
         LeadConversionControllerConvertApiResponse,
         LeadConversionControllerConvertApiArg
@@ -727,24 +745,6 @@ const injectedRtkApi = api
         }),
         invalidatesTags: ["Opportunities"],
       }),
-      gcsStorageControllerActivateErrorMode: build.mutation<
-        GcsStorageControllerActivateErrorModeApiResponse,
-        GcsStorageControllerActivateErrorModeApiArg
-      >({
-        query: (queryArg) => ({
-          url: `/api/gcs/error-mode`,
-          method: "POST",
-          body: queryArg.activateErrorModeDto,
-        }),
-        invalidatesTags: ["GCS Storage"],
-      }),
-      gcsStorageControllerDeactivateErrorMode: build.mutation<
-        GcsStorageControllerDeactivateErrorModeApiResponse,
-        GcsStorageControllerDeactivateErrorModeApiArg
-      >({
-        query: () => ({ url: `/api/gcs/error-mode`, method: "DELETE" }),
-        invalidatesTags: ["GCS Storage"],
-      }),
       twinControllerGetStatus: build.query<
         TwinControllerGetStatusApiResponse,
         TwinControllerGetStatusApiArg
@@ -764,6 +764,33 @@ const injectedRtkApi = api
         TwinControllerStopApiArg
       >({
         query: () => ({ url: `/api/twin/stop`, method: "POST" }),
+        invalidatesTags: ["Twin"],
+      }),
+      twinControllerGetGmailEmails: build.query<
+        TwinControllerGetGmailEmailsApiResponse,
+        TwinControllerGetGmailEmailsApiArg
+      >({
+        query: () => ({ url: `/api/twin/gmail/emails` }),
+        providesTags: ["Twin"],
+      }),
+      twinControllerResetGmail: build.mutation<
+        TwinControllerResetGmailApiResponse,
+        TwinControllerResetGmailApiArg
+      >({
+        query: () => ({ url: `/api/twin/gmail/reset`, method: "POST" }),
+        invalidatesTags: ["Twin"],
+      }),
+      twinControllerSetGmailErrorMode: build.mutation<
+        TwinControllerSetGmailErrorModeApiResponse,
+        TwinControllerSetGmailErrorModeApiArg
+      >({
+        query: (queryArg) => ({
+          url: `/api/twin/gmail/error-mode`,
+          method: "POST",
+          params: {
+            mode: queryArg.mode,
+          },
+        }),
         invalidatesTags: ["Twin"],
       }),
     }),
@@ -932,6 +959,14 @@ export type GcsStorageControllerDeleteFileApiArg = {
   /** File name */
   fileName: string;
 };
+export type GcsStorageControllerActivateErrorModeApiResponse =
+  /** status 200 Error mode activated */ ErrorModeStateDto;
+export type GcsStorageControllerActivateErrorModeApiArg = {
+  activateErrorModeDto: ActivateErrorModeDto;
+};
+export type GcsStorageControllerDeactivateErrorModeApiResponse =
+  /** status 200 Error mode deactivated */ ErrorModeStateDto;
+export type GcsStorageControllerDeactivateErrorModeApiArg = void;
 export type LeadConversionControllerConvertApiResponse = unknown;
 export type LeadConversionControllerConvertApiArg = {
   id: number;
@@ -1124,27 +1159,23 @@ export type OpportunitiesControllerCloseApiArg = {
   id: number;
   closeOpportunityDto: CloseOpportunityDto;
 };
-export type TwinControllerGetStatusApiArg = void;
-export type TwinControllerStartApiResponse =
-  /** status 200 Twin started successfully */ {
-    success?: boolean;
-    message?: string;
-    url?: string;
-  };
-export type GcsStorageControllerActivateErrorModeApiResponse =
-  /** status 200 Error mode activated */ ErrorModeStateDto;
-export type GcsStorageControllerActivateErrorModeApiArg = {
-  activateErrorModeDto: ActivateErrorModeDto;
-};
-export type GcsStorageControllerDeactivateErrorModeApiResponse =
-  /** status 200 Error mode deactivated */ ErrorModeStateDto;
-export type GcsStorageControllerDeactivateErrorModeApiArg = void;
 export type TwinControllerGetStatusApiResponse =
   /** status 200 Twin status retrieved successfully */ TwinStatusDto;
+export type TwinControllerGetStatusApiArg = void;
+export type TwinControllerStartApiResponse =
+  /** status 200 Twin environment started successfully */ TwinStartResponseDto;
 export type TwinControllerStartApiArg = void;
 export type TwinControllerStopApiResponse =
-  /** status 200 Twin stopped successfully */ TwinStopResponseDto;
+  /** status 200 Twin environment stopped successfully */ TwinStopResponseDto;
 export type TwinControllerStopApiArg = void;
+export type TwinControllerGetGmailEmailsApiResponse = unknown;
+export type TwinControllerGetGmailEmailsApiArg = void;
+export type TwinControllerResetGmailApiResponse = unknown;
+export type TwinControllerResetGmailApiArg = void;
+export type TwinControllerSetGmailErrorModeApiResponse = unknown;
+export type TwinControllerSetGmailErrorModeApiArg = {
+  mode: string;
+};
 export type LoginResponseDto = {
   /** JWT access token */
   access_token: string;
@@ -1292,6 +1323,27 @@ export type GetDownloadUrlResponseDto = {
   /** URL expiration timestamp */
   expiresAt: string;
 };
+export type GcsErrorModeType =
+  | "bucket-not-found"
+  | "quota-exceeded"
+  | "permission-denied"
+  | "intermittent-failure";
+export type ErrorModeStateDto = {
+  /** Whether an error mode is currently active */
+  active: boolean;
+  /** The active error mode type */
+  type?: GcsErrorModeType;
+  /** Human-readable description of what the error mode does */
+  description?: string;
+};
+export type ActivateErrorModeDto = {
+  /** The error mode to activate */
+  type: GcsErrorModeType;
+  /** Bucket name for bucket-not-found mode. Required when type is bucket-not-found. */
+  bucketName?: string;
+  /** Fail every Nth request for intermittent-failure mode. Defaults to 2. */
+  failEveryN?: number;
+};
 export type ConvertLeadRequestDto = {
   contactId?: number;
   companyId?: number;
@@ -1339,9 +1391,11 @@ export type UpdateConfigurableLookupDto = {
 };
 export type ActivityLogEntryDto = {
   id: number;
-  relatedType: "contact" | "company" | "lead" | "opportunity";
+  /** Polymorphic identifier for the related record kind. Validated against the allowed-types list registered via DataAccessActivityLogModule.forRoot(). */
+  relatedType: string;
   relatedId: number;
-  type: "note" | "call" | "meeting" | "email" | "task";
+  /** Activity type. Validated against the allowed-types list registered via DataAccessActivityLogModule.forRoot(). */
+  type: string;
   subject: string;
   description?: object | null;
   dueAt?: string | null;
@@ -1351,9 +1405,9 @@ export type ActivityLogEntryDto = {
   updatedAt: string;
 };
 export type CreateActivityLogEntryDto = {
-  relatedType: "contact" | "company" | "lead" | "opportunity";
+  relatedType: string;
   relatedId: number;
-  type: "note" | "call" | "meeting" | "email" | "task";
+  type: string;
   subject: string;
   description?: string;
   dueAt?: string;
@@ -1539,27 +1593,16 @@ export type UpdateOpportunityDto = {
 export type CloseOpportunityDto = {
   outcome: "won" | "lost";
   lossReason?: string;
-}
-export type GcsErrorModeType =
-  | "bucket-not-found"
-  | "quota-exceeded"
-  | "permission-denied"
-  | "intermittent-failure";
-export type ErrorModeStateDto = {
-  /** Whether an error mode is currently active */
-  active: boolean;
-  /** The active error mode type */
-  type?: GcsErrorModeType;
-  /** Human-readable description of what the error mode does */
-  description?: string;
 };
-export type ActivateErrorModeDto = {
-  /** The error mode to activate */
-  type: GcsErrorModeType;
-  /** Bucket name for bucket-not-found mode. Required when type is bucket-not-found. */
-  bucketName?: string;
-  /** Fail every Nth request for intermittent-failure mode. Defaults to 2. */
-  failEveryN?: number;
+export type GmailTwinStatusDto = {
+  /** Whether the Gmail mock server is currently running */
+  running: boolean;
+  /** Whether the Gmail mock server is healthy */
+  healthy: boolean;
+  /** The port the Gmail mock server is listening on */
+  port: number;
+  /** The URL of the Gmail mock server */
+  url?: string;
 };
 export type TwinStatusDto = {
   /** Whether the twin emulator is currently running */
@@ -1572,6 +1615,12 @@ export type TwinStatusDto = {
   url?: string;
   /** Current error simulation mode state */
   errorMode: ErrorModeStateDto;
+  /** Status of the Gmail twin emulator */
+  gmail?: GmailTwinStatusDto;
+  /** Whether the global fetch/HTTP request interceptor is active */
+  interceptorActive: boolean;
+  /** Whether real Gmail credentials are fully configured in the environment */
+  realGmailConfigured: boolean;
 };
 export type TwinStartResponseDto = {
   success: boolean;
@@ -1616,6 +1665,8 @@ export const {
   useGcsStorageControllerGenerateDownloadUrlQuery,
   useGcsStorageControllerDownloadFileQuery,
   useGcsStorageControllerDeleteFileMutation,
+  useGcsStorageControllerActivateErrorModeMutation,
+  useGcsStorageControllerDeactivateErrorModeMutation,
   useLeadConversionControllerConvertMutation,
   useDashboardControllerSnapshotQuery,
   useConfigurableLookupsControllerFindAllQuery,
@@ -1652,9 +1703,10 @@ export const {
   useOpportunitiesControllerFindOneQuery,
   useOpportunitiesControllerUpdateMutation,
   useOpportunitiesControllerCloseMutation,
-  useGcsStorageControllerActivateErrorModeMutation,
-  useGcsStorageControllerDeactivateErrorModeMutation,
   useTwinControllerGetStatusQuery,
   useTwinControllerStartMutation,
   useTwinControllerStopMutation,
+  useTwinControllerGetGmailEmailsQuery,
+  useTwinControllerResetGmailMutation,
+  useTwinControllerSetGmailErrorModeMutation,
 } = injectedRtkApi;

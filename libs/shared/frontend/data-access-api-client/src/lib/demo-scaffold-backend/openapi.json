@@ -8,7 +8,7 @@
         "parameters": [],
         "requestBody": {
           "required": true,
-        "description": "User login credentials",
+          "description": "User login credentials",
           "content": {
             "application/json": {
               "schema": {
@@ -1333,6 +1333,60 @@
         ]
       }
     },
+    "/api/gcs/error-mode": {
+      "post": {
+        "description": "Activates a GCS error simulation mode. Only one mode can be active at a time — activating a new mode replaces the previous one. Only functional when the twin is running.",
+        "operationId": "GcsStorageController_activateErrorMode",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ActivateErrorModeDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Error mode activated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorModeStateDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Activate a GCS error mode",
+        "tags": [
+          "GCS Storage"
+        ]
+      },
+      "delete": {
+        "description": "Deactivates the current GCS error simulation mode, returning to normal pass-through behavior.",
+        "operationId": "GcsStorageController_deactivateErrorMode",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Error mode deactivated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorModeStateDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Deactivate current GCS error mode",
+        "tags": [
+          "GCS Storage"
+        ]
+      }
+    },
     "/api/leads/{id}/convert": {
       "post": {
         "operationId": "LeadConversionController_convert",
@@ -1465,10 +1519,6 @@
       },
       "post": {
         "operationId": "ConfigurableLookupsController_create",
-    "/api/gcs/error-mode": {
-      "post": {
-        "description": "Activates a GCS error simulation mode. Only one mode can be active at a time — activating a new mode replaces the previous one. Only functional when the twin is running.",
-        "operationId": "GcsStorageController_activateErrorMode",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -1570,7 +1620,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/ActivateErrorModeDto"
+                "$ref": "#/components/schemas/UpdateConfigurableLookupDto"
               }
             }
           }
@@ -3077,47 +3127,12 @@
         "summary": "Mark an opportunity as won or lost",
         "tags": [
           "Opportunities"
-          ],
-            "description": "Error mode activated",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorModeStateDto"
-                }
-              }
-            }
-          }
-        },
-        "summary": "Activate a GCS error mode",
-        "tags": [
-          "GCS Storage"
-        ]
-      },
-      "delete": {
-        "description": "Deactivates the current GCS error simulation mode, returning to normal pass-through behavior.",
-        "operationId": "GcsStorageController_deactivateErrorMode",
-        "parameters": [],
-        "responses": {
-          "200": {
-            "description": "Error mode deactivated",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorModeStateDto"
-                }
-              }
-            }
-          }
-        },
-        "summary": "Deactivate current GCS error mode",
-        "tags": [
-          "GCS Storage"
         ]
       }
     },
     "/api/twin/status": {
       "get": {
-        "description": "Returns the current status of the GCS twin (running, healthy, port, URL) and the active error mode state.",
+        "description": "Returns the current status of the GCS twin (running, healthy, port, URL) along with active error mode state, Gmail REST mock, and global interception hooks.",
         "operationId": "TwinController_getStatus",
         "parameters": [],
         "responses": {
@@ -3126,25 +3141,6 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "properties": {
-                    "running": {
-                      "type": "boolean",
-                      "example": true
-                    },
-                    "healthy": {
-                      "type": "boolean",
-                      "example": true
-                    },
-                    "port": {
-                      "type": "number",
-                      "example": 9013
-                    },
-                    "url": {
-                      "type": "string",
-                      "example": "http://localhost:9013"
-                    }
-                  },
                   "$ref": "#/components/schemas/TwinStatusDto"
                 }
               }
@@ -3159,58 +3155,32 @@
     },
     "/api/twin/start": {
       "post": {
-        "description": "Starts the GCS twin Docker container and seeds initial data. Requires Docker to be running.",
+        "description": "Starts GCS twin Docker container, NestJS Gmail mock server, and installs global interception hooks. Requires Docker to be running.",
         "operationId": "TwinController_start",
         "parameters": [],
         "responses": {
           "200": {
-            "description": "Twin started successfully",
+            "description": "Twin environment started successfully",
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "properties": {
-                    "success": {
-                      "type": "boolean",
-                      "example": true
-                    },
-                    "message": {
-                      "type": "string",
-                      "example": "GCS twin started on port 9013"
-                    },
-                    "url": {
-                      "type": "string",
-                      "example": "http://localhost:9013"
-                    }
-                  },
                   "$ref": "#/components/schemas/TwinStartResponseDto"
                 }
               }
             }
           },
           "500": {
-            "description": "Failed to start twin",
+            "description": "Failed to start twin environment",
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "properties": {
-                    "success": {
-                      "type": "boolean",
-                      "example": false
-                    },
-                    "message": {
-                      "type": "string",
-                      "example": "Failed to start GCS twin: Docker is not running"
-                    }
-                  },
                   "$ref": "#/components/schemas/TwinStartResponseDto"
                 }
               }
             }
           }
         },
-        "summary": "Start twin",
+        "summary": "Start twin environment",
         "tags": [
           "Twin"
         ]
@@ -3218,12 +3188,12 @@
     },
     "/api/twin/stop": {
       "post": {
-        "description": "Stops the GCS twin Docker container.",
+        "description": "Gracefully cleans up GCS container, Gmail mock server, and removes interceptor hook.",
         "operationId": "TwinController_stop",
         "parameters": [],
         "responses": {
           "200": {
-            "description": "Twin stopped successfully",
+            "description": "Twin environment stopped successfully",
             "content": {
               "application/json": {
                 "schema": {
@@ -3233,28 +3203,74 @@
             }
           },
           "500": {
-            "description": "Failed to stop twin",
+            "description": "Failed to stop twin environment",
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "properties": {
-                    "success": {
-                      "type": "boolean",
-                      "example": false
-                    },
-                    "message": {
-                      "type": "string",
-                      "example": "Failed to stop GCS twin: Container not found"
-                    }
-                  },
                   "$ref": "#/components/schemas/TwinStopResponseDto"
                 }
               }
             }
           }
         },
-        "summary": "Stop twin",
+        "summary": "Stop twin environment",
+        "tags": [
+          "Twin"
+        ]
+      }
+    },
+    "/api/twin/gmail/emails": {
+      "get": {
+        "description": "Fetches structured emails intercepted in-memory by Gmail digital twin.",
+        "operationId": "TwinController_getGmailEmails",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Get intercepted emails",
+        "tags": [
+          "Twin"
+        ]
+      }
+    },
+    "/api/twin/gmail/reset": {
+      "post": {
+        "description": "Clears the list of stored emails inside the local twin.",
+        "operationId": "TwinController_resetGmail",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Reset mailbox",
+        "tags": [
+          "Twin"
+        ]
+      }
+    },
+    "/api/twin/gmail/error-mode": {
+      "post": {
+        "description": "Changes the active simulated error state for standard REST endpoint handlers.",
+        "operationId": "TwinController_setGmailErrorMode",
+        "parameters": [
+          {
+            "name": "mode",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Configure error injection mode",
         "tags": [
           "Twin"
         ]
@@ -3760,6 +3776,68 @@
           "expiresAt"
         ]
       },
+      "GcsErrorModeType": {
+        "type": "string",
+        "enum": [
+          "bucket-not-found",
+          "quota-exceeded",
+          "permission-denied",
+          "intermittent-failure"
+        ],
+        "description": "The error mode to activate"
+      },
+      "ActivateErrorModeDto": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "description": "The error mode to activate",
+            "example": "quota-exceeded",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/GcsErrorModeType"
+              }
+            ]
+          },
+          "bucketName": {
+            "type": "string",
+            "description": "Bucket name for bucket-not-found mode. Required when type is bucket-not-found.",
+            "example": "app-assets"
+          },
+          "failEveryN": {
+            "type": "number",
+            "description": "Fail every Nth request for intermittent-failure mode. Defaults to 2.",
+            "example": 3
+          }
+        },
+        "required": [
+          "type"
+        ]
+      },
+      "ErrorModeStateDto": {
+        "type": "object",
+        "properties": {
+          "active": {
+            "type": "boolean",
+            "description": "Whether an error mode is currently active",
+            "example": true
+          },
+          "type": {
+            "description": "The active error mode type",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/GcsErrorModeType"
+              }
+            ]
+          },
+          "description": {
+            "type": "string",
+            "description": "Human-readable description of what the error mode does"
+          }
+        },
+        "required": [
+          "active"
+        ]
+      },
       "ConvertLeadRequestDto": {
         "type": "object",
         "properties": {
@@ -3931,25 +4009,14 @@
           },
           "relatedType": {
             "type": "string",
-            "enum": [
-              "contact",
-              "company",
-              "lead",
-              "opportunity"
-            ]
+            "description": "Polymorphic identifier for the related record kind. Validated against the allowed-types list registered via DataAccessActivityLogModule.forRoot()."
           },
           "relatedId": {
             "type": "number"
           },
           "type": {
             "type": "string",
-            "enum": [
-              "note",
-              "call",
-              "meeting",
-              "email",
-              "task"
-            ]
+            "description": "Activity type. Validated against the allowed-types list registered via DataAccessActivityLogModule.forRoot()."
           },
           "subject": {
             "type": "string"
@@ -3995,26 +4062,13 @@
         "type": "object",
         "properties": {
           "relatedType": {
-            "type": "string",
-            "enum": [
-              "contact",
-              "company",
-              "lead",
-              "opportunity"
-            ]
+            "type": "string"
           },
           "relatedId": {
             "type": "number"
           },
           "type": {
-            "type": "string",
-            "enum": [
-              "note",
-              "call",
-              "meeting",
-              "email",
-              "task"
-            ]
+            "type": "string"
           },
           "subject": {
             "type": "string"
@@ -4710,67 +4764,36 @@
         },
         "required": [
           "outcome"
-        ],
-      "GcsErrorModeType": {
-        "type": "string",
-        "enum": [
-          "bucket-not-found",
-          "quota-exceeded",
-          "permission-denied",
-          "intermittent-failure"
-        ],
-        "description": "The error mode to activate"
-      },
-      "ActivateErrorModeDto": {
-        "type": "object",
-        "properties": {
-          "type": {
-            "description": "The error mode to activate",
-            "example": "quota-exceeded",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/GcsErrorModeType"
-              }
-            ]
-          },
-          "bucketName": {
-            "type": "string",
-            "description": "Bucket name for bucket-not-found mode. Required when type is bucket-not-found.",
-            "example": "app-assets"
-          },
-          "failEveryN": {
-            "type": "number",
-            "description": "Fail every Nth request for intermittent-failure mode. Defaults to 2.",
-            "example": 3
-          }
-        },
-        "required": [
-          "type"
         ]
       },
-      "ErrorModeStateDto": {
+      "GmailTwinStatusDto": {
         "type": "object",
         "properties": {
-          "active": {
+          "running": {
             "type": "boolean",
-            "description": "Whether an error mode is currently active",
+            "description": "Whether the Gmail mock server is currently running",
             "example": true
           },
-          "type": {
-            "description": "The active error mode type",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/GcsErrorModeType"
-              }
-            ]
+          "healthy": {
+            "type": "boolean",
+            "description": "Whether the Gmail mock server is healthy",
+            "example": true
           },
-          "description": {
+          "port": {
+            "type": "number",
+            "description": "The port the Gmail mock server is listening on",
+            "example": 9014
+          },
+          "url": {
             "type": "string",
-            "description": "Human-readable description of what the error mode does"
+            "description": "The URL of the Gmail mock server",
+            "example": "http://localhost:9014"
           }
         },
         "required": [
-          "active"
+          "running",
+          "healthy",
+          "port"
         ]
       },
       "TwinStatusDto": {
@@ -4803,13 +4826,33 @@
                 "$ref": "#/components/schemas/ErrorModeStateDto"
               }
             ]
+          },
+          "gmail": {
+            "description": "Status of the Gmail twin emulator",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/GmailTwinStatusDto"
+              }
+            ]
+          },
+          "interceptorActive": {
+            "type": "boolean",
+            "description": "Whether the global fetch/HTTP request interceptor is active",
+            "example": true
+          },
+          "realGmailConfigured": {
+            "type": "boolean",
+            "description": "Whether real Gmail credentials are fully configured in the environment",
+            "example": false
           }
         },
         "required": [
           "running",
           "healthy",
           "port",
-          "errorMode"
+          "errorMode",
+          "interceptorActive",
+          "realGmailConfigured"
         ]
       },
       "TwinStartResponseDto": {
@@ -4852,5 +4895,4 @@
       }
     }
   }
-}
 }
