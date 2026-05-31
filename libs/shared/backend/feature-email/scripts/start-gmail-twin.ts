@@ -10,6 +10,7 @@
  */
 
 import { GmailTwinServer } from '../src/lib/twin/gmail-twin-server.js';
+import { PORT_RANGE } from '../src/lib/twin/constants.js';
 
 async function main() {
   const startTime = Date.now();
@@ -19,10 +20,10 @@ async function main() {
   if (
     portArg &&
     port !== undefined &&
-    (isNaN(port) || port < 1 || port > 65535)
+    (isNaN(port) || port < PORT_RANGE.min || port > PORT_RANGE.max)
   ) {
     console.error(
-      `Invalid port: ${portArg}. Must be a number between 1 and 65535.`
+      `Invalid port: ${portArg}. Must be a number between ${PORT_RANGE.min} and ${PORT_RANGE.max}.`
     );
     process.exit(1);
   }

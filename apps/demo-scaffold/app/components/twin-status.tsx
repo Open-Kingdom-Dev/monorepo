@@ -78,8 +78,8 @@ export function TwinStatus() {
   const port = status?.port ?? 9013;
 
   // Gmail digital twin specific fields
-  const gmail = (status as any)?.gmail;
-  const interceptorActive = (status as any)?.interceptorActive ?? false;
+  const gmail = status?.gmail;
+  const interceptorActive = status?.interceptorActive ?? false;
 
   return (
     <div className="border rounded-lg p-5 bg-white shadow-sm space-y-4">

@@ -787,9 +787,7 @@ const injectedRtkApi = api
         query: (queryArg) => ({
           url: `/api/twin/gmail/error-mode`,
           method: "POST",
-          params: {
-            mode: queryArg.mode,
-          },
+          body: queryArg.setGmailErrorModeDto,
         }),
         invalidatesTags: ["Twin"],
       }),
@@ -1168,13 +1166,16 @@ export type TwinControllerStartApiArg = void;
 export type TwinControllerStopApiResponse =
   /** status 200 Twin environment stopped successfully */ TwinStopResponseDto;
 export type TwinControllerStopApiArg = void;
-export type TwinControllerGetGmailEmailsApiResponse = unknown;
+export type TwinControllerGetGmailEmailsApiResponse =
+  /** status 200 Intercepted emails retrieved successfully */ GmailTwinCapturedEmailDto[];
 export type TwinControllerGetGmailEmailsApiArg = void;
-export type TwinControllerResetGmailApiResponse = unknown;
+export type TwinControllerResetGmailApiResponse =
+  /** status 200 Gmail mailbox reset successfully */ GmailTwinResetResponseDto;
 export type TwinControllerResetGmailApiArg = void;
-export type TwinControllerSetGmailErrorModeApiResponse = unknown;
+export type TwinControllerSetGmailErrorModeApiResponse =
+  /** status 200 Gmail twin error mode configured successfully */ GmailTwinErrorModeResponseDto;
 export type TwinControllerSetGmailErrorModeApiArg = {
-  mode: string;
+  setGmailErrorModeDto: SetGmailErrorModeDto;
 };
 export type LoginResponseDto = {
   /** JWT access token */
@@ -1630,6 +1631,38 @@ export type TwinStartResponseDto = {
 export type TwinStopResponseDto = {
   success: boolean;
   message: string;
+};
+export type GmailTwinCapturedEmailDto = {
+  /** The unique message identifier */
+  id: string;
+  /** The thread identifier of the message */
+  threadId: string;
+  /** List of recipient email addresses */
+  to: string[];
+  /** Sender email address */
+  from: string;
+  /** Email subject line */
+  subject: string;
+  /** Plaintext message content */
+  text?: string;
+  /** HTML message content */
+  html?: string;
+  /** ISO timestamp when the email was captured */
+  timestamp: string;
+  /** The raw base64url encoded email package */
+  raw: string;
+};
+export type GmailTwinResetResponseDto = {
+  success: boolean;
+  message: string;
+};
+export type GmailTwinErrorModeResponseDto = {
+  success: boolean;
+  message: string;
+};
+export type SetGmailErrorModeDto = {
+  /** The simulated error mode to activate */
+  mode: "none" | "rate-limit" | "auth-error" | "bad-request";
 };
 export const {
   useAuthControllerLoginMutation,

@@ -1,4 +1,4 @@
-import { EmailMessage, EmailResult, EmailProvider } from '../email.js';
+import { EmailMessage, EmailResult, EmailProvider } from '../email.types.js';
 
 /**
  * A provider that discards emails silently.

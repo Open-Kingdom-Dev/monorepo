@@ -4,7 +4,7 @@ import {
   Post,
   HttpCode,
   HttpStatus,
-  Query,
+  Body,
 } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { Public } from '@open-kingdom/shared-backend-util-rbac';
@@ -13,6 +13,10 @@ import {
   TwinStatusDto,
   TwinStartResponseDto,
   TwinStopResponseDto,
+  GmailTwinCapturedEmailDto,
+  GmailTwinResetResponseDto,
+  SetGmailErrorModeDto,
+  GmailTwinErrorModeResponseDto,
 } from './twin.dto';
 
 @ApiTags('Twin')
@@ -85,7 +89,12 @@ export class TwinController {
     description:
       'Fetches structured emails intercepted in-memory by Gmail digital twin.',
   })
-  async getGmailEmails() {
+  @ApiResponse({
+    status: 200,
+    type: [GmailTwinCapturedEmailDto],
+    description: 'Intercepted emails retrieved successfully',
+  })
+  async getGmailEmails(): Promise<GmailTwinCapturedEmailDto[]> {
     return await this.twinService.getGmailEmails();
   }
 
@@ -96,7 +105,12 @@ export class TwinController {
     summary: 'Reset mailbox',
     description: 'Clears the list of stored emails inside the local twin.',
   })
-  async resetGmail() {
+  @ApiResponse({
+    status: 200,
+    type: GmailTwinResetResponseDto,
+    description: 'Gmail mailbox reset successfully',
+  })
+  async resetGmail(): Promise<GmailTwinResetResponseDto> {
     await this.twinService.resetGmail();
     return { success: true, message: 'Gmail mailbox reset successfully' };
   }
@@ -109,9 +123,15 @@ export class TwinController {
     description:
       'Changes the active simulated error state for standard REST endpoint handlers.',
   })
+  @ApiResponse({
+    status: 200,
+    type: GmailTwinErrorModeResponseDto,
+    description: 'Gmail twin error mode configured successfully',
+  })
   async setGmailErrorMode(
-    @Query('mode') mode: 'none' | 'rate-limit' | 'auth-error' | 'bad-request'
-  ) {
+    @Body() body: SetGmailErrorModeDto
+  ): Promise<GmailTwinErrorModeResponseDto> {
+    const { mode } = body;
     let mappedMode:
       | 'insufficient-permissions'
       | 'rate-limit'

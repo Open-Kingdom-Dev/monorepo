@@ -48,7 +48,12 @@ export class TwinService implements OnModuleDestroy {
       // 4. Install Global Fetch Interceptor
       if (!this.interceptor) {
         const table = new RoutingTable([
-          ...defaultRoutingEntries,
+          ...defaultRoutingEntries.map((entry) => {
+            if (entry.hostname === 'gmail.googleapis.com') {
+              return { ...entry, target: `http://localhost:${this.gmailPort}` };
+            }
+            return entry;
+          }),
           {
             hostname: 'oauth2.googleapis.com',
             target: `http://localhost:${this.gmailPort}`,

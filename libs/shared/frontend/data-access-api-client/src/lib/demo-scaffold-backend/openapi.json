@@ -3226,7 +3226,17 @@
         "parameters": [],
         "responses": {
           "200": {
-            "description": ""
+            "description": "Intercepted emails retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/GmailTwinCapturedEmailDto"
+                  }
+                }
+              }
+            }
           }
         },
         "summary": "Get intercepted emails",
@@ -3242,7 +3252,14 @@
         "parameters": [],
         "responses": {
           "200": {
-            "description": ""
+            "description": "Gmail mailbox reset successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GmailTwinResetResponseDto"
+                }
+              }
+            }
           }
         },
         "summary": "Reset mailbox",
@@ -3255,19 +3272,27 @@
       "post": {
         "description": "Changes the active simulated error state for standard REST endpoint handlers.",
         "operationId": "TwinController_setGmailErrorMode",
-        "parameters": [
-          {
-            "name": "mode",
-            "required": true,
-            "in": "query",
-            "schema": {
-              "type": "string"
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SetGmailErrorModeDto"
+              }
             }
           }
-        ],
+        },
         "responses": {
           "200": {
-            "description": ""
+            "description": "Gmail twin error mode configured successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GmailTwinErrorModeResponseDto"
+                }
+              }
+            }
           }
         },
         "summary": "Configure error injection mode",
@@ -4886,6 +4911,123 @@
           "message": {
             "type": "string",
             "example": "GCS twin stopped"
+          }
+        },
+        "required": [
+          "success",
+          "message"
+        ]
+      },
+      "GmailTwinCapturedEmailDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "The unique message identifier",
+            "example": "msg-12345"
+          },
+          "threadId": {
+            "type": "string",
+            "description": "The thread identifier of the message",
+            "example": "thread-12345"
+          },
+          "to": {
+            "description": "List of recipient email addresses",
+            "example": [
+              "recipient@example.com"
+            ],
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "from": {
+            "type": "string",
+            "description": "Sender email address",
+            "example": "sender@example.com"
+          },
+          "subject": {
+            "type": "string",
+            "description": "Email subject line",
+            "example": "Hello World"
+          },
+          "text": {
+            "type": "string",
+            "description": "Plaintext message content",
+            "example": "This is the body text"
+          },
+          "html": {
+            "type": "string",
+            "description": "HTML message content",
+            "example": "<p>This is the HTML body</p>"
+          },
+          "timestamp": {
+            "type": "string",
+            "description": "ISO timestamp when the email was captured",
+            "example": "2026-05-30T00:00:00.000Z"
+          },
+          "raw": {
+            "type": "string",
+            "description": "The raw base64url encoded email package",
+            "example": "base64url-encoded-message-content"
+          }
+        },
+        "required": [
+          "id",
+          "threadId",
+          "to",
+          "from",
+          "subject",
+          "timestamp",
+          "raw"
+        ]
+      },
+      "GmailTwinResetResponseDto": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "example": true
+          },
+          "message": {
+            "type": "string",
+            "example": "Gmail mailbox reset successfully"
+          }
+        },
+        "required": [
+          "success",
+          "message"
+        ]
+      },
+      "SetGmailErrorModeDto": {
+        "type": "object",
+        "properties": {
+          "mode": {
+            "type": "string",
+            "description": "The simulated error mode to activate",
+            "enum": [
+              "none",
+              "rate-limit",
+              "auth-error",
+              "bad-request"
+            ],
+            "example": "rate-limit"
+          }
+        },
+        "required": [
+          "mode"
+        ]
+      },
+      "GmailTwinErrorModeResponseDto": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "example": true
+          },
+          "message": {
+            "type": "string",
+            "example": "Gmail twin error mode configured to: rate-limit"
           }
         },
         "required": [

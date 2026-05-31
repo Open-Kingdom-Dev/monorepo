@@ -2,6 +2,7 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import GmailDemo from './gmail-demo';
 import { useDispatch } from 'react-redux';
+import axios from 'axios';
 import {
   useTwinControllerGetStatusQuery,
   useTwinControllerStartMutation,
@@ -27,11 +28,15 @@ jest.mock('../components', () => ({
   TwinStatus: () => <div data-testid="twin-status">TwinStatus Mock</div>,
 }));
 
+jest.mock('axios', () => ({
+  get: jest.fn(),
+  post: jest.fn(),
+}));
+
 describe('GmailDemo', () => {
   let mockDispatch: jest.Mock;
   let mockStartTwin: jest.Mock;
   let mockSendEmail: jest.Mock;
-  let mockFetch: jest.Mock;
 
   beforeEach(() => {
     mockDispatch = jest.fn();
@@ -63,42 +68,45 @@ describe('GmailDemo', () => {
       refetch: jest.fn(),
     });
 
-    mockFetch = jest.fn().mockImplementation((url: string) => {
+    (axios.get as jest.Mock).mockImplementation((url: string) => {
       if (url.includes('/api/twin/gmail/emails')) {
         return Promise.resolve({
-          ok: true,
-          json: () => Promise.resolve([]),
+          status: 200,
+          data: [],
         });
       }
       return Promise.resolve({
-        ok: true,
-        json: () => Promise.resolve({}),
+        status: 200,
+        data: {},
       });
     });
-    global.fetch = mockFetch;
+
+    (axios.post as jest.Mock).mockResolvedValue({
+      status: 200,
+      data: {},
+    });
   });
 
   it('renders correctly when Twin is running', async () => {
-    mockFetch.mockImplementation((url: string) => {
+    (axios.get as jest.Mock).mockImplementation((url: string) => {
       if (url.includes('/api/twin/gmail/emails')) {
         return Promise.resolve({
-          ok: true,
-          json: () =>
-            Promise.resolve([
-              {
-                id: 'msg-1',
-                from: 'sender@example.com',
-                to: 'recipient@example.com',
-                subject: 'Intercepted email',
-                text: 'Hello content',
-                date: new Date().toISOString(),
-              },
-            ]),
+          status: 200,
+          data: [
+            {
+              id: 'msg-1',
+              from: 'sender@example.com',
+              to: 'recipient@example.com',
+              subject: 'Intercepted email',
+              text: 'Hello content',
+              date: new Date().toISOString(),
+            },
+          ],
         });
       }
       return Promise.resolve({
-        ok: true,
-        json: () => Promise.resolve({}),
+        status: 200,
+        data: {},
       });
     });
 
@@ -181,26 +189,25 @@ describe('GmailDemo', () => {
 
   it('handles clear mailbox interaction', async () => {
     window.confirm = jest.fn().mockReturnValue(true);
-    mockFetch.mockImplementation((url: string) => {
+    (axios.get as jest.Mock).mockImplementation((url: string) => {
       if (url.includes('/api/twin/gmail/emails')) {
         return Promise.resolve({
-          ok: true,
-          json: () =>
-            Promise.resolve([
-              {
-                id: 'msg-1',
-                from: 'sender@example.com',
-                to: 'recipient@example.com',
-                subject: 'Intercepted email',
-                text: 'Hello content',
-                date: new Date().toISOString(),
-              },
-            ]),
+          status: 200,
+          data: [
+            {
+              id: 'msg-1',
+              from: 'sender@example.com',
+              to: 'recipient@example.com',
+              subject: 'Intercepted email',
+              text: 'Hello content',
+              date: new Date().toISOString(),
+            },
+          ],
         });
       }
       return Promise.resolve({
-        ok: true,
-        json: () => Promise.resolve({}),
+        status: 200,
+        data: {},
       });
     });
 
@@ -213,10 +220,7 @@ describe('GmailDemo', () => {
     fireEvent.click(clearBtn);
 
     await waitFor(() => {
-      expect(mockFetch).toHaveBeenCalledWith(
-        '/api/twin/gmail/reset',
-        expect.objectContaining({ method: 'POST' })
-      );
+      expect(axios.post).toHaveBeenCalledWith('/api/twin/gmail/reset');
     });
   });
 
@@ -227,12 +231,9 @@ describe('GmailDemo', () => {
     fireEvent.click(button);
 
     await waitFor(() => {
-      expect(mockFetch).toHaveBeenCalledWith(
-        '/api/twin/gmail/error-mode?mode=rate-limit',
-        expect.objectContaining({
-          method: 'POST',
-        })
-      );
+      expect(axios.post).toHaveBeenCalledWith('/api/twin/gmail/error-mode', {
+        mode: 'rate-limit',
+      });
     });
   });
 
@@ -286,20 +287,20 @@ describe('GmailDemo', () => {
 
   it('handles clear mailbox fetch reset error', async () => {
     window.confirm = jest.fn().mockReturnValue(true);
-    mockFetch.mockImplementation((url: string) => {
+    (axios.get as jest.Mock).mockImplementation((url: string) => {
       if (url.includes('/api/twin/gmail/emails')) {
         return Promise.resolve({
-          ok: true,
-          json: () =>
-            Promise.resolve([
-              { id: '1', from: 'a', to: 'b', subject: 'test', text: 'hi' },
-            ]),
+          status: 200,
+          data: [{ id: '1', from: 'a', to: 'b', subject: 'test', text: 'hi' }],
         });
       }
+      return Promise.resolve({ status: 200, data: {} });
+    });
+    (axios.post as jest.Mock).mockImplementation((url: string) => {
       if (url.includes('/api/twin/gmail/reset')) {
         return Promise.reject(new Error('Reset Failed'));
       }
-      return Promise.resolve({ ok: true, json: () => Promise.resolve({}) });
+      return Promise.resolve({ status: 200, data: {} });
     });
 
     render(<GmailDemo />);
@@ -320,17 +321,17 @@ describe('GmailDemo', () => {
   });
 
   it('handles setting error simulation mode fetch failure', async () => {
-    mockFetch.mockImplementation((url: string) => {
+    (axios.get as jest.Mock).mockImplementation((url: string) => {
+      if (url.includes('/api/twin/gmail/emails')) {
+        return Promise.resolve({ status: 200, data: [] });
+      }
+      return Promise.resolve({ status: 200, data: {} });
+    });
+    (axios.post as jest.Mock).mockImplementation((url: string) => {
       if (url.includes('/api/twin/gmail/error-mode')) {
         return Promise.reject(new Error('Fetch Failed'));
       }
-      if (url.includes('/api/twin/gmail/emails')) {
-        return Promise.resolve({
-          ok: true,
-          json: () => Promise.resolve([]),
-        });
-      }
-      return Promise.resolve({ ok: true, json: () => Promise.resolve({}) });
+      return Promise.resolve({ status: 200, data: {} });
     });
 
     render(<GmailDemo />);
@@ -354,17 +355,14 @@ describe('GmailDemo', () => {
       .mockImplementation(() => {
         // noop
       });
-    mockFetch.mockImplementation((url: string) => {
+    (axios.get as jest.Mock).mockImplementation((url: string) => {
       if (url.includes('/api/twin/status')) {
         return Promise.reject(new Error('Status Fetch Failed'));
       }
       if (url.includes('/api/twin/gmail/emails')) {
-        return Promise.resolve({
-          ok: true,
-          json: () => Promise.resolve([]),
-        });
+        return Promise.resolve({ status: 200, data: [] });
       }
-      return Promise.resolve({ ok: true, json: () => Promise.resolve({}) });
+      return Promise.resolve({ status: 200, data: {} });
     });
 
     render(<GmailDemo />);
@@ -499,11 +497,11 @@ describe('GmailDemo', () => {
       .mockImplementation(() => {
         // noop
       });
-    mockFetch.mockImplementation((url: string) => {
+    (axios.get as jest.Mock).mockImplementation((url: string) => {
       if (url.includes('/api/twin/gmail/emails')) {
         return Promise.reject(new Error('Emails Fetch Failed'));
       }
-      return Promise.resolve({ ok: true, json: () => Promise.resolve({}) });
+      return Promise.resolve({ status: 200, data: {} });
     });
 
     render(<GmailDemo />);
@@ -525,20 +523,18 @@ describe('GmailDemo', () => {
     fireEvent.click(badRequestBtn);
 
     await waitFor(() => {
-      expect(mockFetch).toHaveBeenCalledWith(
-        '/api/twin/gmail/error-mode?mode=bad-request',
-        expect.objectContaining({ method: 'POST' })
-      );
+      expect(axios.post).toHaveBeenCalledWith('/api/twin/gmail/error-mode', {
+        mode: 'bad-request',
+      });
     });
 
     const forbiddenBtn = screen.getByRole('button', { name: /403 Forbidden/i });
     fireEvent.click(forbiddenBtn);
 
     await waitFor(() => {
-      expect(mockFetch).toHaveBeenCalledWith(
-        '/api/twin/gmail/error-mode?mode=auth-error',
-        expect.objectContaining({ method: 'POST' })
-      );
+      expect(axios.post).toHaveBeenCalledWith('/api/twin/gmail/error-mode', {
+        mode: 'auth-error',
+      });
     });
   });
 });

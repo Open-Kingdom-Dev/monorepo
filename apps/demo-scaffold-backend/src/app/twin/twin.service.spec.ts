@@ -15,7 +15,7 @@ const mockGmailTwinInstance = {
   stop: jest.fn(),
   getEmulatorHost: jest.fn().mockReturnValue('http://localhost:9014'),
   isHealthy: jest.fn().mockResolvedValue(true),
-  getEmails: jest.fn().mockResolvedValue([]),
+  getEmails: jest.fn().mockReturnValue([]),
   reset: jest.fn(),
   setErrorMode: jest.fn(),
 };

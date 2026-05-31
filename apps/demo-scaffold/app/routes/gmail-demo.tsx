@@ -1,5 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useDispatch } from 'react-redux';
+import axios from 'axios';
 import {
   useTwinControllerGetStatusQuery,
   useTwinControllerStartMutation,
@@ -20,24 +21,6 @@ interface InterceptedEmail {
   html?: string;
   date?: string;
   headers?: Record<string, string>;
-}
-
-interface GmailTwinStatus {
-  running: boolean;
-  healthy: boolean;
-  port: number;
-  url?: string;
-}
-
-interface ExtendedTwinStatusDto {
-  running?: boolean;
-  healthy?: boolean;
-  port?: number;
-  url?: string;
-  errorMode?: any;
-  gmail?: GmailTwinStatus;
-  interceptorActive?: boolean;
-  realGmailConfigured?: boolean;
 }
 
 interface RTKQueryError {
@@ -72,7 +55,7 @@ export default function GmailDemo() {
     'Hello Team, this email is automatically intercepted at the network level by our NodeInterceptor layer!'
   );
 
-  const status = twinStatus as ExtendedTwinStatusDto | undefined;
+  const status = twinStatus;
   const twinRunning = status?.running ?? false;
   const twinHealthy = status?.healthy ?? false;
   const realGmailConfigured = status?.realGmailConfigured ?? false;
@@ -101,21 +84,18 @@ export default function GmailDemo() {
     buttonDisabled = true;
   }
 
-  const fetchInterceptedEmails = async () => {
+  const fetchInterceptedEmails = useCallback(async () => {
     if (!twinRunning) return;
     setLoadingEmails(true);
     try {
-      const response = await fetch('/api/twin/gmail/emails');
-      if (response.ok) {
-        const data = await response.json();
-        setEmails(data);
-      }
+      const response = await axios.get('/api/twin/gmail/emails');
+      setEmails(response.data);
     } catch (err) {
       console.error('Failed to fetch intercepted emails', err);
     } finally {
       setLoadingEmails(false);
     }
-  };
+  }, [twinRunning]);
 
   const handleClearMailbox = async () => {
     if (
@@ -123,30 +103,22 @@ export default function GmailDemo() {
     )
       return;
     try {
-      const response = await fetch('/api/twin/gmail/reset', { method: 'POST' });
-      if (response.ok) {
-        dispatch(
-          showSuccessNotification('Gmail Twin Mailbox cleared successfully')
-        );
-        setEmails([]);
-      }
-    } catch (err) {
+      await axios.post('/api/twin/gmail/reset');
+      dispatch(
+        showSuccessNotification('Gmail Twin Mailbox cleared successfully')
+      );
+      setEmails([]);
+    } catch {
       dispatch(showErrorNotification('Failed to clear mailbox'));
     }
   };
 
   const handleSetErrorMode = async (mode: string) => {
     try {
-      const response = await fetch(`/api/twin/gmail/error-mode?mode=${mode}`, {
-        method: 'POST',
-      });
-      if (response.ok) {
-        setErrorMode(mode);
-        dispatch(
-          showSuccessNotification(`Simulated error mode set to: ${mode}`)
-        );
-      }
-    } catch (err) {
+      await axios.post('/api/twin/gmail/error-mode', { mode });
+      setErrorMode(mode);
+      dispatch(showSuccessNotification(`Simulated error mode set to: ${mode}`));
+    } catch {
       dispatch(showErrorNotification('Failed to set error mode'));
     }
   };
@@ -196,11 +168,8 @@ export default function GmailDemo() {
     const fetchStatusOnLoad = async () => {
       if (twinRunning) {
         try {
-          const response = await fetch('/api/twin/status');
-          if (response.ok) {
-            const data = (await response.json()) as ExtendedTwinStatusDto;
-            console.debug('Digital Twin status synced:', data);
-          }
+          const response = await axios.get('/api/twin/status');
+          console.debug('Digital Twin status synced:', response.data);
         } catch (e) {
           console.error(e);
         }
@@ -215,7 +184,7 @@ export default function GmailDemo() {
     } else {
       setEmails([]);
     }
-  }, [twinRunning]);
+  }, [twinRunning, fetchInterceptedEmails]);
 
   return (
     <div className="p-6 max-w-7xl mx-auto space-y-6 animate-fade-in">
