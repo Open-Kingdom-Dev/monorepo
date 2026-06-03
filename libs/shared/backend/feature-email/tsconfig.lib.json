@@ -19,7 +19,14 @@
     "noFallthroughCasesInSwitch": true
   },
   "include": ["src/**/*.ts"],
-  "references": [],
+  "references": [
+    {
+      "path": "../../poly/util-env-config/tsconfig.lib.json"
+    },
+    {
+      "path": "../integration-test-doubles/tsconfig.lib.json"
+    }
+  ],
   "exclude": [
     "jest.config.ts",
     "jest.config.cts",

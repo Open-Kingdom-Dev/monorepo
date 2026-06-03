@@ -13,6 +13,7 @@ export function AppNav() {
       <NavLink to="/admin/users">Users</NavLink>
       <NavLink to="/crm">CRM</NavLink>
       <NavLink to="/gcs-demo">GCS Demo</NavLink>
+      <NavLink to="/gmail-demo">Gmail Demo</NavLink>
     </nav>
   );
 }

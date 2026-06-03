@@ -9,6 +9,8 @@
     "module": "nodenext",
     "moduleResolution": "nodenext",
     "forceConsistentCasingInFileNames": true,
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
     "types": ["node"]
   },
   "include": ["src/**/*.ts"],

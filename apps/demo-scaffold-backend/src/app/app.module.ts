@@ -35,10 +35,36 @@ const envKeys = [
   'GMAIL_CLIENT_EMAIL',
   'GMAIL_PRIVATE_KEY',
   'GMAIL_IMPERSONATE_EMAIL',
+  'EMAIL_PROVIDER',
 ] as const;
 
 // Create typed config service for this app
 const configService = createConfigService(envKeys, nodeEnvAdapter);
+
+function getEmailModule() {
+  const provider = configService.get('EMAIL_PROVIDER', 'gmail') as
+    | 'gmail'
+    | 'gmail-twin'
+    | 'off';
+  if (provider === 'gmail') {
+    return EmailModule.forRoot({
+      provider: 'gmail',
+      config: {
+        clientEmail: configService.get('GMAIL_CLIENT_EMAIL', ''),
+        privateKey: configService.get('GMAIL_PRIVATE_KEY', ''),
+        impersonateEmail: configService.get('GMAIL_IMPERSONATE_EMAIL', ''),
+      },
+    });
+  } else if (provider === 'gmail-twin') {
+    return EmailModule.forRoot({
+      provider: 'gmail-twin',
+    });
+  } else {
+    return EmailModule.forRoot({
+      provider: 'off',
+    });
+  }
+}
 
 @Module({
   imports: [
@@ -47,14 +73,7 @@ const configService = createConfigService(envKeys, nodeEnvAdapter);
       jwtSecret: configService.get('JWT_SECRET', 'your-secret-key-here'),
       jwtExpiresIn: configService.get('JWT_EXPIRES_IN', '1h'),
     }),
-    EmailModule.forRoot({
-      provider: 'gmail',
-      config: {
-        clientEmail: configService.get('GMAIL_CLIENT_EMAIL', ''),
-        privateKey: configService.get('GMAIL_PRIVATE_KEY', ''),
-        impersonateEmail: configService.get('GMAIL_IMPERSONATE_EMAIL', ''),
-      },
-    }),
+    getEmailModule(),
     FeatureUserManagementModule.forRoot({
       invitationTokenSecret: configService.get(
         'INVITATION_TOKEN_SECRET',

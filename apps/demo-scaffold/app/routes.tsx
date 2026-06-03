@@ -7,6 +7,7 @@ import Profile from './routes/profile';
 import UserManagement from './routes/user-management';
 import AcceptInvitationRoute from './routes/accept-invitation';
 import GcsDemo from './routes/gcs-demo';
+import GmailDemo from './routes/gmail-demo';
 
 export const router = createBrowserRouter([
   {
@@ -20,6 +21,7 @@ export const router = createBrowserRouter([
       { path: 'accept-invitation', Component: AcceptInvitationRoute },
       ...crmRoutes,
       { path: 'gcs-demo', Component: GcsDemo },
+      { path: 'gmail-demo', Component: GmailDemo },
     ],
   },
 ]);

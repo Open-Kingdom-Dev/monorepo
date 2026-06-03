@@ -5,6 +5,8 @@
     "types": ["jest", "node"],
     "module": "nodenext",
     "moduleResolution": "nodenext",
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
     "forceConsistentCasingInFileNames": true
   },
   "include": [
