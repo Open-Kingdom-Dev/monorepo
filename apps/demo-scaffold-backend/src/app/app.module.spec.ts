@@ -104,6 +104,29 @@ jest.mock('@open-kingdom/shared-backend-feature-gcp-resources', () => {
   };
 });
 
+jest.mock('@open-kingdom/shared-backend-feature-youtube', () => {
+  const { Module, Injectable } = require('@nestjs/common');
+  @Injectable()
+  class MockYoutubeSearchService {
+    setErrorMode = jest.fn();
+    clearErrorMode = jest.fn();
+    getErrorModeState = jest.fn().mockReturnValue({ active: false, type: null, description: null });
+    resetErrorMode = jest.fn();
+    search = jest.fn();
+  }
+  @Module({
+    providers: [MockYoutubeSearchService],
+    exports: [MockYoutubeSearchService],
+  })
+  class MockFeatureYoutubeModule {}
+  return {
+    FeatureYoutubeModule: MockFeatureYoutubeModule,
+    YoutubeSearchService: MockYoutubeSearchService,
+    YoutubeErrorModeStateDto: class {},
+    YoutubeActivateErrorModeDto: class {},
+  };
+});
+
 jest.mock('@open-kingdom/shared-backend-integration-test-doubles', () => {
   const { Injectable } = require('@nestjs/common');
   @Injectable()

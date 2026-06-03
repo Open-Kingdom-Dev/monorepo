@@ -14,6 +14,7 @@ export function AppNav() {
       <NavLink to="/crm">CRM</NavLink>
       <NavLink to="/gcs-demo">GCS Demo</NavLink>
       <NavLink to="/gmail-demo">Gmail Demo</NavLink>
+      <NavLink to="/youtube-demo">YouTube Demo</NavLink>
     </nav>
   );
 }

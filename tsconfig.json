@@ -79,6 +79,9 @@
       "path": "./libs/shared/backend/feature-gcp-resources"
     },
     {
+      "path": "./libs/shared/backend/feature-youtube"
+    },
+    {
       "path": "./libs/shared/poly/util-date"
     },
     {
