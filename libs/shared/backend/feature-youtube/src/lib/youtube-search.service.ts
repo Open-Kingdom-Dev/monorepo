@@ -11,7 +11,11 @@ import {
   RoutingTable,
   defaultRoutingEntries,
 } from '@open-kingdom/shared-backend-integration-test-doubles';
-import { YoutubeActivateErrorModeDto, YoutubeErrorModeStateDto, YoutubeErrorModeType } from './youtube-error-mode.dto.js';
+import {
+  YoutubeActivateErrorModeDto,
+  YoutubeErrorModeStateDto,
+  YoutubeErrorModeType,
+} from './youtube-error-mode.dto.js';
 import { YoutubeSearchResponseDto } from './youtube-search.dto.js';
 import axios from 'axios';
 
@@ -44,7 +48,10 @@ export class YoutubeSearchService implements OnModuleInit, OnModuleDestroy {
     }
   }
 
-  async search(query: string, maxResults = 5): Promise<YoutubeSearchResponseDto> {
+  async search(
+    query: string,
+    maxResults = 5
+  ): Promise<YoutubeSearchResponseDto> {
     if (!query?.trim()) {
       throw new BadRequestException('Search query is required');
     }
@@ -66,7 +73,9 @@ export class YoutubeSearchService implements OnModuleInit, OnModuleDestroy {
     }
   }
 
-  async setErrorMode(dto: YoutubeActivateErrorModeDto): Promise<YoutubeErrorModeStateDto> {
+  async setErrorMode(
+    dto: YoutubeActivateErrorModeDto
+  ): Promise<YoutubeErrorModeStateDto> {
     if (!dto.type) {
       throw new BadRequestException('Error mode type is required');
     }
@@ -75,11 +84,16 @@ export class YoutubeSearchService implements OnModuleInit, OnModuleDestroy {
 
     // Propagate to the Express twin if it's running
     try {
-      const response = await axios.post(`${this.twinUrl}/test/youtube/error-mode`, {
-        mode: dto.type,
-      });
+      const response = await axios.post(
+        `${this.twinUrl}/test/youtube/error-mode`,
+        {
+          mode: dto.type,
+        }
+      );
       if (response.status !== 200) {
-        this.logger.warn(`Failed to propagate error mode to twin: ${response.statusText}`);
+        this.logger.warn(
+          `Failed to propagate error mode to twin: ${response.statusText}`
+        );
       }
     } catch (error: any) {
       this.logger.warn(
@@ -95,14 +109,16 @@ export class YoutubeSearchService implements OnModuleInit, OnModuleDestroy {
     this.logger.log('Error mode deactivated');
 
     try {
-      const response = await axios.delete(`${this.twinUrl}/test/youtube/error-mode`);
+      const response = await axios.delete(
+        `${this.twinUrl}/test/youtube/error-mode`
+      );
       if (response.status !== 200) {
-        this.logger.warn(`Failed to clear error mode on twin: ${response.statusText}`);
+        this.logger.warn(
+          `Failed to clear error mode on twin: ${response.statusText}`
+        );
       }
     } catch (error: any) {
-      this.logger.warn(
-        `Could not clear error mode on twin: ${error.message}`
-      );
+      this.logger.warn(`Could not clear error mode on twin: ${error.message}`);
     }
 
     return this.getErrorModeState();
@@ -127,9 +143,7 @@ export class YoutubeSearchService implements OnModuleInit, OnModuleDestroy {
     try {
       await axios.delete(`${this.twinUrl}/test/youtube/error-mode`);
     } catch (error: any) {
-      this.logger.warn(
-        `Could not clear error mode on twin: ${error.message}`
-      );
+      this.logger.warn(`Could not clear error mode on twin: ${error.message}`);
     }
   }
 

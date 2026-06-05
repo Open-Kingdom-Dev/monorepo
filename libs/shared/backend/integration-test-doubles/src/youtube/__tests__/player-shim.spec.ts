@@ -13,7 +13,6 @@ if (typeof global !== 'undefined') {
   (global as any).fetch = fetch;
 }
 
-
 describe('generatePlayerShim', () => {
   it('should replace base URL placeholder', () => {
     const twinUrl = 'http://localhost:9019';
@@ -91,7 +90,9 @@ describe('Player Shim Browser DOM Behavior (JSDOM)', () => {
 
     // Trigger onReady
     jest.advanceTimersByTime(100);
-    expect(onReadySpy).toHaveBeenCalledWith(expect.objectContaining({ target: player }));
+    expect(onReadySpy).toHaveBeenCalledWith(
+      expect.objectContaining({ target: player })
+    );
   });
 
   it('should delegate playback, volume, and destroy methods', () => {
@@ -107,8 +108,12 @@ describe('Player Shim Browser DOM Behavior (JSDOM)', () => {
     expect(videoElement).toBeTruthy();
 
     // Mock HTML5 video methods since JSDOM might not implement full playback controls
-    const playSpy = jest.spyOn(videoElement, 'play').mockResolvedValue(undefined);
-    const pauseSpy = jest.spyOn(videoElement, 'pause').mockImplementation(() => {});
+    const playSpy = jest
+      .spyOn(videoElement, 'play')
+      .mockResolvedValue(undefined);
+    const pauseSpy = jest
+      .spyOn(videoElement, 'pause')
+      .mockImplementation(() => {});
 
     // Playback
     player.playVideo();
@@ -151,10 +156,10 @@ describe('Player Shim Browser DOM Behavior (JSDOM)', () => {
   it('should trigger onError if search response returns __twinErrorMode', async () => {
     jest.useRealTimers();
     const mockSearchResponse = {
-      __twinErrorMode: { playerError: 100 }
+      __twinErrorMode: { playerError: 100 },
     };
     const fetchSpy = jest.spyOn(window, 'fetch').mockResolvedValue({
-      json: async () => mockSearchResponse
+      json: async () => mockSearchResponse,
     } as any);
 
     const code = generatePlayerShim('http://localhost:9019');
@@ -165,31 +170,35 @@ describe('Player Shim Browser DOM Behavior (JSDOM)', () => {
     const player = new (window as any).YT.Player(container, {
       videoId: 'error-vid',
       events: {
-        onError: onErrorSpy
-      }
+        onError: onErrorSpy,
+      },
     });
 
     expect(player).toBeDefined();
 
     await new Promise((resolve) => setTimeout(resolve, 300));
 
-    expect(onErrorSpy).toHaveBeenCalledWith(expect.objectContaining({ data: 100 }));
+    expect(onErrorSpy).toHaveBeenCalledWith(
+      expect.objectContaining({ data: 100 })
+    );
     fetchSpy.mockRestore();
   });
 
   it('should trigger onError via polling fallback if search fetch fails and error-mode endpoint has player-error', async () => {
     jest.useRealTimers();
-    const fetchSpy = jest.spyOn(window, 'fetch').mockImplementation((url: any) => {
-      if (url.includes('/youtube/v3/search')) {
-        return Promise.reject(new Error('Search Failed'));
-      }
-      if (url.includes('/test/youtube/error-mode')) {
-        return Promise.resolve({
-          json: async () => ({ active: true, mode: 'player-error-150' })
-        } as any);
-      }
-      return Promise.reject(new Error('Unknown url'));
-    });
+    const fetchSpy = jest
+      .spyOn(window, 'fetch')
+      .mockImplementation((url: any) => {
+        if (url.includes('/youtube/v3/search')) {
+          return Promise.reject(new Error('Search Failed'));
+        }
+        if (url.includes('/test/youtube/error-mode')) {
+          return Promise.resolve({
+            json: async () => ({ active: true, mode: 'player-error-150' }),
+          } as any);
+        }
+        return Promise.reject(new Error('Unknown url'));
+      });
 
     const code = generatePlayerShim('http://localhost:9019');
     const fn = new Function(code);
@@ -199,19 +208,20 @@ describe('Player Shim Browser DOM Behavior (JSDOM)', () => {
     const player = new (window as any).YT.Player(container, {
       videoId: 'fail-vid',
       events: {
-        onError: onErrorSpy
-      }
+        onError: onErrorSpy,
+      },
     });
 
     expect(player).toBeDefined();
 
     await new Promise((resolve) => setTimeout(resolve, 300));
 
-    expect(onErrorSpy).toHaveBeenCalledWith(expect.objectContaining({ data: 150 }));
+    expect(onErrorSpy).toHaveBeenCalledWith(
+      expect.objectContaining({ data: 150 })
+    );
     fetchSpy.mockRestore();
   });
 });
-
 
 describe('Player Shim Express Route Serving', () => {
   let twin: YoutubeTwin;
@@ -232,7 +242,9 @@ describe('Player Shim Express Route Serving', () => {
       headers: { Connection: 'close' },
     });
     expect(response.status).toBe(200);
-    expect(response.headers.get('content-type')).toContain('application/javascript');
+    expect(response.headers.get('content-type')).toContain(
+      'application/javascript'
+    );
 
     const body = await response.text();
     expect(body).toContain('window.YT =');
@@ -244,7 +256,9 @@ describe('Player Shim Express Route Serving', () => {
       headers: { Connection: 'close' },
     });
     expect(response.status).toBe(200);
-    expect(response.headers.get('content-type')).toContain('application/javascript');
+    expect(response.headers.get('content-type')).toContain(
+      'application/javascript'
+    );
 
     const body = await response.text();
     expect(body).toContain('window.YT =');

@@ -98,7 +98,11 @@ export class YoutubeErrorModeManager {
 
     switch (this.activeMode.type) {
       case 'daily-limit-exceeded':
-        return youtubeApiError(403, 'Daily Limit Exceeded', 'dailyLimitExceeded');
+        return youtubeApiError(
+          403,
+          'Daily Limit Exceeded',
+          'dailyLimitExceeded'
+        );
       case 'invalid-api-key':
         return youtubeApiError(400, 'API key not valid', 'keyInvalid');
       case 'empty-results':

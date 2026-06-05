@@ -6,13 +6,7 @@ import { YoutubeSearchService } from './youtube-search.service.js';
 @Global()
 @Module({
   controllers: [YoutubeSearchController],
-  providers: [
-    YoutubeSearchService,
-    YoutubeErrorModeManager,
-  ],
-  exports: [
-    YoutubeSearchService,
-    YoutubeErrorModeManager,
-  ],
+  providers: [YoutubeSearchService, YoutubeErrorModeManager],
+  exports: [YoutubeSearchService, YoutubeErrorModeManager],
 })
 export class FeatureYoutubeModule {}

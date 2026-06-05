@@ -12,9 +12,9 @@ export interface VideoFixture {
   channelTitle: string;
   channelId: string;
   description: string;
-  publishedAt: string;       // ISO 8601
-  thumbnailIndex: number;    // Maps to thumbnail-XX.jpg
-  duration: string;          // ISO 8601 duration (e.g., "PT20M15S")
+  publishedAt: string; // ISO 8601
+  thumbnailIndex: number; // Maps to thumbnail-XX.jpg
+  duration: string; // ISO 8601 duration (e.g., "PT20M15S")
   viewCount: string;
   tags: string[];
 }
@@ -25,7 +25,8 @@ export const videoFixtures: VideoFixture[] = [
     title: 'Morning Yoga Flow - 20 Minutes',
     channelTitle: 'Wellness Daily',
     channelId: 'UC-wellness-daily-001',
-    description: 'Start your day with this gentle 20-minute yoga flow for all levels.',
+    description:
+      'Start your day with this gentle 20-minute yoga flow for all levels.',
     publishedAt: '2024-03-15T10:00:00Z',
     thumbnailIndex: 1,
     duration: 'PT20M15S',
@@ -37,7 +38,8 @@ export const videoFixtures: VideoFixture[] = [
     title: 'How to Make Classic Italian Pasta carbonara',
     channelTitle: 'Chef Roberto',
     channelId: 'UC-chef-roberto-002',
-    description: 'Learn the secrets to authentic, creamy Roman carbonara without cream!',
+    description:
+      'Learn the secrets to authentic, creamy Roman carbonara without cream!',
     publishedAt: '2024-03-14T17:30:00Z',
     thumbnailIndex: 2,
     duration: 'PT12M45S',
@@ -49,7 +51,8 @@ export const videoFixtures: VideoFixture[] = [
     title: 'TypeScript in 100 Seconds',
     channelTitle: 'Code Academy',
     channelId: 'UC-code-academy-003',
-    description: 'A quick overview of TypeScript features and type safety benefits.',
+    description:
+      'A quick overview of TypeScript features and type safety benefits.',
     publishedAt: '2024-03-13T12:00:00Z',
     thumbnailIndex: 3,
     duration: 'PT1M40S',
@@ -61,7 +64,8 @@ export const videoFixtures: VideoFixture[] = [
     title: 'Solo Travel Guide: 5 Days in Tokyo',
     channelTitle: 'Wanderlust Journal',
     channelId: 'UC-wanderlust-journal-004',
-    description: 'Discover the best sights, food, and neighborhoods in Tokyo as a solo traveler.',
+    description:
+      'Discover the best sights, food, and neighborhoods in Tokyo as a solo traveler.',
     publishedAt: '2024-03-12T08:15:00Z',
     thumbnailIndex: 4,
     duration: 'PT25M10S',
@@ -73,7 +77,8 @@ export const videoFixtures: VideoFixture[] = [
     title: 'Acoustic Guitar Cover of Popular Hits 2024',
     channelTitle: 'Acoustic Sessions',
     channelId: 'UC-acoustic-sessions-005',
-    description: 'Relaxing instrumental acoustic guitar covers for studying or working.',
+    description:
+      'Relaxing instrumental acoustic guitar covers for studying or working.',
     publishedAt: '2024-03-11T20:00:00Z',
     thumbnailIndex: 5,
     duration: 'PT45M00S',
@@ -109,7 +114,8 @@ export const videoFixtures: VideoFixture[] = [
     title: 'Linear Algebra: Matrices Made Intuitive',
     channelTitle: 'Learn Math Easily',
     channelId: 'UC-learn-math-easily-008',
-    description: 'Visualizing matrix transformations, eigenvectors, and eigenvalues.',
+    description:
+      'Visualizing matrix transformations, eigenvectors, and eigenvalues.',
     publishedAt: '2024-03-08T11:00:00Z',
     thumbnailIndex: 8,
     duration: 'PT30M15S',
@@ -121,7 +127,8 @@ export const videoFixtures: VideoFixture[] = [
     title: 'The Great Migration: Serengeti Wild Life',
     channelTitle: 'Earth Documentaries',
     channelId: 'UC-earth-docs-009',
-    description: 'Witnessing millions of wildebeests cross the Mara River in Africa.',
+    description:
+      'Witnessing millions of wildebeests cross the Mara River in Africa.',
     publishedAt: '2024-03-07T06:00:00Z',
     thumbnailIndex: 9,
     duration: 'PT48M50S',
@@ -133,7 +140,8 @@ export const videoFixtures: VideoFixture[] = [
     title: 'Landscape Photography: Mastering the Golden Hour',
     channelTitle: 'Shutter Mastery',
     channelId: 'UC-shutter-mastery-010',
-    description: 'Tips and tricks for capturing perfect lighting in outdoor landscape shots.',
+    description:
+      'Tips and tricks for capturing perfect lighting in outdoor landscape shots.',
     publishedAt: '2024-03-06T15:40:00Z',
     thumbnailIndex: 10,
     duration: 'PT18M12S',
@@ -145,7 +153,8 @@ export const videoFixtures: VideoFixture[] = [
     title: 'Design System Architecture: Figma to Code',
     channelTitle: 'Creative UI/UX',
     channelId: 'UC-creative-uiux-011',
-    description: 'How to structure design tokens and components for seamless engineering hands.',
+    description:
+      'How to structure design tokens and components for seamless engineering hands.',
     publishedAt: '2024-03-05T09:30:00Z',
     thumbnailIndex: 11,
     duration: 'PT22M05S',
@@ -157,7 +166,8 @@ export const videoFixtures: VideoFixture[] = [
     title: 'How We Built a $10M SaaS: Startup Lessons',
     channelTitle: 'Startup Grind',
     channelId: 'UC-startup-grind-012',
-    description: 'An honest breakdown of product-market fit, pricing, and scaling strategies.',
+    description:
+      'An honest breakdown of product-market fit, pricing, and scaling strategies.',
     publishedAt: '2024-03-04T13:10:00Z',
     thumbnailIndex: 12,
     duration: 'PT16M55S',
@@ -169,7 +179,8 @@ export const videoFixtures: VideoFixture[] = [
     title: 'Learn French: 100 Common Phrases for Beginners',
     channelTitle: 'Speak French Fluently',
     channelId: 'UC-speak-french-013',
-    description: 'Essential French phrases for travel, greeting, and simple daily conversation.',
+    description:
+      'Essential French phrases for travel, greeting, and simple daily conversation.',
     publishedAt: '2024-03-03T07:00:00Z',
     thumbnailIndex: 13,
     duration: 'PT14M20S',
@@ -181,7 +192,8 @@ export const videoFixtures: VideoFixture[] = [
     title: 'DIY Oak Coffee Table: Woodworking Guide',
     channelTitle: 'Home Woodworking',
     channelId: 'UC-home-woodworking-014',
-    description: 'Building a modern coffee table from scratch using white oak and mortise joinery.',
+    description:
+      'Building a modern coffee table from scratch using white oak and mortise joinery.',
     publishedAt: '2024-03-02T16:20:00Z',
     thumbnailIndex: 14,
     duration: 'PT28M45S',
@@ -193,7 +205,8 @@ export const videoFixtures: VideoFixture[] = [
     title: '15-Minute Mindfulness Meditation for Anxiety',
     channelTitle: 'Calm Minds',
     channelId: 'UC-calm-minds-015',
-    description: 'A guided meditation to reduce stress, calm the nervous system, and return to center.',
+    description:
+      'A guided meditation to reduce stress, calm the nervous system, and return to center.',
     publishedAt: '2024-03-01T21:00:00Z',
     thumbnailIndex: 15,
     duration: 'PT15M00S',
@@ -205,7 +218,8 @@ export const videoFixtures: VideoFixture[] = [
     title: 'HIIT Workout: Full Body Fat Burner',
     channelTitle: 'Active Training',
     channelId: 'UC-active-training-016',
-    description: 'High intensity interval training routine. No equipment needed.',
+    description:
+      'High intensity interval training routine. No equipment needed.',
     publishedAt: '2024-02-28T09:00:00Z',
     thumbnailIndex: 16,
     duration: 'PT30M00S',
@@ -217,7 +231,8 @@ export const videoFixtures: VideoFixture[] = [
     title: 'iPhone 16 Pro Max: Honest Review After 6 Months',
     channelTitle: 'Gadget Sphere',
     channelId: 'UC-gadget-sphere-017',
-    description: 'Is it still worth buying? Camera, battery life, and durability analysis.',
+    description:
+      'Is it still worth buying? Camera, battery life, and durability analysis.',
     publishedAt: '2024-02-27T14:30:00Z',
     thumbnailIndex: 17,
     duration: 'PT13M40S',
@@ -229,7 +244,8 @@ export const videoFixtures: VideoFixture[] = [
     title: 'The Rise and Fall of the Roman Empire',
     channelTitle: 'Chronicles of Old',
     channelId: 'UC-chronicles-old-018',
-    description: 'Understanding the political and social dynamics that shaped European history.',
+    description:
+      'Understanding the political and social dynamics that shaped European history.',
     publishedAt: '2024-02-26T10:00:00Z',
     thumbnailIndex: 18,
     duration: 'PT52M15S',
@@ -241,7 +257,8 @@ export const videoFixtures: VideoFixture[] = [
     title: 'When Programmers Try to Socialize (Sketch)',
     channelTitle: 'Laughter Zone',
     channelId: 'UC-laughter-zone-019',
-    description: 'A funny comedy sketch about introverted developers attending a house party.',
+    description:
+      'A funny comedy sketch about introverted developers attending a house party.',
     publishedAt: '2024-02-25T18:00:00Z',
     thumbnailIndex: 19,
     duration: 'PT4M15S',
@@ -253,7 +270,8 @@ export const videoFixtures: VideoFixture[] = [
     title: 'Behind the Scenes: Hand-Drawn Animation Loop',
     channelTitle: 'Cartoon Studio',
     channelId: 'UC-cartoon-studio-020',
-    description: 'Timelapse of a 24-frame classical animation walk cycle on light box.',
+    description:
+      'Timelapse of a 24-frame classical animation walk cycle on light box.',
     publishedAt: '2024-02-24T12:00:00Z',
     thumbnailIndex: 20,
     duration: 'PT8M50S',

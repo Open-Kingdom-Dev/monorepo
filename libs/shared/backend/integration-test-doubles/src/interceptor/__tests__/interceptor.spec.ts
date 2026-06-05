@@ -53,7 +53,9 @@ describe('RoutingTable', () => {
     const resolvedApi = table.resolve('https://example.com/api/v1/users');
     expect(resolvedApi).toBe('http://localhost:8080/api/v1/users');
 
-    const resolvedYoutube = table.resolve('https://www.googleapis.com/youtube/v3/search');
+    const resolvedYoutube = table.resolve(
+      'https://www.googleapis.com/youtube/v3/search'
+    );
     expect(resolvedYoutube).toBe('http://localhost:9016/youtube/v3/search');
 
     // Does not match pathPrefix

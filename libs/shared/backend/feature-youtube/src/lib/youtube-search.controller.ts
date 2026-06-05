@@ -18,9 +18,7 @@ import {
 } from '@nestjs/swagger';
 import { Public } from '@open-kingdom/shared-backend-util-rbac';
 import { YoutubeSearchService } from './youtube-search.service.js';
-import {
-  YoutubeSearchResponseDto,
-} from './youtube-search.dto.js';
+import { YoutubeSearchResponseDto } from './youtube-search.dto.js';
 import {
   YoutubeActivateErrorModeDto,
   YoutubeErrorModeStateDto,

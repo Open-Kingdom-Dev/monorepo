@@ -60,7 +60,9 @@ describe('YouTube Twin E2E Interception', () => {
     });
 
     expect(response.status).toBe(200);
-    expect(response.headers.get('content-type')).toContain('application/javascript');
+    expect(response.headers.get('content-type')).toContain(
+      'application/javascript'
+    );
     const text = await response.text();
     expect(text).toContain('window.YT =');
     expect(text).toContain(`http://localhost:${TEST_PORT}`);
@@ -69,7 +71,9 @@ describe('YouTube Twin E2E Interception', () => {
   });
 
   it('should export valid MSW handler configurations', () => {
-    const configs = getYoutubeMswHandlerConfigs(`http://localhost:${TEST_PORT}`);
+    const configs = getYoutubeMswHandlerConfigs(
+      `http://localhost:${TEST_PORT}`
+    );
     expect(configs.length).toBe(2);
     expect(configs[0].url).toBe('https://www.youtube.com/iframe_api');
     expect(configs[0].proxyTo).toBe(`http://localhost:${TEST_PORT}/iframe_api`);

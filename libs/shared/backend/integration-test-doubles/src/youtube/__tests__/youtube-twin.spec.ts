@@ -1,7 +1,5 @@
 import { YoutubeTwin } from '../youtube-twin.js';
-import {
-  createYoutubeConfig,
-} from '../youtube-twin.config.js';
+import { createYoutubeConfig } from '../youtube-twin.config.js';
 import { DEFAULT_PORTS, ENV_VARS } from '../../shared/constants.js';
 
 describe('YoutubeTwin Configuration', () => {
@@ -19,7 +17,9 @@ describe('YoutubeTwin Configuration', () => {
   it('should use default values', () => {
     const config = createYoutubeConfig();
     expect(config.port).toBe(DEFAULT_PORTS.YOUTUBE);
-    expect(config.externalUrl).toBe(`http://localhost:${DEFAULT_PORTS.YOUTUBE}`);
+    expect(config.externalUrl).toBe(
+      `http://localhost:${DEFAULT_PORTS.YOUTUBE}`
+    );
     expect(config.sampleVideoPath).toContain('sample.mp4');
     expect(config.thumbnailDir).toContain('thumbnails');
   });
@@ -123,7 +123,9 @@ describe('YoutubeTwin Server Lifecycle', () => {
       }
     );
     expect(thumbnailResponse.status).toBe(200);
-    expect(thumbnailResponse.headers.get('content-type')).toContain('image/jpeg');
+    expect(thumbnailResponse.headers.get('content-type')).toContain(
+      'image/jpeg'
+    );
     await thumbnailResponse.arrayBuffer(); // Consume body
   });
 
@@ -339,9 +341,12 @@ describe('YoutubeTwin Server Lifecycle', () => {
         body: JSON.stringify({ mode: 'daily-limit-exceeded' }),
       });
 
-      const searchRes = await fetch(`${TEST_URL}/youtube/v3/search?q=yoga&key=valid-key`, {
-        headers: { Connection: 'close' },
-      });
+      const searchRes = await fetch(
+        `${TEST_URL}/youtube/v3/search?q=yoga&key=valid-key`,
+        {
+          headers: { Connection: 'close' },
+        }
+      );
       expect(searchRes.status).toBe(403);
       const body: any = await searchRes.json();
       expect(body.error.code).toBe(403);
@@ -359,9 +364,12 @@ describe('YoutubeTwin Server Lifecycle', () => {
         body: JSON.stringify({ mode: 'invalid-api-key' }),
       });
 
-      const searchRes = await fetch(`${TEST_URL}/youtube/v3/search?q=yoga&key=valid-key`, {
-        headers: { Connection: 'close' },
-      });
+      const searchRes = await fetch(
+        `${TEST_URL}/youtube/v3/search?q=yoga&key=valid-key`,
+        {
+          headers: { Connection: 'close' },
+        }
+      );
       expect(searchRes.status).toBe(400);
       const body: any = await searchRes.json();
       expect(body.error.code).toBe(400);
@@ -379,9 +387,12 @@ describe('YoutubeTwin Server Lifecycle', () => {
         body: JSON.stringify({ mode: 'empty-results' }),
       });
 
-      const searchRes = await fetch(`${TEST_URL}/youtube/v3/search?q=yoga&key=valid-key`, {
-        headers: { Connection: 'close' },
-      });
+      const searchRes = await fetch(
+        `${TEST_URL}/youtube/v3/search?q=yoga&key=valid-key`,
+        {
+          headers: { Connection: 'close' },
+        }
+      );
       expect(searchRes.status).toBe(200);
       const body: any = await searchRes.json();
       expect(body.kind).toBe('youtube#searchListResponse');
@@ -399,9 +410,12 @@ describe('YoutubeTwin Server Lifecycle', () => {
         body: JSON.stringify({ mode: 'player-error-101' }),
       });
 
-      const searchRes = await fetch(`${TEST_URL}/youtube/v3/search?q=yoga&key=valid-key`, {
-        headers: { Connection: 'close' },
-      });
+      const searchRes = await fetch(
+        `${TEST_URL}/youtube/v3/search?q=yoga&key=valid-key`,
+        {
+          headers: { Connection: 'close' },
+        }
+      );
       expect(searchRes.status).toBe(200);
       const body: any = await searchRes.json();
       expect(body.__twinErrorMode).toEqual({ playerError: 101 });
@@ -431,4 +445,3 @@ describe('YoutubeTwin Server Lifecycle', () => {
     });
   });
 });
-

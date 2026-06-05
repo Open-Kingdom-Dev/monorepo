@@ -1,4 +1,8 @@
-import { searchFixtures, videoFixtures, VideoFixture } from '../search-fixtures.js';
+import {
+  searchFixtures,
+  videoFixtures,
+  VideoFixture,
+} from '../search-fixtures.js';
 import { formatSearchResponse } from '../search-response.js';
 
 describe('searchFixtures', () => {
@@ -81,7 +85,11 @@ describe('formatSearchResponse', () => {
   it('should format VideoFixtures exactly matching the YouTube v3 JSON schema', () => {
     const sampleFixtures = videoFixtures.slice(0, 2);
     const baseUrl = 'http://localhost:9016';
-    const response = formatSearchResponse(sampleFixtures, baseUrl, sampleFixtures.length);
+    const response = formatSearchResponse(
+      sampleFixtures,
+      baseUrl,
+      sampleFixtures.length
+    );
 
     expect(response.kind).toBe('youtube#searchListResponse');
     expect(response.etag).toContain('test-etag');

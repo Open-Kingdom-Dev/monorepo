@@ -31,10 +31,10 @@ export class YouTubeTwinController {
 
   @Public()
   @Post('start')
+  @HttpCode(HttpStatus.OK)
   @ApiOperation({
     summary: 'Start YouTube twin',
-    description:
-      'Starts the YouTube Express twin server.',
+    description: 'Starts the YouTube Express twin server.',
   })
   @ApiResponse({
     status: 200,
@@ -47,6 +47,7 @@ export class YouTubeTwinController {
 
   @Public()
   @Post('stop')
+  @HttpCode(HttpStatus.OK)
   @ApiOperation({
     summary: 'Stop YouTube twin',
     description: 'Stops the YouTube twin Express server.',
@@ -65,7 +66,8 @@ export class YouTubeTwinController {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
     summary: 'Reset YouTube twin',
-    description: 'Resets the YouTube twin search fixtures and deactivates any simulated error modes.',
+    description:
+      'Resets the YouTube twin search fixtures and deactivates any simulated error modes.',
   })
   @ApiResponse({
     status: 200,

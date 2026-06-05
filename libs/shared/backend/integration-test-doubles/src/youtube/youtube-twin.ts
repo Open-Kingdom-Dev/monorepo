@@ -2,7 +2,10 @@ import http from 'node:http';
 import path from 'node:path';
 import express, { Request, Response } from 'express';
 import cors from 'cors';
-import { createYoutubeConfig, YoutubeTwinConfig } from './youtube-twin.config.js';
+import {
+  createYoutubeConfig,
+  YoutubeTwinConfig,
+} from './youtube-twin.config.js';
 import {
   VideoFixture,
   videoFixtures,
@@ -11,7 +14,6 @@ import {
 import { formatSearchResponse } from './search-response.js';
 import { generatePlayerShim } from './player-shim.js';
 import { YoutubeErrorModeManager } from './youtube-error-mode.js';
-
 
 export class YoutubeTwin {
   private readonly config: YoutubeTwinConfig;
@@ -42,7 +44,11 @@ export class YoutubeTwin {
         return res.status(errorResult.status).json(errorResult.body);
       }
 
-      const { q = '', maxResults = '10', key } = req.query as Record<string, string>;
+      const {
+        q = '',
+        maxResults = '10',
+        key,
+      } = req.query as Record<string, string>;
 
       if (!key) {
         return res.status(400).json({
@@ -61,8 +67,16 @@ export class YoutubeTwin {
       }
 
       const limit = Number.parseInt(maxResults, 10);
-      const results = searchFixtures(q, Number.isNaN(limit) ? 10 : limit, this.currentFixtures);
-      const response = formatSearchResponse(results, this.config.externalUrl, results.length) as any;
+      const results = searchFixtures(
+        q,
+        Number.isNaN(limit) ? 10 : limit,
+        this.currentFixtures
+      );
+      const response = formatSearchResponse(
+        results,
+        this.config.externalUrl,
+        results.length
+      ) as any;
 
       const playerErrorCode = this.errorModeManager.getPlayerErrorCode();
       if (playerErrorCode !== null) {
@@ -122,7 +136,9 @@ export class YoutubeTwin {
 
     return new Promise<void>((resolve, reject) => {
       this.server = app.listen(this.config.port, () => {
-        console.log(`[YoutubeTwin] Express server listening on port ${this.config.port}`);
+        console.log(
+          `[YoutubeTwin] Express server listening on port ${this.config.port}`
+        );
         resolve();
       });
       this.server.on('error', reject);
@@ -149,9 +165,12 @@ export class YoutubeTwin {
 
   async isHealthy(): Promise<boolean> {
     try {
-      const res = await fetch(`${this.config.externalUrl}/test/youtube/health`, {
-        headers: { Connection: 'close' },
-      });
+      const res = await fetch(
+        `${this.config.externalUrl}/test/youtube/health`,
+        {
+          headers: { Connection: 'close' },
+        }
+      );
       await res.text(); // Consume body to release socket
       return res.ok;
     } catch {

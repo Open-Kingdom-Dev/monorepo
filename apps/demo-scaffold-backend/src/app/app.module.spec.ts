@@ -110,7 +110,9 @@ jest.mock('@open-kingdom/shared-backend-feature-youtube', () => {
   class MockYoutubeSearchService {
     setErrorMode = jest.fn();
     clearErrorMode = jest.fn();
-    getErrorModeState = jest.fn().mockReturnValue({ active: false, type: null, description: null });
+    getErrorModeState = jest
+      .fn()
+      .mockReturnValue({ active: false, type: null, description: null });
     resetErrorMode = jest.fn();
     search = jest.fn();
   }

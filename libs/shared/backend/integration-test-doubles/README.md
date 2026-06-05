@@ -40,12 +40,7 @@ await twin.stop();
 ### Using YouTube Twin (Server-Side Interception)
 
 ```typescript
-import {
-  YoutubeTwin,
-  NodeInterceptor,
-  RoutingTable,
-  defaultRoutingEntries,
-} from '@open-kingdom/shared-backend-integration-test-doubles';
+import { YoutubeTwin, NodeInterceptor, RoutingTable, defaultRoutingEntries } from '@open-kingdom/shared-backend-integration-test-doubles';
 
 // Start the twin (default port 9016)
 const twin = new YoutubeTwin();
@@ -57,9 +52,7 @@ const interceptor = new NodeInterceptor(routingTable);
 interceptor.install();
 
 // Call the production YouTube API endpoint (internally routed to twin)
-const res = await fetch(
-  'https://www.googleapis.com/youtube/v3/search?q=yoga&key=valid-key'
-);
+const res = await fetch('https://www.googleapis.com/youtube/v3/search?q=yoga&key=valid-key');
 const data = await res.json();
 console.log(data.kind); // "youtube#searchListResponse"
 

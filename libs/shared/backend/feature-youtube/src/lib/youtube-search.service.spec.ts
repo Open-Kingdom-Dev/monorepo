@@ -28,7 +28,9 @@ describe('YoutubeSearchService', () => {
     }).compile();
 
     service = module.get<YoutubeSearchService>(YoutubeSearchService);
-    errorModeManager = module.get<YoutubeErrorModeManager>(YoutubeErrorModeManager);
+    errorModeManager = module.get<YoutubeErrorModeManager>(
+      YoutubeErrorModeManager
+    );
 
     jest.clearAllMocks();
   });
@@ -52,7 +54,9 @@ describe('YoutubeSearchService', () => {
       const result = await service.search('meditation', 3);
       expect(result).toEqual(mockResult);
       expect(mockedAxios.get).toHaveBeenCalledWith(
-        expect.stringContaining('https://www.googleapis.com/youtube/v3/search?q=meditation&maxResults=3'),
+        expect.stringContaining(
+          'https://www.googleapis.com/youtube/v3/search?q=meditation&maxResults=3'
+        ),
         expect.objectContaining({ adapter: 'fetch' })
       );
     });
@@ -85,11 +89,20 @@ describe('YoutubeSearchService', () => {
 
   describe('errorMode management', () => {
     it('should set error mode and propagate it to twin', async () => {
-      mockedAxios.post.mockResolvedValue({ status: 200, data: { success: true } });
-      jest.spyOn(errorModeManager, 'getMode').mockReturnValue({ type: 'daily-limit-exceeded' });
+      mockedAxios.post.mockResolvedValue({
+        status: 200,
+        data: { success: true },
+      });
+      jest
+        .spyOn(errorModeManager, 'getMode')
+        .mockReturnValue({ type: 'daily-limit-exceeded' });
 
-      const state = await service.setErrorMode({ type: 'daily-limit-exceeded' });
-      expect(errorModeManager.setMode).toHaveBeenCalledWith({ type: 'daily-limit-exceeded' });
+      const state = await service.setErrorMode({
+        type: 'daily-limit-exceeded',
+      });
+      expect(errorModeManager.setMode).toHaveBeenCalledWith({
+        type: 'daily-limit-exceeded',
+      });
       expect(mockedAxios.post).toHaveBeenCalledWith(
         'http://localhost:9016/test/youtube/error-mode',
         { mode: 'daily-limit-exceeded' }
@@ -100,23 +113,39 @@ describe('YoutubeSearchService', () => {
 
     it('should handle twin propagation failure gracefully when setting error mode', async () => {
       mockedAxios.post.mockRejectedValue(new Error('Twin unreachable'));
-      jest.spyOn(errorModeManager, 'getMode').mockReturnValue({ type: 'daily-limit-exceeded' });
+      jest
+        .spyOn(errorModeManager, 'getMode')
+        .mockReturnValue({ type: 'daily-limit-exceeded' });
 
-      const state = await service.setErrorMode({ type: 'daily-limit-exceeded' });
-      expect(errorModeManager.setMode).toHaveBeenCalledWith({ type: 'daily-limit-exceeded' });
+      const state = await service.setErrorMode({
+        type: 'daily-limit-exceeded',
+      });
+      expect(errorModeManager.setMode).toHaveBeenCalledWith({
+        type: 'daily-limit-exceeded',
+      });
       expect(state.active).toBe(true);
     });
 
     it('should handle non-200 responses from twin when setting error mode', async () => {
-      mockedAxios.post.mockResolvedValue({ status: 500, statusText: 'Internal Error' });
-      jest.spyOn(errorModeManager, 'getMode').mockReturnValue({ type: 'daily-limit-exceeded' });
+      mockedAxios.post.mockResolvedValue({
+        status: 500,
+        statusText: 'Internal Error',
+      });
+      jest
+        .spyOn(errorModeManager, 'getMode')
+        .mockReturnValue({ type: 'daily-limit-exceeded' });
 
-      const state = await service.setErrorMode({ type: 'daily-limit-exceeded' });
+      const state = await service.setErrorMode({
+        type: 'daily-limit-exceeded',
+      });
       expect(state.active).toBe(true);
     });
 
     it('should clear error mode and propagate to twin', async () => {
-      mockedAxios.delete.mockResolvedValue({ status: 200, data: { success: true } });
+      mockedAxios.delete.mockResolvedValue({
+        status: 200,
+        data: { success: true },
+      });
       jest.spyOn(errorModeManager, 'getMode').mockReturnValue(null);
 
       const state = await service.clearErrorMode();
@@ -137,7 +166,10 @@ describe('YoutubeSearchService', () => {
     });
 
     it('should handle non-200 response from twin when clearing error mode', async () => {
-      mockedAxios.delete.mockResolvedValue({ status: 500, statusText: 'Internal Error' });
+      mockedAxios.delete.mockResolvedValue({
+        status: 500,
+        statusText: 'Internal Error',
+      });
       jest.spyOn(errorModeManager, 'getMode').mockReturnValue(null);
 
       const state = await service.clearErrorMode();
@@ -159,14 +191,38 @@ describe('YoutubeSearchService', () => {
 
   describe('describeMode branches', () => {
     const errorModes = [
-      { type: 'daily-limit-exceeded' as const, desc: 'Simulates 403 Daily Limit Exceeded for search requests.' },
-      { type: 'invalid-api-key' as const, desc: 'Simulates 400 API key not valid for search requests.' },
-      { type: 'empty-results' as const, desc: 'Simulates an empty search response (200 OK with no items).' },
-      { type: 'player-error-2' as const, desc: 'Simulates YouTube Player error 2 (invalid parameter).' },
-      { type: 'player-error-5' as const, desc: 'Simulates YouTube Player error 5 (HTML5 player error).' },
-      { type: 'player-error-100' as const, desc: 'Simulates YouTube Player error 100 (video not found/removed).' },
-      { type: 'player-error-101' as const, desc: 'Simulates YouTube Player error 101 (video playback not allowed in embedded players).' },
-      { type: 'player-error-150' as const, desc: 'Simulates YouTube Player error 150 (same as 101, playback restriction).' },
+      {
+        type: 'daily-limit-exceeded' as const,
+        desc: 'Simulates 403 Daily Limit Exceeded for search requests.',
+      },
+      {
+        type: 'invalid-api-key' as const,
+        desc: 'Simulates 400 API key not valid for search requests.',
+      },
+      {
+        type: 'empty-results' as const,
+        desc: 'Simulates an empty search response (200 OK with no items).',
+      },
+      {
+        type: 'player-error-2' as const,
+        desc: 'Simulates YouTube Player error 2 (invalid parameter).',
+      },
+      {
+        type: 'player-error-5' as const,
+        desc: 'Simulates YouTube Player error 5 (HTML5 player error).',
+      },
+      {
+        type: 'player-error-100' as const,
+        desc: 'Simulates YouTube Player error 100 (video not found/removed).',
+      },
+      {
+        type: 'player-error-101' as const,
+        desc: 'Simulates YouTube Player error 101 (video playback not allowed in embedded players).',
+      },
+      {
+        type: 'player-error-150' as const,
+        desc: 'Simulates YouTube Player error 150 (same as 101, playback restriction).',
+      },
       { type: 'unknown-error-mode' as any, desc: 'Simulated error mode' },
     ];
 

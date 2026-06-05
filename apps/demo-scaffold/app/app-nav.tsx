@@ -15,7 +15,10 @@ export function AppNav() {
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
         setIsOpen(false);
       }
     }
@@ -55,7 +58,9 @@ export function AppNav() {
           onClick={() => setIsOpen(!isOpen)}
           className={cn(
             'flex items-center gap-1.5 text-sm font-medium transition-colors hover:text-foreground/80 focus:outline-none select-none',
-            isMockServerActive ? 'text-foreground font-semibold' : 'text-muted-foreground'
+            isMockServerActive
+              ? 'text-foreground font-semibold'
+              : 'text-muted-foreground'
           )}
           aria-expanded={isOpen}
           aria-haspopup="true"
@@ -81,7 +86,9 @@ export function AppNav() {
               className={({ isActive }) =>
                 cn(
                   'flex items-center gap-2 rounded-sm px-3 py-2 text-sm transition-colors hover:bg-accent hover:text-accent-foreground',
-                  isActive ? 'bg-accent text-accent-foreground font-semibold' : 'text-muted-foreground'
+                  isActive
+                    ? 'bg-accent text-accent-foreground font-semibold'
+                    : 'text-muted-foreground'
                 )
               }
             >
@@ -95,7 +102,9 @@ export function AppNav() {
               className={({ isActive }) =>
                 cn(
                   'flex items-center gap-2 rounded-sm px-3 py-2 text-sm transition-colors hover:bg-accent hover:text-accent-foreground',
-                  isActive ? 'bg-accent text-accent-foreground font-semibold' : 'text-muted-foreground'
+                  isActive
+                    ? 'bg-accent text-accent-foreground font-semibold'
+                    : 'text-muted-foreground'
                 )
               }
             >
@@ -109,7 +118,9 @@ export function AppNav() {
               className={({ isActive }) =>
                 cn(
                   'flex items-center gap-2 rounded-sm px-3 py-2 text-sm transition-colors hover:bg-accent hover:text-accent-foreground',
-                  isActive ? 'bg-accent text-accent-foreground font-semibold' : 'text-muted-foreground'
+                  isActive
+                    ? 'bg-accent text-accent-foreground font-semibold'
+                    : 'text-muted-foreground'
                 )
               }
             >

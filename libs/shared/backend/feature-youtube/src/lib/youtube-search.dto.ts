@@ -2,7 +2,8 @@ import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export class YoutubeSearchQueryDto {
   @ApiProperty({
-    description: 'Search query string to match video titles, descriptions, and tags',
+    description:
+      'Search query string to match video titles, descriptions, and tags',
     example: 'yoga',
   })
   q?: string;
