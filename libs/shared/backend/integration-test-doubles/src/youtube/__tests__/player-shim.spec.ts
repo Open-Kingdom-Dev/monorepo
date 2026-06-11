@@ -113,7 +113,9 @@ describe('Player Shim Browser DOM Behavior (JSDOM)', () => {
       .mockResolvedValue(undefined);
     const pauseSpy = jest
       .spyOn(videoElement, 'pause')
-      .mockImplementation(() => {});
+      .mockImplementation(() => {
+        // noop
+      });
 
     // Playback
     player.playVideo();

@@ -310,7 +310,7 @@ describe('YoutubeTwin Server Lifecycle', () => {
       expect(delBody).toEqual({ success: true, mode: null });
 
       // Verify no active mode
-      let checkRes = await fetch(`${TEST_URL}/test/youtube/error-mode`, {
+      const checkRes = await fetch(`${TEST_URL}/test/youtube/error-mode`, {
         headers: { Connection: 'close' },
       });
       const checkBody: any = await checkRes.json();
