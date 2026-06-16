@@ -21,6 +21,7 @@ import {
 import { useGetFactQuery } from '@open-kingdom/shared-frontend-data-access-external-api';
 import {
   AdvancedGridExample,
+  DualListExample,
   ErrorAutologgerExample,
   GridExample,
 } from '../components';
@@ -177,6 +178,15 @@ export function Home() {
         </CardHeader>
         <CardContent>
           <AdvancedGridExample />
+        </CardContent>
+      </Card>
+
+      <Card className="mb-6">
+        <CardHeader>
+          <CardTitle>Dual List Demo</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <DualListExample />
         </CardContent>
       </Card>
 

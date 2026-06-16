@@ -95,6 +95,10 @@ Per-column knobs live on `ColumnMeta` (TanStack augmentation):
 | `tooltipField` / `tooltipValueGetter` | `meta.tooltip`                                   |
 | `cellClass` (string)                  | `meta.className`                                 |
 
+## Recipe: dual-list
+
+`DualListTable` stacks two `DataTable`s and coordinates their row selection (selecting on one side clears the other). Useful for "available pool → committed pool" flows. See `apps/demo-scaffold/app/components/DualListExample.tsx` for a runnable example.
+
 ## Limitations
 
 Flat columns only (no group headers / footers), no row virtualization, no server-side data. Open an issue if you need any of these.

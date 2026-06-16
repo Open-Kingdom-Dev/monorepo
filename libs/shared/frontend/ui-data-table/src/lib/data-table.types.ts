@@ -2,8 +2,10 @@ import type { ReactNode } from 'react';
 import type {
   ColumnDef,
   ColumnPinningState,
+  OnChangeFn,
   Row,
   RowData,
+  RowSelectionState,
   Table,
   TableState,
   Updater,
@@ -54,6 +56,13 @@ export type DataTableProps<T> = {
   // Controlled state — when supplied, persistStateKey is ignored.
   state?: Partial<TableState>;
   onStateChange?: (updater: Updater<TableState>) => void;
+
+  // Per-slice controlled selection. When `rowSelection` is supplied it takes
+  // precedence over `state.rowSelection`. `onRowSelectionChange` fires alongside
+  // the umbrella `onStateChange` — TanStack delivers both for any selection
+  // change.
+  rowSelection?: RowSelectionState;
+  onRowSelectionChange?: OnChangeFn<RowSelectionState>;
 
   // localStorage-backed state persistence (uncontrolled path only).
   persistStateKey?: string;

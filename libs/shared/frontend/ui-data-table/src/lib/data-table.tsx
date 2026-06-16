@@ -40,6 +40,8 @@ export function DataTable<T extends RowData>(props: DataTableProps<T>) {
     getRowId,
     state,
     onStateChange,
+    rowSelection,
+    onRowSelectionChange,
     persistStateKey,
     initialColumnPinning,
     enableSorting = true,
@@ -81,12 +83,14 @@ export function DataTable<T extends RowData>(props: DataTableProps<T>) {
   const initialState = useMemo(() => {
     const persisted = persistenceActive ? persistence.initial : {};
     if (persisted.columnPinning) return persisted;
+
     const left = [
       ...(enableRowSelection ? [SELECTION_COLUMN_ID] : []),
       ...(initialColumnPinning?.left ?? []),
     ];
     const right = initialColumnPinning?.right ?? [];
     if (left.length === 0 && right.length === 0) return persisted;
+
     return { ...persisted, columnPinning: { left, right } };
   }, [
     persistenceActive,
@@ -95,12 +99,27 @@ export function DataTable<T extends RowData>(props: DataTableProps<T>) {
     enableRowSelection,
   ]);
 
+  // Only pass `state` to TanStack when at least one slice is controlled.
+  // Passing an empty object would put TanStack in controlled mode and
+  // override its internal state with `{}` on every render.
+  const composedState = useMemo<Partial<TableState> | undefined>(() => {
+    if (!state && rowSelection === undefined) return undefined;
+    return {
+      ...(state ?? {}),
+      ...(rowSelection !== undefined ? { rowSelection } : {}),
+    };
+  }, [state, rowSelection]);
+
   const table = useDataTable<T>({
     data,
     columns: resolvedColumns,
     getRowId,
-    state,
+    state: composedState,
     initialState,
+    // Spread per-slice handlers conditionally — passing the property as
+    // `undefined` is not equivalent to omitting it, since TanStack uses the
+    // property's presence to flag a slice as controlled.
+    ...(onRowSelectionChange ? { onRowSelectionChange } : {}),
     onStateChange: (updater: Updater<TableState>) => {
       if (isControlled && onStateChange) onStateChange(updater);
       if (!persistenceActive) return;
