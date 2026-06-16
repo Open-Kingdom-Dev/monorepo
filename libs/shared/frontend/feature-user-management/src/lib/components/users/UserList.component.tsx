@@ -6,10 +6,10 @@ import {
 } from '@open-kingdom/shared-frontend-data-access-api-client';
 import { showSuccessNotification } from '@open-kingdom/shared-frontend-data-access-notifications';
 import {
-  DataGrid,
-  type ColDef,
-  type ICellRendererParams,
-} from '@open-kingdom/shared-frontend-ui-datagrid';
+  DataTable,
+  type ColumnDef,
+  type CellContext,
+} from '@open-kingdom/shared-frontend-ui-data-table';
 import { Button } from '@open-kingdom/shared-frontend-ui-primitives';
 import { ConfirmDialog } from '../shared/ConfirmDialog.component';
 import { RoleBadge } from '../shared/RoleBadge.component';
@@ -49,38 +49,38 @@ export function UserList({ currentUserId }: UserListProps) {
     }
   }, [userToDelete, deleteUser, dispatch]);
 
-  const columnDefs = useMemo<ColDef<User>[]>(
+  const columns = useMemo<ColumnDef<User>[]>(
     () => [
-      { field: 'email', headerName: 'Email', flex: 2 },
+      { accessorKey: 'email', header: 'Email' },
       {
-        headerName: 'Name',
-        flex: 2,
-        valueGetter: (params) => {
-          const { firstName, lastName } = params.data ?? {};
+        id: 'name',
+        header: 'Name',
+        accessorFn: (row) => {
+          const { firstName, lastName } = row ?? {};
           return [firstName, lastName].filter(Boolean).join(' ') || '—';
         },
       },
       {
-        field: 'role',
-        headerName: 'Role',
-        flex: 1,
-        cellRenderer: (params: ICellRendererParams<User>) =>
-          params.data ? <RoleBadge role={params.data.role} /> : null,
+        accessorKey: 'role',
+        header: 'Role',
+        cell: ({ row }: CellContext<User, unknown>) =>
+          row.original ? <RoleBadge role={row.original.role} /> : null,
       },
       {
-        headerName: 'Actions',
-        flex: 1,
-        sortable: false,
-        filter: false,
-        cellRenderer: (params: ICellRendererParams<User>) => {
-          if (!params.data) return null;
-          const isSelf = params.data.id === currentUserId;
+        id: 'actions',
+        header: 'Actions',
+        enableSorting: false,
+        enableColumnFilter: false,
+        cell: ({ row }: CellContext<User, unknown>) => {
+          if (!row.original) return null;
+          const isSelf = row.original.id === currentUserId;
+
           return (
             <div className="flex gap-1">
               {canChangeRoles && (
                 <button
                   onClick={() =>
-                    params.data && setUserToChangeRole(params.data)
+                    row.original && setUserToChangeRole(row.original)
                   }
                   disabled={isSelf}
                   title={
@@ -93,7 +93,7 @@ export function UserList({ currentUserId }: UserListProps) {
               )}
               {canDeleteUsers && (
                 <button
-                  onClick={() => params.data && setUserToDelete(params.data)}
+                  onClick={() => row.original && setUserToDelete(row.original)}
                   disabled={isSelf}
                   title={
                     isSelf ? 'Cannot delete your own account' : 'Delete user'
@@ -147,7 +147,13 @@ export function UserList({ currentUserId }: UserListProps) {
         </Button>
       </div>
 
-      <DataGrid rowData={users} columnDefs={columnDefs} loading={isLoading} />
+      <DataTable
+        data={users}
+        columns={columns}
+        loading={isLoading}
+        enableSorting={false}
+        enableColumnResizing={false}
+      />
 
       <InviteUserModal
         isOpen={showInviteModal}

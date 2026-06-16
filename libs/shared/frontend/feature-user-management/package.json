@@ -37,7 +37,7 @@
     "@open-kingdom/shared-frontend-data-access-api-client": "0.0.2-17",
     "@open-kingdom/shared-frontend-data-access-notifications": "0.0.2-17",
     "@open-kingdom/shared-frontend-ui-theme": "0.0.2-17",
-    "@open-kingdom/shared-frontend-ui-datagrid": "0.0.2-17",
+    "@open-kingdom/shared-frontend-ui-data-table": "0.0.2-17",
     "@open-kingdom/shared-frontend-ui-primitives": "0.0.2-17"
   },
   "nx": {

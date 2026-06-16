@@ -6,10 +6,10 @@ import {
 import { useDispatch } from 'react-redux';
 import { showSuccessNotification } from '@open-kingdom/shared-frontend-data-access-notifications';
 import {
-  DataGrid,
-  type ColDef,
-  type ICellRendererParams,
-} from '@open-kingdom/shared-frontend-ui-datagrid';
+  DataTable,
+  type ColumnDef,
+  type CellContext,
+} from '@open-kingdom/shared-frontend-ui-data-table';
 import { ConfirmDialog } from '../shared/ConfirmDialog.component';
 import { RolePermissionsModal } from './RolePermissionsModal.component';
 import { useHasPermission } from '../../hooks/useHasPermission';
@@ -47,28 +47,29 @@ export function RoleList() {
     }
   }
 
-  const columnDefs = useMemo<ColDef<Role>[]>(
+  const columns = useMemo<ColumnDef<Role>[]>(
     () => [
-      { field: 'name', headerName: 'Name', flex: 1 },
-      { field: 'description', headerName: 'Description', flex: 2 },
+      { accessorKey: 'name', header: 'Name' },
+      { accessorKey: 'description', header: 'Description' },
       {
-        headerName: 'Type',
-        flex: 1,
-        valueGetter: (params) => (params.data?.isSystem ? 'System' : 'Custom'),
+        id: 'type',
+        header: 'Type',
+        accessorFn: (row) => (row?.isSystem ? 'System' : 'Custom'),
       },
       {
-        headerName: 'Actions',
-        flex: 1,
-        sortable: false,
-        filter: false,
-        cellRenderer: (params: ICellRendererParams<Role>) => {
-          if (!params.data) return null;
-          const isSystem = !!params.data.isSystem;
+        id: 'actions',
+        header: 'Actions',
+        enableSorting: false,
+        enableColumnFilter: false,
+        cell: ({ row }: CellContext<Role, unknown>) => {
+          if (!row.original) return null;
+          const isSystem = !!row.original.isSystem;
+
           return (
             <div className="flex gap-1">
               {canEditPermissions && (
                 <button
-                  onClick={() => params.data && setRoleToEdit(params.data)}
+                  onClick={() => row.original && setRoleToEdit(row.original)}
                   className="rounded px-2 py-1 text-xs font-medium text-primary transition-colors hover:bg-primary/10"
                 >
                   Permissions
@@ -76,7 +77,7 @@ export function RoleList() {
               )}
               {canDeleteRoles && (
                 <button
-                  onClick={() => params.data && setRoleToDelete(params.data)}
+                  onClick={() => row.original && setRoleToDelete(row.original)}
                   disabled={isSystem}
                   title={
                     isSystem ? 'Cannot delete a system role' : 'Delete role'
@@ -124,7 +125,13 @@ export function RoleList() {
         </h2>
       </div>
 
-      <DataGrid rowData={roles} columnDefs={columnDefs} loading={isLoading} />
+      <DataTable
+        data={roles}
+        columns={columns}
+        loading={isLoading}
+        enableSorting={false}
+        enableColumnResizing={false}
+      />
 
       <RolePermissionsModal
         isOpen={!!roleToEdit}
