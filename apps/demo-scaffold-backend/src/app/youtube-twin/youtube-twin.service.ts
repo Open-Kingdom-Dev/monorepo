@@ -74,7 +74,7 @@ export class YouTubeTwinService implements OnModuleDestroy {
     url?: string;
     errorMode: YoutubeErrorModeStateDto;
   }> {
-    const errorMode = this.youtubeSearchService.getErrorModeState();
+    const errorMode = await this.youtubeSearchService.getErrorModeState();
     if (!this.twin || !this.started) {
       return { running: false, healthy: false, port: this.port, errorMode };
     }

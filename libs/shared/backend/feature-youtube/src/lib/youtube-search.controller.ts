@@ -86,7 +86,7 @@ export class YoutubeSearchController {
   async activateErrorMode(
     @Body() dto: YoutubeActivateErrorModeDto
   ): Promise<YoutubeErrorModeStateDto> {
-    return this.youtubeSearchService.setErrorMode(dto);
+    return await this.youtubeSearchService.setErrorMode(dto);
   }
 
   @Public()
@@ -102,6 +102,6 @@ export class YoutubeSearchController {
     type: YoutubeErrorModeStateDto,
   })
   async deactivateErrorMode(): Promise<YoutubeErrorModeStateDto> {
-    return this.youtubeSearchService.clearErrorMode();
+    return await this.youtubeSearchService.clearErrorMode();
   }
 }

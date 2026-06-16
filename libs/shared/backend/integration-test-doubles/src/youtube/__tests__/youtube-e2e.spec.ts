@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { YoutubeTwin } from '../youtube-twin.js';
 import { NodeInterceptor } from '../../interceptor/node-interceptor.js';
 import { RoutingTable } from '../../interceptor/routing-table.js';

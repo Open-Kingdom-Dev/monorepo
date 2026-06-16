@@ -1,6 +1,7 @@
 /**
  * @jest-environment jsdom
  */
+/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-empty-function */
 import fetch from 'node-fetch';
 import { generatePlayerShim } from '../player-shim.js';
 import { YoutubeTwin } from '../youtube-twin.js';
@@ -14,7 +15,7 @@ if (typeof global !== 'undefined') {
 }
 
 describe('generatePlayerShim', () => {
-  it('should replace base URL placeholder', () => {
+  it('should configure the player script with the local simulator base URL', () => {
     const twinUrl = 'http://localhost:9019';
     const code = generatePlayerShim(twinUrl);
 
@@ -37,6 +38,15 @@ describe('Player Shim Browser DOM Behavior (JSDOM)', () => {
     // Clear globals
     delete (window as any).YT;
     delete (window as any).onYouTubeIframeAPIReady;
+
+    // Polyfill HTMLMediaElement methods not implemented in JSDOM to avoid console noise
+    if (typeof window !== 'undefined') {
+      window.HTMLMediaElement.prototype.load = function () {};
+      window.HTMLMediaElement.prototype.play = function () {
+        return Promise.resolve();
+      };
+      window.HTMLMediaElement.prototype.pause = function () {};
+    }
   });
 
   afterEach(() => {
@@ -44,7 +54,7 @@ describe('Player Shim Browser DOM Behavior (JSDOM)', () => {
     jest.useRealTimers();
   });
 
-  it('should define YT namespace and trigger onYouTubeIframeAPIReady', () => {
+  it('should expose the YouTube player interface and notify the application when the API is ready', () => {
     const apiReadySpy = jest.fn();
     (window as any).onYouTubeIframeAPIReady = apiReadySpy;
 
@@ -61,7 +71,7 @@ describe('Player Shim Browser DOM Behavior (JSDOM)', () => {
     expect(apiReadySpy).toHaveBeenCalled();
   });
 
-  it('should construct video and mount elements into container', () => {
+  it('should embed a video player and display metadata overlays inside the target web page element', () => {
     const code = generatePlayerShim('http://localhost:9019');
     const fn = new Function(code);
     fn();
@@ -95,7 +105,7 @@ describe('Player Shim Browser DOM Behavior (JSDOM)', () => {
     );
   });
 
-  it('should delegate playback, volume, and destroy methods', () => {
+  it('should support standard player operations like play, pause, mute, seek, and clean shutdown', () => {
     const code = generatePlayerShim('http://localhost:9019');
     const fn = new Function(code);
     fn();
@@ -155,14 +165,20 @@ describe('Player Shim Browser DOM Behavior (JSDOM)', () => {
     expect(container.innerHTML).toBe('');
   });
 
-  it('should trigger onError if search response returns __twinErrorMode', async () => {
+  it('should block video playback and show a full-screen error screen to the user when a simulated error is active', async () => {
     jest.useRealTimers();
-    const mockSearchResponse = {
-      __twinErrorMode: { playerError: 100 },
-    };
-    const fetchSpy = jest.spyOn(window, 'fetch').mockResolvedValue({
-      json: async () => mockSearchResponse,
-    } as any);
+    const fetchSpy = jest
+      .spyOn(window, 'fetch')
+      .mockImplementation((url: any) => {
+        if (url.includes('/test/youtube/error-mode')) {
+          return Promise.resolve({
+            json: async () => ({ active: true, mode: 'player-error-100' }),
+          } as any);
+        }
+        return Promise.resolve({
+          json: async () => ({ items: [] }),
+        } as any);
+      });
 
     const code = generatePlayerShim('http://localhost:9019');
     const fn = new Function(code);
@@ -176,6 +192,11 @@ describe('Player Shim Browser DOM Behavior (JSDOM)', () => {
       },
     });
 
+    const videoElement = player._video;
+    const playSpy = jest
+      .spyOn(videoElement, 'play')
+      .mockResolvedValue(undefined);
+
     expect(player).toBeDefined();
 
     await new Promise((resolve) => setTimeout(resolve, 300));
@@ -183,10 +204,29 @@ describe('Player Shim Browser DOM Behavior (JSDOM)', () => {
     expect(onErrorSpy).toHaveBeenCalledWith(
       expect.objectContaining({ data: 100 })
     );
+
+    // Verify error state is set
+    expect(player._hasError).toBe(true);
+    expect(player._errorCode).toBe(100);
+
+    // Verify video src is cleared
+    expect(videoElement.src).toBe('');
+
+    // Try playing again and verify it is blocked
+    player.playVideo();
+    expect(playSpy).not.toHaveBeenCalled();
+
+    // Verify overlay shows the warning and displays flex error screen
+    const overlay = player._overlay;
+    expect(overlay.style.display).toBe('flex');
+    expect(overlay.style.flexDirection).toBe('column');
+    expect(overlay.innerHTML).toContain('Error Code: 100');
+    expect(overlay.innerHTML).toContain('The video requested was not found');
+
     fetchSpy.mockRestore();
   });
 
-  it('should trigger onError via polling fallback if search fetch fails and error-mode endpoint has player-error', async () => {
+  it('should retrieve the current error state from the backend if the metadata search fails', async () => {
     jest.useRealTimers();
     const fetchSpy = jest
       .spyOn(window, 'fetch')
@@ -239,7 +279,7 @@ describe('Player Shim Express Route Serving', () => {
     await twin.stop();
   });
 
-  it('should serve shim JS at /iframe_api', async () => {
+  it('should serve the YouTube twin player script from the standard iframe API route', async () => {
     const response = await fetch(`${TEST_URL}/iframe_api`, {
       headers: { Connection: 'close' },
     });
@@ -253,7 +293,7 @@ describe('Player Shim Express Route Serving', () => {
     expect(body).toContain(TEST_URL);
   });
 
-  it('should serve shim JS at /shim/youtube-player.js', async () => {
+  it('should serve the YouTube twin player script from the custom local path', async () => {
     const response = await fetch(`${TEST_URL}/shim/youtube-player.js`, {
       headers: { Connection: 'close' },
     });

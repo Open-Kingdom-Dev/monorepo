@@ -76,12 +76,7 @@ export class YoutubeTwin {
         results,
         this.config.externalUrl,
         results.length
-      ) as any;
-
-      const playerErrorCode = this.errorModeManager.getPlayerErrorCode();
-      if (playerErrorCode !== null) {
-        response.__twinErrorMode = { playerError: playerErrorCode };
-      }
+      );
 
       return res.json(response);
     });

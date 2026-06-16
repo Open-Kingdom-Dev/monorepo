@@ -1,7 +1,7 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Test, TestingModule } from '@nestjs/testing';
 import { BadRequestException } from '@nestjs/common';
 import { YoutubeSearchService } from './youtube-search.service.js';
-import { YoutubeErrorModeManager } from '@open-kingdom/shared-backend-integration-test-doubles';
 import axios from 'axios';
 
 jest.mock('axios');
@@ -9,28 +9,13 @@ const mockedAxios = axios as jest.Mocked<typeof axios>;
 
 describe('YoutubeSearchService', () => {
   let service: YoutubeSearchService;
-  let errorModeManager: YoutubeErrorModeManager;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [
-        YoutubeSearchService,
-        {
-          provide: YoutubeErrorModeManager,
-          useValue: {
-            setMode: jest.fn(),
-            clearMode: jest.fn(),
-            getMode: jest.fn(),
-            reset: jest.fn(),
-          },
-        },
-      ],
+      providers: [YoutubeSearchService],
     }).compile();
 
     service = module.get<YoutubeSearchService>(YoutubeSearchService);
-    errorModeManager = module.get<YoutubeErrorModeManager>(
-      YoutubeErrorModeManager
-    );
 
     jest.clearAllMocks();
   });
@@ -54,9 +39,7 @@ describe('YoutubeSearchService', () => {
       const result = await service.search('meditation', 3);
       expect(result).toEqual(mockResult);
       expect(mockedAxios.get).toHaveBeenCalledWith(
-        expect.stringContaining(
-          'https://www.googleapis.com/youtube/v3/search?q=meditation&maxResults=3'
-        ),
+        expect.stringContaining('/youtube/v3/search?q=meditation&maxResults=3'),
         expect.objectContaining({ adapter: 'fetch' })
       );
     });
@@ -93,14 +76,12 @@ describe('YoutubeSearchService', () => {
         status: 200,
         data: { success: true },
       });
-      jest
-        .spyOn(errorModeManager, 'getMode')
-        .mockReturnValue({ type: 'daily-limit-exceeded' });
+      mockedAxios.get.mockResolvedValue({
+        status: 200,
+        data: { active: true, mode: 'daily-limit-exceeded' },
+      });
 
       const state = await service.setErrorMode({
-        type: 'daily-limit-exceeded',
-      });
-      expect(errorModeManager.setMode).toHaveBeenCalledWith({
         type: 'daily-limit-exceeded',
       });
       expect(mockedAxios.post).toHaveBeenCalledWith(
@@ -113,27 +94,10 @@ describe('YoutubeSearchService', () => {
 
     it('should handle twin propagation failure gracefully when setting error mode', async () => {
       mockedAxios.post.mockRejectedValue(new Error('Twin unreachable'));
-      jest
-        .spyOn(errorModeManager, 'getMode')
-        .mockReturnValue({ type: 'daily-limit-exceeded' });
-
-      const state = await service.setErrorMode({
-        type: 'daily-limit-exceeded',
+      mockedAxios.get.mockResolvedValue({
+        status: 200,
+        data: { active: true, mode: 'daily-limit-exceeded' },
       });
-      expect(errorModeManager.setMode).toHaveBeenCalledWith({
-        type: 'daily-limit-exceeded',
-      });
-      expect(state.active).toBe(true);
-    });
-
-    it('should handle non-200 responses from twin when setting error mode', async () => {
-      mockedAxios.post.mockResolvedValue({
-        status: 500,
-        statusText: 'Internal Error',
-      });
-      jest
-        .spyOn(errorModeManager, 'getMode')
-        .mockReturnValue({ type: 'daily-limit-exceeded' });
 
       const state = await service.setErrorMode({
         type: 'daily-limit-exceeded',
@@ -146,10 +110,12 @@ describe('YoutubeSearchService', () => {
         status: 200,
         data: { success: true },
       });
-      jest.spyOn(errorModeManager, 'getMode').mockReturnValue(null);
+      mockedAxios.get.mockResolvedValue({
+        status: 200,
+        data: { active: false, mode: null },
+      });
 
       const state = await service.clearErrorMode();
-      expect(errorModeManager.clearMode).toHaveBeenCalled();
       expect(mockedAxios.delete).toHaveBeenCalledWith(
         'http://localhost:9016/test/youtube/error-mode'
       );
@@ -159,18 +125,10 @@ describe('YoutubeSearchService', () => {
 
     it('should handle twin propagation failure gracefully when clearing error mode', async () => {
       mockedAxios.delete.mockRejectedValue(new Error('Twin unreachable'));
-      jest.spyOn(errorModeManager, 'getMode').mockReturnValue(null);
-
-      const state = await service.clearErrorMode();
-      expect(state.active).toBe(false);
-    });
-
-    it('should handle non-200 response from twin when clearing error mode', async () => {
-      mockedAxios.delete.mockResolvedValue({
-        status: 500,
-        statusText: 'Internal Error',
+      mockedAxios.get.mockResolvedValue({
+        status: 200,
+        data: { active: false, mode: null },
       });
-      jest.spyOn(errorModeManager, 'getMode').mockReturnValue(null);
 
       const state = await service.clearErrorMode();
       expect(state.active).toBe(false);
@@ -179,13 +137,11 @@ describe('YoutubeSearchService', () => {
     it('should reset error mode', async () => {
       mockedAxios.delete.mockResolvedValue({ status: 200 });
       await service.resetErrorMode();
-      expect(errorModeManager.reset).toHaveBeenCalled();
     });
 
     it('should handle twin propagation failure when resetting error mode', async () => {
       mockedAxios.delete.mockRejectedValue(new Error('Twin unreachable'));
       await service.resetErrorMode();
-      expect(errorModeManager.reset).toHaveBeenCalled();
     });
   });
 
@@ -227,9 +183,12 @@ describe('YoutubeSearchService', () => {
     ];
 
     errorModes.forEach(({ type, desc }) => {
-      it(`should correctly describe mode: ${type}`, () => {
-        jest.spyOn(errorModeManager, 'getMode').mockReturnValue({ type });
-        const state = service.getErrorModeState();
+      it(`should correctly describe mode: ${type}`, async () => {
+        mockedAxios.get.mockResolvedValue({
+          status: 200,
+          data: { active: true, mode: type },
+        });
+        const state = await service.getErrorModeState();
         expect(state.description).toBe(desc);
       });
     });

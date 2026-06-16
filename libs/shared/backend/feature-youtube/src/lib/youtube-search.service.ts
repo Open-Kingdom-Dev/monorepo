@@ -5,11 +5,22 @@ import {
   OnModuleInit,
   OnModuleDestroy,
 } from '@nestjs/common';
+
+interface AxiosLikeError {
+  response?: {
+    data?: {
+      error?: {
+        message?: string;
+      };
+    };
+  };
+  message?: string;
+}
 import {
-  YoutubeErrorModeManager,
   NodeInterceptor,
   RoutingTable,
   defaultRoutingEntries,
+  isTestMode,
 } from '@open-kingdom/shared-backend-integration-test-doubles';
 import {
   YoutubeActivateErrorModeDto,
@@ -24,8 +35,6 @@ export class YoutubeSearchService implements OnModuleInit, OnModuleDestroy {
   private readonly logger = new Logger(YoutubeSearchService.name);
   private interceptor: NodeInterceptor | null = null;
 
-  constructor(private readonly errorModeManager: YoutubeErrorModeManager) {}
-
   private get port(): number {
     return parseInt(process.env.YOUTUBE_TWIN_PORT || '9016', 10);
   }
@@ -35,10 +44,24 @@ export class YoutubeSearchService implements OnModuleInit, OnModuleDestroy {
   }
 
   onModuleInit() {
-    const table = new RoutingTable(defaultRoutingEntries);
-    this.interceptor = new NodeInterceptor(table);
-    this.interceptor.install();
-    this.logger.log('NodeInterceptor installed for YouTube search');
+    if (isTestMode()) {
+      // Filter out Gmail and OAuth entries — only intercept YouTube hosts in tests
+      const youtubeEntries = defaultRoutingEntries.filter(
+        (entry) =>
+          entry.hostname.includes('youtube') ||
+          entry.hostname === 'www.googleapis.com'
+      );
+      const table = new RoutingTable(youtubeEntries);
+      this.interceptor = new NodeInterceptor(table);
+      this.interceptor.install();
+      this.logger.log(
+        'NodeInterceptor installed for YouTube search (Test Mode)'
+      );
+    } else {
+      this.logger.log(
+        'YouTube search service initialized in production mode (no interceptor)'
+      );
+    }
   }
 
   onModuleDestroy() {
@@ -56,19 +79,27 @@ export class YoutubeSearchService implements OnModuleInit, OnModuleDestroy {
       throw new BadRequestException('Search query is required');
     }
 
-    // Call googleapis.com/youtube/v3/search. The NodeInterceptor intercepts and rewrites this to the local twin.
-    // We pass a mock API key because the twin requires a key parameter to match standard API expectations.
-    const url = `https://www.googleapis.com/youtube/v3/search?q=${encodeURIComponent(
+    const apiKey = process.env.YOUTUBE_API_KEY;
+    const useTwin = isTestMode() || !apiKey;
+
+    const baseUrl = useTwin
+      ? `${this.twinUrl}/youtube/v3/search`
+      : 'https://www.googleapis.com/youtube/v3/search';
+
+    const key = useTwin ? 'mock-api-key' : apiKey;
+
+    const url = `${baseUrl}?q=${encodeURIComponent(
       query
-    )}&maxResults=${maxResults}&key=mock-api-key`;
+    )}&maxResults=${maxResults}&key=${key}`;
 
     try {
-      // Use adapter: 'fetch' to ensure NodeInterceptor catches it
+      // Use adapter: 'fetch' to ensure NodeInterceptor catches it in tests
       const response = await axios.get(url, { adapter: 'fetch' });
       return response.data as YoutubeSearchResponseDto;
-    } catch (error: any) {
+    } catch (error) {
+      const err = error as AxiosLikeError;
       this.logger.error(`YouTube search failed:`, error);
-      const message = error.response?.data?.error?.message || error.message;
+      const message = err.response?.data?.error?.message || err.message;
       throw new BadRequestException(message);
     }
   }
@@ -79,71 +110,66 @@ export class YoutubeSearchService implements OnModuleInit, OnModuleDestroy {
     if (!dto.type) {
       throw new BadRequestException('Error mode type is required');
     }
-    this.errorModeManager.setMode({ type: dto.type });
     this.logger.log(`Error mode activated: ${dto.type}`);
 
-    // Propagate to the Express twin if it's running
     try {
-      const response = await axios.post(
-        `${this.twinUrl}/test/youtube/error-mode`,
-        {
-          mode: dto.type,
-        }
-      );
-      if (response.status !== 200) {
-        this.logger.warn(
-          `Failed to propagate error mode to twin: ${response.statusText}`
-        );
-      }
-    } catch (error: any) {
+      await axios.post(`${this.twinUrl}/test/youtube/error-mode`, {
+        mode: dto.type,
+      });
+    } catch (error) {
+      const err = error as AxiosLikeError;
       this.logger.warn(
-        `Could not propagate error mode to twin: ${error.message}`
+        `Could not propagate error mode to twin: ${err.message}`
       );
     }
 
-    return this.getErrorModeState();
+    return await this.getErrorModeState();
   }
 
   async clearErrorMode(): Promise<YoutubeErrorModeStateDto> {
-    this.errorModeManager.clearMode();
     this.logger.log('Error mode deactivated');
 
     try {
-      const response = await axios.delete(
-        `${this.twinUrl}/test/youtube/error-mode`
-      );
-      if (response.status !== 200) {
-        this.logger.warn(
-          `Failed to clear error mode on twin: ${response.statusText}`
-        );
-      }
-    } catch (error: any) {
-      this.logger.warn(`Could not clear error mode on twin: ${error.message}`);
+      await axios.delete(`${this.twinUrl}/test/youtube/error-mode`);
+    } catch (error) {
+      const err = error as AxiosLikeError;
+      this.logger.warn(`Could not clear error mode on twin: ${err.message}`);
     }
 
-    return this.getErrorModeState();
+    return await this.getErrorModeState();
   }
 
-  getErrorModeState(): YoutubeErrorModeStateDto {
-    const mode = this.errorModeManager.getMode();
-    if (!mode) {
-      return { active: false, type: null, description: null };
+  async getErrorModeState(): Promise<YoutubeErrorModeStateDto> {
+    try {
+      const response = await axios.get(
+        `${this.twinUrl}/test/youtube/error-mode`
+      );
+      if (response.status === 200 && response.data) {
+        const { active, mode } = response.data;
+        return {
+          active,
+          type: mode as YoutubeErrorModeType,
+          description: mode
+            ? this.describeMode(mode as YoutubeErrorModeType)
+            : null,
+        };
+      }
+    } catch (error) {
+      const err = error as AxiosLikeError;
+      this.logger.warn(
+        `Could not fetch error mode state from twin: ${err.message}`
+      );
     }
-    return {
-      active: true,
-      type: mode.type as YoutubeErrorModeType,
-      description: this.describeMode(mode.type as YoutubeErrorModeType),
-    };
+    return { active: false, type: null, description: null };
   }
 
   async resetErrorMode(): Promise<void> {
-    this.errorModeManager.reset();
     this.logger.log('Error mode reset');
-
     try {
       await axios.delete(`${this.twinUrl}/test/youtube/error-mode`);
-    } catch (error: any) {
-      this.logger.warn(`Could not clear error mode on twin: ${error.message}`);
+    } catch (error) {
+      const err = error as AxiosLikeError;
+      this.logger.warn(`Could not clear error mode on twin: ${err.message}`);
     }
   }
 

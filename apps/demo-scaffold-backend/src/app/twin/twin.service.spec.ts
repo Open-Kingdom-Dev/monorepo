@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Test, TestingModule } from '@nestjs/testing';
 import { TwinService } from './twin.service';
 import { GcsStorageService } from '@open-kingdom/shared-backend-feature-gcp-resources';

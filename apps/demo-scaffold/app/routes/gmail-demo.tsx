@@ -1,3 +1,4 @@
+/* eslint-disable jsx-a11y/accessible-emoji */
 import { useState, useEffect, useCallback } from 'react';
 import { useDispatch } from 'react-redux';
 import axios from 'axios';
@@ -223,7 +224,7 @@ export default function GmailDemo() {
                   showSuccessNotification('Gmail Twin booted successfully')
                 );
                 refetchStatus();
-              } catch (e) {
+              } catch {
                 dispatch(showErrorNotification('Failed to start twin'));
               }
             }}
@@ -263,7 +264,7 @@ export default function GmailDemo() {
                   showSuccessNotification('Gmail Twin booted successfully')
                 );
                 refetchStatus();
-              } catch (e) {
+              } catch {
                 dispatch(showErrorNotification('Failed to start twin'));
               }
             }}

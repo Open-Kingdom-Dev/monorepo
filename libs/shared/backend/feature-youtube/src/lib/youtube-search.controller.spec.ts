@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Test, TestingModule } from '@nestjs/testing';
 import { YoutubeSearchController } from './youtube-search.controller.js';
 import { YoutubeSearchService } from './youtube-search.service.js';

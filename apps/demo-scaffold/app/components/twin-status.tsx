@@ -1,10 +1,14 @@
+/* eslint-disable jsx-a11y/accessible-emoji */
 import { useDispatch } from 'react-redux';
 import {
   useTwinControllerGetStatusQuery,
   useTwinControllerStartMutation,
   useTwinControllerStopMutation,
 } from '@open-kingdom/shared-frontend-data-access-api-client';
-import { showSuccessNotification } from '@open-kingdom/shared-frontend-data-access-notifications';
+import {
+  showSuccessNotification,
+  showErrorNotification,
+} from '@open-kingdom/shared-frontend-data-access-notifications';
 
 export function TwinStatus() {
   const dispatch = useDispatch();
@@ -31,6 +35,7 @@ export function TwinStatus() {
       refetch();
     } catch (err) {
       console.error('Failed to start twin:', err);
+      dispatch(showErrorNotification('Failed to start twin environment'));
     }
   };
 
@@ -43,6 +48,7 @@ export function TwinStatus() {
       refetch();
     } catch (err) {
       console.error('Failed to stop twin:', err);
+      dispatch(showErrorNotification('Failed to stop twin environment'));
     }
   };
 

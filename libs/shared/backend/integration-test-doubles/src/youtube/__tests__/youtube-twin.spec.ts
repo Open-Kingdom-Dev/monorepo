@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { YoutubeTwin } from '../youtube-twin.js';
 import { createYoutubeConfig } from '../youtube-twin.config.js';
 import { DEFAULT_PORTS, ENV_VARS } from '../../shared/constants.js';
@@ -400,7 +401,7 @@ describe('YoutubeTwin Server Lifecycle', () => {
       expect(body.pageInfo.totalResults).toBe(0);
     });
 
-    it('should inject player error mode __twinErrorMode in search results', async () => {
+    it('should return clean search results and expose player error mode at error-mode endpoint', async () => {
       await fetch(`${TEST_URL}/test/youtube/error-mode`, {
         method: 'POST',
         headers: {
@@ -418,7 +419,14 @@ describe('YoutubeTwin Server Lifecycle', () => {
       );
       expect(searchRes.status).toBe(200);
       const body: any = await searchRes.json();
-      expect(body.__twinErrorMode).toEqual({ playerError: 101 });
+      expect(body.__twinErrorMode).toBeUndefined();
+
+      const getRes = await fetch(`${TEST_URL}/test/youtube/error-mode`, {
+        headers: { Connection: 'close' },
+      });
+      expect(getRes.status).toBe(200);
+      const getBody: any = await getRes.json();
+      expect(getBody).toEqual({ active: true, mode: 'player-error-101' });
     });
 
     it('should clear error mode on twin reset()', async () => {

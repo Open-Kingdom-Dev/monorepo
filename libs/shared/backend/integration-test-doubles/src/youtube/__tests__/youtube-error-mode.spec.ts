@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { YoutubeErrorModeManager } from '../youtube-error-mode.js';
 
 describe('YoutubeErrorModeManager', () => {

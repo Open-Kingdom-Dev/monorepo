@@ -91,8 +91,9 @@ export class GcsStorageService {
       try {
         await this.storage.createBucket(bucketName);
         this.logger.log(`Created bucket ${bucketName}`);
-      } catch (error: any) {
-        if (error?.code !== 409) {
+      } catch (error) {
+        const err = error as { code?: number };
+        if (err?.code !== 409) {
           this.logger.warn(
             `Bucket creation failed for ${bucketName}: ${
               error instanceof Error ? error.message : String(error)
@@ -112,8 +113,9 @@ export class GcsStorageService {
       try {
         await this.storage.bucket(name).delete();
         this.logger.log(`Deleted bucket ${name}`);
-      } catch (error: any) {
-        if (error?.code !== 404) {
+      } catch (error) {
+        const err = error as { code?: number };
+        if (err?.code !== 404) {
           this.logger.warn(
             `Failed to delete bucket ${name}: ${
               error instanceof Error ? error.message : String(error)

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { GcsTwin } from '../gcs-twin.js';
 
 // Minimal mock for Dockerode container

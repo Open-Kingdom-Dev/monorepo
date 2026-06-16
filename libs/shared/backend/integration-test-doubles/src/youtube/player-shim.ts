@@ -28,6 +28,8 @@ export const SHIM_TEMPLATE = `(function() {
     this._state = PlayerState.UNSTARTED;
     this._volume = 100;
     this._muted = false;
+    this._hasError = false;
+    this._errorCode = null;
     this._videoData = {
       video_id: options.videoId || '',
       title: '',
@@ -45,6 +47,16 @@ export const SHIM_TEMPLATE = `(function() {
     this._video.style.height = '100%';
     this._video.style.backgroundColor = '#000';
     this._video.style.display = 'block';
+
+    // Override video.play to check error state
+    var self = this;
+    var originalPlay = this._video.play;
+    this._video.play = function() {
+      if (self._hasError) {
+        return Promise.reject(new Error('Playback blocked due to player error ' + self._errorCode));
+      }
+      return originalPlay.apply(this, arguments);
+    };
 
     // Create metadata overlay
     this._overlay = document.createElement('div');
@@ -66,21 +78,32 @@ export const SHIM_TEMPLATE = `(function() {
     this._container.appendChild(this._wrapper);
 
     // Wire HTML5 video events -> YT state changes
-    var self = this;
+    this._video.addEventListener('play', function() {
+      if (self._hasError) {
+        self._video.pause();
+      }
+    });
     this._video.addEventListener('playing', function() {
+      if (self._hasError) {
+        self._video.pause();
+        return;
+      }
       self._state = PlayerState.PLAYING;
       self._fireStateChange();
     });
     this._video.addEventListener('pause', function() {
       if (self._video.ended) return; // 'ended' fires separately
+      if (self._hasError) return;
       self._state = PlayerState.PAUSED;
       self._fireStateChange();
     });
     this._video.addEventListener('ended', function() {
+      if (self._hasError) return;
       self._state = PlayerState.ENDED;
       self._fireStateChange();
     });
     this._video.addEventListener('waiting', function() {
+      if (self._hasError) return;
       self._state = PlayerState.BUFFERING;
       self._fireStateChange();
     });
@@ -92,10 +115,6 @@ export const SHIM_TEMPLATE = `(function() {
       }
     }, 100);
 
-    // Auto-play if configured
-    if (options.playerVars && options.playerVars.autoplay === 1) {
-      this._video.play().catch(function() {});
-    }
   }
 
   Player.prototype._loadVideoMetadata = function(videoId) {
@@ -105,41 +124,53 @@ export const SHIM_TEMPLATE = `(function() {
     }
 
     var self = this;
-    fetch(TWIN_BASE + '/youtube/v3/search?q=' + encodeURIComponent(videoId) +
-      '&type=video&maxResults=1&key=shim&part=snippet')
+
+    // Check error-mode control endpoint first
+    fetch(TWIN_BASE + '/test/youtube/error-mode')
       .then(function(res) { return res.json(); })
       .then(function(data) {
-        // Check for player error mode injected by twin server
-        if (data.__twinErrorMode && data.__twinErrorMode.playerError) {
+        if (data.active && data.mode && data.mode.startsWith('player-error-')) {
+          var code = parseInt(data.mode.split('-')[2], 10);
           setTimeout(function() {
-            self._fireError(data.__twinErrorMode.playerError);
+            self._fireError(code);
           }, 200);
           return;
         }
 
-        if (data.items && data.items.length > 0) {
-          var snippet = data.items[0].snippet;
-          self._videoData = {
-            video_id: videoId,
-            title: snippet.title,
-            author: snippet.channelTitle
-          };
-          self._overlay.textContent = snippet.title + ' - ' + snippet.channelTitle;
-        } else {
-          self._overlay.textContent = 'Video: ' + videoId;
+        // Auto-play if configured and no error
+        if (self._options.playerVars && self._options.playerVars.autoplay === 1) {
+          self._video.play().catch(function() {});
         }
-      })
-      .catch(function() {
-        // If search fails entirely, check error mode endpoint directly
-        fetch(TWIN_BASE + '/test/youtube/error-mode')
-          .then(function(res) { return res.json(); })
-          .then(function(data) {
-            if (data.active && data.mode && data.mode.startsWith('player-error-')) {
-              var code = parseInt(data.mode.split('-')[2], 10);
-              self._fireError(code);
+
+        // Fetch actual mock metadata
+        fetch(TWIN_BASE + '/youtube/v3/search?q=' + encodeURIComponent(videoId) +
+          '&type=video&maxResults=1&key=shim&part=snippet')
+          .then(function(res) {
+            if (!res.ok) throw new Error('Search failed');
+            return res.json();
+          })
+          .then(function(searchData) {
+            if (searchData.items && searchData.items.length > 0) {
+              var snippet = searchData.items[0].snippet;
+              self._videoData = {
+                video_id: videoId,
+                title: snippet.title,
+                author: snippet.channelTitle
+              };
+              self._overlay.textContent = snippet.title + ' - ' + snippet.channelTitle;
+            } else {
+              self._overlay.textContent = 'Video: ' + videoId;
             }
           })
-          .catch(function() {});
+          .catch(function() {
+            self._overlay.textContent = 'Video: ' + videoId;
+          });
+      })
+      .catch(function() {
+        // Auto-play if configured and endpoint query fails
+        if (self._options.playerVars && self._options.playerVars.autoplay === 1) {
+          self._video.play().catch(function() {});
+        }
         self._overlay.textContent = 'Video: ' + videoId;
       });
   };
@@ -151,16 +182,62 @@ export const SHIM_TEMPLATE = `(function() {
   };
 
   Player.prototype._fireError = function(code) {
+    this._hasError = true;
+    this._errorCode = code;
+    this._state = PlayerState.UNSTARTED;
+
+    // Pause and clean up video
+    if (this._video) {
+      this._video.pause();
+      this._video.src = '';
+      try {
+        this._video.removeAttribute('src');
+        this._video.load();
+      } catch (e) {}
+    }
+
+    var desc = 'An unknown player error occurred.';
+    if (code === 2) desc = 'The request contains an invalid parameter value.';
+    else if (code === 5) desc = 'The requested content cannot be played in an HTML5 player or another error related to the HTML5 player has occurred.';
+    else if (code === 100) desc = 'The video requested was not found (removed or marked as private).';
+    else if (code === 101 || code === 150) desc = 'The owner of the requested video does not allow it to be played in embedded players.';
+
+    if (this._overlay) {
+      this._overlay.style.cssText =
+        'position:absolute;top:0;left:0;right:0;bottom:0;padding:24px;' +
+        'background:#151515;color:#f1f1f1;font-size:14px;' +
+        'font-family:Roboto,Arial,sans-serif;display:flex;' +
+        'flex-direction:column;align-items:center;justify-content:center;' +
+        'text-align:center;pointer-events:auto;z-index:10;box-sizing:border-box;';
+      this._overlay.innerHTML =
+        '<div style="font-size:28px;margin-bottom:8px;">⚠️</div>' +
+        '<div style="font-weight:bold;margin-bottom:4px;color:#fff;">An error occurred.</div>' +
+        '<div style="font-size:12px;color:#aaa;line-height:1.4;max-width:280px;">' + desc + ' (Error Code: ' + code + ')</div>';
+    }
+
     if (this._options.events && typeof this._options.events.onError === 'function') {
       this._options.events.onError({ target: this, data: code });
     }
   };
 
   // Playback controls
-  Player.prototype.playVideo = function() { this._video.play().catch(function() {}); };
-  Player.prototype.pauseVideo = function() { this._video.pause(); };
-  Player.prototype.stopVideo = function() { this._video.pause(); this._video.currentTime = 0; };
-  Player.prototype.seekTo = function(seconds) { this._video.currentTime = seconds; };
+  Player.prototype.playVideo = function() {
+    if (this._hasError) return;
+    this._video.play().catch(function() {});
+  };
+  Player.prototype.pauseVideo = function() {
+    if (this._hasError) return;
+    this._video.pause();
+  };
+  Player.prototype.stopVideo = function() {
+    if (this._hasError) return;
+    this._video.pause();
+    this._video.currentTime = 0;
+  };
+  Player.prototype.seekTo = function(seconds) {
+    if (this._hasError) return;
+    this._video.currentTime = seconds;
+  };
 
   // Volume controls
   Player.prototype.setVolume = function(vol) {
