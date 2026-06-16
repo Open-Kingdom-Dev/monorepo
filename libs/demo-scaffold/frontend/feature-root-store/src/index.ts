@@ -12,10 +12,6 @@ import {
   showErrorNotification,
 } from '@open-kingdom/shared-frontend-data-access-notifications';
 import {
-  DataGridKey,
-  dataGridReducer,
-} from '@open-kingdom/shared-frontend-ui-datagrid';
-import {
   ApiKey,
   apiReducer,
   apiMiddleware,
@@ -41,7 +37,6 @@ export const createRootStore = () => {
     reducer: {
       [LoggerKey]: loggerReducer,
       [NotificationKey]: notificationReducer,
-      [DataGridKey]: dataGridReducer,
       [ApiKey]: apiReducer,
       [AuthKey]: authReducer,
       [CatFactsApiKey]: catFactsApiReducer,

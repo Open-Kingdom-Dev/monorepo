@@ -1,0 +1,29 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "demo-scaffold",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev"],
+      "port": 4200,
+      "autoPort": true
+    },
+    {
+      "name": "demo-scaffold-backend",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev:backend"],
+      "port": 3000,
+      "autoPort": true
+    },
+    {
+      "name": "youtube-twin",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": [
+        "nx",
+        "run",
+        "integration-test-doubles:start:youtube-twin"
+      ],
+      "port": 9016
+    }
+  ]
+}

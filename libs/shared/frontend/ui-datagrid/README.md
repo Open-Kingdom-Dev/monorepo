@@ -1,5 +1,13 @@
 # @open-kingdom/shared-frontend-ui-datagrid
 
+> **Deprecated.** Use [`@open-kingdom/shared-frontend-ui-data-table`](../ui-data-table/README.md) instead.
+>
+> This package wraps AG Grid Community and ships a Redux slice — the slice violates the `ui-*` boundary rule (`.claude/rules/architecture.md`). The replacement is built on TanStack Table v8 + shadcn primitives, integrates cleanly with the design system, and ships the real-world patterns (bulk actions, current-page header checkbox, floating filters, dynamic row heights, state persistence, empty/loading states) every consumer rebuilds today.
+>
+> This package will continue publishing on its current version track until consumers migrate. See the migration table in the [`ui-data-table` README](../ui-data-table/README.md#migrating-from-ui-datagrid) for the prop-by-prop mapping. Tracked by **OKRE-108**; consumer migrations land in separate PRs per repo.
+
+---
+
 React data grid component wrapping AG Grid Community Edition with opinionated defaults (sorting, filtering, pagination, auto-sizing), theme adaptation from the `ui-theme` color system (light/dark mode), optional grid state persistence to any async storage provider, and a Redux slice for multi-instance state and saved view management.
 
 ---

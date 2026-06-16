@@ -168,11 +168,14 @@ export function Home() {
         </CardHeader>
         <CardContent>
           <GridExample />
+        </CardContent>
+      </Card>
 
-          <h2 className="text-2xl font-semibold mb-4 text-card-foreground mt-6">
-            Advanced Data Grid Demo
-          </h2>
-
+      <Card className="mb-6">
+        <CardHeader>
+          <CardTitle>Advanced Data Grid Demo</CardTitle>
+        </CardHeader>
+        <CardContent>
           <AdvancedGridExample />
         </CardContent>
       </Card>
