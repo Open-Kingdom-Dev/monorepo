@@ -1,6 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Test, TestingModule } from '@nestjs/testing';
-import { BadRequestException } from '@nestjs/common';
+import {
+  BadRequestException,
+  InternalServerErrorException,
+} from '@nestjs/common';
 import { YoutubeSearchService } from './youtube-search.service.js';
 import axios from 'axios';
 
@@ -11,6 +14,7 @@ describe('YoutubeSearchService', () => {
   let service: YoutubeSearchService;
 
   beforeEach(async () => {
+    process.env.TEST_MODE = 'true';
     const module: TestingModule = await Test.createTestingModule({
       providers: [YoutubeSearchService],
     }).compile();
@@ -67,6 +71,41 @@ describe('YoutubeSearchService', () => {
         message: 'Network Error',
       });
       await expect(service.search('yoga')).rejects.toThrow('Network Error');
+    });
+
+    it('should query real API and succeed if YOUTUBE_API_KEY is configured in production mode', async () => {
+      process.env.TEST_MODE = 'false';
+      process.env.YOUTUBE_API_KEY = 'real-prod-key';
+      const mockResult = {
+        kind: 'youtube#searchListResponse',
+        items: [],
+      };
+
+      mockedAxios.get.mockResolvedValue({
+        status: 200,
+        data: mockResult,
+      });
+
+      const result = await service.search('meditation', 3);
+      expect(result).toEqual(mockResult);
+      expect(mockedAxios.get).toHaveBeenCalledWith(
+        expect.stringContaining(
+          'https://www.googleapis.com/youtube/v3/search?q=meditation&maxResults=3&key=real-prod-key'
+        ),
+        expect.objectContaining({ adapter: 'fetch' })
+      );
+    });
+
+    it('should throw InternalServerErrorException in production mode if YOUTUBE_API_KEY is not configured', async () => {
+      process.env.TEST_MODE = 'false';
+      delete process.env.YOUTUBE_API_KEY;
+
+      await expect(service.search('yoga')).rejects.toThrow(
+        InternalServerErrorException
+      );
+      await expect(service.search('yoga')).rejects.toThrow(
+        'YOUTUBE_API_KEY environment variable is not configured.'
+      );
     });
   });
 

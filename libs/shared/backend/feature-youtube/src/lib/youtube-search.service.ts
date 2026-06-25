@@ -1,6 +1,7 @@
 import {
   Injectable,
   BadRequestException,
+  InternalServerErrorException,
   Logger,
   OnModuleInit,
   OnModuleDestroy,
@@ -80,7 +81,13 @@ export class YoutubeSearchService implements OnModuleInit, OnModuleDestroy {
     }
 
     const apiKey = process.env.YOUTUBE_API_KEY;
-    const useTwin = isTestMode() || !apiKey;
+    const useTwin = isTestMode();
+
+    if (!useTwin && !apiKey) {
+      throw new InternalServerErrorException(
+        'YOUTUBE_API_KEY environment variable is not configured.'
+      );
+    }
 
     const baseUrl = useTwin
       ? `${this.twinUrl}/youtube/v3/search`
