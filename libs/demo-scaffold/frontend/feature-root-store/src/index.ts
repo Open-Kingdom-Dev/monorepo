@@ -31,6 +31,20 @@ export const createRootStore = () => {
   const rtkErrorMiddleware = createReduxRTKErrorMiddleware({
     logAction: addLog,
     notifyAction: showErrorNotification,
+    shouldHandle: (action: unknown) => {
+      // Do not notify or log condition errors (aborted queries/mutations)
+      const act = action as {
+        meta?: { condition?: boolean };
+        error?: { name?: string };
+      };
+      if (
+        act?.meta?.condition === true ||
+        act?.error?.name === 'ConditionError'
+      ) {
+        return false;
+      }
+      return true;
+    },
   });
 
   return configureStore({

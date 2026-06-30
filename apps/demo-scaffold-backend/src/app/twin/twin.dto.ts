@@ -53,6 +53,12 @@ export class TwinStatusDto {
   url?: string;
 
   @ApiProperty({
+    description: 'Whether GCS storage emulator is online',
+    example: true,
+  })
+  gcsOnline?: boolean;
+
+  @ApiProperty({
     description: 'Current error simulation mode state',
     type: ErrorModeStateDto,
   })

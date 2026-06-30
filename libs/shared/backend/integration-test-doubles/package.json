@@ -20,6 +20,7 @@
   "files": [
     "README.md",
     "dist",
+    "test-assets",
     "!**/*.tsbuildinfo"
   ],
   "nx": {
@@ -49,13 +50,24 @@
         "dependsOn": [
           "^build"
         ]
+      },
+      "start:youtube-twin": {
+        "command": "npx tsx libs/shared/backend/integration-test-doubles/scripts/start-youtube-twin.ts",
+        "dependsOn": [
+          "^build"
+        ]
       }
     }
   },
   "dependencies": {
     "@open-kingdom/shared-poly-util-env-config": "0.0.2-17",
+    "cors": "^2.8.5",
     "dockerode": "^4.0.6",
+    "express": "^5.1.0",
     "tslib": "^2.3.0"
   },
-  "devDependencies": {}
+  "devDependencies": {
+    "@types/cors": "^2.8.17",
+    "@types/express": "^5.0.0"
+  }
 }

@@ -1,10 +1,14 @@
+/* eslint-disable jsx-a11y/accessible-emoji */
 import { useDispatch } from 'react-redux';
 import {
   useTwinControllerGetStatusQuery,
   useTwinControllerStartMutation,
   useTwinControllerStopMutation,
 } from '@open-kingdom/shared-frontend-data-access-api-client';
-import { showSuccessNotification } from '@open-kingdom/shared-frontend-data-access-notifications';
+import {
+  showSuccessNotification,
+  showErrorNotification,
+} from '@open-kingdom/shared-frontend-data-access-notifications';
 
 export function TwinStatus() {
   const dispatch = useDispatch();
@@ -31,6 +35,7 @@ export function TwinStatus() {
       refetch();
     } catch (err) {
       console.error('Failed to start twin:', err);
+      dispatch(showErrorNotification('Failed to start twin environment'));
     }
   };
 
@@ -43,6 +48,7 @@ export function TwinStatus() {
       refetch();
     } catch (err) {
       console.error('Failed to stop twin:', err);
+      dispatch(showErrorNotification('Failed to stop twin environment'));
     }
   };
 
@@ -76,6 +82,7 @@ export function TwinStatus() {
   const running = status?.running ?? false;
   const healthy = status?.healthy ?? false;
   const port = status?.port ?? 9013;
+  const gcsOnline = status?.gcsOnline ?? false;
 
   // Gmail digital twin specific fields
   const gmail = status?.gmail;
@@ -109,24 +116,30 @@ export function TwinStatus() {
           <div className="flex items-center gap-2">
             <span
               className={`h-2.5 w-2.5 rounded-full transition-all duration-500 ${
-                running
+                running && gcsOnline
                   ? 'bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.6)] animate-pulse'
+                  : running
+                  ? 'bg-yellow-500 shadow-[0_0_8px_rgba(234,179,8,0.6)]'
                   : 'bg-gray-300'
               }`}
             ></span>
             <span className="font-mono text-xs">
               {running ? (
-                status?.url ? (
-                  <a
-                    href={status.url}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="text-blue-600 hover:underline"
-                  >
-                    {status.url}
-                  </a>
+                gcsOnline ? (
+                  status?.url ? (
+                    <a
+                      href={status.url}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="text-blue-600 hover:underline"
+                    >
+                      {status.url}
+                    </a>
+                  ) : (
+                    `Port ${port}`
+                  )
                 ) : (
-                  `Port ${port}`
+                  'Offline (Docker is not running)'
                 )
               ) : (
                 'Stopped'

@@ -40,7 +40,15 @@ export class TwinService implements OnModuleDestroy {
 
     try {
       // 2. Start GCS Twin
-      await this.gcsTwin.start();
+      try {
+        await this.gcsTwin.start();
+      } catch (err) {
+        this.logger.warn(
+          `Failed to start GCS Twin (Docker might not be running). GCS mock will be unavailable. Details: ${
+            err instanceof Error ? err.message : String(err)
+          }`
+        );
+      }
 
       // 3. Start Gmail REST Twin
       await this.gmailTwin.start();
@@ -164,6 +172,7 @@ export class TwinService implements OnModuleDestroy {
     healthy: boolean;
     port: number;
     url?: string;
+    gcsOnline?: boolean;
     errorMode: ErrorModeStateDto;
     gmail?: { running: boolean; healthy: boolean; port: number; url?: string };
     interceptorActive: boolean;
@@ -177,6 +186,7 @@ export class TwinService implements OnModuleDestroy {
         running: false,
         healthy: false,
         port: this.gcsPort,
+        gcsOnline: false,
         errorMode,
         interceptorActive: false,
         realGmailConfigured,
@@ -187,13 +197,9 @@ export class TwinService implements OnModuleDestroy {
       const gcsHealthy = await this.gcsTwin.isHealthy();
       const gmailHealthy = await this.gmailTwin.isHealthy();
 
-      if (!gcsHealthy) {
-        this.gcsTwin = null;
-      }
+      // Only shutdown environment if Gmail is unhealthy (GCS offline is allowed)
       if (!gmailHealthy) {
         this.gmailTwin = null;
-      }
-      if (!gcsHealthy || !gmailHealthy) {
         this.started = false;
       }
 
@@ -202,6 +208,7 @@ export class TwinService implements OnModuleDestroy {
         healthy: gcsHealthy && gmailHealthy,
         port: this.gcsPort,
         url: this.gcsTwin ? this.gcsTwin.getEmulatorHost() : undefined,
+        gcsOnline: gcsHealthy,
         errorMode,
         gmail: {
           running: this.started,
@@ -222,6 +229,7 @@ export class TwinService implements OnModuleDestroy {
         running: false,
         healthy: false,
         port: this.gcsPort,
+        gcsOnline: false,
         errorMode,
         interceptorActive: false,
         realGmailConfigured,

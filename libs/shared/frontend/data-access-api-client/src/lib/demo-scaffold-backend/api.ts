@@ -11,6 +11,7 @@ export const addTagTypes = [
   "User Roles",
   "GCP Resources",
   "GCS Storage",
+  "YouTube Search",
   "Lead Conversion",
   "CRM Dashboard",
   "Configurable Lookups",
@@ -20,6 +21,7 @@ export const addTagTypes = [
   "Leads",
   "Opportunities",
   "Twin",
+  "YouTube Twin",
 ] as const;
 const injectedRtkApi = api
   .enhanceEndpoints({
@@ -358,6 +360,37 @@ const injectedRtkApi = api
       >({
         query: () => ({ url: `/api/gcs/error-mode`, method: "DELETE" }),
         invalidatesTags: ["GCS Storage"],
+      }),
+      youtubeSearchControllerSearch: build.query<
+        YoutubeSearchControllerSearchApiResponse,
+        YoutubeSearchControllerSearchApiArg
+      >({
+        query: (queryArg) => ({
+          url: `/api/youtube/search`,
+          params: {
+            q: queryArg.q,
+            maxResults: queryArg.maxResults,
+          },
+        }),
+        providesTags: ["YouTube Search"],
+      }),
+      youtubeSearchControllerActivateErrorMode: build.mutation<
+        YoutubeSearchControllerActivateErrorModeApiResponse,
+        YoutubeSearchControllerActivateErrorModeApiArg
+      >({
+        query: (queryArg) => ({
+          url: `/api/youtube/error-mode`,
+          method: "POST",
+          body: queryArg.youtubeActivateErrorModeDto,
+        }),
+        invalidatesTags: ["YouTube Search"],
+      }),
+      youtubeSearchControllerDeactivateErrorMode: build.mutation<
+        YoutubeSearchControllerDeactivateErrorModeApiResponse,
+        YoutubeSearchControllerDeactivateErrorModeApiArg
+      >({
+        query: () => ({ url: `/api/youtube/error-mode`, method: "DELETE" }),
+        invalidatesTags: ["YouTube Search"],
       }),
       leadConversionControllerConvert: build.mutation<
         LeadConversionControllerConvertApiResponse,
@@ -791,6 +824,34 @@ const injectedRtkApi = api
         }),
         invalidatesTags: ["Twin"],
       }),
+      youTubeTwinControllerGetStatus: build.query<
+        YouTubeTwinControllerGetStatusApiResponse,
+        YouTubeTwinControllerGetStatusApiArg
+      >({
+        query: () => ({ url: `/api/youtube-twin/status` }),
+        providesTags: ["YouTube Twin"],
+      }),
+      youTubeTwinControllerStart: build.mutation<
+        YouTubeTwinControllerStartApiResponse,
+        YouTubeTwinControllerStartApiArg
+      >({
+        query: () => ({ url: `/api/youtube-twin/start`, method: "POST" }),
+        invalidatesTags: ["YouTube Twin"],
+      }),
+      youTubeTwinControllerStop: build.mutation<
+        YouTubeTwinControllerStopApiResponse,
+        YouTubeTwinControllerStopApiArg
+      >({
+        query: () => ({ url: `/api/youtube-twin/stop`, method: "POST" }),
+        invalidatesTags: ["YouTube Twin"],
+      }),
+      youTubeTwinControllerReset: build.mutation<
+        YouTubeTwinControllerResetApiResponse,
+        YouTubeTwinControllerResetApiArg
+      >({
+        query: () => ({ url: `/api/youtube-twin/reset`, method: "POST" }),
+        invalidatesTags: ["YouTube Twin"],
+      }),
     }),
     overrideExisting: false,
   });
@@ -965,6 +1026,22 @@ export type GcsStorageControllerActivateErrorModeApiArg = {
 export type GcsStorageControllerDeactivateErrorModeApiResponse =
   /** status 200 Error mode deactivated */ ErrorModeStateDto;
 export type GcsStorageControllerDeactivateErrorModeApiArg = void;
+export type YoutubeSearchControllerSearchApiResponse =
+  /** status 200 Search results returned successfully */ YoutubeSearchResponseDto;
+export type YoutubeSearchControllerSearchApiArg = {
+  /** Search query string */
+  q: string;
+  /** Maximum number of results */
+  maxResults?: string;
+};
+export type YoutubeSearchControllerActivateErrorModeApiResponse =
+  /** status 200 Error mode activated successfully */ YoutubeErrorModeStateDto;
+export type YoutubeSearchControllerActivateErrorModeApiArg = {
+  youtubeActivateErrorModeDto: YoutubeActivateErrorModeDto;
+};
+export type YoutubeSearchControllerDeactivateErrorModeApiResponse =
+  /** status 200 Error mode deactivated successfully */ YoutubeErrorModeStateDto;
+export type YoutubeSearchControllerDeactivateErrorModeApiArg = void;
 export type LeadConversionControllerConvertApiResponse = unknown;
 export type LeadConversionControllerConvertApiArg = {
   id: number;
@@ -1177,6 +1254,17 @@ export type TwinControllerSetGmailErrorModeApiResponse =
 export type TwinControllerSetGmailErrorModeApiArg = {
   setGmailErrorModeDto: SetGmailErrorModeDto;
 };
+export type YouTubeTwinControllerGetStatusApiResponse =
+  /** status 200 YouTube twin status retrieved successfully */ YouTubeTwinStatusDto;
+export type YouTubeTwinControllerGetStatusApiArg = void;
+export type YouTubeTwinControllerStartApiResponse =
+  /** status 200 YouTube twin started successfully */ YouTubeTwinStartResponseDto;
+export type YouTubeTwinControllerStartApiArg = void;
+export type YouTubeTwinControllerStopApiResponse =
+  /** status 200 YouTube twin stopped successfully */ YouTubeTwinStopResponseDto;
+export type YouTubeTwinControllerStopApiArg = void;
+export type YouTubeTwinControllerResetApiResponse = unknown;
+export type YouTubeTwinControllerResetApiArg = void;
 export type LoginResponseDto = {
   /** JWT access token */
   access_token: string;
@@ -1344,6 +1432,85 @@ export type ActivateErrorModeDto = {
   bucketName?: string;
   /** Fail every Nth request for intermittent-failure mode. Defaults to 2. */
   failEveryN?: number;
+};
+export type YoutubePageInfoDto = {
+  /** Total results */
+  totalResults: number;
+  /** Results per page */
+  resultsPerPage: number;
+};
+export type YoutubeVideoIdDto = {
+  /** Resource kind */
+  kind: string;
+  /** Unique video ID */
+  videoId: string;
+};
+export type YoutubeThumbnailDetailsDto = {
+  /** Thumbnail URL */
+  url: string;
+  /** Thumbnail width */
+  width: number;
+  /** Thumbnail height */
+  height: number;
+};
+export type YoutubeThumbnailsDto = {
+  default: YoutubeThumbnailDetailsDto;
+  medium: YoutubeThumbnailDetailsDto;
+  high: YoutubeThumbnailDetailsDto;
+};
+export type YoutubeSearchSnippetDto = {
+  /** Publish time */
+  publishedAt: string;
+  /** Channel ID */
+  channelId: string;
+  /** Video title */
+  title: string;
+  /** Video description */
+  description: string;
+  thumbnails: YoutubeThumbnailsDto;
+  /** Channel Title */
+  channelTitle: string;
+  /** Live broadcast content status */
+  liveBroadcastContent: string;
+};
+export type YoutubeSearchResultItemDto = {
+  /** Result item kind */
+  kind: string;
+  /** ETag of the item */
+  etag: string;
+  id: YoutubeVideoIdDto;
+  snippet: YoutubeSearchSnippetDto;
+};
+export type YoutubeSearchResponseDto = {
+  /** Search list response kind */
+  kind: string;
+  /** ETag */
+  etag: string;
+  /** Region code */
+  regionCode: string;
+  pageInfo: YoutubePageInfoDto;
+  items: YoutubeSearchResultItemDto[];
+};
+export type YoutubeErrorModeType =
+  | "daily-limit-exceeded"
+  | "invalid-api-key"
+  | "empty-results"
+  | "player-error-2"
+  | "player-error-5"
+  | "player-error-100"
+  | "player-error-101"
+  | "player-error-150";
+export type YoutubeErrorModeStateDto = {
+  /** Whether an error mode is currently active */
+  active: boolean;
+  /** The active error mode type */
+  type?: YoutubeErrorModeType;
+  /** Human-readable description of what the error mode does */
+  description?: string;
+};
+export type YoutubeActivateErrorModeDto = {
+  /** The YouTube error mode to activate */
+  type: YoutubeErrorModeType;
 };
 export type ConvertLeadRequestDto = {
   contactId?: number;
@@ -1614,6 +1781,8 @@ export type TwinStatusDto = {
   port: number;
   /** The URL of the twin emulator */
   url?: string;
+  /** Whether GCS storage emulator is online */
+  gcsOnline: boolean;
   /** Current error simulation mode state */
   errorMode: ErrorModeStateDto;
   /** Status of the Gmail twin emulator */
@@ -1664,6 +1833,27 @@ export type SetGmailErrorModeDto = {
   /** The simulated error mode to activate */
   mode: "none" | "rate-limit" | "auth-error" | "bad-request";
 };
+export type YouTubeTwinStatusDto = {
+  /** Whether the YouTube twin emulator is currently running */
+  running: boolean;
+  /** Whether the YouTube twin emulator is healthy */
+  healthy: boolean;
+  /** The port the YouTube twin emulator is listening on */
+  port: number;
+  /** The URL of the YouTube twin emulator */
+  url?: string;
+  /** Current YouTube error simulation mode state */
+  errorMode: YoutubeErrorModeStateDto;
+};
+export type YouTubeTwinStartResponseDto = {
+  success: boolean;
+  message: string;
+  url?: string;
+};
+export type YouTubeTwinStopResponseDto = {
+  success: boolean;
+  message: string;
+};
 export const {
   useAuthControllerLoginMutation,
   useAuthControllerGetProfileQuery,
@@ -1700,6 +1890,9 @@ export const {
   useGcsStorageControllerDeleteFileMutation,
   useGcsStorageControllerActivateErrorModeMutation,
   useGcsStorageControllerDeactivateErrorModeMutation,
+  useYoutubeSearchControllerSearchQuery,
+  useYoutubeSearchControllerActivateErrorModeMutation,
+  useYoutubeSearchControllerDeactivateErrorModeMutation,
   useLeadConversionControllerConvertMutation,
   useDashboardControllerSnapshotQuery,
   useConfigurableLookupsControllerFindAllQuery,
@@ -1742,4 +1935,8 @@ export const {
   useTwinControllerGetGmailEmailsQuery,
   useTwinControllerResetGmailMutation,
   useTwinControllerSetGmailErrorModeMutation,
+  useYouTubeTwinControllerGetStatusQuery,
+  useYouTubeTwinControllerStartMutation,
+  useYouTubeTwinControllerStopMutation,
+  useYouTubeTwinControllerResetMutation,
 } = injectedRtkApi;

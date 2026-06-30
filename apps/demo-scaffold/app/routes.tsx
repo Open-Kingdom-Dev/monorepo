@@ -8,6 +8,7 @@ import UserManagement from './routes/user-management';
 import AcceptInvitationRoute from './routes/accept-invitation';
 import GcsDemo from './routes/gcs-demo';
 import GmailDemo from './routes/gmail-demo';
+import YouTubeDemo from './routes/youtube-demo';
 
 export const router = createBrowserRouter([
   {
@@ -22,6 +23,7 @@ export const router = createBrowserRouter([
       ...crmRoutes,
       { path: 'gcs-demo', Component: GcsDemo },
       { path: 'gmail-demo', Component: GmailDemo },
+      { path: 'youtube-demo', Component: YouTubeDemo },
     ],
   },
 ]);

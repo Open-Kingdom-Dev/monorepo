@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Test, TestingModule } from '@nestjs/testing';
 import {
   createConfigService,
@@ -101,6 +102,31 @@ jest.mock('@open-kingdom/shared-backend-feature-gcp-resources', () => {
   return {
     FeatureGcpResourcesModule: MockFeatureGcpResourcesModule,
     GcsStorageService: MockGcsStorageService,
+  };
+});
+
+jest.mock('@open-kingdom/shared-backend-feature-youtube', () => {
+  const { Module, Injectable } = require('@nestjs/common');
+  @Injectable()
+  class MockYoutubeSearchService {
+    setErrorMode = jest.fn();
+    clearErrorMode = jest.fn();
+    getErrorModeState = jest
+      .fn()
+      .mockReturnValue({ active: false, type: null, description: null });
+    resetErrorMode = jest.fn();
+    search = jest.fn();
+  }
+  @Module({
+    providers: [MockYoutubeSearchService],
+    exports: [MockYoutubeSearchService],
+  })
+  class MockFeatureYoutubeModule {}
+  return {
+    FeatureYoutubeModule: MockFeatureYoutubeModule,
+    YoutubeSearchService: MockYoutubeSearchService,
+    YoutubeErrorModeStateDto: class {},
+    YoutubeActivateErrorModeDto: class {},
   };
 });
 

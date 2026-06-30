@@ -12,6 +12,7 @@ export class GcsTwin {
   private readonly docker: Docker;
   private container: Docker.Container | null = null;
   private readonly containerName: string;
+  private dockerUnavailable = false;
 
   /**
    * Create a new GCS twin.
@@ -32,6 +33,16 @@ export class GcsTwin {
    */
   async start(): Promise<void> {
     console.log(`Starting GCS twin on port ${this.config.port}...`);
+    try {
+      await this.docker.ping();
+    } catch (_err) {
+      console.warn(
+        `[GcsTwin] Docker is not available. Skipping GCS emulator container startup. GCS emulator will be offline.`
+      );
+      this.dockerUnavailable = true;
+      return;
+    }
+
     await this.ensureImageExists();
     await this.ensureContainerRemoved();
     await this.createContainer();
@@ -46,6 +57,10 @@ export class GcsTwin {
    * Stop and remove the Docker container.
    */
   async stop(): Promise<void> {
+    if (this.dockerUnavailable) {
+      this.dockerUnavailable = false;
+      return;
+    }
     if (!this.container) {
       return;
     }
@@ -65,6 +80,9 @@ export class GcsTwin {
    * Reset all data: delete buckets then re‑create them.
    */
   async reset(): Promise<void> {
+    if (this.dockerUnavailable) {
+      return;
+    }
     console.log('Resetting GCS twin...');
     for (const bucket of this.config.buckets) {
       try {
@@ -90,6 +108,9 @@ export class GcsTwin {
    * Check if the twin is running and healthy.
    */
   async isHealthy(): Promise<boolean> {
+    if (this.dockerUnavailable) {
+      return false;
+    }
     try {
       const response = await fetch(`${this.config.externalUrl}/storage/v1/b`);
       return response.ok;

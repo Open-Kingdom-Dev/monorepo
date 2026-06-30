@@ -42,6 +42,7 @@ export class TwinController {
 
   @Public()
   @Post('start')
+  @HttpCode(HttpStatus.OK)
   @ApiOperation({
     summary: 'Start twin environment',
     description:
@@ -63,6 +64,7 @@ export class TwinController {
 
   @Public()
   @Post('stop')
+  @HttpCode(HttpStatus.OK)
   @ApiOperation({
     summary: 'Stop twin environment',
     description:

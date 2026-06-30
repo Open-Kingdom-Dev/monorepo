@@ -174,6 +174,7 @@ describe('TwinStatus', () => {
           healthy: true,
           port: 9013,
           url: 'http://localhost:9013',
+          gcsOnline: true,
         },
         isLoading: false,
         error: null,
@@ -183,6 +184,28 @@ describe('TwinStatus', () => {
       render(<TwinStatus />);
 
       expect(screen.getByText(/http:\/\/localhost:9013/i)).toBeTruthy();
+    });
+
+    it('displays offline warning for GCS when GCS is offline', () => {
+      mockUseGetStatus.mockReturnValue({
+        data: {
+          running: true,
+          healthy: false,
+          port: 9013,
+          url: 'http://localhost:9013',
+          gcsOnline: false,
+        },
+        isLoading: false,
+        error: null,
+        refetch: mockRefetch,
+      });
+
+      render(<TwinStatus />);
+
+      expect(
+        screen.getByText(/Offline \(Docker is not running\)/i)
+      ).toBeTruthy();
+      expect(document.querySelector('.bg-yellow-500')).toBeTruthy();
     });
   });
 

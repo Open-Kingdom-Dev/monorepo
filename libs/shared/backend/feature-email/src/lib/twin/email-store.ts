@@ -1,4 +1,4 @@
-import { simpleParser } from 'mailparser';
+import { simpleParser, AddressObject, EmailAddress } from 'mailparser';
 import crypto from 'crypto';
 
 export interface CapturedEmail {
@@ -21,8 +21,9 @@ export class EmailStore {
     const parsed = await simpleParser(mimeBuffer);
 
     const to = parsed.to
-      ? (Array.isArray(parsed.to) ? parsed.to : [parsed.to]).flatMap((addr) =>
-          addr.value.map((v) => v.address || '')
+      ? (Array.isArray(parsed.to) ? parsed.to : [parsed.to]).flatMap(
+          (addr: AddressObject) =>
+            addr.value.map((v: EmailAddress) => v.address || '')
         )
       : [];
     const from = parsed.from?.value?.[0]?.address || '';

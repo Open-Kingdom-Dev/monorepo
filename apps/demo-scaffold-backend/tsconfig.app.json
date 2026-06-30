@@ -51,6 +51,9 @@
       "path": "../../libs/shared/backend/feature-gcp-resources/tsconfig.lib.json"
     },
     {
+      "path": "../../libs/shared/backend/feature-youtube/tsconfig.lib.json"
+    },
+    {
       "path": "../../libs/shared/backend/feature-user-management/tsconfig.lib.json"
     },
     {

@@ -344,8 +344,16 @@ describe('GmailTwinServer', () => {
     });
 
     it('should return 500 when active error mode is unknown', async () => {
-      const service = (twin as any).service;
-      service.setErrorMode('unknown-mode' as any);
+      const service = (
+        twin as unknown as {
+          service: {
+            setErrorMode(mode: string): void;
+            reset(): void;
+            sendEmail: jest.Mock;
+          };
+        }
+      ).service;
+      service.setErrorMode('unknown-mode' as unknown as never);
 
       try {
         const host = twin.getEmulatorHost();
@@ -358,7 +366,7 @@ describe('GmailTwinServer', () => {
           body: JSON.stringify({ raw: 'some-raw' }),
         });
         expect(res.status).toBe(500);
-        const json = (await res.json()) as any;
+        const json = (await res.json()) as { error: { message: string } };
         expect(json.error.message).toBe('Unknown simulated error mode');
       } finally {
         service.reset();
@@ -366,7 +374,15 @@ describe('GmailTwinServer', () => {
     });
 
     it('should return 500 when service throws non-HttpException', async () => {
-      const service = (twin as any).service;
+      const service = (
+        twin as unknown as {
+          service: {
+            setErrorMode(mode: string): void;
+            reset(): void;
+            sendEmail: jest.Mock;
+          };
+        }
+      ).service;
       const originalSend = service.sendEmail;
       service.sendEmail = jest
         .fn()
@@ -383,7 +399,7 @@ describe('GmailTwinServer', () => {
           body: JSON.stringify({ raw: 'some-raw' }),
         });
         expect(res.status).toBe(500);
-        const json = (await res.json()) as any;
+        const json = (await res.json()) as { error: { message: string } };
         expect(json.error.message).toContain('Internal Database Error');
       } finally {
         service.sendEmail = originalSend;
@@ -397,7 +413,7 @@ describe('GmailTwinServer', () => {
       for (const path of ['/token', '/oauth2/v4/token', '/oauth2/v3/token']) {
         const res = await fetch(`${host}${path}`, { method: 'POST' });
         expect(res.status).toBe(200);
-        const json = (await res.json()) as any;
+        const json = (await res.json()) as { access_token: string };
         expect(json.access_token).toBe('mock-twin-access-token');
       }
     });

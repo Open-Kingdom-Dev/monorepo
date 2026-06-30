@@ -17,7 +17,6 @@ export class NodeInterceptor {
   private originalHttpGet: typeof http.get | null = null;
   private originalHttpsRequest: typeof https.request | null = null;
   private originalHttpsGet: typeof https.get | null = null;
-
   private readonly routingTable: RoutingTable;
   private active = false;
 
@@ -72,6 +71,10 @@ export class NodeInterceptor {
       input: Parameters<typeof globalThis.fetch>[0],
       init?: Parameters<typeof globalThis.fetch>[1]
     ): Promise<Response> => {
+      if (!originalFetch) {
+        throw new Error('NodeInterceptor: original fetch is not cached');
+      }
+
       let urlStr = '';
 
       if (typeof input === 'string') {
@@ -108,18 +111,23 @@ export class NodeInterceptor {
 
         // Handle native Request object conversion cleanly
         if (input instanceof Request) {
-          const newInit: RequestInit = {
+          const newInit: Record<string, unknown> = {
             method: input.method,
             headers: headers,
             body: input.body,
             signal: input.signal,
-            credentials: input.credentials,
-            mode: input.mode,
-            referrer: input.referrer,
-            redirect: input.redirect,
             ...init,
           };
-          const newRequest = new Request(rewritten, newInit);
+          if (input.body) {
+            newInit.duplex = 'half';
+          }
+          if ('credentials' in input) newInit.credentials = input.credentials;
+          if ('mode' in input) newInit.mode = input.mode;
+          if ('referrer' in input) newInit.referrer = input.referrer;
+          if ('cache' in input) newInit.cache = input.cache;
+          if ('redirect' in input) newInit.redirect = input.redirect;
+
+          const newRequest = new Request(rewritten, newInit as RequestInit);
           return originalFetch(newRequest);
         }
 

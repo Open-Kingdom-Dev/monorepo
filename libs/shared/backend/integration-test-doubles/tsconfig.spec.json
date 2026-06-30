@@ -3,6 +3,7 @@
   "compilerOptions": {
     "outDir": "./out-tsc/jest",
     "types": ["jest", "node"],
+    "lib": ["es2022", "dom"],
     "module": "nodenext",
     "moduleResolution": "nodenext",
     "experimentalDecorators": true,

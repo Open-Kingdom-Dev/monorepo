@@ -37,6 +37,30 @@ const client = new Storage({
 await twin.stop();
 ```
 
+### Using YouTube Twin (Server-Side Interception)
+
+```typescript
+import { YoutubeTwin, NodeInterceptor, RoutingTable, defaultRoutingEntries } from '@open-kingdom/shared-backend-integration-test-doubles';
+
+// Start the twin (default port 9016)
+const twin = new YoutubeTwin();
+await twin.start();
+
+// Install the global fetch interceptor
+const routingTable = new RoutingTable(defaultRoutingEntries);
+const interceptor = new NodeInterceptor(routingTable);
+interceptor.install();
+
+// Call the production YouTube API endpoint (internally routed to twin)
+const res = await fetch('https://www.googleapis.com/youtube/v3/search?q=yoga&key=valid-key');
+const data = await res.json();
+console.log(data.kind); // "youtube#searchListResponse"
+
+// Clean up
+interceptor.uninstall();
+await twin.stop();
+```
+
 ### NestJS Integration
 
 Use the `TwinService` to manage the twin lifecycle within a NestJS application:
@@ -93,6 +117,52 @@ interface BucketConfig {
 }
 ```
 
+### YouTubeTwin & Network Interceptor
+
+#### YouTubeTwin Constructor
+
+```typescript
+constructor(overrides?: Partial<YoutubeTwinConfig>)
+```
+
+- `overrides.port`: Port to run the twin on (default: 9016, or from `YOUTUBE_TWIN_PORT` env var; must be within 9010-9020)
+- `overrides.externalUrl`: External URL for the twin (default: `http://localhost:{port}`)
+
+#### YouTubeTwin Methods
+
+- `start()`: Start the Express server
+- `stop()`: Stop the Express server
+- `reset()`: Reset search fixtures to defaults and clear any active error mode
+- `getEmulatorHost()`: Get the twin URL (e.g., `http://localhost:9016`)
+- `isHealthy()`: Check if the twin is running and responding
+
+#### NodeInterceptor & RoutingTable
+
+- `new NodeInterceptor(routingTable)`: Instantiate interceptor
+- `install()`: Patches `globalThis.fetch` to intercept matching domains
+- `uninstall()`: Restores `globalThis.fetch` to its original reference
+- `isActive()`: Check if interceptor is currently active
+
+#### Browser-Side MSW Interception
+
+Use `getYoutubeMswHandlerConfigs(twinBaseUrl)` to export mock route definitions for browser-side testing frameworks like MSW:
+
+```typescript
+import { http, HttpResponse } from 'msw';
+import { getYoutubeMswHandlerConfigs } from '@open-kingdom/shared-backend-integration-test-doubles';
+
+const configs = getYoutubeMswHandlerConfigs('http://localhost:9016');
+const handlers = configs.map((config) =>
+  http.get(config.url, async () => {
+    const res = await fetch(config.proxyTo);
+    const body = await res.text();
+    return new HttpResponse(body, {
+      headers: { 'Content-Type': config.contentType },
+    });
+  })
+);
+```
+
 ### Exports
 
 ```typescript
@@ -127,7 +197,7 @@ The library reserves ports 9010-9020 for test doubles:
 | GCS             | 9013          |
 | Gmail           | 9014 (future) |
 | Google Auth     | 9015 (future) |
-| YouTube         | 9016 (future) |
+| YouTube         | 9016          |
 | Google Calendar | 9017 (future) |
 | Spotify         | 9018 (future) |
 
@@ -145,14 +215,14 @@ Port validation ensures the value is within the reserved range (9010-9020).
 
 ## Scripts
 
-### Start Twin Manually
+### Start Twins Manually
 
 ```bash
-# Start on default port (9013)
+# Start GCS twin manually on default port (9013)
 npx tsx scripts/start-twin.ts
 
-# Start on specific port
-npx tsx scripts/start-twin.ts 9013
+# Start YouTube twin manually on default port (9016)
+npx nx run integration-test-doubles:start:youtube-twin
 ```
 
 The script outputs the twin URL and sets `GCS_EMULATOR_URL`. Keeps running until Ctrl+C.

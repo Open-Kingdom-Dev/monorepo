@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { GcsTwin } from '../gcs-twin.js';
 
 // Minimal mock for Dockerode container
@@ -14,6 +15,7 @@ const createMockContainer = () => {
 const createMockDocker = (existingContainer = null) => {
   const mockContainer = createMockContainer();
   const mockDocker = {
+    ping: jest.fn().mockResolvedValue(undefined),
     getContainer: jest.fn().mockImplementation(() => ({
       inspect: existingContainer
         ? jest.fn().mockResolvedValue({ State: { Running: true } })
@@ -107,6 +109,7 @@ describe('GcsTwin (lifecycle)', () => {
         remove: jest.fn().mockResolvedValue(undefined),
       };
       const mockDocker = {
+        ping: jest.fn().mockResolvedValue(undefined),
         getContainer: jest.fn().mockReturnValue(existingContainer),
         createContainer: jest.fn().mockResolvedValue(createMockContainer()),
         listImages: jest.fn().mockResolvedValue([{ Id: 'fake-image-id' }]),

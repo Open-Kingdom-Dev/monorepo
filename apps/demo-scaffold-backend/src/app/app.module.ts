@@ -17,8 +17,10 @@ import {
   UserRolesService,
 } from '@open-kingdom/shared-backend-feature-user-management';
 import { FeatureGcpResourcesModule } from '@open-kingdom/shared-backend-feature-gcp-resources';
+import { FeatureYoutubeModule } from '@open-kingdom/shared-backend-feature-youtube';
 import { FeatureCrmModule } from '@open-kingdom/crm-backend-feature-crm';
 import { TwinModule } from './twin/twin.module';
+import { YouTubeTwinModule } from './youtube-twin/youtube-twin.module.js';
 import {
   PermissionGuard,
   ROLE_RESOLVER,
@@ -82,8 +84,10 @@ function getEmailModule() {
       frontendBaseUrl: configService.get('BASE_URL', 'http://localhost:3000'),
     }),
     FeatureGcpResourcesModule,
+    FeatureYoutubeModule,
     FeatureCrmModule.forRoot({ seedDefaults: true }),
     TwinModule,
+    YouTubeTwinModule,
   ],
   controllers: [],
   providers: [

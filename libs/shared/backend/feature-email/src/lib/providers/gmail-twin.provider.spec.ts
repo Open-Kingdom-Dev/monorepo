@@ -174,7 +174,9 @@ describe('GmailTwinProvider', () => {
 
     it('throws error for unknown simulated error mode', () => {
       expect(() => {
-        (provider as any).throwSimulatedError('unknown-mode');
+        (
+          provider as unknown as { throwSimulatedError(mode: string): void }
+        ).throwSimulatedError('unknown-mode');
       }).toThrow('Unknown simulated error mode: unknown-mode');
     });
   });

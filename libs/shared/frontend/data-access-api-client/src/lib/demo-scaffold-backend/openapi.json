@@ -1387,6 +1387,107 @@
         ]
       }
     },
+    "/api/youtube/search": {
+      "get": {
+        "description": "Searches for videos using the YouTube Data API mock twin.",
+        "operationId": "YoutubeSearchController_search",
+        "parameters": [
+          {
+            "name": "q",
+            "required": true,
+            "in": "query",
+            "description": "Search query string",
+            "schema": {
+              "example": "yoga",
+              "type": "string"
+            }
+          },
+          {
+            "name": "maxResults",
+            "required": false,
+            "in": "query",
+            "description": "Maximum number of results",
+            "schema": {
+              "example": 5,
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Search results returned successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/YoutubeSearchResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Missing query parameters or API error"
+          }
+        },
+        "summary": "Search YouTube videos",
+        "tags": [
+          "YouTube Search"
+        ]
+      }
+    },
+    "/api/youtube/error-mode": {
+      "post": {
+        "description": "Activates a YouTube error simulation mode.",
+        "operationId": "YoutubeSearchController_activateErrorMode",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/YoutubeActivateErrorModeDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Error mode activated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/YoutubeErrorModeStateDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Activate a YouTube error mode",
+        "tags": [
+          "YouTube Search"
+        ]
+      },
+      "delete": {
+        "description": "Deactivates the current YouTube error simulation mode.",
+        "operationId": "YoutubeSearchController_deactivateErrorMode",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Error mode deactivated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/YoutubeErrorModeStateDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Deactivate current YouTube error mode",
+        "tags": [
+          "YouTube Search"
+        ]
+      }
+    },
     "/api/leads/{id}/convert": {
       "post": {
         "operationId": "LeadConversionController_convert",
@@ -3300,6 +3401,91 @@
           "Twin"
         ]
       }
+    },
+    "/api/youtube-twin/status": {
+      "get": {
+        "description": "Returns the current status of the YouTube twin (running, healthy, port, URL) and the active error mode state.",
+        "operationId": "YouTubeTwinController_getStatus",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "YouTube twin status retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/YouTubeTwinStatusDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Get YouTube twin status",
+        "tags": [
+          "YouTube Twin"
+        ]
+      }
+    },
+    "/api/youtube-twin/start": {
+      "post": {
+        "description": "Starts the YouTube Express twin server.",
+        "operationId": "YouTubeTwinController_start",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "YouTube twin started successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/YouTubeTwinStartResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Start YouTube twin",
+        "tags": [
+          "YouTube Twin"
+        ]
+      }
+    },
+    "/api/youtube-twin/stop": {
+      "post": {
+        "description": "Stops the YouTube twin Express server.",
+        "operationId": "YouTubeTwinController_stop",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "YouTube twin stopped successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/YouTubeTwinStopResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Stop YouTube twin",
+        "tags": [
+          "YouTube Twin"
+        ]
+      }
+    },
+    "/api/youtube-twin/reset": {
+      "post": {
+        "description": "Resets the YouTube twin search fixtures and deactivates any simulated error modes.",
+        "operationId": "YouTubeTwinController_reset",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "YouTube twin state reset successfully"
+          }
+        },
+        "summary": "Reset YouTube twin",
+        "tags": [
+          "YouTube Twin"
+        ]
+      }
     }
   },
   "info": {
@@ -3851,6 +4037,236 @@
             "allOf": [
               {
                 "$ref": "#/components/schemas/GcsErrorModeType"
+              }
+            ]
+          },
+          "description": {
+            "type": "string",
+            "description": "Human-readable description of what the error mode does"
+          }
+        },
+        "required": [
+          "active"
+        ]
+      },
+      "YoutubePageInfoDto": {
+        "type": "object",
+        "properties": {
+          "totalResults": {
+            "type": "number",
+            "description": "Total results"
+          },
+          "resultsPerPage": {
+            "type": "number",
+            "description": "Results per page"
+          }
+        },
+        "required": [
+          "totalResults",
+          "resultsPerPage"
+        ]
+      },
+      "YoutubeVideoIdDto": {
+        "type": "object",
+        "properties": {
+          "kind": {
+            "type": "string",
+            "description": "Resource kind"
+          },
+          "videoId": {
+            "type": "string",
+            "description": "Unique video ID"
+          }
+        },
+        "required": [
+          "kind",
+          "videoId"
+        ]
+      },
+      "YoutubeThumbnailDetailsDto": {
+        "type": "object",
+        "properties": {
+          "url": {
+            "type": "string",
+            "description": "Thumbnail URL"
+          },
+          "width": {
+            "type": "number",
+            "description": "Thumbnail width"
+          },
+          "height": {
+            "type": "number",
+            "description": "Thumbnail height"
+          }
+        },
+        "required": [
+          "url",
+          "width",
+          "height"
+        ]
+      },
+      "YoutubeThumbnailsDto": {
+        "type": "object",
+        "properties": {
+          "default": {
+            "$ref": "#/components/schemas/YoutubeThumbnailDetailsDto"
+          },
+          "medium": {
+            "$ref": "#/components/schemas/YoutubeThumbnailDetailsDto"
+          },
+          "high": {
+            "$ref": "#/components/schemas/YoutubeThumbnailDetailsDto"
+          }
+        },
+        "required": [
+          "default",
+          "medium",
+          "high"
+        ]
+      },
+      "YoutubeSearchSnippetDto": {
+        "type": "object",
+        "properties": {
+          "publishedAt": {
+            "type": "string",
+            "description": "Publish time"
+          },
+          "channelId": {
+            "type": "string",
+            "description": "Channel ID"
+          },
+          "title": {
+            "type": "string",
+            "description": "Video title"
+          },
+          "description": {
+            "type": "string",
+            "description": "Video description"
+          },
+          "thumbnails": {
+            "$ref": "#/components/schemas/YoutubeThumbnailsDto"
+          },
+          "channelTitle": {
+            "type": "string",
+            "description": "Channel Title"
+          },
+          "liveBroadcastContent": {
+            "type": "string",
+            "description": "Live broadcast content status"
+          }
+        },
+        "required": [
+          "publishedAt",
+          "channelId",
+          "title",
+          "description",
+          "thumbnails",
+          "channelTitle",
+          "liveBroadcastContent"
+        ]
+      },
+      "YoutubeSearchResultItemDto": {
+        "type": "object",
+        "properties": {
+          "kind": {
+            "type": "string",
+            "description": "Result item kind"
+          },
+          "etag": {
+            "type": "string",
+            "description": "ETag of the item"
+          },
+          "id": {
+            "$ref": "#/components/schemas/YoutubeVideoIdDto"
+          },
+          "snippet": {
+            "$ref": "#/components/schemas/YoutubeSearchSnippetDto"
+          }
+        },
+        "required": [
+          "kind",
+          "etag",
+          "id",
+          "snippet"
+        ]
+      },
+      "YoutubeSearchResponseDto": {
+        "type": "object",
+        "properties": {
+          "kind": {
+            "type": "string",
+            "description": "Search list response kind"
+          },
+          "etag": {
+            "type": "string",
+            "description": "ETag"
+          },
+          "regionCode": {
+            "type": "string",
+            "description": "Region code"
+          },
+          "pageInfo": {
+            "$ref": "#/components/schemas/YoutubePageInfoDto"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/YoutubeSearchResultItemDto"
+            }
+          }
+        },
+        "required": [
+          "kind",
+          "etag",
+          "regionCode",
+          "pageInfo",
+          "items"
+        ]
+      },
+      "YoutubeErrorModeType": {
+        "type": "string",
+        "enum": [
+          "daily-limit-exceeded",
+          "invalid-api-key",
+          "empty-results",
+          "player-error-2",
+          "player-error-5",
+          "player-error-100",
+          "player-error-101",
+          "player-error-150"
+        ],
+        "description": "The YouTube error mode to activate"
+      },
+      "YoutubeActivateErrorModeDto": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "description": "The YouTube error mode to activate",
+            "example": "daily-limit-exceeded",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/YoutubeErrorModeType"
+              }
+            ]
+          }
+        },
+        "required": [
+          "type"
+        ]
+      },
+      "YoutubeErrorModeStateDto": {
+        "type": "object",
+        "properties": {
+          "active": {
+            "type": "boolean",
+            "description": "Whether an error mode is currently active",
+            "example": true
+          },
+          "type": {
+            "description": "The active error mode type",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/YoutubeErrorModeType"
               }
             ]
           },
@@ -4844,6 +5260,11 @@
             "description": "The URL of the twin emulator",
             "example": "http://localhost:9013"
           },
+          "gcsOnline": {
+            "type": "boolean",
+            "description": "Whether GCS storage emulator is online",
+            "example": true
+          },
           "errorMode": {
             "description": "Current error simulation mode state",
             "allOf": [
@@ -4875,6 +5296,7 @@
           "running",
           "healthy",
           "port",
+          "gcsOnline",
           "errorMode",
           "interceptorActive",
           "realGmailConfigured"
@@ -5028,6 +5450,83 @@
           "message": {
             "type": "string",
             "example": "Gmail twin error mode configured to: rate-limit"
+          }
+        },
+        "required": [
+          "success",
+          "message"
+        ]
+      },
+      "YouTubeTwinStatusDto": {
+        "type": "object",
+        "properties": {
+          "running": {
+            "type": "boolean",
+            "description": "Whether the YouTube twin emulator is currently running",
+            "example": true
+          },
+          "healthy": {
+            "type": "boolean",
+            "description": "Whether the YouTube twin emulator is healthy",
+            "example": true
+          },
+          "port": {
+            "type": "number",
+            "description": "The port the YouTube twin emulator is listening on",
+            "example": 9016
+          },
+          "url": {
+            "type": "string",
+            "description": "The URL of the YouTube twin emulator",
+            "example": "http://localhost:9016"
+          },
+          "errorMode": {
+            "description": "Current YouTube error simulation mode state",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/YoutubeErrorModeStateDto"
+              }
+            ]
+          }
+        },
+        "required": [
+          "running",
+          "healthy",
+          "port",
+          "errorMode"
+        ]
+      },
+      "YouTubeTwinStartResponseDto": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "example": true
+          },
+          "message": {
+            "type": "string",
+            "example": "YouTube twin started on port 9016"
+          },
+          "url": {
+            "type": "string",
+            "example": "http://localhost:9016"
+          }
+        },
+        "required": [
+          "success",
+          "message"
+        ]
+      },
+      "YouTubeTwinStopResponseDto": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "example": true
+          },
+          "message": {
+            "type": "string",
+            "example": "YouTube twin stopped"
           }
         },
         "required": [
