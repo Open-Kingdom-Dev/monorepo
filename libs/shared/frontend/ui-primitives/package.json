@@ -1,6 +1,6 @@
 {
   "name": "@open-kingdom/shared-frontend-ui-primitives",
-  "version": "0.0.2-17",
+  "version": "0.0.2-18",
   "publishConfig": {
     "access": "public"
   },
@@ -46,6 +46,6 @@
     "clsx": "^2.0.0",
     "tailwind-merge": "^3.0.0",
     "lucide-react": ">=0.400.0",
-    "@open-kingdom/shared-frontend-ui-theme": "0.0.2-17"
+    "@open-kingdom/shared-frontend-ui-theme": "0.0.2-18"
   }
 }
