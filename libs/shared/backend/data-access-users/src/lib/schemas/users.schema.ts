@@ -8,7 +8,10 @@ export const users = table(UsersTableName, {
   firstName: t.text('first_name'),
   lastName: t.text('last_name'),
   email: t.text().notNull().unique(),
-  password: t.text().notNull(),
+  // Nullable: users provisioned by an external identity provider (embedded
+  // mode) have no local credential. A null password can never authenticate
+  // through the credential path (AuthenticationService guards it).
+  password: t.text(),
 });
 
 export type User = typeof users.$inferSelect;

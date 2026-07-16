@@ -17,5 +17,9 @@ module.exports = {
   },
   moduleFileExtensions: ['ts', 'js', 'html'],
   coverageDirectory: 'test-output/jest/coverage',
-  coveragePathIgnorePatterns: ['role-resolver\\.ts$'],
+  // Type-only modules — nothing executable to cover
+  coveragePathIgnorePatterns: [
+    'role-resolver\\.ts$',
+    'authenticated-request\\.ts$',
+  ],
 };

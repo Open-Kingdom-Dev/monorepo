@@ -67,9 +67,20 @@ import { leads, opportunities } from '@open-kingdom/crm-backend-data-access-oppo
 
 ## Configuration
 
-| Option         | Type      | Default | Description                                                                                                     |
-| -------------- | --------- | ------- | --------------------------------------------------------------------------------------------------------------- |
-| `seedDefaults` | `boolean` | `true`  | When `false`, `CrmSeedService.onModuleInit()` returns early — no lookup seeding and no role/permission mapping. |
+| Option         | Type                             | Default  | Description                                                                                                                      |
+| -------------- | -------------------------------- | -------- | --------------------------------------------------------------------------------------------------------------------------------- |
+| `seed`         | `'none' \| 'lookups' \| 'full'`  | `'full'` | What `CrmSeedService` seeds on init. `'lookups'` seeds dropdown data only and works WITHOUT `FeatureUserManagementModule` — for embedded hosts that bring their own identity/RBAC. `'full'` additionally maps the baseline CRM permissions onto the system roles. |
+| `seedDefaults` | `boolean`                        | `true`   | **Deprecated** — use `seed`. `true` ≡ `'full'`, `false` ≡ `'none'`. Ignored when `seed` is set.                                    |
+
+### Embedded hosts (no OpenKingdom auth stack)
+
+The CRM boots without `FeatureUserManagementModule`, `OpenKingdomFeatureBackendAuthModule`, or
+`EmailModule`: register `FeatureCrmModule.forRoot({ seed: 'lookups' })`, register no global
+guards, and stamp `req.user = { id, email }` from your own middleware (see `AuthenticatedRequest`
+in `@open-kingdom/shared-backend-util-rbac`). Controllers use `req.user.id` for record ownership;
+the `@RequirePermission` decorators are inert metadata without `PermissionGuard`.
+`src/lib/embedded-mode.integration.spec.ts` is a complete working example, including generating
+the DDL with `drizzle-kit/api`.
 
 ---
 

@@ -10,6 +10,15 @@ type schema = {
   [UsersTableName]: typeof users;
 };
 
+/**
+ * Input for creating a user. `password` is optional: omit it (or pass null)
+ * for users owned by an external identity provider — the row is stored with a
+ * null password and can never log in through the credential path.
+ */
+export type CreateUserInput = Omit<User, 'id' | 'password'> & {
+  password?: string | null;
+};
+
 @Injectable()
 export class UsersService {
   constructor(@Inject(DB_TAG) private db: BetterSQLite3Database<schema>) {}
@@ -32,10 +41,10 @@ export class UsersService {
     return this.db.query.users.findMany();
   }
 
-  async create(data: Omit<User, 'id'>): Promise<User> {
+  async create(data: CreateUserInput): Promise<User> {
     await this.db.insert(users).values({
       ...data,
-      password: await bcrypt.hash(data.password, 12),
+      password: data.password ? await bcrypt.hash(data.password, 12) : null,
     });
     return this.findOne(data.email) as Promise<User>;
   }
@@ -44,7 +53,7 @@ export class UsersService {
     await this.db.delete(users).where(eq(users.id, id));
   }
 
-  async ensureUser(data: Omit<User, 'id'>) {
+  async ensureUser(data: CreateUserInput) {
     const existing = await this.findOne(data.email);
     if (existing) return existing;
 
@@ -52,7 +61,7 @@ export class UsersService {
       firstName: data.firstName,
       lastName: data.lastName,
       email: data.email,
-      password: await bcrypt.hash(data.password, 12),
+      password: data.password ? await bcrypt.hash(data.password, 12) : null,
     });
     return this.findOne(data.email);
   }

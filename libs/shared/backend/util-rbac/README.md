@@ -19,6 +19,24 @@ providers: [
 ];
 ```
 
+### External identity (embedded hosts)
+
+The identity contract every OpenKingdom controller relies on is just
+`req.user: { id: number; email?: string }` (`AuthenticatedUser` / `AuthenticatedRequest`,
+exported here). Hosts with their own auth perimeter register NO OpenKingdom guards and stamp
+that shape from their own middleware:
+
+```typescript
+app.use((req, res, next) => {
+  req.user = { id: localUserId, email }; // verified by the host's own auth
+  next();
+});
+```
+
+`@RequirePermission` decorators are inert without `PermissionGuard`. A host that wants the
+guard's RBAC enforcement keeps it and binds `ROLE_RESOLVER` to its own `RoleResolver`
+implementation instead of `UserRolesService`.
+
 ## Usage
 
 ```typescript

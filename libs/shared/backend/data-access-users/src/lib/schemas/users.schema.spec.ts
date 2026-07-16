@@ -19,8 +19,12 @@ describe('Users Schema', () => {
       expect(columns.email.isUnique).toBe(true);
     });
 
-    it('requires a password for authentication', () => {
-      expect(columns.password.notNull).toBe(true);
+    it('allows a null password for externally-provisioned identities', () => {
+      // Embedded hosts bring their own auth: their users have no local
+      // credential. A null password can never pass the credential path
+      // (AuthenticationService rejects it before comparing).
+      expect(columns.password).toBeDefined();
+      expect(columns.password.notNull).toBe(false);
     });
   });
 

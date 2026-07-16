@@ -275,4 +275,37 @@ describe('UsersService', () => {
       expect(mockDb.delete(users).where).toHaveBeenCalledWith(eq(users.id, 1));
     });
   });
+
+  describe('externally-provisioned users (no password)', () => {
+    const externalUser = {
+      firstName: 'Ext',
+      lastName: 'User',
+      email: 'ext@example.com',
+    };
+
+    it('create stores a null password and skips hashing when none is given', async () => {
+      const createdUser: User = { id: 2, ...externalUser, password: null };
+      mockQuery.users.findFirst.mockResolvedValue(createdUser);
+
+      const result = await service.create(externalUser);
+
+      expect(mockedBcrypt.hash).not.toHaveBeenCalled();
+      expect(mockDb.insert(users).values).toHaveBeenCalledWith(
+        expect.objectContaining({ password: null })
+      );
+      expect(result).toEqual(createdUser);
+    });
+
+    it('ensureUser inserts a passwordless row when the user is absent', async () => {
+      const createdUser: User = { id: 3, ...externalUser, password: null };
+      mockQuery.users.findFirst
+        .mockResolvedValueOnce(undefined) // findOne miss
+        .mockResolvedValue(createdUser); // post-insert read
+
+      const result = await service.ensureUser(externalUser);
+
+      expect(mockedBcrypt.hash).not.toHaveBeenCalled();
+      expect(result).toEqual(createdUser);
+    });
+  });
 });

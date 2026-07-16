@@ -8,6 +8,13 @@
       "when": 1776545654910,
       "tag": "0000_happy_gateway",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "6",
+      "when": 1784236628114,
+      "tag": "0001_wide_sphinx",
+      "breakpoints": true
     }
   ]
 }

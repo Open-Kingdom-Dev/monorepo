@@ -63,6 +63,15 @@ describe('AuthService', () => {
       expect(result).toEqual(userWithoutPassword);
     });
 
+    it('rejects externally-provisioned users (null password) without comparing', async () => {
+      usersService.findOne.mockResolvedValue({ ...mockUser, password: null });
+
+      await expect(
+        service.validateUser(mockUser.email, 'anything')
+      ).rejects.toThrow('Invalid credentials');
+      expect(mockedBcrypt.compare).not.toHaveBeenCalled();
+    });
+
     it('rejects invalid passwords', async () => {
       usersService.findOne.mockResolvedValue(mockUser);
       mockedBcrypt.compare.mockResolvedValue(false as never);

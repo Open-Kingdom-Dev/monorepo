@@ -19,7 +19,9 @@ export class AuthenticationService {
     password: string
   ): Promise<Omit<User, 'password'>> {
     const user = await this.usersService.findOne(email);
-    if (!user) {
+    // A null password marks an externally-provisioned identity — it must never
+    // authenticate through the credential path.
+    if (!user || !user.password) {
       throw new UnauthorizedException('Invalid credentials');
     }
 
