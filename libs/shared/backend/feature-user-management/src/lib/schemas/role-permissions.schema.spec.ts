@@ -1,7 +1,7 @@
 import {
   rolePermissions,
   RolePermissionsTableName,
-} from './role-permissions.schema';
+} from './index';
 import { getTableColumns } from 'drizzle-orm';
 
 describe('Role–Permission mappings', () => {

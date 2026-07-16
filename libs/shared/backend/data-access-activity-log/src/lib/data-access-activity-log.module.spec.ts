@@ -1,7 +1,8 @@
 import { Global, Module } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 
-import { DB_TAG } from '@open-kingdom/shared-poly-util-constants';
+import { DB_TAG, SCHEMA_TAG } from '@open-kingdom/shared-poly-util-constants';
+import { activityLog } from './schemas';
 import { DataAccessActivityLogModule } from './data-access-activity-log.module';
 import { ActivityLogService } from './activity-log.service';
 
@@ -12,12 +13,21 @@ import { ActivityLogService } from './activity-log.service';
 })
 class FakeDbModule {}
 
+// Stand-in for DatabaseSetupModule's global SCHEMA_TAG provider — services
+// resolve their tables through it (host-composable, prefixable schemas).
+@Global()
+@Module({
+  providers: [{ provide: SCHEMA_TAG, useValue: { activityLog } }],
+  exports: [SCHEMA_TAG],
+})
+class TestSchemaModule {}
+
 describe('DataAccessActivityLogModule', () => {
   let module: TestingModule;
 
   beforeEach(async () => {
     module = await Test.createTestingModule({
-      imports: [FakeDbModule, DataAccessActivityLogModule],
+      imports: [FakeDbModule, TestSchemaModule, DataAccessActivityLogModule],
     }).compile();
   });
 

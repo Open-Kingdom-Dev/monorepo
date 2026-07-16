@@ -1,6 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 
-import { DB_TAG } from '@open-kingdom/shared-poly-util-constants';
+import { DB_TAG, SCHEMA_TAG } from '@open-kingdom/shared-poly-util-constants';
+import { roles, userRoles } from '../schemas';
 import { UserRolesService } from './user-roles.service';
 import { PermissionsService } from './permissions.service';
 
@@ -79,6 +80,7 @@ describe('UserRolesService', () => {
       providers: [
         UserRolesService,
         { provide: DB_TAG, useValue: mockDb },
+        { provide: SCHEMA_TAG, useValue: { userRoles, roles } },
         { provide: PermissionsService, useValue: mockPermissionsService },
       ],
     }).compile();

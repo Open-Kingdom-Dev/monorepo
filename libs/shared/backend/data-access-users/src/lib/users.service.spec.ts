@@ -3,7 +3,7 @@ import { BetterSQLite3Database } from 'drizzle-orm/better-sqlite3';
 import { eq } from 'drizzle-orm';
 import * as bcrypt from 'bcrypt';
 
-import { DB_TAG } from '@open-kingdom/shared-poly-util-constants';
+import { DB_TAG, SCHEMA_TAG } from '@open-kingdom/shared-poly-util-constants';
 import { users, User } from './schemas';
 import { UsersService } from './users.service';
 
@@ -48,6 +48,10 @@ describe('UsersService', () => {
         {
           provide: DB_TAG,
           useValue: mockDb,
+        },
+        {
+          provide: SCHEMA_TAG,
+          useValue: { users },
         },
       ],
     }).compile();

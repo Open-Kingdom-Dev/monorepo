@@ -20,7 +20,10 @@ import {
   opportunities,
 } from '@open-kingdom/crm-backend-data-access-opportunities';
 
-// Compose schema from all packages used by this app
+// Compose schema from all packages used by this app. These are the default
+// (unprefixed) singletons; embedded hosts compose the same shape from the
+// create*Schema factories with a table-name prefix instead — see
+// "Composing a prefixed schema" in data-access-database-setup's README.
 const schema = {
   users,
   roles,

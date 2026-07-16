@@ -8,22 +8,27 @@ import {
 import { BetterSQLite3Database } from 'drizzle-orm/better-sqlite3';
 import { and, asc, eq } from 'drizzle-orm';
 
-import { DB_TAG } from '@open-kingdom/shared-poly-util-constants';
-import { ConfigurableLookup, configurableLookups } from './schemas';
+import { DB_TAG, SCHEMA_TAG } from '@open-kingdom/shared-poly-util-constants';
+import type { ConfigurableLookup, ConfigurableLookupsSchema } from './schemas';
 import {
   CreateConfigurableLookupDto,
   UpdateConfigurableLookupDto,
 } from './dtos';
 
-type schema = {
-  configurableLookups: typeof configurableLookups;
-};
-
 @Injectable()
 export class ConfigurableLookupsService {
+  // Tables come from the host-composed schema (SCHEMA_TAG) rather than the
+  // module-scope singletons, so a prefixed schema (embedded mode) works
+  // transparently.
+  private readonly configurableLookups: ConfigurableLookupsSchema['configurableLookups'];
+
   constructor(
-    @Inject(DB_TAG) private readonly db: BetterSQLite3Database<schema>
-  ) {}
+    @Inject(DB_TAG)
+    private readonly db: BetterSQLite3Database<ConfigurableLookupsSchema>,
+    @Inject(SCHEMA_TAG) schema: ConfigurableLookupsSchema
+  ) {
+    this.configurableLookups = schema.configurableLookups;
+  }
 
   async findByListKey(
     listKey: string,
@@ -31,9 +36,9 @@ export class ConfigurableLookupsService {
   ): Promise<ConfigurableLookup[]> {
     const rows = await this.db
       .select()
-      .from(configurableLookups)
-      .where(eq(configurableLookups.listKey, listKey))
-      .orderBy(asc(configurableLookups.sortOrder), asc(configurableLookups.id))
+      .from(this.configurableLookups)
+      .where(eq(this.configurableLookups.listKey, listKey))
+      .orderBy(asc(this.configurableLookups.sortOrder), asc(this.configurableLookups.id))
       .all();
     return opts.includeInactive ? rows : rows.filter((r) => r.isActive === 1);
   }
@@ -41,18 +46,18 @@ export class ConfigurableLookupsService {
   async findAll(): Promise<ConfigurableLookup[]> {
     return this.db
       .select()
-      .from(configurableLookups)
+      .from(this.configurableLookups)
       .orderBy(
-        asc(configurableLookups.listKey),
-        asc(configurableLookups.sortOrder),
-        asc(configurableLookups.id)
+        asc(this.configurableLookups.listKey),
+        asc(this.configurableLookups.sortOrder),
+        asc(this.configurableLookups.id)
       )
       .all();
   }
 
   async findById(id: number): Promise<ConfigurableLookup | undefined> {
     return this.db.query.configurableLookups.findFirst({
-      where: eq(configurableLookups.id, id),
+      where: eq(this.configurableLookups.id, id),
     });
   }
 
@@ -62,8 +67,8 @@ export class ConfigurableLookupsService {
   ): Promise<ConfigurableLookup | undefined> {
     return this.db.query.configurableLookups.findFirst({
       where: and(
-        eq(configurableLookups.listKey, listKey),
-        eq(configurableLookups.value, value)
+        eq(this.configurableLookups.listKey, listKey),
+        eq(this.configurableLookups.value, value)
       ),
     });
   }
@@ -78,7 +83,7 @@ export class ConfigurableLookupsService {
       );
     }
     const [row] = await this.db
-      .insert(configurableLookups)
+      .insert(this.configurableLookups)
       .values({
         listKey: input.listKey,
         value: input.value,
@@ -124,7 +129,7 @@ export class ConfigurableLookupsService {
     }
 
     const [row] = await this.db
-      .update(configurableLookups)
+      .update(this.configurableLookups)
       .set({
         listKey: nextListKey,
         value: nextValue,
@@ -138,7 +143,7 @@ export class ConfigurableLookupsService {
             : 0,
         updatedAt: new Date(),
       })
-      .where(eq(configurableLookups.id, id))
+      .where(eq(this.configurableLookups.id, id))
       .returning();
     return row;
   }
@@ -154,8 +159,8 @@ export class ConfigurableLookupsService {
       );
     }
     await this.db
-      .delete(configurableLookups)
-      .where(eq(configurableLookups.id, id));
+      .delete(this.configurableLookups)
+      .where(eq(this.configurableLookups.id, id));
   }
 
   async seedDefaults(
@@ -172,7 +177,7 @@ export class ConfigurableLookupsService {
         entry.value
       );
       if (existing) continue;
-      await this.db.insert(configurableLookups).values({
+      await this.db.insert(this.configurableLookups).values({
         listKey: entry.listKey,
         value: entry.value,
         label: entry.label,

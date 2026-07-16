@@ -25,29 +25,34 @@ import {
 } from 'drizzle-kit/api';
 
 import { DatabaseSetupModule } from '@open-kingdom/shared-backend-data-access-database-setup';
-import { users } from '@open-kingdom/shared-backend-data-access-users';
-import { configurableLookups } from '@open-kingdom/shared-backend-data-access-configurable-lookups';
-import { activityLog } from '@open-kingdom/shared-backend-data-access-activity-log';
-import {
-  companies,
-  contacts,
-} from '@open-kingdom/crm-backend-data-access-contacts';
-import {
-  leads,
-  opportunities,
-} from '@open-kingdom/crm-backend-data-access-opportunities';
+import { createUsersSchema } from '@open-kingdom/shared-backend-data-access-users';
+import { createConfigurableLookupsSchema } from '@open-kingdom/shared-backend-data-access-configurable-lookups';
+import { createActivityLogSchema } from '@open-kingdom/shared-backend-data-access-activity-log';
+import { createContactsSchema } from '@open-kingdom/crm-backend-data-access-contacts';
+import { createOpportunitiesSchema } from '@open-kingdom/crm-backend-data-access-opportunities';
 import type { AuthenticatedRequest } from '@open-kingdom/shared-backend-util-rbac';
 
 import { FeatureCrmModule } from './feature-crm.module';
 
+// A PREFIXED composition — the embedded host mounts the CRM's tables inside a
+// database it may share with its own (SQL names become `emb_users` etc.; the
+// db.query keys and every service are oblivious). Factories receive their
+// same-prefix dependency tables, so composition follows FK order.
+const PREFIX = 'emb_';
+const usersSchema = createUsersSchema(PREFIX);
+const contactsSchema = createContactsSchema(
+  { users: usersSchema.users },
+  PREFIX
+);
 const schema = {
-  users,
-  configurableLookups,
-  activityLog,
-  companies,
-  contacts,
-  leads,
-  opportunities,
+  ...usersSchema,
+  ...createConfigurableLookupsSchema(PREFIX),
+  ...createActivityLogSchema({ users: usersSchema.users }, PREFIX),
+  ...contactsSchema,
+  ...createOpportunitiesSchema(
+    { users: usersSchema.users, ...contactsSchema },
+    PREFIX
+  ),
 };
 
 describe('embedded mode (no OpenKingdom auth stack)', () => {
@@ -66,10 +71,11 @@ describe('embedded mode (no OpenKingdom auth stack)', () => {
     const bootstrap = new Database(dbFile);
     for (const statement of statements) bootstrap.exec(statement);
     // The host's identity perimeter provisions local users itself — note the
-    // NULL password (externally-owned identity, no local credential).
+    // NULL password (externally-owned identity, no local credential) and the
+    // prefixed SQL table name.
     bootstrap
       .prepare(
-        `INSERT INTO users (first_name, last_name, email, password) VALUES (?, ?, ?, NULL)`
+        `INSERT INTO emb_users (first_name, last_name, email, password) VALUES (?, ?, ?, NULL)`
       )
       .run('Host', 'User', 'host@example.test');
     bootstrap.close();
