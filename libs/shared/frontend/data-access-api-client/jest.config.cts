@@ -22,7 +22,6 @@ module.exports = {
     '!src/**/*.spec.{ts,js}',
     '!src/**/*.d.ts',
     '!src/lib/**/api.ts', // Exclude auto-generated API files
-    '!src/lib/baseApi.ts', // Exclude baseApi (setup file)
     '!src/lib/index.ts', // Exclude index (re-exports)
     '!src/index.ts', // Exclude main index (re-exports)
     '!src/lib/**/openapi.json', // Exclude OpenAPI JSON files
