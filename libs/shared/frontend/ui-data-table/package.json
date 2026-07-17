@@ -1,6 +1,6 @@
 {
   "name": "@open-kingdom/shared-frontend-ui-data-table",
-  "version": "0.0.2-18",
+  "version": "0.0.2-19",
   "publishConfig": {
     "access": "public"
   },
@@ -36,8 +36,8 @@
     "tailwind-merge": "^3.0.0",
     "lucide-react": ">=0.400.0",
     "@react-hookz/web": "^25.0.0",
-    "@open-kingdom/shared-frontend-ui-theme": "0.0.2-18",
-    "@open-kingdom/shared-frontend-ui-primitives": "0.0.2-18"
+    "@open-kingdom/shared-frontend-ui-theme": "0.0.2-19",
+    "@open-kingdom/shared-frontend-ui-primitives": "0.0.2-19"
   },
   "dependencies": {
     "@tanstack/react-table": "^8.20.0"

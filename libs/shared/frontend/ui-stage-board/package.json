@@ -1,6 +1,6 @@
 {
   "name": "@open-kingdom/shared-frontend-ui-stage-board",
-  "version": "0.0.2-18",
+  "version": "0.0.2-19",
   "publishConfig": {
     "access": "public"
   },
@@ -34,6 +34,6 @@
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "@dnd-kit/core": "^6.0.0",
-    "@open-kingdom/shared-frontend-ui-theme": "0.0.2-18"
+    "@open-kingdom/shared-frontend-ui-theme": "0.0.2-19"
   }
 }

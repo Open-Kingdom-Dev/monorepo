@@ -1,6 +1,6 @@
 {
   "name": "@open-kingdom/shared-frontend-ui-record-detail",
-  "version": "0.0.2-18",
+  "version": "0.0.2-19",
   "publishConfig": {
     "access": "public"
   },
@@ -33,7 +33,7 @@
   "peerDependencies": {
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "@open-kingdom/shared-frontend-ui-theme": "0.0.2-18",
-    "@open-kingdom/shared-frontend-ui-primitives": "0.0.2-18"
+    "@open-kingdom/shared-frontend-ui-theme": "0.0.2-19",
+    "@open-kingdom/shared-frontend-ui-primitives": "0.0.2-19"
   }
 }
