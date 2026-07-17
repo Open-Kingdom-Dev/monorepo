@@ -1,6 +1,6 @@
 {
   "name": "@open-kingdom/shared-backend-feature-youtube",
-  "version": "0.0.2-18",
+  "version": "0.0.2-19",
   "type": "module",
   "publishConfig": {
     "access": "public"
@@ -27,8 +27,8 @@
     "@nestjs/common": "^11.0.0",
     "@nestjs/swagger": "^11.0.0",
     "axios": "^1.6.0",
-    "@open-kingdom/shared-backend-util-rbac": "0.0.2-18",
-    "@open-kingdom/shared-backend-integration-test-doubles": "0.0.2-18"
+    "@open-kingdom/shared-backend-util-rbac": "0.0.2-19",
+    "@open-kingdom/shared-backend-integration-test-doubles": "0.0.2-19"
   },
   "nx": {
     "name": "@open-kingdom/shared-backend-feature-youtube",

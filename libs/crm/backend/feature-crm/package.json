@@ -1,6 +1,6 @@
 {
   "name": "@open-kingdom/crm-backend-feature-crm",
-  "version": "0.0.2-18",
+  "version": "0.0.2-19",
   "publishConfig": {
     "access": "public"
   },
@@ -31,13 +31,13 @@
   },
   "dependencies": {
     "tslib": "^2.3.0",
-    "@open-kingdom/crm-poly-util-domain": "0.0.2-18",
-    "@open-kingdom/shared-backend-util-rbac": "0.0.2-18",
-    "@open-kingdom/shared-backend-data-access-configurable-lookups": "0.0.2-18",
-    "@open-kingdom/shared-backend-data-access-activity-log": "0.0.2-18",
-    "@open-kingdom/crm-backend-data-access-contacts": "0.0.2-18",
-    "@open-kingdom/crm-backend-data-access-opportunities": "0.0.2-18",
-    "@open-kingdom/shared-backend-feature-user-management": "0.0.2-18",
+    "@open-kingdom/crm-poly-util-domain": "0.0.2-19",
+    "@open-kingdom/shared-backend-util-rbac": "0.0.2-19",
+    "@open-kingdom/shared-backend-data-access-configurable-lookups": "0.0.2-19",
+    "@open-kingdom/shared-backend-data-access-activity-log": "0.0.2-19",
+    "@open-kingdom/crm-backend-data-access-contacts": "0.0.2-19",
+    "@open-kingdom/crm-backend-data-access-opportunities": "0.0.2-19",
+    "@open-kingdom/shared-backend-feature-user-management": "0.0.2-19",
     "@nestjs/common": "^11.0.0",
     "@nestjs/swagger": "^11.0.0"
   }

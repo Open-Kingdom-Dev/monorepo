@@ -1,6 +1,6 @@
 {
   "name": "@open-kingdom/crm-poly-util-domain",
-  "version": "0.0.2-18",
+  "version": "0.0.2-19",
   "publishConfig": {
     "access": "public"
   },

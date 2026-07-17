@@ -1,6 +1,6 @@
 {
   "name": "@open-kingdom/shared-frontend-data-access-logger",
-  "version": "0.0.2-18",
+  "version": "0.0.2-19",
   "publishConfig": {
     "access": "public"
   },
