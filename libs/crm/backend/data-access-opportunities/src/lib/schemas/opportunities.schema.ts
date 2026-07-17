@@ -58,7 +58,9 @@ export function createOpportunitiesTable(
       t.index(`${prefix}opportunities_owner_idx`).on(tbl.ownerId),
       t.index(`${prefix}opportunities_stage_idx`).on(tbl.stage),
       t.index(`${prefix}opportunities_company_idx`).on(tbl.companyId),
-      t.index(`${prefix}opportunities_close_date_idx`).on(tbl.expectedCloseDate),
+      t
+        .index(`${prefix}opportunities_close_date_idx`)
+        .on(tbl.expectedCloseDate),
     ]
   );
 }

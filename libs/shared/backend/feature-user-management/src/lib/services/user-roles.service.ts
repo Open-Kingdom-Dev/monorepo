@@ -65,7 +65,10 @@ export class UserRolesService implements RoleResolver {
     assignedBy?: number | null
   ): Promise<void> {
     const existing = await this.db.query.userRoles.findFirst({
-      where: and(eq(this.userRoles.userId, userId), eq(this.userRoles.roleId, roleId)),
+      where: and(
+        eq(this.userRoles.userId, userId),
+        eq(this.userRoles.roleId, roleId)
+      ),
     });
 
     if (existing) return;
@@ -81,7 +84,12 @@ export class UserRolesService implements RoleResolver {
   async removeRole(userId: number, roleId: number): Promise<void> {
     await this.db
       .delete(this.userRoles)
-      .where(and(eq(this.userRoles.userId, userId), eq(this.userRoles.roleId, roleId)));
+      .where(
+        and(
+          eq(this.userRoles.userId, userId),
+          eq(this.userRoles.roleId, roleId)
+        )
+      );
   }
 
   async setRoles(

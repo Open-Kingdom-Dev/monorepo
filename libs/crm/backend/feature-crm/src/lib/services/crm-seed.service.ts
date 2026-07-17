@@ -79,9 +79,9 @@ export class CrmSeedService implements OnModuleInit {
         );
         continue;
       }
-      const existingPermissionIds = (
-        await permissions.findByRole(role.id)
-      ).map((p) => p.id);
+      const existingPermissionIds = (await permissions.findByRole(role.id)).map(
+        (p) => p.id
+      );
       const mergedIds = new Set<number>(existingPermissionIds);
       for (const perm of perms) {
         const existing = await permissions.findByResourceAction(
@@ -100,10 +100,7 @@ export class CrmSeedService implements OnModuleInit {
         }
       }
       if (mergedIds.size > existingPermissionIds.length) {
-        await permissions.setRolePermissions(
-          role.id,
-          Array.from(mergedIds)
-        );
+        await permissions.setRolePermissions(role.id, Array.from(mergedIds));
         this.logger.log(
           `Mapped ${
             mergedIds.size - existingPermissionIds.length

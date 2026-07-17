@@ -30,10 +30,7 @@ describe('createOpportunitiesSchema', () => {
   describe('prefixed schema', () => {
     const prefix = 'pfx_';
     const pfxUsers = createUsersSchema(prefix);
-    const pfxContacts = createContactsSchema(
-      { users: pfxUsers.users },
-      prefix
-    );
+    const pfxContacts = createContactsSchema({ users: pfxUsers.users }, prefix);
     const pfx = createOpportunitiesSchema(
       {
         users: pfxUsers.users,

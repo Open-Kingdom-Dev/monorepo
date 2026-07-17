@@ -28,14 +28,12 @@ describe('baseApi dynamic base URL', () => {
   let fetchMock: jest.SpyInstance;
 
   beforeEach(() => {
-    fetchMock = jest
-      .spyOn(globalThis, 'fetch')
-      .mockResolvedValue(
-        new Response(JSON.stringify({ ok: true }), {
-          status: 200,
-          headers: { 'content-type': 'application/json' },
-        })
-      );
+    fetchMock = jest.spyOn(globalThis, 'fetch').mockResolvedValue(
+      new Response(JSON.stringify({ ok: true }), {
+        status: 200,
+        headers: { 'content-type': 'application/json' },
+      })
+    );
   });
 
   afterEach(() => {

@@ -111,7 +111,7 @@ describe('InvitationsService', () => {
       providers: [
         InvitationsService,
         { provide: DB_TAG, useValue: mockDb },
-          { provide: SCHEMA_TAG, useValue: { invitations, roles } },
+        { provide: SCHEMA_TAG, useValue: { invitations, roles } },
         { provide: USER_MANAGEMENT_OPTIONS, useValue: mockOptions },
         { provide: UsersService, useValue: mockUsersService },
         { provide: UserRolesService, useValue: mockUserRolesService },

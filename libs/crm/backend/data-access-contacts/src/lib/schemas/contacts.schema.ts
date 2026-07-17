@@ -56,7 +56,9 @@ export function createContactsTable(
       t.index(`${prefix}contacts_owner_idx`).on(tbl.ownerId),
       t.index(`${prefix}contacts_company_idx`).on(tbl.companyId),
       t.index(`${prefix}contacts_email_idx`).on(tbl.email),
-      t.index(`${prefix}contacts_last_first_idx`).on(tbl.lastName, tbl.firstName),
+      t
+        .index(`${prefix}contacts_last_first_idx`)
+        .on(tbl.lastName, tbl.firstName),
     ]
   );
 }

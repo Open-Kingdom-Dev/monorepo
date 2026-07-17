@@ -67,10 +67,10 @@ import { leads, opportunities } from '@open-kingdom/crm-backend-data-access-oppo
 
 ## Configuration
 
-| Option         | Type                             | Default  | Description                                                                                                                      |
-| -------------- | -------------------------------- | -------- | --------------------------------------------------------------------------------------------------------------------------------- |
-| `seed`         | `'none' \| 'lookups' \| 'full'`  | `'full'` | What `CrmSeedService` seeds on init. `'lookups'` seeds dropdown data only and works WITHOUT `FeatureUserManagementModule` — for embedded hosts that bring their own identity/RBAC. `'full'` additionally maps the baseline CRM permissions onto the system roles. |
-| `seedDefaults` | `boolean`                        | `true`   | **Deprecated** — use `seed`. `true` ≡ `'full'`, `false` ≡ `'none'`. Ignored when `seed` is set.                                    |
+| Option         | Type                            | Default  | Description                                                                                                                                                                                                                                                       |
+| -------------- | ------------------------------- | -------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `seed`         | `'none' \| 'lookups' \| 'full'` | `'full'` | What `CrmSeedService` seeds on init. `'lookups'` seeds dropdown data only and works WITHOUT `FeatureUserManagementModule` — for embedded hosts that bring their own identity/RBAC. `'full'` additionally maps the baseline CRM permissions onto the system roles. |
+| `seedDefaults` | `boolean`                       | `true`   | **Deprecated** — use `seed`. `true` ≡ `'full'`, `false` ≡ `'none'`. Ignored when `seed` is set.                                                                                                                                                                   |
 
 ### Embedded hosts (no OpenKingdom auth stack)
 

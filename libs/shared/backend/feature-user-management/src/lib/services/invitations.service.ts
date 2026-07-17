@@ -249,7 +249,9 @@ export class InvitationsService {
       error instanceof Error ? error.stack : undefined
     );
 
-    await this.db.delete(this.invitations).where(eq(this.invitations.token, token));
+    await this.db
+      .delete(this.invitations)
+      .where(eq(this.invitations.token, token));
 
     throw new BadGatewayException(
       'Invitation could not be sent - email delivery failed'

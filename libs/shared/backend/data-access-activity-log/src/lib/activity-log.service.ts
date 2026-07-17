@@ -31,7 +31,8 @@ export class ActivityLogService {
   private readonly activityLog: ActivityLogSchema['activityLog'];
 
   constructor(
-    @Inject(DB_TAG) private readonly db: BetterSQLite3Database<ActivityLogSchema>,
+    @Inject(DB_TAG)
+    private readonly db: BetterSQLite3Database<ActivityLogSchema>,
     @Inject(SCHEMA_TAG) schema: ActivityLogSchema,
     @Optional()
     @Inject(ACTIVITY_LOG_OPTIONS)
@@ -80,7 +81,10 @@ export class ActivityLogService {
       .select()
       .from(this.activityLog)
       .where(
-        and(eq(this.activityLog.ownerId, ownerId), isNull(this.activityLog.completedAt))
+        and(
+          eq(this.activityLog.ownerId, ownerId),
+          isNull(this.activityLog.completedAt)
+        )
       )
       .orderBy(asc(this.activityLog.dueAt), asc(this.activityLog.id))
       .all();

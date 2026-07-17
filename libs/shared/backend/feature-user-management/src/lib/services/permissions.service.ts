@@ -62,7 +62,10 @@ export class PermissionsService {
     return this.db
       .select(getTableColumns(this.permissions))
       .from(this.rolePermissions)
-      .innerJoin(this.permissions, eq(this.rolePermissions.permissionId, this.permissions.id))
+      .innerJoin(
+        this.permissions,
+        eq(this.rolePermissions.permissionId, this.permissions.id)
+      )
       .where(eq(this.rolePermissions.roleId, roleId));
   }
 
@@ -73,8 +76,14 @@ export class PermissionsService {
         action: this.permissions.action,
       })
       .from(this.userRoles)
-      .innerJoin(this.rolePermissions, eq(this.userRoles.roleId, this.rolePermissions.roleId))
-      .innerJoin(this.permissions, eq(this.rolePermissions.permissionId, this.permissions.id))
+      .innerJoin(
+        this.rolePermissions,
+        eq(this.userRoles.roleId, this.rolePermissions.roleId)
+      )
+      .innerJoin(
+        this.permissions,
+        eq(this.rolePermissions.permissionId, this.permissions.id)
+      )
       .where(eq(this.userRoles.userId, userId));
 
     const unique = new Set(rows.map((r) => `${r.resource}:${r.action}`));

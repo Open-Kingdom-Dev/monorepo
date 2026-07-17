@@ -90,12 +90,10 @@ describe('embedded mode (no OpenKingdom auth stack)', () => {
     app = moduleRef.createNestApplication();
     // The host's auth middleware: identity was already verified upstream;
     // stamp the id the CRM controllers use for ownership.
-    app.use(
-      (req: AuthenticatedRequest, _res: unknown, next: () => void) => {
-        req.user = { id: 1, email: 'host@example.test' };
-        next();
-      }
-    );
+    app.use((req: AuthenticatedRequest, _res: unknown, next: () => void) => {
+      req.user = { id: 1, email: 'host@example.test' };
+      next();
+    });
     app.setGlobalPrefix('api');
     await app.init();
     await app.listen(0);

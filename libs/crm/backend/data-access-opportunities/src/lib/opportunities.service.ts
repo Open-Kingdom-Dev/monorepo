@@ -67,7 +67,10 @@ export class OpportunitiesService {
       .select()
       .from(this.opportunities)
       .where(conditions.length ? and(...conditions) : undefined)
-      .orderBy(asc(this.opportunities.expectedCloseDate), asc(this.opportunities.id))
+      .orderBy(
+        asc(this.opportunities.expectedCloseDate),
+        asc(this.opportunities.id)
+      )
       .all();
     if (filter.openOnly) {
       return rows.filter(

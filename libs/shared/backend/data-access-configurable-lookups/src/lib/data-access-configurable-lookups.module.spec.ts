@@ -27,7 +27,11 @@ describe('DataAccessConfigurableLookupsModule', () => {
 
   beforeEach(async () => {
     module = await Test.createTestingModule({
-      imports: [FakeDbModule, TestSchemaModule, DataAccessConfigurableLookupsModule],
+      imports: [
+        FakeDbModule,
+        TestSchemaModule,
+        DataAccessConfigurableLookupsModule,
+      ],
     }).compile();
   });
 

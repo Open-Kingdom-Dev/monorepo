@@ -38,7 +38,10 @@ export class ConfigurableLookupsService {
       .select()
       .from(this.configurableLookups)
       .where(eq(this.configurableLookups.listKey, listKey))
-      .orderBy(asc(this.configurableLookups.sortOrder), asc(this.configurableLookups.id))
+      .orderBy(
+        asc(this.configurableLookups.sortOrder),
+        asc(this.configurableLookups.id)
+      )
       .all();
     return opts.includeInactive ? rows : rows.filter((r) => r.isActive === 1);
   }
