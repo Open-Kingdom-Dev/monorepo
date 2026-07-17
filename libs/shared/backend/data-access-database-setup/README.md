@@ -71,8 +71,46 @@ export class AppModule {}
 3. Each entry in `options.pragmas` is applied synchronously before any queries run.
 4. Drizzle ORM wraps the connection using the provided `options.schema`.
 5. The resulting `BetterSQLite3Database<TSchema>` is provided under the `DB_TAG` token and exported globally.
+6. The composed schema object itself is provided under the `SCHEMA_TAG` token (also global) — services resolve their table objects through it rather than importing module-scope singletons.
 
 Migration execution is **not** performed automatically. Migrations are managed via `drizzle-kit` scripts in the application's `package.json`. The typical scripts are `db:generate` (runs `drizzle-kit generate`) and `db:migrate` (runs `drizzle-kit migrate`), both pointing to a `drizzle.config.ts` configuration file.
+
+---
+
+## Composing a prefixed schema (embedded hosts)
+
+Every data-access lib exports a `create*Schema` factory alongside its default table
+singletons. A host that mounts OpenKingdom tables inside an existing database (or mounts
+several instances in one file) composes a prefixed schema and passes it to `register()` —
+FK-dependency order matters, since each factory receives its same-prefix dependencies:
+
+```typescript
+import { createUsersSchema } from '@open-kingdom/shared-backend-data-access-users';
+import { createConfigurableLookupsSchema } from '@open-kingdom/shared-backend-data-access-configurable-lookups';
+import { createActivityLogSchema } from '@open-kingdom/shared-backend-data-access-activity-log';
+import { createContactsSchema } from '@open-kingdom/crm-backend-data-access-contacts';
+import { createOpportunitiesSchema } from '@open-kingdom/crm-backend-data-access-opportunities';
+
+const prefix = 'crm1_';
+const usersSchema = createUsersSchema(prefix);
+const contactsSchema = createContactsSchema({ users: usersSchema.users }, prefix);
+const schema = {
+  ...usersSchema,
+  ...createConfigurableLookupsSchema(prefix),
+  ...createActivityLogSchema({ users: usersSchema.users }, prefix),
+  ...contactsSchema,
+  ...createOpportunitiesSchema({ users: usersSchema.users, ...contactsSchema }, prefix),
+};
+
+DatabaseSetupModule.register({ schema, filename: 'shared.db' });
+```
+
+SQL table and index names get the prefix (`crm1_contacts`); the JS schema keys — and
+therefore the relational `db.query.contacts.*` API and all inferred types — are unchanged.
+DDL for a prefixed schema is generated with `drizzle-kit` against the composed object
+(programmatically via `generateSQLiteDrizzleJson`/`generateSQLiteMigration` from
+`drizzle-kit/api` — see `embedded-mode.integration.spec.ts` in `crm-backend-feature-crm`
+for a complete example).
 
 ---
 
@@ -91,6 +129,19 @@ export class MyService {
   async findAll() {
     return this.db.query.myTable.findMany();
   }
+}
+```
+
+Services that build queries against table objects should resolve them via `SCHEMA_TAG`
+(the composed schema) instead of importing the singletons, so they work against prefixed
+schemas too:
+
+```typescript
+constructor(
+  @Inject(DB_TAG) private db: BetterSQLite3Database<ContactsSchema>,
+  @Inject(SCHEMA_TAG) schema: ContactsSchema
+) {
+  this.contacts = schema.contacts;
 }
 ```
 

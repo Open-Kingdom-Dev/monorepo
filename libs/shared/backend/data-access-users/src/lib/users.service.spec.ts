@@ -3,7 +3,7 @@ import { BetterSQLite3Database } from 'drizzle-orm/better-sqlite3';
 import { eq } from 'drizzle-orm';
 import * as bcrypt from 'bcrypt';
 
-import { DB_TAG } from '@open-kingdom/shared-poly-util-constants';
+import { DB_TAG, SCHEMA_TAG } from '@open-kingdom/shared-poly-util-constants';
 import { users, User } from './schemas';
 import { UsersService } from './users.service';
 
@@ -48,6 +48,10 @@ describe('UsersService', () => {
         {
           provide: DB_TAG,
           useValue: mockDb,
+        },
+        {
+          provide: SCHEMA_TAG,
+          useValue: { users },
         },
       ],
     }).compile();
@@ -273,6 +277,39 @@ describe('UsersService', () => {
 
       expect(mockDb.delete).toHaveBeenCalledWith(users);
       expect(mockDb.delete(users).where).toHaveBeenCalledWith(eq(users.id, 1));
+    });
+  });
+
+  describe('externally-provisioned users (no password)', () => {
+    const externalUser = {
+      firstName: 'Ext',
+      lastName: 'User',
+      email: 'ext@example.com',
+    };
+
+    it('create stores a null password and skips hashing when none is given', async () => {
+      const createdUser: User = { id: 2, ...externalUser, password: null };
+      mockQuery.users.findFirst.mockResolvedValue(createdUser);
+
+      const result = await service.create(externalUser);
+
+      expect(mockedBcrypt.hash).not.toHaveBeenCalled();
+      expect(mockDb.insert(users).values).toHaveBeenCalledWith(
+        expect.objectContaining({ password: null })
+      );
+      expect(result).toEqual(createdUser);
+    });
+
+    it('ensureUser inserts a passwordless row when the user is absent', async () => {
+      const createdUser: User = { id: 3, ...externalUser, password: null };
+      mockQuery.users.findFirst
+        .mockResolvedValueOnce(undefined) // findOne miss
+        .mockResolvedValue(createdUser); // post-insert read
+
+      const result = await service.ensureUser(externalUser);
+
+      expect(mockedBcrypt.hash).not.toHaveBeenCalled();
+      expect(result).toEqual(createdUser);
     });
   });
 });

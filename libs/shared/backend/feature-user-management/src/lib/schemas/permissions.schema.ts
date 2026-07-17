@@ -1,18 +1,26 @@
-import { sqliteTable as table } from 'drizzle-orm/sqlite-core';
 import * as t from 'drizzle-orm/sqlite-core';
 
 export const PermissionsTableName = 'permissions';
 
-export const permissions = table(
-  PermissionsTableName,
-  {
-    id: t.int().primaryKey({ autoIncrement: true }),
-    resource: t.text().notNull(),
-    action: t.text().notNull(),
-    description: t.text(),
-  },
-  (tbl) => [t.unique().on(tbl.resource, tbl.action)]
-);
+/**
+ * Builds the permissions table with the host-supplied table creator (plain or
+ * prefixed). Composed into the lib schema by `createUserManagementSchema`
+ * in ./index.ts, which also exports the default (unprefixed) singleton.
+ */
+export function createPermissionsTable(table: t.SQLiteTableFn) {
+  return table(
+    PermissionsTableName,
+    {
+      id: t.int().primaryKey({ autoIncrement: true }),
+      resource: t.text().notNull(),
+      action: t.text().notNull(),
+      description: t.text(),
+    },
+    (tbl) => [t.unique().on(tbl.resource, tbl.action)]
+  );
+}
 
-export type Permission = typeof permissions.$inferSelect;
-export type NewPermission = typeof permissions.$inferInsert;
+export type PermissionsTable = ReturnType<typeof createPermissionsTable>;
+
+export type Permission = PermissionsTable['$inferSelect'];
+export type NewPermission = PermissionsTable['$inferInsert'];

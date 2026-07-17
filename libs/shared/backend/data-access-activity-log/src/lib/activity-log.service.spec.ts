@@ -2,7 +2,8 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { BetterSQLite3Database } from 'drizzle-orm/better-sqlite3';
 import { BadRequestException, NotFoundException } from '@nestjs/common';
 
-import { DB_TAG } from '@open-kingdom/shared-poly-util-constants';
+import { DB_TAG, SCHEMA_TAG } from '@open-kingdom/shared-poly-util-constants';
+import { activityLog } from './schemas';
 import { ActivityLogService } from './activity-log.service';
 import { ACTIVITY_LOG_OPTIONS } from './data-access-activity-log.options';
 
@@ -64,6 +65,7 @@ describe('ActivityLogService', () => {
       providers: [
         ActivityLogService,
         { provide: DB_TAG, useValue: mockDb as BetterSQLite3Database<never> },
+        { provide: SCHEMA_TAG, useValue: { activityLog } },
         {
           provide: ACTIVITY_LOG_OPTIONS,
           useValue: {

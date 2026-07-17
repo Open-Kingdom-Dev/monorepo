@@ -117,4 +117,44 @@ describe('CrmSeedService', () => {
     await service.onModuleInit();
     expect(permissions.setRolePermissions).not.toHaveBeenCalled();
   });
+
+  describe('seed modes (embedded hosts)', () => {
+    it("seed: 'none' seeds nothing", async () => {
+      service = await buildModule({ seed: 'none' });
+      await service.onModuleInit();
+      expect(lookups.seedDefaults).not.toHaveBeenCalled();
+      expect(roles.findByName).not.toHaveBeenCalled();
+    });
+
+    it("seed: 'lookups' seeds lookups but never touches roles/permissions", async () => {
+      service = await buildModule({ seed: 'lookups' });
+      await service.onModuleInit();
+      expect(lookups.seedDefaults).toHaveBeenCalled();
+      expect(roles.findByName).not.toHaveBeenCalled();
+      expect(permissions.findByRole).not.toHaveBeenCalled();
+    });
+
+    it('seed takes precedence over the legacy seedDefaults flag', async () => {
+      service = await buildModule({ seed: 'lookups', seedDefaults: false });
+      await service.onModuleInit();
+      expect(lookups.seedDefaults).toHaveBeenCalled();
+    });
+
+    it('boots and seeds lookups when user-management is not registered at all', async () => {
+      // No PermissionsService / RolesService providers — the @Optional
+      // injections resolve to undefined, matching an embedded host that
+      // brings its own identity stack.
+      const module: TestingModule = await Test.createTestingModule({
+        providers: [
+          CrmSeedService,
+          { provide: ConfigurableLookupsService, useValue: lookups },
+          { provide: CRM_FEATURE_OPTIONS, useValue: {} },
+        ],
+      }).compile();
+      service = module.get(CrmSeedService);
+
+      await expect(service.onModuleInit()).resolves.toBeUndefined();
+      expect(lookups.seedDefaults).toHaveBeenCalled();
+    });
+  });
 });

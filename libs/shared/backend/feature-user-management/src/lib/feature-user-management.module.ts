@@ -50,7 +50,14 @@ export class FeatureUserManagementModule {
       ],
       providers: [
         { provide: USER_MANAGEMENT_OPTIONS, useValue: options },
-        { provide: EMAIL_SENDER, useExisting: EmailService },
+        // Optional: hosts without the email stack (e.g. embedded mode) can
+        // omit EmailModule — InvitationsService already tolerates a null
+        // sender (invites are created, just not emailed).
+        {
+          provide: EMAIL_SENDER,
+          useFactory: (email?: EmailService) => email ?? null,
+          inject: [{ token: EmailService, optional: true }],
+        },
         InvitationsService,
         UserManagementService,
         RolesService,

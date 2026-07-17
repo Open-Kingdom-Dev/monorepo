@@ -5,7 +5,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 
-import { DB_TAG } from '@open-kingdom/shared-poly-util-constants';
+import { DB_TAG, SCHEMA_TAG } from '@open-kingdom/shared-poly-util-constants';
 import { UsersService } from '@open-kingdom/shared-backend-data-access-users';
 import { InvitationsService } from './invitations.service';
 import { UserRolesService } from './user-roles.service';
@@ -15,7 +15,8 @@ import {
   INVITATION_STATUS,
 } from '../types';
 import type { EmailSender } from '../types';
-import { invitations, Invitation } from '../schemas/invitations.schema';
+import { invitations, roles } from '../schemas';
+import type { Invitation } from '../schemas/invitations.schema';
 
 interface MockQuery {
   invitations: {
@@ -110,6 +111,7 @@ describe('InvitationsService', () => {
       providers: [
         InvitationsService,
         { provide: DB_TAG, useValue: mockDb },
+        { provide: SCHEMA_TAG, useValue: { invitations, roles } },
         { provide: USER_MANAGEMENT_OPTIONS, useValue: mockOptions },
         { provide: UsersService, useValue: mockUsersService },
         { provide: UserRolesService, useValue: mockUserRolesService },
@@ -185,6 +187,7 @@ describe('InvitationsService', () => {
         providers: [
           InvitationsService,
           { provide: DB_TAG, useValue: mockDb },
+          { provide: SCHEMA_TAG, useValue: { invitations, roles } },
           { provide: USER_MANAGEMENT_OPTIONS, useValue: mockOptions },
           { provide: UsersService, useValue: mockUsersService },
           { provide: UserRolesService, useValue: mockUserRolesService },
@@ -227,6 +230,7 @@ describe('InvitationsService', () => {
         providers: [
           InvitationsService,
           { provide: DB_TAG, useValue: mockDb },
+          { provide: SCHEMA_TAG, useValue: { invitations, roles } },
           { provide: USER_MANAGEMENT_OPTIONS, useValue: mockOptions },
           { provide: UsersService, useValue: mockUsersService },
           { provide: UserRolesService, useValue: mockUserRolesService },
@@ -265,6 +269,7 @@ describe('InvitationsService', () => {
         providers: [
           InvitationsService,
           { provide: DB_TAG, useValue: mockDb },
+          { provide: SCHEMA_TAG, useValue: { invitations, roles } },
           { provide: USER_MANAGEMENT_OPTIONS, useValue: mockOptions },
           { provide: UsersService, useValue: mockUsersService },
           { provide: UserRolesService, useValue: mockUserRolesService },
@@ -301,6 +306,7 @@ describe('InvitationsService', () => {
         providers: [
           InvitationsService,
           { provide: DB_TAG, useValue: mockDb },
+          { provide: SCHEMA_TAG, useValue: { invitations, roles } },
           { provide: USER_MANAGEMENT_OPTIONS, useValue: mockOptions },
           { provide: UsersService, useValue: mockUsersService },
           { provide: UserRolesService, useValue: mockUserRolesService },
@@ -337,6 +343,7 @@ describe('InvitationsService', () => {
         providers: [
           InvitationsService,
           { provide: DB_TAG, useValue: mockDb },
+          { provide: SCHEMA_TAG, useValue: { invitations, roles } },
           { provide: USER_MANAGEMENT_OPTIONS, useValue: mockOptions },
           { provide: UsersService, useValue: mockUsersService },
           { provide: UserRolesService, useValue: mockUserRolesService },
@@ -378,6 +385,7 @@ describe('InvitationsService', () => {
         providers: [
           InvitationsService,
           { provide: DB_TAG, useValue: mockDb },
+          { provide: SCHEMA_TAG, useValue: { invitations, roles } },
           {
             provide: USER_MANAGEMENT_OPTIONS,
             useValue: optionsWithoutExpiry,

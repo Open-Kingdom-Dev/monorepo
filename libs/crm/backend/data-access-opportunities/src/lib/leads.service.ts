@@ -7,13 +7,9 @@ import {
 import { BetterSQLite3Database } from 'drizzle-orm/better-sqlite3';
 import { and, asc, eq, like, or } from 'drizzle-orm';
 
-import { DB_TAG } from '@open-kingdom/shared-poly-util-constants';
-import { Lead, LeadsTableName, leads } from './schemas';
+import { DB_TAG, SCHEMA_TAG } from '@open-kingdom/shared-poly-util-constants';
+import type { Lead, OpportunitiesSchema } from './schemas';
 import { CreateLeadDto, UpdateLeadDto } from './dtos';
-
-type schema = {
-  [LeadsTableName]: typeof leads;
-};
 
 export interface LeadFilter {
   ownerId?: number;
@@ -24,38 +20,47 @@ export interface LeadFilter {
 
 @Injectable()
 export class LeadsService {
+  // Tables come from the host-composed schema (SCHEMA_TAG) rather than the
+  // module-scope singletons, so a prefixed schema (embedded mode) works
+  // transparently.
+  private readonly leads: OpportunitiesSchema['leads'];
+
   constructor(
-    @Inject(DB_TAG) private readonly db: BetterSQLite3Database<schema>
-  ) {}
+    @Inject(DB_TAG)
+    private readonly db: BetterSQLite3Database<OpportunitiesSchema>,
+    @Inject(SCHEMA_TAG) schema: OpportunitiesSchema
+  ) {
+    this.leads = schema.leads;
+  }
 
   async findAll(filter: LeadFilter = {}): Promise<Lead[]> {
     const conditions = [];
     if (filter.ownerId !== undefined) {
-      conditions.push(eq(leads.ownerId, filter.ownerId));
+      conditions.push(eq(this.leads.ownerId, filter.ownerId));
     }
     if (filter.status) {
-      conditions.push(eq(leads.status, filter.status));
+      conditions.push(eq(this.leads.status, filter.status));
     }
     if (filter.search) {
       const wildcard = `%${filter.search}%`;
       const searchCond = or(
-        like(leads.name, wildcard),
-        like(leads.companyName, wildcard),
-        like(leads.email, wildcard),
-        like(leads.phone, wildcard)
+        like(this.leads.name, wildcard),
+        like(this.leads.companyName, wildcard),
+        like(this.leads.email, wildcard),
+        like(this.leads.phone, wildcard)
       );
       if (searchCond) conditions.push(searchCond);
     }
     return this.db
       .select()
-      .from(leads)
+      .from(this.leads)
       .where(conditions.length ? and(...conditions) : undefined)
-      .orderBy(asc(leads.createdAt))
+      .orderBy(asc(this.leads.createdAt))
       .all();
   }
 
   async findById(id: number): Promise<Lead | undefined> {
-    return this.db.query.leads.findFirst({ where: eq(leads.id, id) });
+    return this.db.query.leads.findFirst({ where: eq(this.leads.id, id) });
   }
 
   async create(input: CreateLeadDto, defaultOwnerId: number): Promise<Lead> {
@@ -66,7 +71,7 @@ export class LeadsService {
     }
     const { ownerId, status, ...rest } = input;
     const [row] = await this.db
-      .insert(leads)
+      .insert(this.leads)
       .values({
         ...rest,
         name: input.name,
@@ -84,9 +89,9 @@ export class LeadsService {
       Object.entries(input).filter(([, v]) => v !== undefined)
     );
     const [row] = await this.db
-      .update(leads)
+      .update(this.leads)
       .set({ ...patch, updatedAt: new Date() })
-      .where(eq(leads.id, id))
+      .where(eq(this.leads.id, id))
       .returning();
     return row;
   }
@@ -99,7 +104,7 @@ export class LeadsService {
     const current = await this.findById(id);
     if (!current) throw new NotFoundException(`Lead ${id} not found`);
     const [row] = await this.db
-      .update(leads)
+      .update(this.leads)
       .set({
         status: 'qualified',
         convertedAt: new Date(),
@@ -107,7 +112,7 @@ export class LeadsService {
         convertedToCompanyId: companyId,
         updatedAt: new Date(),
       })
-      .where(eq(leads.id, id))
+      .where(eq(this.leads.id, id))
       .returning();
     return row;
   }
@@ -115,6 +120,6 @@ export class LeadsService {
   async delete(id: number): Promise<void> {
     const current = await this.findById(id);
     if (!current) throw new NotFoundException(`Lead ${id} not found`);
-    await this.db.delete(leads).where(eq(leads.id, id));
+    await this.db.delete(this.leads).where(eq(this.leads.id, id));
   }
 }

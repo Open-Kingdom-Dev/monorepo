@@ -7,13 +7,9 @@ import {
 import { BetterSQLite3Database } from 'drizzle-orm/better-sqlite3';
 import { and, asc, eq, like, or } from 'drizzle-orm';
 
-import { DB_TAG } from '@open-kingdom/shared-poly-util-constants';
-import { Company, CompaniesTableName, companies } from './schemas';
+import { DB_TAG, SCHEMA_TAG } from '@open-kingdom/shared-poly-util-constants';
+import type { Company, ContactsSchema } from './schemas';
 import { CreateCompanyDto, UpdateCompanyDto } from './dtos';
-
-type schema = {
-  [CompaniesTableName]: typeof companies;
-};
 
 export interface CompanyFilter {
   ownerId?: number;
@@ -24,41 +20,49 @@ export interface CompanyFilter {
 
 @Injectable()
 export class CompaniesService {
+  // Tables come from the host-composed schema (SCHEMA_TAG) rather than the
+  // module-scope singletons, so a prefixed schema (embedded mode) works
+  // transparently.
+  private readonly companies: ContactsSchema['companies'];
+
   constructor(
-    @Inject(DB_TAG) private readonly db: BetterSQLite3Database<schema>
-  ) {}
+    @Inject(DB_TAG) private readonly db: BetterSQLite3Database<ContactsSchema>,
+    @Inject(SCHEMA_TAG) schema: ContactsSchema
+  ) {
+    this.companies = schema.companies;
+  }
 
   async findAll(filter: CompanyFilter = {}): Promise<Company[]> {
     const conditions = [];
     if (!filter.includeArchived) {
-      conditions.push(eq(companies.isArchived, 0));
+      conditions.push(eq(this.companies.isArchived, 0));
     }
     if (filter.ownerId !== undefined) {
-      conditions.push(eq(companies.ownerId, filter.ownerId));
+      conditions.push(eq(this.companies.ownerId, filter.ownerId));
     }
     if (filter.status) {
-      conditions.push(eq(companies.status, filter.status));
+      conditions.push(eq(this.companies.status, filter.status));
     }
     if (filter.search) {
       const wildcard = `%${filter.search}%`;
       const searchCond = or(
-        like(companies.name, wildcard),
-        like(companies.website, wildcard),
-        like(companies.industry, wildcard)
+        like(this.companies.name, wildcard),
+        like(this.companies.website, wildcard),
+        like(this.companies.industry, wildcard)
       );
       if (searchCond) conditions.push(searchCond);
     }
     return this.db
       .select()
-      .from(companies)
+      .from(this.companies)
       .where(conditions.length ? and(...conditions) : undefined)
-      .orderBy(asc(companies.name))
+      .orderBy(asc(this.companies.name))
       .all();
   }
 
   async findById(id: number): Promise<Company | undefined> {
     return this.db.query.companies.findFirst({
-      where: eq(companies.id, id),
+      where: eq(this.companies.id, id),
     });
   }
 
@@ -68,7 +72,7 @@ export class CompaniesService {
   ): Promise<Company> {
     const { ownerId, status, ...rest } = input;
     const [row] = await this.db
-      .insert(companies)
+      .insert(this.companies)
       .values({
         ...rest,
         name: input.name,
@@ -87,9 +91,9 @@ export class CompaniesService {
       Object.entries(input).filter(([, v]) => v !== undefined)
     );
     const [row] = await this.db
-      .update(companies)
+      .update(this.companies)
       .set({ ...patch, updatedAt: new Date() })
-      .where(eq(companies.id, id))
+      .where(eq(this.companies.id, id))
       .returning();
     return row;
   }
@@ -98,9 +102,9 @@ export class CompaniesService {
     const current = await this.findById(id);
     if (!current) throw new NotFoundException(`Company ${id} not found`);
     const [row] = await this.db
-      .update(companies)
+      .update(this.companies)
       .set({ isArchived: 1, updatedAt: new Date() })
-      .where(eq(companies.id, id))
+      .where(eq(this.companies.id, id))
       .returning();
     return row;
   }
@@ -109,9 +113,9 @@ export class CompaniesService {
     const current = await this.findById(id);
     if (!current) throw new NotFoundException(`Company ${id} not found`);
     const [row] = await this.db
-      .update(companies)
+      .update(this.companies)
       .set({ isArchived: 0, updatedAt: new Date() })
-      .where(eq(companies.id, id))
+      .where(eq(this.companies.id, id))
       .returning();
     return row;
   }

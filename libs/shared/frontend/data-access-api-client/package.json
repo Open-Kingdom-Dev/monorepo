@@ -30,7 +30,9 @@
     ]
   },
   "dependencies": {
-    "@reduxjs/toolkit": "^2.8.2",
+    "@reduxjs/toolkit": "^2.8.2"
+  },
+  "devDependencies": {
     "vite": "^7.0.0",
     "@vitejs/plugin-react": "^4.2.0",
     "@nx/vite": "^22.3.3",

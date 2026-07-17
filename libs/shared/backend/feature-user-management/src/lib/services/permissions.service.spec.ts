@@ -1,7 +1,8 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { NotFoundException, BadRequestException } from '@nestjs/common';
 
-import { DB_TAG } from '@open-kingdom/shared-poly-util-constants';
+import { DB_TAG, SCHEMA_TAG } from '@open-kingdom/shared-poly-util-constants';
+import { permissions, rolePermissions, userRoles } from '../schemas';
 import { PermissionsService } from './permissions.service';
 import type { Permission } from '../schemas/permissions.schema';
 
@@ -84,7 +85,14 @@ describe('PermissionsService', () => {
     };
 
     const module: TestingModule = await Test.createTestingModule({
-      providers: [PermissionsService, { provide: DB_TAG, useValue: mockDb }],
+      providers: [
+        PermissionsService,
+        { provide: DB_TAG, useValue: mockDb },
+        {
+          provide: SCHEMA_TAG,
+          useValue: { permissions, rolePermissions, userRoles },
+        },
+      ],
     }).compile();
 
     service = module.get<PermissionsService>(PermissionsService);

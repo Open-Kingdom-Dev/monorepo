@@ -1,10 +1,20 @@
+import { Global, Module } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { DrizzleBetterSQLiteModule } from '@knaadh/nestjs-drizzle-better-sqlite3';
 
-import { DB_TAG } from '@open-kingdom/shared-poly-util-constants';
+import { DB_TAG, SCHEMA_TAG } from '@open-kingdom/shared-poly-util-constants';
 import { users } from './schemas';
 import { OpenKingdomDataAccessBackendUsersModule } from './data-access-backend-users.module';
 import { UsersService } from './users.service';
+
+// Stand-in for DatabaseSetupModule's global SCHEMA_TAG provider — services
+// resolve their tables through it (host-composable, prefixable schemas).
+@Global()
+@Module({
+  providers: [{ provide: SCHEMA_TAG, useValue: { users } }],
+  exports: [SCHEMA_TAG],
+})
+class TestSchemaModule {}
 
 describe('OpenKingdomDataAccessBackendUsersModule', () => {
   let module: TestingModule;
@@ -19,6 +29,7 @@ describe('OpenKingdomDataAccessBackendUsersModule', () => {
           },
           config: { schema: users },
         }),
+        TestSchemaModule,
         OpenKingdomDataAccessBackendUsersModule,
       ],
     }).compile();

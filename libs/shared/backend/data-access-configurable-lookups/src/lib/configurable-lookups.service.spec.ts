@@ -6,7 +6,8 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 
-import { DB_TAG } from '@open-kingdom/shared-poly-util-constants';
+import { DB_TAG, SCHEMA_TAG } from '@open-kingdom/shared-poly-util-constants';
+import { configurableLookups } from './schemas';
 import { ConfigurableLookupsService } from './configurable-lookups.service';
 
 describe('ConfigurableLookupsService', () => {
@@ -67,6 +68,7 @@ describe('ConfigurableLookupsService', () => {
       providers: [
         ConfigurableLookupsService,
         { provide: DB_TAG, useValue: mockDb as BetterSQLite3Database<never> },
+        { provide: SCHEMA_TAG, useValue: { configurableLookups } },
       ],
     }).compile();
     service = module.get(ConfigurableLookupsService);

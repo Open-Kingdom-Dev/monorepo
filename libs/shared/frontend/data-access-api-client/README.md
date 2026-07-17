@@ -99,13 +99,30 @@ Any `localStorage`-compatible object that implements `getItem(key)`, `setItem(ke
 
 ## Base API Behavior
 
-- `baseUrl` reads `process.env.VITE_API_BASE_URL` (empty string `''` if unset)
+- The base URL is resolved **per request**: a runtime override set via `setApiBaseUrl()` wins,
+  else the build-time `process.env.VITE_API_BASE_URL` define, else `''` (same-origin relative)
 - On every outgoing request, reads `state['auth'].token` from Redux state
 - If a token is present:
   - If a custom `AuthAdapter` is registered via `setAuthAdapter()`, calls `adapter.prepareHeaders(headers, token)`
   - Otherwise, sets `Authorization: Bearer <token>` by default
 - `endpoints` is empty (`endpoints: () => ({})`) — extended via `baseApi.injectEndpoints()` in generated code
 - Generated endpoint hooks are auto-injected at import time via `import './lib/demo-scaffold-backend/api'` in `src/index.ts`
+
+### Dynamic base URL (embedded hosts)
+
+Hosts that mount the backend at a path only known at runtime (e.g. `/api/app/{instance-id}`)
+call `setApiBaseUrl()` before (or after — it takes effect on the next request) creating the
+store, mirroring the `configureAuth()` pattern:
+
+```ts
+import { setApiBaseUrl } from '@open-kingdom/shared-frontend-data-access-api-client';
+
+setApiBaseUrl('/api/app/my-instance'); // origin/mount path only — endpoints already embed '/api/...'
+```
+
+- Pass `undefined` to restore the build-time default; `getApiBaseUrl()` returns the value in effect
+- The value must NOT include the `/api` suffix — every generated endpoint URL already starts with it
+- Trailing slashes are tolerated; string and object (`FetchArgs`) queries are both handled
 
 ---
 

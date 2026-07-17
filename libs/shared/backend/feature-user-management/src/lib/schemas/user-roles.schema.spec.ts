@@ -1,4 +1,4 @@
-import { userRoles, UserRolesTableName } from './user-roles.schema';
+import { userRoles, UserRolesTableName } from './index';
 import { getTableColumns } from 'drizzle-orm';
 
 describe('User role assignments', () => {

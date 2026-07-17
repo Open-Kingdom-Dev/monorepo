@@ -11,20 +11,14 @@ import { BetterSQLite3Database } from 'drizzle-orm/better-sqlite3';
 import { eq } from 'drizzle-orm';
 import { createHmac, randomBytes } from 'crypto';
 
-import { DB_TAG } from '@open-kingdom/shared-poly-util-constants';
+import { DB_TAG, SCHEMA_TAG } from '@open-kingdom/shared-poly-util-constants';
 import {
   UsersService,
   User,
-  users,
-  UsersTableName,
 } from '@open-kingdom/shared-backend-data-access-users';
 import { UserRolesService } from './user-roles.service';
-import {
-  invitations,
-  Invitation,
-  InvitationsTableName,
-} from '../schemas/invitations.schema';
-import { roles, RolesTableName } from '../schemas/roles.schema';
+import type { UserManagementSchema } from '../schemas';
+import type { Invitation } from '../schemas/invitations.schema';
 import {
   USER_MANAGEMENT_OPTIONS,
   EMAIL_SENDER,
@@ -42,12 +36,6 @@ import type {
 
 export type InvitationResponse = Omit<Invitation, 'token'>;
 
-type Schema = {
-  [UsersTableName]: typeof users;
-  [InvitationsTableName]: typeof invitations;
-  [RolesTableName]: typeof roles;
-};
-
 const MS_PER_DAY = 24 * 60 * 60 * 1000;
 const DEFAULT_EXPIRY_DAYS = 7;
 
@@ -55,14 +43,25 @@ const DEFAULT_EXPIRY_DAYS = 7;
 export class InvitationsService {
   private readonly logger = new Logger(InvitationsService.name);
 
+  // Tables come from the host-composed schema (SCHEMA_TAG) rather than the
+  // module-scope singletons, so a prefixed schema (embedded mode) works
+  // transparently.
+  private readonly invitations: UserManagementSchema['invitations'];
+  private readonly roles: UserManagementSchema['roles'];
+
   constructor(
-    @Inject(DB_TAG) private readonly db: BetterSQLite3Database<Schema>,
+    @Inject(DB_TAG)
+    private readonly db: BetterSQLite3Database<UserManagementSchema>,
+    @Inject(SCHEMA_TAG) schema: UserManagementSchema,
     @Inject(USER_MANAGEMENT_OPTIONS)
     private readonly options: UserManagementModuleOptions,
     private readonly usersService: UsersService,
     private readonly userRolesService: UserRolesService,
     @Optional() @Inject(EMAIL_SENDER) private readonly emailSender?: EmailSender
-  ) {}
+  ) {
+    this.invitations = schema.invitations;
+    this.roles = schema.roles;
+  }
 
   async invite(
     email: string,
@@ -75,7 +74,7 @@ export class InvitationsService {
     const role = await this.resolveRole(roleName);
     const { token, expiresAt } = this.generateToken(email);
 
-    await this.db.insert(invitations).values({
+    await this.db.insert(this.invitations).values({
       email,
       token,
       tokenExpiry: expiresAt,
@@ -152,7 +151,7 @@ export class InvitationsService {
 
   async cancel(id: number): Promise<void> {
     await this.findInvitationOrFail(id);
-    await this.db.delete(invitations).where(eq(invitations.id, id));
+    await this.db.delete(this.invitations).where(eq(this.invitations.id, id));
   }
 
   private async ensureUserDoesNotExist(email: string): Promise<void> {
@@ -165,7 +164,7 @@ export class InvitationsService {
 
   private async ensureNoPendingInvitation(email: string): Promise<void> {
     const existing = await this.db.query.invitations.findFirst({
-      where: eq(invitations.email, email),
+      where: eq(this.invitations.email, email),
     });
 
     if (
@@ -180,7 +179,7 @@ export class InvitationsService {
 
   private async resolveRole(roleName: string) {
     const role = await this.db.query.roles.findFirst({
-      where: eq(roles.name, roleName),
+      where: eq(this.roles.name, roleName),
     });
 
     if (!role) {
@@ -192,7 +191,7 @@ export class InvitationsService {
 
   private async findInvitationOrFail(id: number): Promise<Invitation> {
     const invitation = await this.db.query.invitations.findFirst({
-      where: eq(invitations.id, id),
+      where: eq(this.invitations.id, id),
     });
 
     if (!invitation) {
@@ -220,22 +219,22 @@ export class InvitationsService {
 
   private async findByToken(token: string): Promise<Invitation | undefined> {
     return this.db.query.invitations.findFirst({
-      where: eq(invitations.token, token),
+      where: eq(this.invitations.token, token),
     });
   }
 
   private async markAsExpired(id: number): Promise<void> {
     await this.db
-      .update(invitations)
+      .update(this.invitations)
       .set({ status: INVITATION_STATUS.EXPIRED })
-      .where(eq(invitations.id, id));
+      .where(eq(this.invitations.id, id));
   }
 
   private async markAsAccepted(token: string): Promise<void> {
     await this.db
-      .update(invitations)
+      .update(this.invitations)
       .set({ status: INVITATION_STATUS.ACCEPTED })
-      .where(eq(invitations.token, token));
+      .where(eq(this.invitations.token, token));
   }
 
   private async rollbackInvitation(
@@ -250,7 +249,9 @@ export class InvitationsService {
       error instanceof Error ? error.stack : undefined
     );
 
-    await this.db.delete(invitations).where(eq(invitations.token, token));
+    await this.db
+      .delete(this.invitations)
+      .where(eq(this.invitations.token, token));
 
     throw new BadGatewayException(
       'Invitation could not be sent - email delivery failed'

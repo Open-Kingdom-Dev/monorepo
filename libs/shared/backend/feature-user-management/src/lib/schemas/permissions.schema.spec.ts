@@ -1,4 +1,4 @@
-import { permissions, PermissionsTableName } from './permissions.schema';
+import { permissions, PermissionsTableName } from './index';
 import { getTableColumns } from 'drizzle-orm';
 
 describe('Permissions', () => {

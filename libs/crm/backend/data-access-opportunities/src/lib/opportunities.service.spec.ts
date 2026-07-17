@@ -2,7 +2,8 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { BetterSQLite3Database } from 'drizzle-orm/better-sqlite3';
 import { NotFoundException } from '@nestjs/common';
 
-import { DB_TAG } from '@open-kingdom/shared-poly-util-constants';
+import { DB_TAG, SCHEMA_TAG } from '@open-kingdom/shared-poly-util-constants';
+import { leads, opportunities } from './schemas';
 import { OpportunitiesService } from './opportunities.service';
 
 describe('OpportunitiesService', () => {
@@ -62,6 +63,7 @@ describe('OpportunitiesService', () => {
       providers: [
         OpportunitiesService,
         { provide: DB_TAG, useValue: mockDb as BetterSQLite3Database<never> },
+        { provide: SCHEMA_TAG, useValue: { leads, opportunities } },
       ],
     }).compile();
     service = module.get(OpportunitiesService);

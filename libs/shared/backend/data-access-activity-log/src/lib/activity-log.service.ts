@@ -8,9 +8,9 @@ import {
 import { BetterSQLite3Database } from 'drizzle-orm/better-sqlite3';
 import { and, asc, desc, eq, isNull, lte } from 'drizzle-orm';
 
-import { DB_TAG } from '@open-kingdom/shared-poly-util-constants';
+import { DB_TAG, SCHEMA_TAG } from '@open-kingdom/shared-poly-util-constants';
 
-import { ActivityLogEntry, activityLog } from './schemas';
+import type { ActivityLogEntry, ActivityLogSchema } from './schemas';
 import {
   CompleteActivityLogEntryDto,
   CreateActivityLogEntryDto,
@@ -21,21 +21,24 @@ import {
   DataAccessActivityLogOptions,
 } from './data-access-activity-log.options';
 
-type schema = {
-  activityLog: typeof activityLog;
-};
-
 @Injectable()
 export class ActivityLogService {
   private readonly allowedRelatedTypes: ReadonlySet<string> | null;
   private readonly allowedActivityTypes: ReadonlySet<string> | null;
+  // Tables come from the host-composed schema (SCHEMA_TAG) rather than the
+  // module-scope singletons, so a prefixed schema (embedded mode) works
+  // transparently.
+  private readonly activityLog: ActivityLogSchema['activityLog'];
 
   constructor(
-    @Inject(DB_TAG) private readonly db: BetterSQLite3Database<schema>,
+    @Inject(DB_TAG)
+    private readonly db: BetterSQLite3Database<ActivityLogSchema>,
+    @Inject(SCHEMA_TAG) schema: ActivityLogSchema,
     @Optional()
     @Inject(ACTIVITY_LOG_OPTIONS)
     options: DataAccessActivityLogOptions | null = null
   ) {
+    this.activityLog = schema.activityLog;
     this.allowedRelatedTypes = options?.allowedRelatedTypes
       ? new Set(options.allowedRelatedTypes)
       : null;
@@ -62,25 +65,28 @@ export class ActivityLogService {
   ): Promise<ActivityLogEntry[]> {
     return this.db
       .select()
-      .from(activityLog)
+      .from(this.activityLog)
       .where(
         and(
-          eq(activityLog.relatedType, relatedType),
-          eq(activityLog.relatedId, relatedId)
+          eq(this.activityLog.relatedType, relatedType),
+          eq(this.activityLog.relatedId, relatedId)
         )
       )
-      .orderBy(desc(activityLog.createdAt))
+      .orderBy(desc(this.activityLog.createdAt))
       .all();
   }
 
   async findOpenForOwner(ownerId: number): Promise<ActivityLogEntry[]> {
     return this.db
       .select()
-      .from(activityLog)
+      .from(this.activityLog)
       .where(
-        and(eq(activityLog.ownerId, ownerId), isNull(activityLog.completedAt))
+        and(
+          eq(this.activityLog.ownerId, ownerId),
+          isNull(this.activityLog.completedAt)
+        )
       )
-      .orderBy(asc(activityLog.dueAt), asc(activityLog.id))
+      .orderBy(asc(this.activityLog.dueAt), asc(this.activityLog.id))
       .all();
   }
 
@@ -90,21 +96,21 @@ export class ActivityLogService {
   ): Promise<ActivityLogEntry[]> {
     return this.db
       .select()
-      .from(activityLog)
+      .from(this.activityLog)
       .where(
         and(
-          eq(activityLog.ownerId, ownerId),
-          isNull(activityLog.completedAt),
-          lte(activityLog.dueAt, now)
+          eq(this.activityLog.ownerId, ownerId),
+          isNull(this.activityLog.completedAt),
+          lte(this.activityLog.dueAt, now)
         )
       )
-      .orderBy(asc(activityLog.dueAt), asc(activityLog.id))
+      .orderBy(asc(this.activityLog.dueAt), asc(this.activityLog.id))
       .all();
   }
 
   async findById(id: number): Promise<ActivityLogEntry | undefined> {
     return this.db.query.activityLog.findFirst({
-      where: eq(activityLog.id, id),
+      where: eq(this.activityLog.id, id),
     });
   }
 
@@ -121,7 +127,7 @@ export class ActivityLogService {
       throw new BadRequestException(`Unknown activity type '${input.type}'`);
     }
     const [row] = await this.db
-      .insert(activityLog)
+      .insert(this.activityLog)
       .values({
         relatedType: input.relatedType,
         relatedId: input.relatedId,
@@ -144,7 +150,7 @@ export class ActivityLogService {
       throw new NotFoundException(`Activity ${id} not found`);
     }
     const [row] = await this.db
-      .update(activityLog)
+      .update(this.activityLog)
       .set({
         subject: input.subject ?? current.subject,
         description:
@@ -154,7 +160,7 @@ export class ActivityLogService {
         dueAt: input.dueAt === undefined ? current.dueAt : input.dueAt,
         updatedAt: new Date(),
       })
-      .where(eq(activityLog.id, id))
+      .where(eq(this.activityLog.id, id))
       .returning();
     return row;
   }
@@ -171,13 +177,13 @@ export class ActivityLogService {
       ? [current.description, input.outcomeNotes].filter(Boolean).join('\n\n')
       : current.description;
     const [row] = await this.db
-      .update(activityLog)
+      .update(this.activityLog)
       .set({
         completedAt: new Date(),
         description,
         updatedAt: new Date(),
       })
-      .where(eq(activityLog.id, id))
+      .where(eq(this.activityLog.id, id))
       .returning();
     return row;
   }
@@ -187,6 +193,6 @@ export class ActivityLogService {
     if (!current) {
       throw new NotFoundException(`Activity ${id} not found`);
     }
-    await this.db.delete(activityLog).where(eq(activityLog.id, id));
+    await this.db.delete(this.activityLog).where(eq(this.activityLog.id, id));
   }
 }

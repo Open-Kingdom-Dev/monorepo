@@ -1,7 +1,8 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { NotFoundException, BadRequestException } from '@nestjs/common';
 
-import { DB_TAG } from '@open-kingdom/shared-poly-util-constants';
+import { DB_TAG, SCHEMA_TAG } from '@open-kingdom/shared-poly-util-constants';
+import { roles, userRoles } from '../schemas';
 import { RolesService } from './roles.service';
 import type { Role } from '../schemas/roles.schema';
 
@@ -63,7 +64,11 @@ describe('RolesService', () => {
     };
 
     const module: TestingModule = await Test.createTestingModule({
-      providers: [RolesService, { provide: DB_TAG, useValue: mockDb }],
+      providers: [
+        RolesService,
+        { provide: DB_TAG, useValue: mockDb },
+        { provide: SCHEMA_TAG, useValue: { roles, userRoles } },
+      ],
     }).compile();
 
     service = module.get<RolesService>(RolesService);

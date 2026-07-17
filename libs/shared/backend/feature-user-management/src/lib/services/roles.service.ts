@@ -7,21 +7,26 @@ import {
 import { BetterSQLite3Database } from 'drizzle-orm/better-sqlite3';
 import { eq } from 'drizzle-orm';
 
-import { DB_TAG } from '@open-kingdom/shared-poly-util-constants';
-import { roles } from '../schemas/roles.schema';
-import { userRoles } from '../schemas/user-roles.schema';
+import { DB_TAG, SCHEMA_TAG } from '@open-kingdom/shared-poly-util-constants';
+import type { UserManagementSchema } from '../schemas';
 import type { Role, NewRole } from '../schemas/roles.schema';
-
-type Schema = {
-  roles: typeof roles;
-  userRoles: typeof userRoles;
-};
 
 @Injectable()
 export class RolesService {
+  // Tables come from the host-composed schema (SCHEMA_TAG) rather than the
+  // module-scope singletons, so a prefixed schema (embedded mode) works
+  // transparently.
+  private readonly roles: UserManagementSchema['roles'];
+  private readonly userRoles: UserManagementSchema['userRoles'];
+
   constructor(
-    @Inject(DB_TAG) private readonly db: BetterSQLite3Database<Schema>
-  ) {}
+    @Inject(DB_TAG)
+    private readonly db: BetterSQLite3Database<UserManagementSchema>,
+    @Inject(SCHEMA_TAG) schema: UserManagementSchema
+  ) {
+    this.roles = schema.roles;
+    this.userRoles = schema.userRoles;
+  }
 
   async findAll(): Promise<Role[]> {
     return this.db.query.roles.findMany();
@@ -29,7 +34,7 @@ export class RolesService {
 
   async findById(id: number): Promise<Role> {
     const role = await this.db.query.roles.findFirst({
-      where: eq(roles.id, id),
+      where: eq(this.roles.id, id),
     });
 
     if (!role) {
@@ -41,7 +46,7 @@ export class RolesService {
 
   async findByName(name: string): Promise<Role | undefined> {
     return this.db.query.roles.findFirst({
-      where: eq(roles.name, name),
+      where: eq(this.roles.name, name),
     });
   }
 
@@ -56,7 +61,7 @@ export class RolesService {
       throw new BadRequestException(`Role '${name}' already exists`);
     }
 
-    await this.db.insert(roles).values({ name, description, isSystem });
+    await this.db.insert(this.roles).values({ name, description, isSystem });
 
     const created = await this.findByName(name);
 
@@ -77,7 +82,7 @@ export class RolesService {
       throw new BadRequestException('Cannot rename a system role');
     }
 
-    await this.db.update(roles).set(data).where(eq(roles.id, id));
+    await this.db.update(this.roles).set(data).where(eq(this.roles.id, id));
 
     return this.findById(id);
   }
@@ -90,7 +95,7 @@ export class RolesService {
     }
 
     const assigned = await this.db.query.userRoles.findFirst({
-      where: eq(userRoles.roleId, id),
+      where: eq(this.userRoles.roleId, id),
     });
 
     if (assigned) {
@@ -99,6 +104,6 @@ export class RolesService {
       );
     }
 
-    await this.db.delete(roles).where(eq(roles.id, id));
+    await this.db.delete(this.roles).where(eq(this.roles.id, id));
   }
 }

@@ -3,6 +3,7 @@ export * from './lib';
 import './lib/demo-scaffold-backend/api';
 import './lib/api-enhancements';
 export { baseApi, ApiKey, apiReducer, apiMiddleware } from './lib/baseApi';
+export { setApiBaseUrl, getApiBaseUrl } from './lib/apiConfig';
 export * from './lib/adapters';
 export type { AuthAdapter } from './lib/adapters/adapters.types';
 export * from './lib/auth.slice';

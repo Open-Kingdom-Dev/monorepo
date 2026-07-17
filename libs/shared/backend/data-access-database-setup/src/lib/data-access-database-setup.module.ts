@@ -2,7 +2,7 @@ import { Module, DynamicModule } from '@nestjs/common';
 import Database from 'better-sqlite3';
 import { drizzle } from 'drizzle-orm/better-sqlite3';
 
-import { DB_TAG } from '@open-kingdom/shared-poly-util-constants';
+import { DB_TAG, SCHEMA_TAG } from '@open-kingdom/shared-poly-util-constants';
 
 export interface DatabaseSetupModuleOptions<
   TSchema extends Record<string, unknown> = Record<string, unknown>
@@ -36,8 +36,15 @@ export class DatabaseSetupModule {
             });
           },
         },
+        // The composed schema itself, so services resolve table objects via DI
+        // (supports host-composed, table-name-prefixed schemas — see the
+        // create*Schema factories exported by each data-access lib).
+        {
+          provide: SCHEMA_TAG,
+          useValue: options.schema,
+        },
       ],
-      exports: [DB_TAG],
+      exports: [DB_TAG, SCHEMA_TAG],
     };
   }
 }

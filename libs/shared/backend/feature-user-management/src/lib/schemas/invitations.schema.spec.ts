@@ -1,4 +1,4 @@
-import { invitations, InvitationsTableName } from './invitations.schema';
+import { invitations, InvitationsTableName } from './index';
 import { getTableColumns } from 'drizzle-orm';
 
 describe('Invitations', () => {
