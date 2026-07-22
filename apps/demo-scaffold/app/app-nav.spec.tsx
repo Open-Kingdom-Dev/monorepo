@@ -44,6 +44,7 @@ describe('AppNav Component', () => {
     expect(screen.queryByText('Gmail Demo')).toBeNull();
     expect(screen.queryByText('YouTube Demo')).toBeNull();
     expect(screen.queryByText('Apple Music Demo')).toBeNull();
+    expect(screen.queryByText('Google Auth Demo')).toBeNull();
 
     // 5 base links: Home, About, Profile, Users, CRM
     const links = container.querySelectorAll('a');
@@ -61,10 +62,11 @@ describe('AppNav Component', () => {
     expect(screen.getByText('Gmail Demo')).toBeTruthy();
     expect(screen.getByText('YouTube Demo')).toBeTruthy();
     expect(screen.getByText('Apple Music Demo')).toBeTruthy();
+    expect(screen.getByText('Google Auth Demo')).toBeTruthy();
 
-    // 5 base links + 4 dropdown links = 9 links total
+    // 5 base links + 5 dropdown links = 10 links total
     const links = container.querySelectorAll('a');
-    expect(links).toHaveLength(9);
+    expect(links).toHaveLength(10);
   });
 
   it('should close the dropdown menu when a dropdown link is clicked', () => {
@@ -81,6 +83,7 @@ describe('AppNav Component', () => {
     expect(screen.queryByText('Gmail Demo')).toBeNull();
     expect(screen.queryByText('YouTube Demo')).toBeNull();
     expect(screen.queryByText('Apple Music Demo')).toBeNull();
+    expect(screen.queryByText('Google Auth Demo')).toBeNull();
     expect(trigger.getAttribute('aria-expanded')).toBe('false');
   });
 
@@ -102,7 +105,7 @@ describe('AppNav Component', () => {
   });
 
   it('should highlight Mock Server trigger when a child route is active', () => {
-    renderAppNav(['/youtube-demo']);
+    renderAppNav(['/google-auth-demo']);
 
     const trigger = screen.getByRole('button', { name: /Mock Server/i });
     // Active styling check: we expect "text-foreground font-semibold"
