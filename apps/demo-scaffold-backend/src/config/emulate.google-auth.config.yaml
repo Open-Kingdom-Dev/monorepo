@@ -1,0 +1,12 @@
+google:
+  users:
+    - email: testuser@example.com
+      name: Test User
+      picture: https://lh3.googleusercontent.com/a/default-user
+      email_verified: true
+  oauth_clients:
+    - client_id: example-client-id.apps.googleusercontent.com
+      client_secret: GOCSPX-example_secret
+      name: Code App (Google)
+      redirect_uris:
+        - http://localhost:3000/api/google-auth-emulate/callback
