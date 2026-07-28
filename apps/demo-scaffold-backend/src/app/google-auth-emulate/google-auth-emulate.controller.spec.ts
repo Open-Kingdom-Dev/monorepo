@@ -25,12 +25,6 @@ describe('GoogleAuthEmulateController', () => {
             reset: jest
               .fn()
               .mockResolvedValue({ success: true, message: 'Reset' }),
-            getAuthorizationUrl: jest
-              .fn()
-              .mockReturnValue('http://localhost:9015/o/oauth2/v2/auth'),
-            handleCallback: jest
-              .fn()
-              .mockResolvedValue({ tokens: {}, userProfile: {}, apiLogs: [] }),
             getLogs: jest.fn().mockReturnValue([]),
             getLastOAuthResult: jest.fn().mockReturnValue(null),
           },
@@ -61,10 +55,9 @@ describe('GoogleAuthEmulateController', () => {
     expect(service.start).toHaveBeenCalled();
   });
 
-  it('should get login URL', () => {
+  it('should get login URL endpoint', () => {
     const res = controller.getLoginUrl();
-    expect(res.authUrl).toBe('http://localhost:9015/o/oauth2/v2/auth');
-    expect(service.getAuthorizationUrl).toHaveBeenCalled();
+    expect(res.authUrl).toBe('/api/google-auth-emulate/login');
   });
 
   it('should get logs and last result', () => {

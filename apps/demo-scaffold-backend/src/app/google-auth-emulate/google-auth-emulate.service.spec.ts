@@ -22,13 +22,26 @@ describe('GoogleAuthEmulateService', () => {
     expect(status.port).toBe(9015);
   });
 
-  it('should generate valid authorization URL', () => {
-    const authUrl = service.getAuthorizationUrl();
-    expect(authUrl).toContain('http://localhost:9015/o/oauth2/v2/auth');
-    expect(authUrl).toContain(
-      'client_id=example-client-id.apps.googleusercontent.com'
-    );
-    expect(authUrl).toContain('response_type=code');
+  it('should set and retrieve OAuth result', () => {
+    const tokens = {
+      access_token: 'mock-access',
+      id_token: 'mock-id',
+      expires_in: 3600,
+      token_type: 'Bearer',
+      scope: 'openid profile email',
+    };
+    const userProfile = {
+      sub: '123',
+      email: 'test@example.com',
+      name: 'Test User',
+      picture: '',
+      email_verified: true,
+    };
+
+    service.setOAuthResult(tokens, userProfile);
+    const result = service.getLastOAuthResult();
+    expect(result?.tokens?.access_token).toBe('mock-access');
+    expect(result?.userProfile?.email).toBe('test@example.com');
   });
 
   it('should reset logs and result cleanly', async () => {
