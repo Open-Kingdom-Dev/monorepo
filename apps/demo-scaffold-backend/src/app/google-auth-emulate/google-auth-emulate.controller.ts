@@ -2,14 +2,15 @@ import {
   Controller,
   Get,
   Post,
-  Query,
+  Req,
   Res,
   HttpCode,
   HttpStatus,
-  BadRequestException,
+  UseGuards,
 } from '@nestjs/common';
-import type { Response } from 'express';
-import { ApiTags, ApiOperation, ApiResponse, ApiQuery } from '@nestjs/swagger';
+import type { Request, Response } from 'express';
+import { AuthGuard } from '@nestjs/passport';
+import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { Public } from '@open-kingdom/shared-backend-util-rbac';
 import { GoogleAuthEmulateService } from './google-auth-emulate.service';
 import {
@@ -89,52 +90,41 @@ export class GoogleAuthEmulateController {
   @Public()
   @Get('login-url')
   @ApiOperation({
-    summary: 'Get Google OAuth authorization URL',
+    summary: 'Get Google OAuth authorization URL / Initiate OAuth login',
     description:
-      'Generates the OAuth authorize URL to trigger sign-in against the local emulator.',
+      'Returns auth URL endpoint or initiates sign-in redirect via Passport against local emulator.',
   })
   @ApiResponse({
     status: 200,
-    description: 'Authorization URL generated',
+    description: 'Authorization endpoint ready',
   })
   getLoginUrl(): { authUrl: string } {
-    return { authUrl: this.googleAuthEmulateService.getAuthorizationUrl() };
+    return { authUrl: '/api/google-auth-emulate/login' };
+  }
+
+  @Public()
+  @Get('login')
+  @UseGuards(AuthGuard('google-emulate'))
+  @ApiOperation({
+    summary: 'Initiate Google OAuth login via Passport',
+    description:
+      'Redirects user to local Google emulator OAuth authorization page.',
+  })
+  login(): void {
+    // Handled automatically by Passport AuthGuard redirect
   }
 
   @Public()
   @Get('callback')
+  @UseGuards(AuthGuard('google-emulate'))
   @ApiOperation({
     summary: 'Google OAuth callback handler',
     description:
-      'Receives authorization code from Google emulator, performs token exchange and userinfo fetch, and redirects back to frontend demo app.',
+      'Passport receives authorization code from Google emulator, performs token exchange and userinfo fetch, and redirects back to frontend demo app.',
   })
-  @ApiQuery({
-    name: 'code',
-    required: true,
-    description: 'OAuth authorization code',
-  })
-  async callback(
-    @Query('code') code: string,
-    @Res() res: Response
-  ): Promise<void> {
-    if (!code) {
-      throw new BadRequestException('Missing authorization code');
-    }
-
-    try {
-      await this.googleAuthEmulateService.handleCallback(code);
-      // Redirect back to frontend demo page with success indicator
-      const frontendUrl = process.env['BASE_URL'] || 'http://localhost:4200';
-      return res.redirect(`${frontendUrl}/google-auth-demo?auth=success`);
-    } catch (err) {
-      const frontendUrl = process.env['BASE_URL'] || 'http://localhost:4200';
-      const errorMessage = encodeURIComponent(
-        err instanceof Error ? err.message : String(err)
-      );
-      return res.redirect(
-        `${frontendUrl}/google-auth-demo?auth=error&message=${errorMessage}`
-      );
-    }
+  async callback(@Req() _req: Request, @Res() res: Response): Promise<void> {
+    const frontendUrl = process.env['BASE_URL'] || 'http://localhost:4200';
+    return res.redirect(`${frontendUrl}/google-auth-demo?auth=success`);
   }
 
   @Public()

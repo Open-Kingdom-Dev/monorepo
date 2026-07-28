@@ -3486,6 +3486,190 @@
           "YouTube Twin"
         ]
       }
+    },
+    "/api/google-auth-emulate/status": {
+      "get": {
+        "description": "Returns running status, port, health check result, and base URL of the local Google emulator.",
+        "operationId": "GoogleAuthEmulateController_getStatus",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GoogleEmulatorStatusDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Get Google OAuth emulator status",
+        "tags": [
+          "Google Auth Emulate"
+        ]
+      }
+    },
+    "/api/google-auth-emulate/start": {
+      "post": {
+        "description": "Launches Vercel Labs emulate Google service on port 9015 using local seed configuration.",
+        "operationId": "GoogleAuthEmulateController_start",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Google emulator started"
+          }
+        },
+        "summary": "Start Google OAuth emulator",
+        "tags": [
+          "Google Auth Emulate"
+        ]
+      }
+    },
+    "/api/google-auth-emulate/stop": {
+      "post": {
+        "description": "Stops the Google emulator server cleanly.",
+        "operationId": "GoogleAuthEmulateController_stop",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Google emulator stopped"
+          }
+        },
+        "summary": "Stop Google OAuth emulator",
+        "tags": [
+          "Google Auth Emulate"
+        ]
+      }
+    },
+    "/api/google-auth-emulate/reset": {
+      "post": {
+        "description": "Resets emulator seed data and clears captured API logs.",
+        "operationId": "GoogleAuthEmulateController_reset",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Google emulator reset"
+          }
+        },
+        "summary": "Reset Google OAuth emulator state",
+        "tags": [
+          "Google Auth Emulate"
+        ]
+      }
+    },
+    "/api/google-auth-emulate/login-url": {
+      "get": {
+        "description": "Returns auth URL endpoint or initiates sign-in redirect via Passport against local emulator.",
+        "operationId": "GoogleAuthEmulateController_getLoginUrl",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Authorization endpoint ready"
+          }
+        },
+        "summary": "Get Google OAuth authorization URL / Initiate OAuth login",
+        "tags": [
+          "Google Auth Emulate"
+        ]
+      }
+    },
+    "/api/google-auth-emulate/login": {
+      "get": {
+        "description": "Redirects user to local Google emulator OAuth authorization page.",
+        "operationId": "GoogleAuthEmulateController_login",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Initiate Google OAuth login via Passport",
+        "tags": [
+          "Google Auth Emulate"
+        ]
+      }
+    },
+    "/api/google-auth-emulate/callback": {
+      "get": {
+        "description": "Passport receives authorization code from Google emulator, performs token exchange and userinfo fetch, and redirects back to frontend demo app.",
+        "operationId": "GoogleAuthEmulateController_callback",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Google OAuth callback handler",
+        "tags": [
+          "Google Auth Emulate"
+        ]
+      }
+    },
+    "/api/google-auth-emulate/last-result": {
+      "get": {
+        "description": "Returns tokens, user profile, and HTTP logs from the most recent OAuth sign-in flow.",
+        "operationId": "GoogleAuthEmulateController_getLastResult",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GoogleOAuthResultDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Get last Google OAuth authentication result",
+        "tags": [
+          "Google Auth Emulate"
+        ]
+      }
+    },
+    "/api/google-auth-emulate/logs": {
+      "get": {
+        "description": "Returns structured HTTP request/response log entries captured during OAuth interactions.",
+        "operationId": "GoogleAuthEmulateController_getLogs",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ApiLogEntryDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "summary": "Get captured API logs",
+        "tags": [
+          "Google Auth Emulate"
+        ]
+      }
+    },
+    "/api/google-auth-emulate/logout": {
+      "post": {
+        "description": "Clears the active Google OAuth session result in the backend.",
+        "operationId": "GoogleAuthEmulateController_logout",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Google OAuth session cleared"
+          }
+        },
+        "summary": "Sign out / Clear Google OAuth session",
+        "tags": [
+          "Google Auth Emulate"
+        ]
+      }
     }
   },
   "info": {
@@ -5532,6 +5716,204 @@
         "required": [
           "success",
           "message"
+        ]
+      },
+      "GoogleEmulatorStatusDto": {
+        "type": "object",
+        "properties": {
+          "running": {
+            "type": "boolean",
+            "description": "Indicates whether the Google emulator server is running",
+            "example": true
+          },
+          "healthy": {
+            "type": "boolean",
+            "description": "Indicates whether the Google emulator server is healthy",
+            "example": true
+          },
+          "port": {
+            "type": "number",
+            "description": "Port on which the emulator is listening",
+            "example": 9015
+          },
+          "url": {
+            "type": "string",
+            "description": "Base URL of the running emulator",
+            "example": "http://localhost:9015"
+          }
+        },
+        "required": [
+          "running",
+          "healthy",
+          "port"
+        ]
+      },
+      "GoogleOAuthTokensDto": {
+        "type": "object",
+        "properties": {
+          "access_token": {
+            "type": "string",
+            "description": "Google OAuth Access Token",
+            "example": "ya29.a0AfH6SM..."
+          },
+          "id_token": {
+            "type": "string",
+            "description": "Google OIDC ID Token",
+            "example": "eyJhbGciOiJSUzI1Ni..."
+          },
+          "refresh_token": {
+            "type": "string",
+            "description": "Google OAuth Refresh Token",
+            "example": "1//0g..."
+          },
+          "expires_in": {
+            "type": "number",
+            "description": "Token expiration duration in seconds",
+            "example": 3600
+          },
+          "token_type": {
+            "type": "string",
+            "description": "Token type",
+            "example": "Bearer"
+          },
+          "scope": {
+            "type": "string",
+            "description": "Granted scopes",
+            "example": "openid profile email"
+          }
+        },
+        "required": [
+          "access_token",
+          "id_token",
+          "expires_in",
+          "token_type",
+          "scope"
+        ]
+      },
+      "GoogleUserProfileDto": {
+        "type": "object",
+        "properties": {
+          "sub": {
+            "type": "string",
+            "description": "Subject / User ID",
+            "example": "100000000000000000001"
+          },
+          "email": {
+            "type": "string",
+            "description": "User email address",
+            "example": "testuser@example.com"
+          },
+          "name": {
+            "type": "string",
+            "description": "Full name of the user",
+            "example": "Test User"
+          },
+          "picture": {
+            "type": "string",
+            "description": "Profile picture URL",
+            "example": "https://lh3.googleusercontent.com/a/default-user"
+          },
+          "email_verified": {
+            "type": "boolean",
+            "description": "Whether the email address has been verified",
+            "example": true
+          },
+          "hd": {
+            "type": "string",
+            "description": "Hosted domain if applicable",
+            "example": "example.com"
+          }
+        },
+        "required": [
+          "sub",
+          "email",
+          "name",
+          "picture",
+          "email_verified"
+        ]
+      },
+      "ApiLogEntryDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Unique log ID",
+            "example": "log_1721640000000"
+          },
+          "timestamp": {
+            "type": "string",
+            "description": "ISO Timestamp",
+            "example": "2026-07-22T09:15:00.000Z"
+          },
+          "method": {
+            "type": "string",
+            "description": "HTTP Method",
+            "example": "POST"
+          },
+          "url": {
+            "type": "string",
+            "description": "Request URL",
+            "example": "http://localhost:9015/token"
+          },
+          "statusCode": {
+            "type": "number",
+            "description": "HTTP Response Status Code",
+            "example": 200
+          },
+          "requestHeaders": {
+            "type": "object",
+            "description": "Request headers object"
+          },
+          "requestBody": {
+            "type": "string",
+            "description": "Request body"
+          },
+          "responseHeaders": {
+            "type": "object",
+            "description": "Response headers object"
+          },
+          "responseBody": {
+            "type": "string",
+            "description": "Response body payload"
+          },
+          "latencyMs": {
+            "type": "number",
+            "description": "Latency in milliseconds",
+            "example": 15
+          }
+        },
+        "required": [
+          "id",
+          "timestamp",
+          "method",
+          "url",
+          "statusCode",
+          "requestHeaders",
+          "responseHeaders",
+          "responseBody",
+          "latencyMs"
+        ]
+      },
+      "GoogleOAuthResultDto": {
+        "type": "object",
+        "properties": {
+          "tokens": {
+            "$ref": "#/components/schemas/GoogleOAuthTokensDto"
+          },
+          "userProfile": {
+            "$ref": "#/components/schemas/GoogleUserProfileDto"
+          },
+          "apiLogs": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ApiLogEntryDto"
+            }
+          }
+        },
+        "required": [
+          "tokens",
+          "userProfile",
+          "apiLogs"
         ]
       }
     }

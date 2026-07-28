@@ -147,135 +147,15 @@ export class GoogleAuthEmulateService implements OnModuleDestroy {
     }
   }
 
-  getAuthorizationUrl(): string {
-    const baseUrl = this.emulator?.url || `http://localhost:${this.port}`;
-    const clientId = 'example-client-id.apps.googleusercontent.com';
-    const redirectUri = encodeURIComponent(
-      'http://localhost:3000/api/google-auth-emulate/callback'
-    );
-    const scope = encodeURIComponent('openid profile email');
-    return `${baseUrl}/o/oauth2/v2/auth?client_id=${clientId}&redirect_uri=${redirectUri}&response_type=code&scope=${scope}&access_type=offline`;
-  }
-
-  async handleCallback(code: string): Promise<GoogleOAuthResultDto> {
-    const emulatorUrl = this.emulator?.url || `http://localhost:${this.port}`;
-    const clientId = 'example-client-id.apps.googleusercontent.com';
-    const clientSecret = 'GOCSPX-example_secret';
-    const redirectUri =
-      'http://localhost:3000/api/google-auth-emulate/callback';
-
-    // 1. Exchange auth code for tokens
-    const tokenStartTime = Date.now();
-    const tokenUrl = `${emulatorUrl}/oauth2/token`;
-    const tokenRequestBody = new URLSearchParams({
-      code,
-      client_id: clientId,
-      client_secret: clientSecret,
-      redirect_uri: redirectUri,
-      grant_type: 'authorization_code',
-    }).toString();
-
-    let tokens: GoogleOAuthTokensDto;
-    try {
-      const tokenRes = await axios.post(tokenUrl, tokenRequestBody, {
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      });
-      const tokenLatency = Date.now() - tokenStartTime;
-
-      this.logApiCall({
-        method: 'POST',
-        url: tokenUrl,
-        statusCode: tokenRes.status,
-        requestHeaders: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        requestBody: tokenRequestBody,
-        responseHeaders: tokenRes.headers as Record<string, string>,
-        responseBody: JSON.stringify(tokenRes.data, null, 2),
-        latencyMs: tokenLatency,
-      });
-
-      tokens = tokenRes.data as GoogleOAuthTokensDto;
-    } catch (err: unknown) {
-      const errorObj = err as {
-        response?: {
-          status?: number;
-          headers?: Record<string, string>;
-          data?: unknown;
-        };
-      };
-      this.logApiCall({
-        method: 'POST',
-        url: tokenUrl,
-        statusCode: errorObj.response?.status || 500,
-        requestHeaders: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        requestBody: tokenRequestBody,
-        responseHeaders:
-          (errorObj.response?.headers as Record<string, string>) || {},
-        responseBody: JSON.stringify(
-          errorObj.response?.data || { error: String(err) },
-          null,
-          2
-        ),
-        latencyMs: Date.now() - tokenStartTime,
-      });
-      throw err;
-    }
-
-    // 2. Fetch User Profile
-    const userinfoStartTime = Date.now();
-    const userinfoUrl = `${emulatorUrl}/oauth2/v2/userinfo`;
-    let userProfile: GoogleUserProfileDto;
-    try {
-      const userinfoRes = await axios.get(userinfoUrl, {
-        headers: { Authorization: `Bearer ${tokens.access_token}` },
-      });
-      const userinfoLatency = Date.now() - userinfoStartTime;
-
-      this.logApiCall({
-        method: 'GET',
-        url: userinfoUrl,
-        statusCode: userinfoRes.status,
-        requestHeaders: {
-          Authorization: `Bearer ${tokens.access_token.slice(0, 15)}...`,
-        },
-        responseHeaders: userinfoRes.headers as Record<string, string>,
-        responseBody: JSON.stringify(userinfoRes.data, null, 2),
-        latencyMs: userinfoLatency,
-      });
-
-      userProfile = userinfoRes.data as GoogleUserProfileDto;
-    } catch (err: unknown) {
-      const errorObj = err as {
-        response?: {
-          status?: number;
-          headers?: Record<string, string>;
-          data?: unknown;
-        };
-      };
-      this.logApiCall({
-        method: 'GET',
-        url: userinfoUrl,
-        statusCode: errorObj.response?.status || 500,
-        requestHeaders: {
-          Authorization: `Bearer ${tokens.access_token.slice(0, 15)}...`,
-        },
-        responseHeaders:
-          (errorObj.response?.headers as Record<string, string>) || {},
-        responseBody: JSON.stringify(
-          errorObj.response?.data || { error: String(err) },
-          null,
-          2
-        ),
-        latencyMs: Date.now() - userinfoStartTime,
-      });
-      throw err;
-    }
-
+  setOAuthResult(
+    tokens: GoogleOAuthTokensDto,
+    userProfile: GoogleUserProfileDto
+  ): GoogleOAuthResultDto {
     const result: GoogleOAuthResultDto = {
       tokens,
       userProfile,
       apiLogs: [...this.apiLogs],
     };
-
     this.lastOAuthResult = result;
     return result;
   }
