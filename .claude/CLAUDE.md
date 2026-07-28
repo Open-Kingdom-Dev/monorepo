@@ -107,6 +107,33 @@ monorepo/
 export class AppModule {}
 ```
 
+## Local Service Emulation & Mocking (Twins)
+
+The monorepo provides local mock servers ("twins" and emulators) for offline development and CI pipeline testing without external API dependencies:
+
+- **Google Auth Emulator (`GoogleAuthEmulateModule`)**: Powered by `vercel-labs/emulate`. Mocks Google OAuth 2.0 & OIDC consent screen, token exchange, and user profile endpoints locally on port `9015`.
+- **Passport Integration**: Standard `PassportStrategy(Strategy, 'google-emulate')` extending `passport-google-oauth20`. Point `authorizationURL`, `tokenURL`, and `userProfileURL` to local emulator endpoints in dev/CI, or default to production Google endpoints via env vars (`GOOGLE_AUTH_URL`, `GOOGLE_TOKEN_URL`, `GOOGLE_USERINFO_URL`).
+- **CJS/ESM Interop Pattern**: `emulate` is an ESM-only package. In CommonJS NestJS builds, dynamic imports must use `await (eval('import("emulate")'))` to prevent TypeScript/SWC from downleveling `import()` to `require()` (which throws `ERR_REQUIRE_ESM`).
+
+```typescript
+// Example: Passport strategy overriding Google endpoints for local emulator
+@Injectable()
+export class GoogleAuthEmulateStrategy extends PassportStrategy(Strategy, 'google-emulate') {
+  constructor(googleAuthService: GoogleAuthEmulateService) {
+    const emulatorUrl = process.env['GOOGLE_EMULATOR_URL'] || 'http://localhost:9015';
+    super({
+      clientID: process.env['GOOGLE_CLIENT_ID'] || 'example-client-id.apps.googleusercontent.com',
+      clientSecret: process.env['GOOGLE_CLIENT_SECRET'] || 'GOCSPX-example_secret',
+      callbackURL: 'http://localhost:3000/api/google-auth-emulate/callback',
+      scope: ['openid', 'profile', 'email'],
+      authorizationURL: process.env['GOOGLE_AUTH_URL'] || `${emulatorUrl}/o/oauth2/v2/auth`,
+      tokenURL: process.env['GOOGLE_TOKEN_URL'] || `${emulatorUrl}/oauth2/token`,
+      userProfileURL: process.env['GOOGLE_USERINFO_URL'] || `${emulatorUrl}/oauth2/v2/userinfo`,
+    });
+  }
+}
+```
+
 ### Frontend Root Store
 
 ```typescript

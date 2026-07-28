@@ -55,6 +55,9 @@ export class GoogleAuthEmulateService implements OnModuleDestroy {
     }
 
     try {
+      // ESM-only package in a CJS NestJS environment: plain await import('emulate')
+      // downlevels to require() during compilation and throws ERR_REQUIRE_ESM.
+      // Use eval to preserve native dynamic import in CJS output.
       const { createEmulator } = await (eval('import("emulate")') as Promise<
         typeof import('emulate')
       >);
@@ -174,15 +177,6 @@ export class GoogleAuthEmulateService implements OnModuleDestroy {
       success: true,
       message: 'Google OAuth session cleared successfully',
     };
-  }
-
-  private logApiCall(entry: Omit<ApiLogEntryDto, 'id' | 'timestamp'>) {
-    const logEntry: ApiLogEntryDto = {
-      id: `log_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`,
-      timestamp: new Date().toISOString(),
-      ...entry,
-    };
-    this.apiLogs.unshift(logEntry);
   }
 
   async onModuleDestroy() {
