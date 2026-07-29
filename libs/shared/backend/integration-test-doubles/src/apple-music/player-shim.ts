@@ -32,6 +32,13 @@ export const SHIM_TEMPLATE = `(function() {
     this._listeners = {};
     this._queue = [];
     this._currentIndex = -1;
+    this.currentPlaybackTime = 0;
+    this.currentPlaybackDuration = 0;
+
+    // Add HTML5 audio player
+    this._audio = document.createElement('audio');
+    this._audio.preload = 'auto';
+    document.body.appendChild(this._audio);
   }
 
   MusicKitInstance.prototype.addEventListener = function(event, callback) {
@@ -60,11 +67,15 @@ export const SHIM_TEMPLATE = `(function() {
     var self = this;
     return new Promise(function(resolve) {
       console.log('[MusicKit Shim] setQueue:', options);
+      var preloaded = options._preloadedAttributes || {};
+
       if (options.song) {
-        self._queue = [{ id: options.song, type: 'songs' }];
+        self._queue = [{ id: options.song, type: 'songs', attributes: preloaded[options.song] || null }];
         self._currentIndex = 0;
       } else if (options.songs) {
-        self._queue = options.songs.map(function(id) { return { id: id, type: 'songs' }; });
+        self._queue = options.songs.map(function(id) {
+          return { id: id, type: 'songs', attributes: preloaded[id] || null };
+        });
         self._currentIndex = 0;
       } else if (options.playlist) {
         fetch('__TWIN_BASE_URL__/v1/catalog/us/playlists/' + options.playlist)
@@ -82,14 +93,14 @@ export const SHIM_TEMPLATE = `(function() {
               self._updateNowPlaying();
               resolve();
             } else {
-              self._queue = [{ id: 'mock-track-001', type: 'songs' }];
+              self._queue = [{ id: 'mock-track-001', type: 'songs', attributes: null }];
               self._currentIndex = 0;
               self._updateNowPlaying();
               resolve();
             }
           })
           .catch(function() {
-            self._queue = [{ id: 'mock-track-001', type: 'songs' }];
+            self._queue = [{ id: 'mock-track-001', type: 'songs', attributes: null }];
             self._currentIndex = 0;
             self._updateNowPlaying();
             resolve();
@@ -103,23 +114,41 @@ export const SHIM_TEMPLATE = `(function() {
 
   MusicKitInstance.prototype._updateNowPlaying = function() {
     var item = this._queue[this._currentIndex];
+    var self = this;
     if (item) {
       if (item.attributes) {
         this.nowPlayingItem = {
           id: item.id,
           attributes: item.attributes
         };
+        if (item.attributes.audioUrl) {
+          this._audio.src = item.attributes.audioUrl;
+          this._audio.load();
+          this.currentPlaybackTime = 0;
+          this.currentPlaybackDuration = 0;
+          this._trigger('playbackTimeDidChange');
+          this._trigger('playbackDurationDidChange');
+        }
         this._trigger('nowPlayingItemDidChange');
       } else {
-        var self = this;
         fetch('__TWIN_BASE_URL__/v1/catalog/us/songs/' + item.id)
           .then(function(res) { return res.json(); })
           .then(function(data) {
             if (data && data.data && data.data[0]) {
+              // Cache attributes back on the queue item so skips don't re-fetch
+              self._queue[self._currentIndex].attributes = data.data[0].attributes;
               self.nowPlayingItem = {
                 id: item.id,
                 attributes: data.data[0].attributes
               };
+              if (data.data[0].attributes.audioUrl) {
+                self._audio.src = data.data[0].attributes.audioUrl;
+                self._audio.load();
+                self.currentPlaybackTime = 0;
+                self.currentPlaybackDuration = 0;
+                self._trigger('playbackTimeDidChange');
+                self._trigger('playbackDurationDidChange');
+              }
               self._trigger('nowPlayingItemDidChange');
             }
           });
@@ -127,6 +156,11 @@ export const SHIM_TEMPLATE = `(function() {
       }
     } else {
       this.nowPlayingItem = null;
+      this._audio.src = '';
+      this.currentPlaybackTime = 0;
+      this.currentPlaybackDuration = 0;
+      this._trigger('playbackTimeDidChange');
+      this._trigger('playbackDurationDidChange');
       this._trigger('nowPlayingItemDidChange');
     }
   };
@@ -161,17 +195,21 @@ export const SHIM_TEMPLATE = `(function() {
   MusicKitInstance.prototype.play = function() {
     var self = this;
     return new Promise(function(resolve) {
-      self.playbackState = PlaybackStates.playing;
+      self.playbackState = PlaybackStates.loading;
       self._trigger('playbackStateDidChange');
-      resolve();
+      self._audio.play()
+        .then(function() { resolve(); })
+        .catch(function(e) {
+          console.error('[MusicKit Shim] play() failed:', e);
+          resolve();
+        });
     });
   };
 
   MusicKitInstance.prototype.pause = function() {
     var self = this;
     return new Promise(function(resolve) {
-      self.playbackState = PlaybackStates.paused;
-      self._trigger('playbackStateDidChange');
+      self._audio.pause();
       resolve();
     });
   };
@@ -179,12 +217,15 @@ export const SHIM_TEMPLATE = `(function() {
   MusicKitInstance.prototype.stop = function() {
     var self = this;
     return new Promise(function(resolve) {
+      self._audio.pause();
+      self._audio.currentTime = 0;
       self.playbackState = PlaybackStates.stopped;
       self._trigger('playbackStateDidChange');
       resolve();
     });
   };
 
+  // Bug 5 fix: auto-play after skipping
   MusicKitInstance.prototype.skipToNextItem = function() {
     var self = this;
     return new Promise(function(resolve) {
@@ -195,6 +236,8 @@ export const SHIM_TEMPLATE = `(function() {
           self._currentIndex = (self._currentIndex + 1) % self._queue.length;
         }
         self._updateNowPlaying();
+        // Auto-play after skip
+        setTimeout(function() { self._audio.play().catch(function(){}); }, 150);
       }
       resolve();
     });
@@ -206,6 +249,8 @@ export const SHIM_TEMPLATE = `(function() {
       if (self._queue.length > 0) {
         self._currentIndex = (self._currentIndex - 1 + self._queue.length) % self._queue.length;
         self._updateNowPlaying();
+        // Auto-play after skip
+        setTimeout(function() { self._audio.play().catch(function(){}); }, 150);
       }
       resolve();
     });
@@ -218,6 +263,35 @@ export const SHIM_TEMPLATE = `(function() {
       return new Promise(function(resolve) {
         instance = new MusicKitInstance();
         instance.developerToken = config.developerToken;
+
+        // Wire audio events
+        instance._audio.addEventListener('playing', function() {
+          instance.playbackState = PlaybackStates.playing;
+          instance._trigger('playbackStateDidChange');
+        });
+        instance._audio.addEventListener('pause', function() {
+          if (instance.playbackState !== PlaybackStates.stopped) {
+            instance.playbackState = PlaybackStates.paused;
+            instance._trigger('playbackStateDidChange');
+          }
+        });
+        instance._audio.addEventListener('ended', function() {
+          instance.playbackState = PlaybackStates.ended;
+          instance._trigger('playbackStateDidChange');
+        });
+        instance._audio.addEventListener('waiting', function() {
+          instance.playbackState = PlaybackStates.waiting;
+          instance._trigger('playbackStateDidChange');
+        });
+        instance._audio.addEventListener('timeupdate', function() {
+          instance.currentPlaybackTime = instance._audio.currentTime;
+          instance._trigger('playbackTimeDidChange');
+        });
+        instance._audio.addEventListener('durationchange', function() {
+          instance.currentPlaybackDuration = instance._audio.duration;
+          instance._trigger('playbackDurationDidChange');
+        });
+
         resolve(instance);
       });
     },

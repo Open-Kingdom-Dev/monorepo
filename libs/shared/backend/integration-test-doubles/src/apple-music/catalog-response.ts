@@ -1,6 +1,6 @@
 import { AppleMusicTrackFixture, AppleMusicPlaylistFixture } from './catalog-fixtures.js';
 
-export function formatTrackResource(track: AppleMusicTrackFixture) {
+export function formatTrackResource(track: AppleMusicTrackFixture, baseUrl?: string) {
   return {
     id: track.id,
     type: 'songs',
@@ -9,6 +9,7 @@ export function formatTrackResource(track: AppleMusicTrackFixture) {
       artistName: track.artistName,
       albumName: track.albumName,
       durationInMillis: track.durationMs,
+      audioUrl: baseUrl ? `${baseUrl}/v1/audio/${track.audioFile}` : null,
       artwork: track.artworkUrl
         ? {
             url: track.artworkUrl,
@@ -22,7 +23,8 @@ export function formatTrackResource(track: AppleMusicTrackFixture) {
 
 export function formatPlaylistResource(
   playlist: AppleMusicPlaylistFixture,
-  allTracks: AppleMusicTrackFixture[]
+  allTracks: AppleMusicTrackFixture[],
+  baseUrl?: string
 ) {
   const playlistTracks = playlist.trackIds
     .map((id) => allTracks.find((t) => t.id === id))
@@ -49,7 +51,7 @@ export function formatPlaylistResource(
     },
     relationships: {
       tracks: {
-        data: playlistTracks.map((t) => formatTrackResource(t)),
+        data: playlistTracks.map((t) => formatTrackResource(t, baseUrl)),
       },
     },
   };
@@ -58,7 +60,8 @@ export function formatPlaylistResource(
 export function formatSearchResponse(
   tracks: AppleMusicTrackFixture[],
   playlists: AppleMusicPlaylistFixture[],
-  allTracks: AppleMusicTrackFixture[]
+  allTracks: AppleMusicTrackFixture[],
+  baseUrl?: string
 ) {
   const response: { results: Record<string, { data: unknown[] }> } = {
     results: {},
@@ -66,13 +69,13 @@ export function formatSearchResponse(
 
   if (tracks.length > 0) {
     response.results.songs = {
-      data: tracks.map((t) => formatTrackResource(t)),
+      data: tracks.map((t) => formatTrackResource(t, baseUrl)),
     };
   }
 
   if (playlists.length > 0) {
     response.results.playlists = {
-      data: playlists.map((p) => formatPlaylistResource(p, allTracks)),
+      data: playlists.map((p) => formatPlaylistResource(p, allTracks, baseUrl)),
     };
   }
 

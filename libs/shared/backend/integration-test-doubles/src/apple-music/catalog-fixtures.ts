@@ -5,6 +5,7 @@ export interface AppleMusicTrackFixture {
   albumName: string;
   durationMs: number;
   artworkUrl: string | null;
+  audioFile: string;
 }
 
 export interface AppleMusicPlaylistFixture {
@@ -23,6 +24,7 @@ export const trackFixtures: AppleMusicTrackFixture[] = [
     albumName: 'Zen Garden',
     durationMs: 180000,
     artworkUrl: 'https://images.unsplash.com/photo-1518241353330-0f7941c2d9b5?w=300&h=300&fit=crop',
+    audioFile: 'mock-1.mp3',
   },
   {
     id: 'mock-track-002',
@@ -31,6 +33,7 @@ export const trackFixtures: AppleMusicTrackFixture[] = [
     albumName: 'Relaxing Storms',
     durationMs: 300000,
     artworkUrl: 'https://images.unsplash.com/photo-1534274988757-a28bf1a57c17?w=300&h=300&fit=crop',
+    audioFile: 'mock-2.mp3',
   },
   {
     id: 'mock-track-003',
@@ -39,6 +42,7 @@ export const trackFixtures: AppleMusicTrackFixture[] = [
     albumName: 'Acoustic Sunday',
     durationMs: 240000,
     artworkUrl: 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=300&h=300&fit=crop',
+    audioFile: 'mock-3.mp3',
   },
   {
     id: 'mock-track-004',
@@ -47,6 +51,7 @@ export const trackFixtures: AppleMusicTrackFixture[] = [
     albumName: 'Late Night Chill',
     durationMs: 150000,
     artworkUrl: 'https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?w=300&h=300&fit=crop',
+    audioFile: 'mock-1.mp3',
   },
   {
     id: 'mock-track-005',
@@ -55,6 +60,7 @@ export const trackFixtures: AppleMusicTrackFixture[] = [
     albumName: 'Baroque Classics',
     durationMs: 320000,
     artworkUrl: 'https://images.unsplash.com/photo-1507838153414-b4b713384a76?w=300&h=300&fit=crop',
+    audioFile: 'mock-2.mp3',
   },
   {
     id: 'mock-track-006',
@@ -63,6 +69,7 @@ export const trackFixtures: AppleMusicTrackFixture[] = [
     albumName: 'Focus & Study Piano',
     durationMs: 210000,
     artworkUrl: 'https://images.unsplash.com/photo-1520523839897-bd0b52f945a0?w=300&h=300&fit=crop',
+    audioFile: 'mock-3.mp3',
   },
   {
     id: 'mock-track-007',
@@ -71,6 +78,7 @@ export const trackFixtures: AppleMusicTrackFixture[] = [
     albumName: 'Sounds of the Forest',
     durationMs: 270000,
     artworkUrl: 'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=300&h=300&fit=crop',
+    audioFile: 'mock-1.mp3',
   },
 ];
 

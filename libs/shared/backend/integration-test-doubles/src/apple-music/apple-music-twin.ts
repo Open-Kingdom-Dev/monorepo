@@ -1,4 +1,7 @@
 import http from 'node:http';
+import path from 'node:path';
+import fs from 'node:fs';
+import { fileURLToPath } from 'node:url';
 import express, { Request, Response } from 'express';
 import cors from 'cors';
 import { createAppleMusicConfig, AppleMusicTwinConfig } from './apple-music-twin.config.js';
@@ -54,14 +57,31 @@ export class AppleMusicTwin {
       res.type('application/javascript').send(shimJs);
     });
 
+    // Audio static files
+    const __dirname = path.dirname(fileURLToPath(import.meta.url));
+    let audioPath = path.join(__dirname, 'audio');
+    if (!fs.existsSync(audioPath)) {
+      audioPath = path.join(__dirname, '../audio');
+    }
+    app.use(
+      '/v1/audio',
+      express.static(audioPath, {
+        setHeaders: (res) => {
+          res.setHeader('Access-Control-Allow-Origin', '*');
+          res.setHeader('Accept-Ranges', 'bytes');
+        },
+      })
+    );
+
     // --- Apple Music Catalog API ---
 
-    // Search
+    // Search — empty term returns all tracks/playlists
     app.get('/v1/catalog/:storefront/search', (req: Request, res: Response) => {
       const { term = '', types = 'songs' } = req.query as Record<string, string>;
       const requestedTypes = types.split(',');
 
-      const matchesTerm = (val: string) => val.toLowerCase().includes(term.toLowerCase());
+      const matchesTerm = (val: string) =>
+        term.trim() === '' || val.toLowerCase().includes(term.toLowerCase());
 
       const matchedTracks = requestedTypes.includes('songs')
         ? this.currentTracks.filter((t) => matchesTerm(t.name) || matchesTerm(t.artistName))
@@ -71,7 +91,7 @@ export class AppleMusicTwin {
         ? this.currentPlaylists.filter((p) => matchesTerm(p.name))
         : [];
 
-      const response = formatSearchResponse(matchedTracks, matchedPlaylists, this.currentTracks);
+      const response = formatSearchResponse(matchedTracks, matchedPlaylists, this.currentTracks, this.config.externalUrl);
       res.json(response);
     });
 
@@ -85,7 +105,7 @@ export class AppleMusicTwin {
         });
         return;
       }
-      res.json({ data: [formatTrackResource(track)] });
+      res.json({ data: [formatTrackResource(track, this.config.externalUrl)] });
     });
 
     // Get Single Playlist
@@ -98,7 +118,7 @@ export class AppleMusicTwin {
         });
         return;
       }
-      res.json({ data: [formatPlaylistResource(playlist, this.currentTracks)] });
+      res.json({ data: [formatPlaylistResource(playlist, this.currentTracks, this.config.externalUrl)] });
     });
 
     // Get Playlist Tracks
@@ -115,7 +135,7 @@ export class AppleMusicTwin {
         .map((tid) => this.currentTracks.find((t) => t.id === tid))
         .filter((t): t is AppleMusicTrackFixture => !!t);
 
-      res.json({ data: playlistTracks.map((t) => formatTrackResource(t)) });
+      res.json({ data: playlistTracks.map((t) => formatTrackResource(t, this.config.externalUrl)) });
     });
 
     // --- Custom Auth / Playback endpoints ---

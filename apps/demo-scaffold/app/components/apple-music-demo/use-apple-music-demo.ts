@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useDispatch } from 'react-redux';
 import {
   showSuccessNotification,
@@ -21,6 +21,7 @@ export interface AppleMusicTrack {
   albumName: string;
   durationMs: number;
   artworkUrl: string | null;
+  audioUrl?: string | null;
 }
 
 export interface AppleMusicPlaylist {
@@ -61,7 +62,7 @@ export default function useAppleMusicDemo() {
   const [clearErrorMode] = useAppleMusicTwinControllerClearErrorModeMutation();
 
   // Local State
-  const [query, setQuery] = useState('Meditation');
+  const [query, setQuery] = useState('');
   const [searching, setSearching] = useState(false);
   const [searchResults, setSearchResults] = useState<{ songs?: AppleMusicTrack[]; playlists?: AppleMusicPlaylist[] }>({});
   const [currentTrack, setCurrentTrack] = useState<AppleMusicTrack | null>(null);
@@ -69,14 +70,82 @@ export default function useAppleMusicDemo() {
   const [apiLogs, setApiLogs] = useState<ApiLogEntry[]>([]);
   const [selectedLogId, setSelectedLogId] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
+  const [progress, setProgress] = useState<number>(0);
+  const [duration, setDuration] = useState<number>(0);
+  const [volume, setVolume] = useState<number>(0.8); // 0..1
+
+  // Track if MusicKit listeners have already been registered to avoid stacking
+  const listenersRegistered = useRef(false);
+  // Track the queue of tracks for skip functionality
+  const currentQueueRef = useRef<AppleMusicTrack[]>([]);
+  const currentIndexRef = useRef<number>(-1);
 
   const activeLog = apiLogs.find((l) => l.id === selectedLogId) || apiLogs[0];
   const activeTwin = status?.running ?? false;
   const errorModeObj = status?.errorMode as { active?: boolean; mode?: string } | undefined;
   const errorActive = errorModeObj?.active ?? false;
   const currentErrorType = errorModeObj?.mode || 'none';
+  const twinUrl = status?.url || 'http://localhost:9019';
 
-  // Local Logger Helper (equivalent to the one inside use-youtube-demo.ts)
+  // --- Bug 6: Load all songs on initial mount when twin becomes active ---
+  const initialLoadDone = useRef(false);
+  useEffect(() => {
+    if (activeTwin && !initialLoadDone.current) {
+      initialLoadDone.current = true;
+      loadAllSongs();
+    }
+    if (!activeTwin) {
+      initialLoadDone.current = false;
+    }
+  }, [activeTwin]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const loadAllSongs = async () => {
+    setSearching(true);
+    const fetchUrl = `${twinUrl}/v1/catalog/us/search?term=&types=songs,playlists`;
+    try {
+      const res = await fetch(fetchUrl);
+      const data = await res.json();
+      const songs = mapSongs(data.results?.songs?.data || []);
+      const playlists = mapPlaylists(data.results?.playlists?.data || []);
+      setSearchResults({ songs, playlists });
+    } catch {
+      // silently fail on initial load — user can search manually
+    } finally {
+      setSearching(false);
+    }
+  };
+
+  // Helpers to map raw API results
+  const mapSongs = (rawSongs: any[]): AppleMusicTrack[] =>
+    rawSongs.map((s: any) => ({
+      id: s.id,
+      name: s.attributes.name,
+      artistName: s.attributes.artistName,
+      albumName: s.attributes.albumName,
+      durationMs: s.attributes.durationInMillis,
+      artworkUrl: s.attributes.artwork?.url || null,
+      audioUrl: s.attributes.audioUrl || null,
+    }));
+
+  const mapPlaylists = (rawPlaylists: any[]): AppleMusicPlaylist[] =>
+    rawPlaylists.map((p: any) => ({
+      id: p.id,
+      name: p.attributes.name,
+      description: p.attributes.description?.standard || null,
+      artworkUrl: p.attributes.artwork?.url || null,
+      trackCount: p.attributes.trackCount,
+      tracks: (p.relationships?.tracks?.data || []).map((t: any) => ({
+        id: t.id,
+        name: t.attributes.name,
+        artistName: t.attributes.artistName,
+        albumName: t.attributes.albumName,
+        durationMs: t.attributes.durationInMillis,
+        artworkUrl: t.attributes.artwork?.url || null,
+        audioUrl: t.attributes.audioUrl || null,
+      })),
+    }));
+
+  // Local Logger Helper
   async function logApiCall<T>(
     method: 'GET' | 'POST' | 'DELETE',
     url: string,
@@ -132,13 +201,28 @@ export default function useAppleMusicDemo() {
 
   const handleStopTwin = async () => {
     try {
+      // Stop browser audio FIRST — the <audio> element lives in the DOM and keeps
+      // playing even after the Express twin server is shut down.
+      const win = window as any;
+      const instance = win.MusicKit?.getInstance();
+      if (instance) {
+        instance._audio?.pause();
+        instance._audio && (instance._audio.currentTime = 0);
+        instance._audio && (instance._audio.src = '');
+        instance.playbackState = 4; // stopped
+        instance._trigger?.('playbackStateDidChange');
+      }
+      setCurrentTrack(null);
+      setProgress(0);
+      setDuration(0);
+      listenersRegistered.current = false; // allow fresh listener registration next play
+
       await logApiCall('POST', '/api/apple-music-twin/stop', async () => {
         const data = await stopTwin().unwrap();
         return { status: 200, statusText: 'OK', data };
       });
       dispatch(showSuccessNotification('Apple Music Twin stopped cleanly'));
       setSearchResults({});
-      setCurrentTrack(null);
       fetchStatus();
     } catch (err: any) {
       dispatch(logError('Failed to stop Apple Music Twin: ' + err.message));
@@ -163,11 +247,10 @@ export default function useAppleMusicDemo() {
   // Search Action
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!query.trim()) return;
 
     setSearching(true);
-    const twinUrl = status?.url || 'http://localhost:9019';
-    const fetchUrl = `${twinUrl}/v1/catalog/us/search?term=${encodeURIComponent(query)}&types=songs,playlists`;
+    const term = query.trim();
+    const fetchUrl = `${twinUrl}/v1/catalog/us/search?term=${encodeURIComponent(term)}&types=songs,playlists`;
 
     try {
       const response = await logApiCall('GET', fetchUrl, async () => {
@@ -177,31 +260,8 @@ export default function useAppleMusicDemo() {
         return { status: res.status, statusText: res.statusText, data };
       });
 
-      const songs = response.data.results?.songs?.data?.map((s: any) => ({
-        id: s.id,
-        name: s.attributes.name,
-        artistName: s.attributes.artistName,
-        albumName: s.attributes.albumName,
-        durationMs: s.attributes.durationInMillis,
-        artworkUrl: s.attributes.artwork?.url || null,
-      })) || [];
-
-      const playlists = response.data.results?.playlists?.data?.map((p: any) => ({
-        id: p.id,
-        name: p.attributes.name,
-        description: p.attributes.description?.standard || null,
-        artworkUrl: p.attributes.artwork?.url || null,
-        trackCount: p.attributes.trackCount,
-        tracks: p.relationships?.tracks?.data?.map((t: any) => ({
-          id: t.id,
-          name: t.attributes.name,
-          artistName: t.attributes.artistName,
-          albumName: t.attributes.albumName,
-          durationMs: t.attributes.durationInMillis,
-          artworkUrl: t.attributes.artwork?.url || null,
-        })) || [],
-      })) || [];
-
+      const songs = mapSongs(response.data.results?.songs?.data || []);
+      const playlists = mapPlaylists(response.data.results?.playlists?.data || []);
       setSearchResults({ songs, playlists });
     } catch (err: any) {
       dispatch(showErrorNotification('Search failed: ' + (err.data?.errors?.[0]?.detail || 'Server error')));
@@ -234,28 +294,100 @@ export default function useAppleMusicDemo() {
   const loadMusicKitApi = (): Promise<void> => {
     return new Promise((resolve) => {
       const win = window as any;
-      if (win.MusicKit && win.MusicKit.getInstance()) {
+      if (win.MusicKit) {
         resolve();
         return;
       }
 
-      const twinUrl = status?.url || 'http://localhost:9019';
       let script = document.getElementById('apple-music-twin-sdk') as HTMLScriptElement;
       if (!script) {
+        document.addEventListener('musickitloaded', () => resolve(), { once: true });
         script = document.createElement('script');
         script.id = 'apple-music-twin-sdk';
         script.src = `${twinUrl}/musickit.js`;
         document.body.appendChild(script);
-      }
-
-      document.addEventListener('musickitloaded', () => {
+      } else {
         resolve();
-      });
+      }
     });
   };
 
-  const playTrack = async (track: AppleMusicTrack) => {
+  // Get or create a configured MusicKit instance with all listeners attached once
+  const getMusicKitInstance = async () => {
+    await loadMusicKitApi();
+    const win = window as any;
+    const musicKit = win.MusicKit;
+    let instance = musicKit.getInstance();
+
+    if (!instance) {
+      instance = await musicKit.configure({
+        developerToken: 'mock-developer-token-jwt',
+        app: { name: 'Demo Scaffold', version: '1.0' },
+      });
+    }
+
+    // --- Bug 2/3 fix: Register listeners only once ---
+    if (!listenersRegistered.current) {
+      listenersRegistered.current = true;
+
+      instance.addEventListener('playbackStateDidChange', () => {
+        setPlaybackState(instance.playbackState);
+        if (instance.playbackState === 4) { // Stopped
+          setProgress(0);
+        }
+      });
+
+      instance.addEventListener('nowPlayingItemDidChange', () => {
+        // When the shim resolves the nowPlayingItem after a fetch, sync track to React state
+        if (instance.nowPlayingItem) {
+          const attrs = instance.nowPlayingItem.attributes;
+          if (attrs) {
+            setCurrentTrack((prev) => {
+              if (prev?.id === instance.nowPlayingItem.id) return prev;
+              return {
+                id: instance.nowPlayingItem.id,
+                name: attrs.name || '',
+                artistName: attrs.artistName || '',
+                albumName: attrs.albumName || '',
+                durationMs: attrs.durationInMillis || 0,
+                artworkUrl: attrs.artwork?.url || null,
+                audioUrl: attrs.audioUrl || null,
+              };
+            });
+          }
+        }
+      });
+
+      instance.addEventListener('playbackTimeDidChange', () => {
+        setProgress(instance.currentPlaybackTime || 0);
+      });
+
+      // Bug 2 fix: Use real durationchange from HTML5 audio, not mock durationMs
+      instance.addEventListener('playbackDurationDidChange', () => {
+        if (instance.currentPlaybackDuration && instance.currentPlaybackDuration > 0) {
+          setDuration(instance.currentPlaybackDuration);
+        }
+      });
+    }
+
+    // Bug 4 fix: Sync volume to audio element on every call
+    if (instance._audio) {
+      instance._audio.volume = volume;
+    }
+
+    return instance;
+  };
+
+  // Internal: play a track object directly using its audioUrl in the queue
+  const _playTrackInternal = async (track: AppleMusicTrack, queueTracks: AppleMusicTrack[], index: number) => {
     setCurrentTrack(track);
+    setProgress(0);
+    // Set mock duration immediately so UI isn't blank; real duration will overwrite via durationchange
+    setDuration(track.durationMs / 1000);
+
+    currentQueueRef.current = queueTracks;
+    currentIndexRef.current = index;
+
     const playLogId = Math.random().toString(36).substring(2, 9);
     setApiLogs((prev) => [
       {
@@ -272,31 +404,33 @@ export default function useAppleMusicDemo() {
     setSelectedLogId(playLogId);
 
     try {
-      await loadMusicKitApi();
-      const win = window as any;
-      const musicKit = win.MusicKit;
-      let instance = musicKit.getInstance();
+      const instance = await getMusicKitInstance();
 
-      if (!instance) {
-        instance = await musicKit.configure({
-          developerToken: 'mock-developer-token-jwt',
-          app: { name: 'Demo Scaffold', version: '1.0' },
-        });
-      }
-
-      instance.addEventListener('playbackStateDidChange', () => {
-        setPlaybackState(instance.playbackState);
+      // Bug 1 fix: Pass the full track with attributes (including audioUrl) directly
+      // so _updateNowPlaying doesn't need to fetch — audio src is set immediately
+      await instance.setQueue({
+        songs: [track.id],
+        // inject attributes pre-loaded so shim skips the catalog fetch
+        _preloadedAttributes: { [track.id]: {
+          name: track.name,
+          artistName: track.artistName,
+          albumName: track.albumName,
+          durationInMillis: track.durationMs,
+          audioUrl: track.audioUrl,
+          artwork: track.artworkUrl ? { url: track.artworkUrl } : null,
+        }},
       });
-
-      instance.addEventListener('nowPlayingItemDidChange', () => {
-        console.log('[MusicKit Shim] nowPlayingItem changed');
-      });
-
-      await instance.setQueue({ song: track.id });
       await instance.play();
     } catch (err: any) {
       dispatch(showErrorNotification('Failed to play track via MusicKit SDK'));
     }
+  };
+
+  // Public: play from a search result list (builds the queue from all results)
+  const playTrack = async (track: AppleMusicTrack) => {
+    const queue = searchResults.songs || [];
+    const index = queue.findIndex((t) => t.id === track.id);
+    await _playTrackInternal(track, queue.length > 0 ? queue : [track], index >= 0 ? index : 0);
   };
 
   const pauseTrack = async () => {
@@ -377,6 +511,32 @@ export default function useAppleMusicDemo() {
     }
   };
 
+  // Bug 5 fix: Next / Previous with actual queue traversal
+  const skipToNext = async () => {
+    const queue = currentQueueRef.current;
+    if (queue.length === 0) return;
+    const nextIndex = (currentIndexRef.current + 1) % queue.length;
+    await _playTrackInternal(queue[nextIndex], queue, nextIndex);
+  };
+
+  const skipToPrevious = async () => {
+    const queue = currentQueueRef.current;
+    if (queue.length === 0) return;
+    const prevIndex = (currentIndexRef.current - 1 + queue.length) % queue.length;
+    await _playTrackInternal(queue[prevIndex], queue, prevIndex);
+  };
+
+  // Bug 4 fix: Volume setter — applies to live audio element immediately
+  const setVolumeLevel = (level: number) => {
+    const clamped = Math.max(0, Math.min(1, level));
+    setVolume(clamped);
+    const win = window as any;
+    const instance = win.MusicKit?.getInstance();
+    if (instance?._audio) {
+      instance._audio.volume = clamped;
+    }
+  };
+
   const handleCopyToClipboard = async () => {
     if (!activeLog) return;
     try {
@@ -421,6 +581,12 @@ export default function useAppleMusicDemo() {
     pauseTrack,
     resumeTrack,
     stopTrack,
+    skipToNext,
+    skipToPrevious,
+    progress,
+    duration,
+    volume,
+    setVolumeLevel,
   };
 }
 
