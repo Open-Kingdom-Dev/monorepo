@@ -163,6 +163,45 @@ const handlers = configs.map((config) =>
 );
 ```
 
+### AppleMusicTwin
+
+#### AppleMusicTwin Constructor
+
+```typescript
+constructor(overrides?: Partial<AppleMusicTwinConfig>)
+```
+
+- `overrides.port`: Port to run the twin on (default: 9019, or from `APPLE_MUSIC_TWIN_PORT` env var; must be within 9010-9020)
+- `overrides.externalUrl`: External URL for the twin (default: `http://localhost:{port}`)
+
+#### AppleMusicTwin Methods
+
+- `start()`: Start the Express server
+- `stop()`: Stop the Express server
+- `reset()`: Reset catalog fixtures, auth state, and clear any active error mode
+- `getEmulatorHost()`: Get the twin URL (e.g., `http://localhost:9019`)
+- `isHealthy()`: Check if the twin is running and responding
+
+#### Browser-Side MSW Interception
+
+Use `getAppleMusicMswHandlerConfigs(twinBaseUrl)` to export mock route definitions for browser-side testing frameworks like MSW:
+
+```typescript
+import { http, HttpResponse } from 'msw';
+import { getAppleMusicMswHandlerConfigs } from '@open-kingdom/shared-backend-integration-test-doubles';
+
+const configs = getAppleMusicMswHandlerConfigs('http://localhost:9019');
+const handlers = configs.map((config) =>
+  http.get(config.url, async () => {
+    const res = await fetch(config.proxyTo);
+    const body = await res.text();
+    return new HttpResponse(body, {
+      headers: { 'Content-Type': config.contentType },
+    });
+  })
+);
+```
+
 ### Exports
 
 ```typescript

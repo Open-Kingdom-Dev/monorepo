@@ -56,6 +56,12 @@
         "dependsOn": [
           "^build"
         ]
+      },
+      "start:apple-music-twin": {
+        "command": "npx tsx libs/shared/backend/integration-test-doubles/scripts/start-apple-music-twin.ts",
+        "dependsOn": [
+          "^build"
+        ]
       }
     }
   },
