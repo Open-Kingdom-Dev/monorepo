@@ -4,9 +4,21 @@ import fs from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import express, { Request, Response } from 'express';
 import cors from 'cors';
-import { createAppleMusicConfig, AppleMusicTwinConfig } from './apple-music-twin.config.js';
-import { trackFixtures, playlistFixtures, AppleMusicTrackFixture, AppleMusicPlaylistFixture } from './catalog-fixtures.js';
-import { formatSearchResponse, formatTrackResource, formatPlaylistResource } from './catalog-response.js';
+import {
+  createAppleMusicConfig,
+  AppleMusicTwinConfig,
+} from './apple-music-twin.config.js';
+import {
+  trackFixtures,
+  playlistFixtures,
+  AppleMusicTrackFixture,
+  AppleMusicPlaylistFixture,
+} from './catalog-fixtures.js';
+import {
+  formatSearchResponse,
+  formatTrackResource,
+  formatPlaylistResource,
+} from './catalog-response.js';
 import { generatePlayerShim } from './player-shim.js';
 import { AppleMusicErrorModeManager } from './apple-music-error-mode.js';
 
@@ -77,66 +89,114 @@ export class AppleMusicTwin {
 
     // Search — empty term returns all tracks/playlists
     app.get('/v1/catalog/:storefront/search', (req: Request, res: Response) => {
-      const { term = '', types = 'songs' } = req.query as Record<string, string>;
+      const { term = '', types = 'songs' } = req.query as Record<
+        string,
+        string
+      >;
       const requestedTypes = types.split(',');
 
       const matchesTerm = (val: string) =>
         term.trim() === '' || val.toLowerCase().includes(term.toLowerCase());
 
       const matchedTracks = requestedTypes.includes('songs')
-        ? this.currentTracks.filter((t) => matchesTerm(t.name) || matchesTerm(t.artistName))
+        ? this.currentTracks.filter(
+            (t) => matchesTerm(t.name) || matchesTerm(t.artistName)
+          )
         : [];
 
       const matchedPlaylists = requestedTypes.includes('playlists')
         ? this.currentPlaylists.filter((p) => matchesTerm(p.name))
         : [];
 
-      const response = formatSearchResponse(matchedTracks, matchedPlaylists, this.currentTracks, this.config.externalUrl);
+      const response = formatSearchResponse(
+        matchedTracks,
+        matchedPlaylists,
+        this.currentTracks,
+        this.config.externalUrl
+      );
       res.json(response);
     });
 
     // Get Single Song
-    app.get('/v1/catalog/:storefront/songs/:id', (req: Request, res: Response) => {
-      const { id } = req.params;
-      const track = this.currentTracks.find((t) => t.id === id);
-      if (!track) {
-        res.status(404).json({
-          errors: [{ title: 'Resource Not Found', detail: `Song with ID ${id} not found.` }],
+    app.get(
+      '/v1/catalog/:storefront/songs/:id',
+      (req: Request, res: Response) => {
+        const { id } = req.params;
+        const track = this.currentTracks.find((t) => t.id === id);
+        if (!track) {
+          res.status(404).json({
+            errors: [
+              {
+                title: 'Resource Not Found',
+                detail: `Song with ID ${id} not found.`,
+              },
+            ],
+          });
+          return;
+        }
+        res.json({
+          data: [formatTrackResource(track, this.config.externalUrl)],
         });
-        return;
       }
-      res.json({ data: [formatTrackResource(track, this.config.externalUrl)] });
-    });
+    );
 
     // Get Single Playlist
-    app.get('/v1/catalog/:storefront/playlists/:id', (req: Request, res: Response) => {
-      const { id } = req.params;
-      const playlist = this.currentPlaylists.find((p) => p.id === id);
-      if (!playlist) {
-        res.status(404).json({
-          errors: [{ title: 'Resource Not Found', detail: `Playlist with ID ${id} not found.` }],
+    app.get(
+      '/v1/catalog/:storefront/playlists/:id',
+      (req: Request, res: Response) => {
+        const { id } = req.params;
+        const playlist = this.currentPlaylists.find((p) => p.id === id);
+        if (!playlist) {
+          res.status(404).json({
+            errors: [
+              {
+                title: 'Resource Not Found',
+                detail: `Playlist with ID ${id} not found.`,
+              },
+            ],
+          });
+          return;
+        }
+        res.json({
+          data: [
+            formatPlaylistResource(
+              playlist,
+              this.currentTracks,
+              this.config.externalUrl
+            ),
+          ],
         });
-        return;
       }
-      res.json({ data: [formatPlaylistResource(playlist, this.currentTracks, this.config.externalUrl)] });
-    });
+    );
 
     // Get Playlist Tracks
-    app.get('/v1/catalog/:storefront/playlists/:id/tracks', (req: Request, res: Response) => {
-      const { id } = req.params;
-      const playlist = this.currentPlaylists.find((p) => p.id === id);
-      if (!playlist) {
-        res.status(404).json({
-          errors: [{ title: 'Resource Not Found', detail: `Playlist with ID ${id} not found.` }],
-        });
-        return;
-      }
-      const playlistTracks = playlist.trackIds
-        .map((tid) => this.currentTracks.find((t) => t.id === tid))
-        .filter((t): t is AppleMusicTrackFixture => !!t);
+    app.get(
+      '/v1/catalog/:storefront/playlists/:id/tracks',
+      (req: Request, res: Response) => {
+        const { id } = req.params;
+        const playlist = this.currentPlaylists.find((p) => p.id === id);
+        if (!playlist) {
+          res.status(404).json({
+            errors: [
+              {
+                title: 'Resource Not Found',
+                detail: `Playlist with ID ${id} not found.`,
+              },
+            ],
+          });
+          return;
+        }
+        const playlistTracks = playlist.trackIds
+          .map((tid) => this.currentTracks.find((t) => t.id === tid))
+          .filter((t): t is AppleMusicTrackFixture => !!t);
 
-      res.json({ data: playlistTracks.map((t) => formatTrackResource(t, this.config.externalUrl)) });
-    });
+        res.json({
+          data: playlistTracks.map((t) =>
+            formatTrackResource(t, this.config.externalUrl)
+          ),
+        });
+      }
+    );
 
     // --- Custom Auth / Playback endpoints ---
 
@@ -181,7 +241,10 @@ export class AppleMusicTwin {
     // Playback Telemetry Report
     app.post('/v1/playback', (req: Request, res: Response) => {
       this.currentPlayback = req.body;
-      console.log('[AppleMusicTwin] Playback telemetry received:', this.currentPlayback);
+      console.log(
+        '[AppleMusicTwin] Playback telemetry received:',
+        this.currentPlayback
+      );
       res.json({ success: true });
     });
 
@@ -193,10 +256,13 @@ export class AppleMusicTwin {
     });
 
     // Reset
-    app.post('/test/apple-music/reset', async (_req: Request, res: Response) => {
-      await this.reset();
-      res.json({ success: true });
-    });
+    app.post(
+      '/test/apple-music/reset',
+      async (_req: Request, res: Response) => {
+        await this.reset();
+        res.json({ success: true });
+      }
+    );
 
     // Runtime fixtures override
     app.put('/test/apple-music/fixtures', (req: Request, res: Response) => {
@@ -221,10 +287,13 @@ export class AppleMusicTwin {
       res.json({ success: true, mode });
     });
 
-    app.delete('/test/apple-music/error-mode', (_req: Request, res: Response) => {
-      this.errorModeManager.clearMode();
-      res.json({ success: true, mode: null });
-    });
+    app.delete(
+      '/test/apple-music/error-mode',
+      (_req: Request, res: Response) => {
+        this.errorModeManager.clearMode();
+        res.json({ success: true, mode: null });
+      }
+    );
 
     app.get('/test/apple-music/error-mode', (_req: Request, res: Response) => {
       const mode = this.errorModeManager.getMode();
@@ -233,7 +302,9 @@ export class AppleMusicTwin {
 
     return new Promise<void>((resolve, reject) => {
       this.server = app.listen(this.config.port, () => {
-        console.log(`[AppleMusicTwin] Express server listening on port ${this.config.port}`);
+        console.log(
+          `[AppleMusicTwin] Express server listening on port ${this.config.port}`
+        );
         resolve();
       });
       this.server.on('error', reject);
@@ -269,9 +340,12 @@ export class AppleMusicTwin {
 
   async isHealthy(): Promise<boolean> {
     try {
-      const res = await fetch(`${this.config.externalUrl}/test/apple-music/health`, {
-        headers: { Connection: 'close' },
-      });
+      const res = await fetch(
+        `${this.config.externalUrl}/test/apple-music/health`,
+        {
+          headers: { Connection: 'close' },
+        }
+      );
       await res.text();
       return res.ok;
     } catch {

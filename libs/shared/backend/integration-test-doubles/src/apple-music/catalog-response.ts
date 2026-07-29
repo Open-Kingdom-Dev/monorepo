@@ -1,6 +1,12 @@
-import { AppleMusicTrackFixture, AppleMusicPlaylistFixture } from './catalog-fixtures.js';
+import {
+  AppleMusicTrackFixture,
+  AppleMusicPlaylistFixture,
+} from './catalog-fixtures.js';
 
-export function formatTrackResource(track: AppleMusicTrackFixture, baseUrl?: string) {
+export function formatTrackResource(
+  track: AppleMusicTrackFixture,
+  baseUrl?: string
+) {
   return {
     id: track.id,
     type: 'songs',

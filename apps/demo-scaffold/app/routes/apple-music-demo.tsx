@@ -33,7 +33,9 @@ export default function AppleMusicDemo() {
             </h1>
           </div>
           <p className="text-gray-500 max-w-2xl text-sm font-medium leading-relaxed">
-            Verify mock catalog lookups, simulate edge-case exceptions, and test the custom browser-side MusicKit JS SDK emulator inside a premium, interactive playback workspace.
+            Verify mock catalog lookups, simulate edge-case exceptions, and test
+            the custom browser-side MusicKit JS SDK emulator inside a premium,
+            interactive playback workspace.
           </p>
         </div>
 

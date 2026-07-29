@@ -17,7 +17,9 @@ describe('AppleMusicTwin Configuration', () => {
   it('should use default values', () => {
     const config = createAppleMusicConfig();
     expect(config.port).toBe(DEFAULT_PORTS.APPLE_MUSIC);
-    expect(config.externalUrl).toBe(`http://localhost:${DEFAULT_PORTS.APPLE_MUSIC}`);
+    expect(config.externalUrl).toBe(
+      `http://localhost:${DEFAULT_PORTS.APPLE_MUSIC}`
+    );
   });
 
   it('should override port with environment variable', () => {
@@ -35,7 +37,9 @@ describe('AppleMusicTwin Configuration', () => {
   });
 
   it('should throw error for out-of-range port', () => {
-    expect(() => createAppleMusicConfig({ port: 8080 })).toThrow(/is outside the reserved range/);
+    expect(() => createAppleMusicConfig({ port: 8080 })).toThrow(
+      /is outside the reserved range/
+    );
   });
 });
 
@@ -65,7 +69,9 @@ describe('AppleMusicTwin Server Lifecycle', () => {
   it('should serve catalog search', async () => {
     await twin.start();
 
-    const response = await fetch(`${TEST_URL}/v1/catalog/us/search?term=Meditation&types=songs`);
+    const response = await fetch(
+      `${TEST_URL}/v1/catalog/us/search?term=Meditation&types=songs`
+    );
     expect(response.status).toBe(200);
 
     const body: any = await response.json();
@@ -76,7 +82,9 @@ describe('AppleMusicTwin Server Lifecycle', () => {
   it('should serve single songs', async () => {
     await twin.start();
 
-    const response = await fetch(`${TEST_URL}/v1/catalog/us/songs/mock-track-001`);
+    const response = await fetch(
+      `${TEST_URL}/v1/catalog/us/songs/mock-track-001`
+    );
     expect(response.status).toBe(200);
 
     const body: any = await response.json();
@@ -91,7 +99,9 @@ describe('AppleMusicTwin Server Lifecycle', () => {
 
     const body = await response.text();
     expect(body).toContain('window.MusicKit =');
-    expect(body).toContain('document.dispatchEvent(new Event(\'musickitloaded\'));');
+    expect(body).toContain(
+      "document.dispatchEvent(new Event('musickitloaded'));"
+    );
   });
 
   it('should handle simulated errors', async () => {
@@ -112,7 +122,9 @@ describe('AppleMusicTwin Server Lifecycle', () => {
     expect(body.errors[0].title).toBe('Unauthorized');
 
     // Deactivate error mode
-    res = await fetch(`${TEST_URL}/test/apple-music/error-mode`, { method: 'DELETE' });
+    res = await fetch(`${TEST_URL}/test/apple-music/error-mode`, {
+      method: 'DELETE',
+    });
     expect(res.status).toBe(200);
 
     res = await fetch(`${TEST_URL}/v1/catalog/us/songs/mock-track-001`);

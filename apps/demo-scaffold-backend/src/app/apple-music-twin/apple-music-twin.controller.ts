@@ -1,4 +1,13 @@
-import { Controller, Get, Post, Delete, Body, HttpCode, HttpStatus, BadRequestException } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Delete,
+  Body,
+  HttpCode,
+  HttpStatus,
+  BadRequestException,
+} from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { Public } from '@open-kingdom/shared-backend-util-rbac';
 import { AppleMusicTwinService } from './apple-music-twin.service.js';
@@ -74,7 +83,10 @@ export class AppleMusicTwinController {
   })
   async reset(): Promise<{ success: boolean; message: string }> {
     await this.appleMusicTwinService.reset();
-    return { success: true, message: 'Apple Music twin state reset successfully' };
+    return {
+      success: true,
+      message: 'Apple Music twin state reset successfully',
+    };
   }
 
   @Public()
@@ -82,13 +94,16 @@ export class AppleMusicTwinController {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
     summary: 'Set Apple Music twin error mode',
-    description: 'Configures a simulated error mode (unauthorized, rate-limited, etc.).',
+    description:
+      'Configures a simulated error mode (unauthorized, rate-limited, etc.).',
   })
   @ApiResponse({
     status: 200,
     description: 'Apple Music twin error mode configured successfully',
   })
-  async setErrorMode(@Body() dto: AppleMusicErrorModeStateDto): Promise<{ success: boolean }> {
+  async setErrorMode(
+    @Body() dto: AppleMusicErrorModeStateDto
+  ): Promise<{ success: boolean }> {
     if (!dto.mode) {
       throw new BadRequestException('Error mode is required');
     }

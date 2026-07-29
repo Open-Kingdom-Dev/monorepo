@@ -24,14 +24,20 @@ export function AppleMusicTwinStatus({ demo }: AppleMusicTwinStatusProps) {
         {loadingStatus ? (
           <span className="text-xs text-gray-400">Loading...</span>
         ) : (
-          <span className={`h-2.5 w-2.5 rounded-full ${activeTwin ? 'bg-green-500' : 'bg-red-500'}`} />
+          <span
+            className={`h-2.5 w-2.5 rounded-full ${
+              activeTwin ? 'bg-green-500' : 'bg-red-500'
+            }`}
+          />
         )}
       </div>
 
       <div className="space-y-2 text-xs">
         <div className="flex justify-between">
           <span className="text-gray-500">Service Port:</span>
-          <span className="font-semibold text-gray-800">{status?.port || 9019}</span>
+          <span className="font-semibold text-gray-800">
+            {status?.port || 9019}
+          </span>
         </div>
         <div className="flex justify-between">
           <span className="text-gray-500">Emulator URL:</span>

@@ -57,11 +57,23 @@ export class AppleMusicErrorModeManager {
 
     switch (this.activeMode.type) {
       case 'unauthorized':
-        return appleMusicError(401, 'Unauthorized', 'The developer token is missing or invalid.');
+        return appleMusicError(
+          401,
+          'Unauthorized',
+          'The developer token is missing or invalid.'
+        );
       case 'expired-token':
-        return appleMusicError(403, 'Forbidden', 'The user token has expired or is invalid.');
+        return appleMusicError(
+          403,
+          'Forbidden',
+          'The user token has expired or is invalid.'
+        );
       case 'rate-limited':
-        return appleMusicError(429, 'Too Many Requests', 'The request was rate limited.');
+        return appleMusicError(
+          429,
+          'Too Many Requests',
+          'The request was rate limited.'
+        );
       case 'empty-results':
         if (path.includes('/search')) {
           return {
@@ -73,7 +85,11 @@ export class AppleMusicErrorModeManager {
         }
         return null;
       case 'not-found':
-        return appleMusicError(404, 'Not Found', 'The requested resource was not found.');
+        return appleMusicError(
+          404,
+          'Not Found',
+          'The requested resource was not found.'
+        );
       default:
         return null;
     }

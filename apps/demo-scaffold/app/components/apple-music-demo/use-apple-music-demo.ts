@@ -55,17 +55,26 @@ export default function useAppleMusicDemo() {
     pollingInterval: 5000,
   });
 
-  const [startTwin, { isLoading: startingTwin }] = useAppleMusicTwinControllerStartMutation();
-  const [stopTwin, { isLoading: stoppingTwin }] = useAppleMusicTwinControllerStopMutation();
-  const [resetTwin, { isLoading: resettingTwin }] = useAppleMusicTwinControllerResetMutation();
-  const [setErrorMode, { isLoading: activatingError }] = useAppleMusicTwinControllerSetErrorModeMutation();
+  const [startTwin, { isLoading: startingTwin }] =
+    useAppleMusicTwinControllerStartMutation();
+  const [stopTwin, { isLoading: stoppingTwin }] =
+    useAppleMusicTwinControllerStopMutation();
+  const [resetTwin, { isLoading: resettingTwin }] =
+    useAppleMusicTwinControllerResetMutation();
+  const [setErrorMode, { isLoading: activatingError }] =
+    useAppleMusicTwinControllerSetErrorModeMutation();
   const [clearErrorMode] = useAppleMusicTwinControllerClearErrorModeMutation();
 
   // Local State
   const [query, setQuery] = useState('');
   const [searching, setSearching] = useState(false);
-  const [searchResults, setSearchResults] = useState<{ songs?: AppleMusicTrack[]; playlists?: AppleMusicPlaylist[] }>({});
-  const [currentTrack, setCurrentTrack] = useState<AppleMusicTrack | null>(null);
+  const [searchResults, setSearchResults] = useState<{
+    songs?: AppleMusicTrack[];
+    playlists?: AppleMusicPlaylist[];
+  }>({});
+  const [currentTrack, setCurrentTrack] = useState<AppleMusicTrack | null>(
+    null
+  );
   const [playbackState, setPlaybackState] = useState<number>(4); // Stopped (4)
   const [apiLogs, setApiLogs] = useState<ApiLogEntry[]>([]);
   const [selectedLogId, setSelectedLogId] = useState<string | null>(null);
@@ -82,7 +91,9 @@ export default function useAppleMusicDemo() {
 
   const activeLog = apiLogs.find((l) => l.id === selectedLogId) || apiLogs[0];
   const activeTwin = status?.running ?? false;
-  const errorModeObj = status?.errorMode as { active?: boolean; mode?: string } | undefined;
+  const errorModeObj = status?.errorMode as
+    | { active?: boolean; mode?: string }
+    | undefined;
   const errorActive = errorModeObj?.active ?? false;
   const currentErrorType = errorModeObj?.mode || 'none';
   const twinUrl = status?.url || 'http://localhost:9019';
@@ -191,7 +202,9 @@ export default function useAppleMusicDemo() {
         const data = await startTwin().unwrap();
         return { status: 200, statusText: 'OK', data };
       });
-      dispatch(showSuccessNotification('Apple Music Twin started successfully'));
+      dispatch(
+        showSuccessNotification('Apple Music Twin started successfully')
+      );
       fetchStatus();
     } catch (err: any) {
       dispatch(logError('Failed to start Apple Music Twin: ' + err.message));
@@ -236,7 +249,9 @@ export default function useAppleMusicDemo() {
         const data = await resetTwin().unwrap();
         return { status: 200, statusText: 'OK', data };
       });
-      dispatch(showSuccessNotification('Apple Music Twin state reset successfully'));
+      dispatch(
+        showSuccessNotification('Apple Music Twin state reset successfully')
+      );
       fetchStatus();
     } catch (err: any) {
       dispatch(logError('Failed to reset Apple Music Twin: ' + err.message));
@@ -250,7 +265,9 @@ export default function useAppleMusicDemo() {
 
     setSearching(true);
     const term = query.trim();
-    const fetchUrl = `${twinUrl}/v1/catalog/us/search?term=${encodeURIComponent(term)}&types=songs,playlists`;
+    const fetchUrl = `${twinUrl}/v1/catalog/us/search?term=${encodeURIComponent(
+      term
+    )}&types=songs,playlists`;
 
     try {
       const response = await logApiCall('GET', fetchUrl, async () => {
@@ -261,10 +278,16 @@ export default function useAppleMusicDemo() {
       });
 
       const songs = mapSongs(response.data.results?.songs?.data || []);
-      const playlists = mapPlaylists(response.data.results?.playlists?.data || []);
+      const playlists = mapPlaylists(
+        response.data.results?.playlists?.data || []
+      );
       setSearchResults({ songs, playlists });
     } catch (err: any) {
-      dispatch(showErrorNotification('Search failed: ' + (err.data?.errors?.[0]?.detail || 'Server error')));
+      dispatch(
+        showErrorNotification(
+          'Search failed: ' + (err.data?.errors?.[0]?.detail || 'Server error')
+        )
+      );
     } finally {
       setSearching(false);
     }
@@ -274,15 +297,25 @@ export default function useAppleMusicDemo() {
   const handleSetErrorMode = async (mode: string) => {
     try {
       if (mode === 'none') {
-        await logApiCall('DELETE', '/api/apple-music-twin/error-mode', async () => {
-          const data = await clearErrorMode().unwrap();
-          return { status: 200, statusText: 'OK', data };
-        });
+        await logApiCall(
+          'DELETE',
+          '/api/apple-music-twin/error-mode',
+          async () => {
+            const data = await clearErrorMode().unwrap();
+            return { status: 200, statusText: 'OK', data };
+          }
+        );
       } else {
-        await logApiCall('POST', '/api/apple-music-twin/error-mode', async () => {
-          const data = await setErrorMode({ appleMusicErrorModeStateDto: { mode } }).unwrap();
-          return { status: 200, statusText: 'OK', data };
-        });
+        await logApiCall(
+          'POST',
+          '/api/apple-music-twin/error-mode',
+          async () => {
+            const data = await setErrorMode({
+              appleMusicErrorModeStateDto: { mode },
+            }).unwrap();
+            return { status: 200, statusText: 'OK', data };
+          }
+        );
       }
       fetchStatus();
     } catch (err: any) {
@@ -299,9 +332,13 @@ export default function useAppleMusicDemo() {
         return;
       }
 
-      let script = document.getElementById('apple-music-twin-sdk') as HTMLScriptElement;
+      let script = document.getElementById(
+        'apple-music-twin-sdk'
+      ) as HTMLScriptElement;
       if (!script) {
-        document.addEventListener('musickitloaded', () => resolve(), { once: true });
+        document.addEventListener('musickitloaded', () => resolve(), {
+          once: true,
+        });
         script = document.createElement('script');
         script.id = 'apple-music-twin-sdk';
         script.src = `${twinUrl}/musickit.js`;
@@ -332,7 +369,8 @@ export default function useAppleMusicDemo() {
 
       instance.addEventListener('playbackStateDidChange', () => {
         setPlaybackState(instance.playbackState);
-        if (instance.playbackState === 4) { // Stopped
+        if (instance.playbackState === 4) {
+          // Stopped
           setProgress(0);
         }
       });
@@ -364,7 +402,10 @@ export default function useAppleMusicDemo() {
 
       // Bug 2 fix: Use real durationchange from HTML5 audio, not mock durationMs
       instance.addEventListener('playbackDurationDidChange', () => {
-        if (instance.currentPlaybackDuration && instance.currentPlaybackDuration > 0) {
+        if (
+          instance.currentPlaybackDuration &&
+          instance.currentPlaybackDuration > 0
+        ) {
           setDuration(instance.currentPlaybackDuration);
         }
       });
@@ -379,7 +420,11 @@ export default function useAppleMusicDemo() {
   };
 
   // Internal: play a track object directly using its audioUrl in the queue
-  const _playTrackInternal = async (track: AppleMusicTrack, queueTracks: AppleMusicTrack[], index: number) => {
+  const _playTrackInternal = async (
+    track: AppleMusicTrack,
+    queueTracks: AppleMusicTrack[],
+    index: number
+  ) => {
     setCurrentTrack(track);
     setProgress(0);
     // Set mock duration immediately so UI isn't blank; real duration will overwrite via durationchange
@@ -411,14 +456,16 @@ export default function useAppleMusicDemo() {
       await instance.setQueue({
         songs: [track.id],
         // inject attributes pre-loaded so shim skips the catalog fetch
-        _preloadedAttributes: { [track.id]: {
-          name: track.name,
-          artistName: track.artistName,
-          albumName: track.albumName,
-          durationInMillis: track.durationMs,
-          audioUrl: track.audioUrl,
-          artwork: track.artworkUrl ? { url: track.artworkUrl } : null,
-        }},
+        _preloadedAttributes: {
+          [track.id]: {
+            name: track.name,
+            artistName: track.artistName,
+            albumName: track.albumName,
+            durationInMillis: track.durationMs,
+            audioUrl: track.audioUrl,
+            artwork: track.artworkUrl ? { url: track.artworkUrl } : null,
+          },
+        },
       });
       await instance.play();
     } catch (err: any) {
@@ -430,7 +477,11 @@ export default function useAppleMusicDemo() {
   const playTrack = async (track: AppleMusicTrack) => {
     const queue = searchResults.songs || [];
     const index = queue.findIndex((t) => t.id === track.id);
-    await _playTrackInternal(track, queue.length > 0 ? queue : [track], index >= 0 ? index : 0);
+    await _playTrackInternal(
+      track,
+      queue.length > 0 ? queue : [track],
+      index >= 0 ? index : 0
+    );
   };
 
   const pauseTrack = async () => {
@@ -448,7 +499,10 @@ export default function useAppleMusicDemo() {
             url: 'musickit-player://pause',
             status: 200,
             statusText: 'OK',
-            response: { event: 'onPause', message: 'Playback paused via MusicKit SDK' },
+            response: {
+              event: 'onPause',
+              message: 'Playback paused via MusicKit SDK',
+            },
           },
           ...prev,
         ]);
@@ -474,7 +528,10 @@ export default function useAppleMusicDemo() {
             url: 'musickit-player://resume',
             status: 200,
             statusText: 'OK',
-            response: { event: 'onResume', message: 'Playback resumed via MusicKit SDK' },
+            response: {
+              event: 'onResume',
+              message: 'Playback resumed via MusicKit SDK',
+            },
           },
           ...prev,
         ]);
@@ -500,7 +557,10 @@ export default function useAppleMusicDemo() {
             url: 'musickit-player://stop',
             status: 200,
             statusText: 'OK',
-            response: { event: 'onStop', message: 'Playback stopped via MusicKit SDK' },
+            response: {
+              event: 'onStop',
+              message: 'Playback stopped via MusicKit SDK',
+            },
           },
           ...prev,
         ]);
@@ -522,7 +582,8 @@ export default function useAppleMusicDemo() {
   const skipToPrevious = async () => {
     const queue = currentQueueRef.current;
     if (queue.length === 0) return;
-    const prevIndex = (currentIndexRef.current - 1 + queue.length) % queue.length;
+    const prevIndex =
+      (currentIndexRef.current - 1 + queue.length) % queue.length;
     await _playTrackInternal(queue[prevIndex], queue, prevIndex);
   };
 
@@ -540,7 +601,9 @@ export default function useAppleMusicDemo() {
   const handleCopyToClipboard = async () => {
     if (!activeLog) return;
     try {
-      await navigator.clipboard.writeText(JSON.stringify(activeLog.response, null, 2));
+      await navigator.clipboard.writeText(
+        JSON.stringify(activeLog.response, null, 2)
+      );
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch {

@@ -229,7 +229,9 @@ export function AppleMusicPlayerShim({ demo }: { demo: AppleMusicDemoHook }) {
               style={{ left: `calc(${volume * 100}% - 6px)` }}
             />
           </div>
-          <span className="text-[10px] font-mono w-6 text-right">{Math.round(volume * 100)}</span>
+          <span className="text-[10px] font-mono w-6 text-right">
+            {Math.round(volume * 100)}
+          </span>
         </div>
       </div>
 

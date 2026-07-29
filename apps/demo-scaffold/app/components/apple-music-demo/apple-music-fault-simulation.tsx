@@ -4,8 +4,16 @@ interface AppleMusicFaultSimulationProps {
   demo: AppleMusicDemoHook;
 }
 
-export function AppleMusicFaultSimulation({ demo }: AppleMusicFaultSimulationProps) {
-  const { activeTwin, activatingError, currentErrorType, errorActive, handleSetErrorMode } = demo;
+export function AppleMusicFaultSimulation({
+  demo,
+}: AppleMusicFaultSimulationProps) {
+  const {
+    activeTwin,
+    activatingError,
+    currentErrorType,
+    errorActive,
+    handleSetErrorMode,
+  } = demo;
 
   const errorModes = [
     { value: 'none', label: 'None (Healthy)' },
@@ -17,9 +25,13 @@ export function AppleMusicFaultSimulation({ demo }: AppleMusicFaultSimulationPro
 
   return (
     <div className="border rounded-xl bg-white shadow-sm p-5 space-y-4">
-      <h3 className="font-bold text-gray-900 border-b pb-2 text-md">Fault Simulation</h3>
+      <h3 className="font-bold text-gray-900 border-b pb-2 text-md">
+        Fault Simulation
+      </h3>
       <div className="space-y-3">
-        <label className="block text-xs font-semibold text-gray-500">Inject Simulated Error:</label>
+        <label className="block text-xs font-semibold text-gray-500">
+          Inject Simulated Error:
+        </label>
         <select
           disabled={!activeTwin || activatingError}
           value={currentErrorType}
@@ -34,7 +46,8 @@ export function AppleMusicFaultSimulation({ demo }: AppleMusicFaultSimulationPro
         </select>
         {errorActive && (
           <div className="p-3 bg-red-50 border border-red-100 text-red-800 text-xs rounded-lg font-medium leading-relaxed">
-            ⚠️ Simulated mode active. Active requests to catalog or play tracks will return mock failures.
+            ⚠️ Simulated mode active. Active requests to catalog or play tracks
+            will return mock failures.
           </div>
         )}
       </div>

@@ -8,8 +8,13 @@ export function AppleMusicSearchPanel({ demo }: AppleMusicSearchPanelProps) {
   const { activeTwin, searching, query, setQuery, handleSearch } = demo;
 
   return (
-    <form onSubmit={handleSearch} className="border rounded-xl bg-white shadow-sm p-5 space-y-4">
-      <h3 className="font-bold text-gray-900 border-b pb-2 text-md">Catalog Explorer</h3>
+    <form
+      onSubmit={handleSearch}
+      className="border rounded-xl bg-white shadow-sm p-5 space-y-4"
+    >
+      <h3 className="font-bold text-gray-900 border-b pb-2 text-md">
+        Catalog Explorer
+      </h3>
       <div className="flex gap-2">
         <input
           type="text"

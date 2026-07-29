@@ -5,7 +5,9 @@ interface AppleMusicOfflineBannerProps {
   demo: AppleMusicDemoHook;
 }
 
-export function AppleMusicOfflineBanner({ demo }: AppleMusicOfflineBannerProps) {
+export function AppleMusicOfflineBanner({
+  demo,
+}: AppleMusicOfflineBannerProps) {
   const { activeTwin, startingTwin, handleStartTwin } = demo;
 
   if (activeTwin) return null;
@@ -17,7 +19,8 @@ export function AppleMusicOfflineBanner({ demo }: AppleMusicOfflineBannerProps) 
         <div>
           <h4 className="font-bold text-sm">Apple Music Twin Offline</h4>
           <p className="text-xs text-red-700 mt-0.5">
-            The Express simulator server is stopped. Please start the service to enable search and playback shims.
+            The Express simulator server is stopped. Please start the service to
+            enable search and playback shims.
           </p>
         </div>
       </div>

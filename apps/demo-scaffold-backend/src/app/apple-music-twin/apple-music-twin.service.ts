@@ -6,7 +6,10 @@ export class AppleMusicTwinService implements OnModuleDestroy {
   private readonly logger = new Logger(AppleMusicTwinService.name);
   private twin: AppleMusicTwin | null = null;
   private started = false;
-  private readonly port = parseInt(process.env.APPLE_MUSIC_TWIN_PORT || '9019', 10);
+  private readonly port = parseInt(
+    process.env.APPLE_MUSIC_TWIN_PORT || '9019',
+    10
+  );
 
   async start(): Promise<{ success: boolean; message: string; url?: string }> {
     if (!this.twin) {
@@ -16,7 +19,9 @@ export class AppleMusicTwinService implements OnModuleDestroy {
     try {
       await this.twin.start();
       this.started = true;
-      this.logger.log(`Apple Music twin started at ${this.twin.getEmulatorHost()}`);
+      this.logger.log(
+        `Apple Music twin started at ${this.twin.getEmulatorHost()}`
+      );
       return {
         success: true,
         message: `Apple Music twin started on port ${this.port}`,
@@ -89,14 +94,25 @@ export class AppleMusicTwinService implements OnModuleDestroy {
       }
 
       // Fetch active error mode from the twin server itself
-      let errorMode: { active: boolean; mode: string | null } = { active: false, mode: null };
+      let errorMode: { active: boolean; mode: string | null } = {
+        active: false,
+        mode: null,
+      };
       try {
-        const res = await fetch(`${this.twin.getEmulatorHost()}/test/apple-music/error-mode`);
+        const res = await fetch(
+          `${this.twin.getEmulatorHost()}/test/apple-music/error-mode`
+        );
         if (res.ok) {
-          errorMode = (await res.json()) as { active: boolean; mode: string | null };
+          errorMode = (await res.json()) as {
+            active: boolean;
+            mode: string | null;
+          };
         }
       } catch (err) {
-        this.logger.warn('Failed to fetch error mode from Apple Music twin', err);
+        this.logger.warn(
+          'Failed to fetch error mode from Apple Music twin',
+          err
+        );
       }
 
       return {
@@ -127,19 +143,25 @@ export class AppleMusicTwinService implements OnModuleDestroy {
 
   async setErrorMode(mode: string): Promise<void> {
     if (this.twin && this.started) {
-      await fetch(`${this.twin.getEmulatorHost()}/test/apple-music/error-mode`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ mode }),
-      });
+      await fetch(
+        `${this.twin.getEmulatorHost()}/test/apple-music/error-mode`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ mode }),
+        }
+      );
     }
   }
 
   async clearErrorMode(): Promise<void> {
     if (this.twin && this.started) {
-      await fetch(`${this.twin.getEmulatorHost()}/test/apple-music/error-mode`, {
-        method: 'DELETE',
-      });
+      await fetch(
+        `${this.twin.getEmulatorHost()}/test/apple-music/error-mode`,
+        {
+          method: 'DELETE',
+        }
+      );
     }
   }
 
