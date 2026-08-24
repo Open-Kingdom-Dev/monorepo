@@ -12,8 +12,31 @@ export {
   resolveUrlTemplates,
   recommendWidth,
   findPortCollisions,
+  findDuplicateBases,
+  portFromEnv,
+  portsFromEnv,
 } from './lib/port-math.js';
-export type { PortMap, BandOptions, PortCollision } from './lib/port-math.js';
+export type {
+  PortMap,
+  BandOptions,
+  PortCollision,
+  DuplicateBase,
+  RecommendWidthOptions,
+  PortFromEnvOptions,
+} from './lib/port-math.js';
+
+export {
+  ENV_FILE_HEADER,
+  renderEnvFile,
+  writeEnvFile,
+  parseEnvFile,
+} from './lib/env-file.js';
+export type {
+  RenderEnvFileOptions,
+  WriteEnvFileOptions,
+  WriteEnvFileResult,
+  EnvFileAction,
+} from './lib/env-file.js';
 
 export {
   EMPTY_REGISTRY,

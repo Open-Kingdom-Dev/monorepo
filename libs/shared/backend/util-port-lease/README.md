@@ -68,18 +68,71 @@ Object.assign(process.env, envForSlot(PORT_MAP, slot, { width: 1250 }));
 
 Child processes the runner spawns re-import this config; they read `__PORT_SLOT__` from the inherited environment and reuse the parent's slot instead of each re-leasing. Set `slotCacheEnvVar: false` to opt out.
 
-### Validating your width
+### Reading the ports back (the consumer half)
 
-`width` must exceed the span of your port map, or two slots will overlap. Assert it rather than commenting it:
+Every vite, playwright, or test config should read its port through `portFromEnv` rather than hardcoding a number. With no lease in play it returns the historical port, so the main checkout and CI are unchanged:
 
 ```typescript
-import { findPortCollisions, recommendWidth } from '@open-kingdom/shared-backend-util-port-lease';
+import { portFromEnv } from '@open-kingdom/shared-backend-util-port-lease';
+
+const backendPort = portFromEnv('PORT', PORT_MAP);
+const previewPort = portFromEnv('PREVIEW_PORT', PORT_MAP);
+
+// Build derived URLs from the same value, never a repeated literal — they must
+// agree or Playwright's reuseExistingServer attaches to one server while the
+// specs drive another.
+const previewURL = `http://localhost:${previewPort}`;
+```
+
+This is the half that keeps a port from being retyped anywhere: `envForSlot` publishes, `portFromEnv` reads. A set-but-unusable value falls back to the base rather than throwing — a stray env var must not stop a dev server — but calls `onWarning`, so the typo is not silent.
+
+### Persisting the lease to an env file
+
+The launcher exports ports to its children, but a developer who hand-restarts a single service starts a process the launcher never touched. Write the lease to a git-ignored env file so that process picks up the same block:
+
+```typescript
+import { writeEnvFile } from '@open-kingdom/shared-backend-util-port-lease';
+
+const { action } = writeEnvFile({
+  filePath: join(workspaceRoot, '.local.env'),
+  env: { ...envForSlot(PORT_MAP, lease.slot, BAND), ...urls },
+  slot: lease.slot,
+  branch: lease.branch,
+  worktreePath: lease.worktreePath,
+  notes: ['Regenerate with `npm run ports:lease`.'],
+});
+if (action === 'skipped-foreign') {
+  console.warn('.local.env was hand-written; left alone.');
+}
+```
+
+Two behaviours worth knowing:
+
+- **Slot 0 removes the file** rather than writing it. The primary worktree's ports are already the historical ones, so a file would only be a second place for them to drift — and its absence keeps the main checkout and CI byte-identical to before the lease existed. Pass `removeAtSlotZero: false` to opt out.
+- **A file whose first line is not the header is never touched**, so a hand-authored file predating the lease is reported (`skipped-foreign`) rather than clobbered.
+
+If your runner reads a specific filename, mind its precedence. Nx loads `.env.local`, then `.local.env`, then `.env`, first value winning — so writing `.local.env` leaves `.env.local` free for a developer's own overrides while still beating the checked-in defaults.
+
+### Validating your width
+
+`width` must not let two _different slots_ land on the same port. Assert it rather than commenting it:
+
+```typescript
+import { findPortCollisions, findDuplicateBases, recommendWidth } from '@open-kingdom/shared-backend-util-port-lease';
+
+const MAX_SLOTS = 16;
 
 it('is collision-free for slots 0-15', () => {
-  expect(findPortCollisions(PORT_MAP, BAND, 16)).toEqual([]);
+  expect(findPortCollisions(PORT_MAP, BAND, MAX_SLOTS)).toEqual([]);
 });
-// recommendWidth(PORT_MAP) → the smallest width that can never collide
+
+// Searches for the smallest width that passes that same check.
+const width = recommendWidth(PORT_MAP, { maxSlots: MAX_SLOTS, minWidth: 50 });
 ```
+
+`findPortCollisions` reports only **cross-slot** overlaps. Two names sharing a base collide inside every slot by construction and no uniform shift can separate them — but that is frequently deliberate (two apps that never run at the same time may share a port), so it is reported by `findDuplicateBases` instead. Counted as collisions, a deliberate choice would look like a fault at every slot and bury the real overlaps.
+
+`recommendWidth` searches upward from `minWidth` (default: the number of distinct bases, per §2's "at least as large as the number of ports any one stack needs") for the first collision-free width that also keeps every port inside the TCP range at the highest slot. It deliberately does **not** return the map's span: for a real map with bases 3000-9018 the span is 6017 where 65 is provably fine, so the span is a sufficient bound but a useless recommendation. Round the result up for headroom.
 
 ## Pitfall — the classic slot ≠ 0 bug
 
@@ -94,8 +147,13 @@ A service listening on its slot-offset port while its client still holds the un-
 | `portsForSlot(map, slot, band)`                                                                                                          | Resolve a whole `PortMap` for one slot                                        |
 | `envForSlot(map, slot, band)`                                                                                                            | Same, stringified for `process.env` or an env file                            |
 | `resolveUrlTemplates(templates, ports)`                                                                                                  | Substitute `{PORT_NAME}` placeholders; throws on an unknown name              |
-| `recommendWidth(map)`                                                                                                                    | Smallest width that can never collide                                         |
-| `findPortCollisions(map, band, maxSlots)`                                                                                                | Exhaustive overlap check, for a unit test                                     |
+| `portFromEnv(name, map, opts?)`                                                                                                          | Read a leased port, falling back to its base — the consumer half              |
+| `portsFromEnv(map, opts?)`                                                                                                               | Same, across a whole map                                                      |
+| `recommendWidth(map, {maxSlots, minWidth?})`                                                                                             | Smallest collision-free width, by search                                      |
+| `findPortCollisions(map, band, maxSlots)`                                                                                                | Cross-slot overlap check, for a unit test                                     |
+| `findDuplicateBases(map)`                                                                                                                | Names sharing a base — collide in every slot, often deliberate                |
+| `renderEnvFile(opts)` / `parseEnvFile(text)`                                                                                             | Serialize / read a lease as dotenv                                            |
+| `writeEnvFile(opts)`                                                                                                                     | Write, remove at slot 0, or refuse a foreign file                             |
 | `isPortFree(port)` / `findBusyPorts(ports)`                                                                                              | Startup diagnostic — surface, never reassign                                  |
 | `normalizeWorktreePath`, `parseWorktreePorcelain`, `parseRegistry`, `serializeRegistry`, `pruneRegistry`, `selectSlot`, `lowestFreeSlot` | Pure registry internals, exported for testing and for custom leasing policies |
 

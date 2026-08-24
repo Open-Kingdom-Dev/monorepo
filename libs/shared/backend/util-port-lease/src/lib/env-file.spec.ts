@@ -1,0 +1,180 @@
+import {
+  existsSync,
+  mkdtempSync,
+  readFileSync,
+  rmSync,
+  writeFileSync,
+} from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
+
+import {
+  ENV_FILE_HEADER,
+  parseEnvFile,
+  renderEnvFile,
+  writeEnvFile,
+} from './env-file.js';
+
+const ENV = {
+  PORT: '3101',
+  FRONTEND_PORT: '4301',
+  VITE_API_BASE_URL: 'http://localhost:3101',
+};
+
+describe('renderEnvFile', () => {
+  it('leads with the marker that stops the tool clobbering a human-written file', () => {
+    expect(
+      renderEnvFile({ env: ENV, slot: 1 }).startsWith(ENV_FILE_HEADER)
+    ).toBe(true);
+  });
+
+  it('records the slot, branch and worktree for whoever opens the file', () => {
+    const body = renderEnvFile({
+      env: ENV,
+      slot: 2,
+      branch: 'feature-x',
+      worktreePath: '/work/project-x',
+    });
+    expect(body).toContain('slot 2');
+    expect(body).toContain('branch feature-x');
+    expect(body).toContain('/work/project-x');
+  });
+
+  it('renders the notes a caller passes, e.g. how to regenerate', () => {
+    const body = renderEnvFile({
+      env: ENV,
+      slot: 1,
+      notes: ['Regenerate with `npm run ports:lease`.'],
+    });
+    expect(body).toContain('# Regenerate with `npm run ports:lease`.');
+  });
+
+  it('parses back to exactly the environment it was given', () => {
+    expect(parseEnvFile(renderEnvFile({ env: ENV, slot: 1 }))).toEqual(ENV);
+  });
+
+  it('quotes a value a dotenv parser would otherwise mangle', () => {
+    const env = { NOTE: 'two words', EMPTY: '' };
+    const body = renderEnvFile({ env, slot: 1 });
+    expect(body).toContain('NOTE="two words"');
+    expect(parseEnvFile(body)).toEqual(env);
+  });
+
+  it('round-trips quotes, backslashes and newlines', () => {
+    const env = { TRICKY: 'a "b" c\\d\ne' };
+    expect(parseEnvFile(renderEnvFile({ env, slot: 1 }))).toEqual(env);
+  });
+
+  it('refuses a name a shell would misparse rather than writing a broken file', () => {
+    expect(() => renderEnvFile({ env: { 'BAD-NAME': '1' }, slot: 1 })).toThrow(
+      /not a valid environment variable name/
+    );
+  });
+});
+
+describe('parseEnvFile', () => {
+  it('ignores comments and blank lines', () => {
+    expect(parseEnvFile('# a comment\n\nA=1\n')).toEqual({ A: '1' });
+  });
+
+  it('keeps `=` inside a value', () => {
+    expect(parseEnvFile('URL=http://x/?a=b\n')).toEqual({
+      URL: 'http://x/?a=b',
+    });
+  });
+
+  it('skips a line with no name', () => {
+    expect(parseEnvFile('=orphan\nA=1\n')).toEqual({ A: '1' });
+  });
+});
+
+describe('writeEnvFile', () => {
+  let dir: string;
+  let filePath: string;
+
+  beforeEach(() => {
+    dir = mkdtempSync(join(tmpdir(), 'port-lease-env-'));
+    filePath = join(dir, '.local.env');
+  });
+
+  afterEach(() => {
+    rmSync(dir, { recursive: true, force: true });
+  });
+
+  it('writes the file for a non-zero slot', () => {
+    expect(writeEnvFile({ filePath, env: ENV, slot: 1 })).toEqual({
+      action: 'written',
+      filePath,
+    });
+    expect(parseEnvFile(readFileSync(filePath, 'utf8'))).toEqual(ENV);
+  });
+
+  it('reports unchanged on a second identical write', () => {
+    writeEnvFile({ filePath, env: ENV, slot: 1 });
+    expect(writeEnvFile({ filePath, env: ENV, slot: 1 }).action).toBe(
+      'unchanged'
+    );
+  });
+
+  it('rewrites when the lease moves to another slot', () => {
+    writeEnvFile({ filePath, env: ENV, slot: 1 });
+    const next = { ...ENV, PORT: '3202' };
+    expect(writeEnvFile({ filePath, env: next, slot: 2 }).action).toBe(
+      'written'
+    );
+    expect(parseEnvFile(readFileSync(filePath, 'utf8')).PORT).toBe('3202');
+  });
+
+  it('removes the file at slot 0, so the main checkout keeps using .env', () => {
+    writeEnvFile({ filePath, env: ENV, slot: 1 });
+    expect(writeEnvFile({ filePath, env: ENV, slot: 0 })).toEqual({
+      action: 'removed',
+      filePath,
+    });
+    expect(existsSync(filePath)).toBe(false);
+  });
+
+  it('does nothing at slot 0 when there was no file to begin with', () => {
+    expect(writeEnvFile({ filePath, env: ENV, slot: 0 }).action).toBe(
+      'unchanged'
+    );
+    expect(existsSync(filePath)).toBe(false);
+  });
+
+  it('can be told to write at slot 0 anyway', () => {
+    expect(
+      writeEnvFile({ filePath, env: ENV, slot: 0, removeAtSlotZero: false })
+        .action
+    ).toBe('written');
+    expect(existsSync(filePath)).toBe(true);
+  });
+
+  it('refuses to clobber a file it did not write', () => {
+    writeFileSync(filePath, 'MY_OWN=1\n');
+    expect(writeEnvFile({ filePath, env: ENV, slot: 1 })).toEqual({
+      action: 'skipped-foreign',
+      filePath,
+    });
+    expect(readFileSync(filePath, 'utf8')).toBe('MY_OWN=1\n');
+  });
+
+  it('will not delete a foreign file at slot 0 either', () => {
+    writeFileSync(filePath, 'MY_OWN=1\n');
+    expect(writeEnvFile({ filePath, env: ENV, slot: 0 }).action).toBe(
+      'skipped-foreign'
+    );
+    expect(existsSync(filePath)).toBe(true);
+  });
+
+  it('honours a custom header for ownership', () => {
+    const header = '# generated by my-tool';
+    writeEnvFile({ filePath, env: ENV, slot: 1, header });
+    // The default header no longer owns this file.
+    expect(writeEnvFile({ filePath, env: ENV, slot: 1 }).action).toBe(
+      'skipped-foreign'
+    );
+    expect(writeEnvFile({ filePath, env: ENV, slot: 1, header }).action).toBe(
+      'unchanged'
+    );
+  });
+});
