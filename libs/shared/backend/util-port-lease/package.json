@@ -1,0 +1,35 @@
+{
+  "name": "@open-kingdom/shared-backend-util-port-lease",
+  "version": "0.0.2-19",
+  "publishConfig": {
+    "access": "public"
+  },
+  "type": "module",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    "./package.json": "./package.json",
+    ".": {
+      "@open-kingdom/source": "./src/index.ts",
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "README.md",
+    "dist",
+    "!**/*.tsbuildinfo"
+  ],
+  "nx": {
+    "tags": [
+      "scope:shared",
+      "type:util",
+      "environment:backend"
+    ]
+  },
+  "dependencies": {
+    "tslib": "^2.3.0"
+  }
+}
