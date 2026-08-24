@@ -52,6 +52,12 @@ test-report.html
 *.db
 *.log
 .env
+# Worktree port lease: .local.env is generated per worktree and holds that
+# checkout's leased ports; .env.local is where a developer's own overrides go.
+# Both are machine-local — committing either pins everyone to one slot.
+# See docs/Worktree-Port-Leasing.md.
+.local.env
+.env.local
 
 # ── GSD baseline (auto-generated) ──
 .gsd
