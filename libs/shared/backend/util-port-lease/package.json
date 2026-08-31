@@ -19,6 +19,8 @@
   },
   "files": [
     "README.md",
+    "docs",
+    "examples",
     "dist",
     "!**/*.tsbuildinfo"
   ],

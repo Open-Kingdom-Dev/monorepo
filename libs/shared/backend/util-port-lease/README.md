@@ -2,7 +2,35 @@
 
 Deterministic, collision-free port allocation for running many development stacks — one per git worktree — on a single machine. No daemon, no configuration, no port-probing races.
 
-Reference implementation of the pattern in [`docs/Worktree-Port-Leasing.md`](../../../../docs/Worktree-Port-Leasing.md).
+Reference implementation of the pattern in [`docs/Worktree-Port-Leasing.md`](./docs/Worktree-Port-Leasing.md), which ships with this package. A runnable end-to-end script is in [`examples/port-lease-demo.mjs`](./examples/port-lease-demo.mjs).
+
+## Quickstart
+
+Declare your slot-0 ports once, lease a slot, derive everything from it:
+
+```typescript
+import { leaseSlot, portsForSlot, envForSlot } from '@open-kingdom/shared-backend-util-port-lease';
+
+const PORT_MAP = { FRONTEND_PORT: 4200, BACKEND_PORT: 3000 } as const;
+const BAND = { width: 65 }; // not arbitrary — see "Validating your width" below
+
+const { slot } = leaseSlot(); // 0 in the main checkout, 1+ in each worktree
+Object.assign(process.env, envForSlot(PORT_MAP, slot, BAND));
+
+portsForSlot(PORT_MAP, slot, BAND);
+// slot 0 → { FRONTEND_PORT: 4200, BACKEND_PORT: 3000 }  ← unchanged
+// slot 1 → { FRONTEND_PORT: 4265, BACKEND_PORT: 3065 }
+```
+
+Then read the ports back wherever they're consumed — a vite config, a Playwright config, a `main.ts` — instead of hardcoding a number:
+
+```typescript
+import { portFromEnv } from '@open-kingdom/shared-backend-util-port-lease';
+
+const port = portFromEnv('BACKEND_PORT', PORT_MAP); // leased value, or 3000
+```
+
+That's the whole mechanism. The rest of this README covers picking a safe `width`, keeping derived URLs in step with the listeners, and persisting a lease to disk.
 
 ## The idea
 
