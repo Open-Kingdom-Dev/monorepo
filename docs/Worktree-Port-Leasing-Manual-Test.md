@@ -12,10 +12,10 @@ Every output block below was captured from an actual run.
 
 ```bash
 npx nx build @open-kingdom/shared-backend-util-port-lease
-export DEMO="$(git rev-parse --show-toplevel)/docs/port-lease-demo.mjs"
+export DEMO="$(git rev-parse --show-toplevel)/libs/shared/backend/util-port-lease/examples/port-lease-demo.mjs"
 ```
 
-`docs/port-lease-demo.mjs` uses this repo's real ports as slot-0 bases — backend `3000`, vite dev `4200`, vite preview / e2e baseURL `4300`, twins `9013`–`9018` — and resolves the built library through the git common dir. That last detail matters: it means the script runs from a freshly-added worktree that has no `node_modules` of its own.
+`examples/port-lease-demo.mjs` uses this repo's real ports as slot-0 bases — backend `3000`, vite dev `4200`, vite preview / e2e baseURL `4300`, twins `9013`–`9018` — and resolves the built library through the git common dir when there is no build beside it. That last detail matters: it means the script runs from a freshly-added worktree that has no `node_modules` of its own.
 
 Nothing here needs the dev servers running. The demo only leases and prints.
 
@@ -214,4 +214,4 @@ Also note `PORT` appears in the demo map only to show the arithmetic. Three apps
 
 ---
 
-_This file and `port-lease-demo.mjs` are intentionally left uncommitted. If they should become part of the repo, they need a `PORT_MAP` that tracks the real one rather than a hand-copied snapshot — otherwise they will drift the first time a port changes._
+_`PORT_MAP` in the demo is a hand-copied snapshot of this repo's real ports, so it will drift the first time a port changes. Once a launcher owns the real map, both this procedure and the demo should import it rather than restate it._

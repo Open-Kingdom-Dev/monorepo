@@ -5,34 +5,58 @@
  * Companion to docs/Worktree-Port-Leasing-Manual-Test.md. Run from any worktree
  * of this repo:
  *
- *   node <main-checkout>/docs/port-lease-demo.mjs
+ *   node <main-checkout>/libs/shared/backend/util-port-lease/examples/port-lease-demo.mjs
  *
- * Resolves the built library through the git common dir, so it also works from
- * worktrees that have no node_modules of their own. Requires a prior
- * `npx nx build @open-kingdom/shared-backend-util-port-lease`.
+ * Installed from npm, it runs as-is: the built library sits next door.
  *
- * Intentionally not committed — see the doc's closing note.
+ * In-repo it needs a prior `npx nx build @open-kingdom/shared-backend-util-port-lease`,
+ * and from a worktree with no node_modules of its own it falls back to
+ * resolving that build through the git common dir.
  */
 import { execFileSync } from 'node:child_process';
-import { readFileSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import { dirname, isAbsolute, join, resolve } from 'node:path';
-import { pathToFileURL } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 
-// This script lives outside the repo, so resolve the built library through the
-// git common dir — the same rendezvous point the registry uses.
-// Falls back to OK_ROOT so the degradation step (run from outside any repo,
-// where this lookup necessarily fails) can still load the library.
-function findMainCheckout() {
+const LIB_SUBPATH = 'libs/shared/backend/util-port-lease/dist/index.js';
+
+/**
+ * Finds the built library, in the order that puts the cheapest answer first:
+ *
+ *  1. The sibling `../dist` — true when installed from npm, and in the main
+ *     checkout after a build.
+ *  2. Through the git common dir — the same rendezvous point the registry
+ *     uses. This is the case that matters for the manual test: a freshly-added
+ *     worktree has the source but no build and no node_modules of its own, and
+ *     the common dir leads back to the main checkout that does.
+ *  3. `OK_ROOT`, for the degradation step — run from outside any repo, where
+ *     the git lookup necessarily fails.
+ */
+function findLibrary() {
+  const sibling = resolve(
+    dirname(fileURLToPath(import.meta.url)),
+    '../dist/index.js'
+  );
+  if (existsSync(sibling)) return sibling;
+
   try {
     const commonDir = execFileSync('git', ['rev-parse', '--git-common-dir'], {
       encoding: 'utf8',
       stdio: ['ignore', 'pipe', 'ignore'],
     }).trim();
-    return dirname(
+    const mainCheckout = dirname(
       isAbsolute(commonDir) ? commonDir : resolve(process.cwd(), commonDir)
     );
+    const built = join(mainCheckout, LIB_SUBPATH);
+    if (existsSync(built)) return built;
+    console.error(
+      `\n  Found the main checkout (${mainCheckout}) but no build. Run:\n` +
+        '    npx nx build @open-kingdom/shared-backend-util-port-lease\n'
+    );
+    process.exit(1);
   } catch {
-    if (process.env.OK_ROOT) return resolve(process.env.OK_ROOT);
+    if (process.env.OK_ROOT)
+      return join(resolve(process.env.OK_ROOT), LIB_SUBPATH);
     console.error(
       '\n  Not inside a git repo, and OK_ROOT is unset — cannot locate the built\n' +
         '  library. Re-run as:  OK_ROOT=/path/to/ok-monorepo node <this script>\n'
@@ -40,7 +64,6 @@ function findMainCheckout() {
     process.exit(1);
   }
 }
-const mainCheckout = findMainCheckout();
 const {
   leaseSlot,
   portsForSlot,
@@ -49,11 +72,7 @@ const {
   findDuplicateBases,
   recommendWidth,
   findBusyPorts,
-} = await import(
-  pathToFileURL(
-    join(mainCheckout, 'libs/shared/backend/util-port-lease/dist/index.js')
-  ).href
-);
+} = await import(pathToFileURL(findLibrary()).href);
 
 // This repo's real ports, as slot-0 bases.
 const PORT_MAP = {
