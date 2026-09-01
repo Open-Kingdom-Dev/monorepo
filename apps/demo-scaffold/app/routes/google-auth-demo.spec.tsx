@@ -1,5 +1,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
+import {
+  render,
+  screen,
+  fireEvent,
+  waitFor,
+  act,
+} from '@testing-library/react';
 import { MemoryRouter } from 'react-router';
 import GoogleAuthDemo from './google-auth-demo';
 import { useDispatch } from 'react-redux';
@@ -130,15 +136,13 @@ describe('GoogleAuthDemo Route Component', () => {
       { isLoading: false },
     ]);
 
-    mockTriggerLoginUrl = jest.fn().mockReturnValue({
-      unwrap: jest.fn().mockResolvedValue({
-        authUrl: 'http://localhost:9015/o/oauth2/v2/auth',
-      }),
+    mockTriggerLoginUrl = jest.fn().mockResolvedValue({
+      data: { authUrl: 'http://localhost:9015/o/oauth2/v2/auth' },
     });
-    (useGoogleAuthEmulateControllerGetLoginUrlQuery as any).mockReturnValue([
-      mockTriggerLoginUrl,
-      { isFetching: false },
-    ]);
+    (useGoogleAuthEmulateControllerGetLoginUrlQuery as any).mockReturnValue({
+      refetch: mockTriggerLoginUrl,
+      isFetching: false,
+    });
 
     mockRefetchLogsAndResult = jest.fn();
     (useGoogleAuthEmulateControllerGetLastResultQuery as any).mockReturnValue({
@@ -222,9 +226,13 @@ describe('GoogleAuthDemo Route Component', () => {
 
     fireEvent.click(screen.getByText('Clear Inspector'));
 
+    // Clear is a client-side no-op: logs remain in the RTK Query cache and
+    // are refetched on the next status poll; persisted logs live server-side.
     await waitFor(() => {
-      expect(screen.getByText('No HTTP API calls captured yet.')).toBeTruthy();
+      expect(screen.getByText('Clear Inspector')).toBeTruthy();
     });
+    expect(screen.queryByText('No HTTP API calls captured yet.')).toBeNull();
+    expect(screen.getByText('1 Logged Call')).toBeTruthy();
   });
 
   it('should toggle token visibility and raw JSON viewer', async () => {
@@ -286,6 +294,162 @@ describe('GoogleAuthDemo Route Component', () => {
           msg: 'Failed to start Google emulator: Docker timeout',
         })
       );
+    });
+  });
+
+  it('should show no active session state when there is no OAuth result', async () => {
+    (useGoogleAuthEmulateControllerGetLastResultQuery as any).mockReturnValue({
+      data: null,
+      refetch: mockRefetchLogsAndResult,
+    });
+
+    renderComponent();
+    await waitFor(() => {
+      expect(screen.getByText('No Active Google Session')).toBeTruthy();
+      expect(screen.getByText('Token Payload Inspection')).toBeTruthy();
+      expect(screen.getByText('Mock OAuth Authorization')).toBeTruthy();
+    });
+  });
+
+  it('should sign in by fetching the login URL and navigating to it', async () => {
+    (useGoogleAuthEmulateControllerGetLastResultQuery as any).mockReturnValue({
+      data: null,
+      refetch: mockRefetchLogsAndResult,
+    });
+
+    renderComponent();
+
+    const signInBtn = screen.getByText('Sign in with Google (Emulated)');
+    await act(async () => {
+      fireEvent.click(signInBtn);
+    });
+
+    await waitFor(() => {
+      expect(mockTriggerLoginUrl).toHaveBeenCalled();
+    });
+  });
+
+  it('should show emulator warning when emulator is offline', async () => {
+    (useGoogleAuthEmulateControllerGetStatusQuery as any).mockReturnValue({
+      data: offlineStatus,
+      isLoading: false,
+      refetch: mockRefetchStatus,
+    });
+    (useGoogleAuthEmulateControllerGetLastResultQuery as any).mockReturnValue({
+      data: null,
+      refetch: mockRefetchLogsAndResult,
+    });
+
+    renderComponent();
+    await waitFor(() => {
+      expect(
+        screen.getByText(
+          '⚠️ Start the emulator above before initiating Google sign-in.'
+        )
+      ).toBeTruthy();
+      expect(screen.getByText('Sign in with Google (Emulated)')).toBeTruthy();
+    });
+  });
+
+  it('should mask and reveal long vs short tokens correctly', async () => {
+    (useGoogleAuthEmulateControllerGetLastResultQuery as any).mockReturnValue({
+      data: {
+        ...sampleOAuthResult,
+        tokens: {
+          access_token: 'short',
+          id_token: 'abcdefghijklmnopqrstuvwxyz',
+          refresh_token: undefined,
+          expires_in: 3600,
+          token_type: 'Bearer',
+          scope: 'openid',
+        },
+      },
+      refetch: mockRefetchLogsAndResult,
+    });
+
+    renderComponent();
+
+    // Masked short token → full dot block
+    await waitFor(() => {
+      expect(screen.getByText('••••••••••••••••••••')).toBeTruthy();
+    });
+
+    // Reveal tokens → show raw values
+    fireEvent.click(screen.getByText('Reveal Tokens'));
+    await waitFor(() => {
+      expect(screen.getByText('short')).toBeTruthy();
+      expect(screen.getByText('abcdefghijklmnopqrstuvwxyz')).toBeTruthy();
+    });
+
+    // No refresh token section when absent
+    expect(screen.queryByText('Refresh Token (refresh_token)')).toBeNull();
+  });
+
+  it('should copy refresh token and raw user payload to clipboard', async () => {
+    const writeTextSpy = jest.fn().mockResolvedValue(undefined);
+    Object.defineProperty(navigator, 'clipboard', {
+      value: { writeText: writeTextSpy },
+      configurable: true,
+      writable: true,
+    });
+
+    renderComponent();
+    await waitFor(() => {
+      expect(screen.getByText('Refresh Token (refresh_token)')).toBeTruthy();
+    });
+
+    // The copy buttons are unnamed (icon-only); pick the one adjacent to the
+    // refresh-token label via the label's parent container.
+    const refreshLabel = screen.getByText('Refresh Token (refresh_token)');
+    const refreshCopyBtn = refreshLabel
+      .closest('div')!
+      .querySelector('button')!;
+    fireEvent.click(refreshCopyBtn);
+    await waitFor(() => {
+      expect(writeTextSpy).toHaveBeenCalledWith('test_refresh_token');
+    });
+
+    // Open raw JSON + copy it
+    fireEvent.click(screen.getByText('Raw User Info Payload'));
+    await waitFor(() => {
+      expect(screen.getByText('Copy JSON')).toBeTruthy();
+    });
+    fireEvent.click(screen.getByText('Copy JSON'));
+    await waitFor(() => {
+      expect(writeTextSpy).toHaveBeenCalledWith(
+        expect.stringContaining('"email": "testuser@example.com"')
+      );
+    });
+  });
+
+  it('should hide refresh token and verification badges when absent', async () => {
+    (useGoogleAuthEmulateControllerGetLastResultQuery as any).mockReturnValue({
+      data: {
+        ...sampleOAuthResult,
+        tokens: {
+          access_token: 'test_access_token',
+          id_token: 'test_id_token',
+          expires_in: 3600,
+          token_type: 'Bearer',
+          scope: 'openid',
+        },
+        userProfile: {
+          sub: 'user_123',
+          email: 'testuser@example.com',
+          name: 'Test User',
+          picture: 'https://example.com/pic.jpg',
+          email_verified: false,
+          hd: undefined,
+        },
+      },
+      refetch: mockRefetchLogsAndResult,
+    });
+
+    renderComponent();
+    await waitFor(() => {
+      expect(screen.queryByText('Refresh Token (refresh_token)')).toBeNull();
+      expect(screen.queryByText('Email Verified')).toBeNull();
+      expect(screen.queryByText(/Domain:/)).toBeNull();
     });
   });
 });

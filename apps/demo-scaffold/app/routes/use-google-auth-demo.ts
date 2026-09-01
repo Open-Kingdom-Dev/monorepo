@@ -1,9 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router';
 import { useDispatch } from 'react-redux';
-import {
-  showErrorNotification,
-} from '@open-kingdom/shared-frontend-data-access-notifications';
+import { showErrorNotification } from '@open-kingdom/shared-frontend-data-access-notifications';
 import { logError } from '@open-kingdom/shared-frontend-data-access-logger';
 import {
   useGoogleAuthEmulateControllerGetStatusQuery,
@@ -14,7 +12,22 @@ import {
   useGoogleAuthEmulateControllerGetLogsQuery,
   useGoogleAuthEmulateControllerGetLastResultQuery,
   useGoogleAuthEmulateControllerLogoutMutation,
+  type ApiLogEntryDto,
 } from '@open-kingdom/shared-frontend-data-access-api-client';
+import type { ApiLogEntry } from '../components/google-auth-demo/google-auth-api-inspector';
+
+const toInspectorLog = (log: ApiLogEntryDto): ApiLogEntry => ({
+  id: log.id,
+  timestamp: log.timestamp,
+  method: log.method,
+  url: log.url,
+  statusCode: log.statusCode,
+  requestHeaders: (log.requestHeaders ?? {}) as Record<string, string>,
+  requestBody: log.requestBody,
+  responseHeaders: (log.responseHeaders ?? {}) as Record<string, string>,
+  responseBody: log.responseBody,
+  latencyMs: log.latencyMs,
+});
 
 export default function useGoogleAuthDemo() {
   const dispatch = useDispatch();
@@ -39,23 +52,22 @@ export default function useGoogleAuthDemo() {
     useGoogleAuthEmulateControllerLogoutMutation();
 
   // Fetch captured logs & last OAuth result whenever status reports healthy.
-  const {
-    data: oauthResult,
-    refetch: refetchLogsAndResult,
-  } = useGoogleAuthEmulateControllerGetLastResultQuery(undefined, {
-    skip: !status?.running || !status?.healthy,
-  });
-  const { data: apiLogs = [] } = useGoogleAuthEmulateControllerGetLogsQuery(
+  const { data: oauthResult, refetch: refetchLogsAndResult } =
+    useGoogleAuthEmulateControllerGetLastResultQuery(undefined, {
+      skip: !status?.running || !status?.healthy,
+    });
+  const { data: apiLogsRaw = [] } = useGoogleAuthEmulateControllerGetLogsQuery(
     undefined,
     {
       skip: !status?.running || !status?.healthy,
     }
   );
 
-  const [triggerLoginUrl] = useGoogleAuthEmulateControllerGetLoginUrlQuery(
-    undefined,
-    { skip: true }
-  );
+  // Sign-in: fetch the login URL and hard-navigate to it.
+  const { refetch: fetchLoginUrl } =
+    useGoogleAuthEmulateControllerGetLoginUrlQuery(undefined, {
+      skip: true,
+    });
 
   const [authenticating, setAuthenticating] = useState(false);
   const [authError, setAuthError] = useState<string | null>(null);
@@ -126,9 +138,10 @@ export default function useGoogleAuthDemo() {
     setAuthenticating(true);
     setAuthError(null);
     try {
-      const res = await triggerLoginUrl().unwrap();
-      if (res?.authUrl) {
-        window.location.href = res.authUrl;
+      const { data } = await fetchLoginUrl();
+      const authUrl = (data as { authUrl?: string } | undefined)?.authUrl;
+      if (authUrl) {
+        window.location.href = authUrl;
       }
     } catch (err) {
       const message = err instanceof Error ? err.message : String(err);
@@ -165,7 +178,7 @@ export default function useGoogleAuthDemo() {
     loggingOut,
     oauthResult,
     authenticating,
-    apiLogs,
+    apiLogs: (apiLogsRaw ?? []).map(toInspectorLog),
     authError,
     handleStart,
     handleStop,

@@ -181,7 +181,10 @@ export class GoogleAuthEmulateStrategy extends PassportStrategy(
       requestBody:
         'grant_type=authorization_code&client_id=<redacted>&redirect_uri=<redacted>&code=<redacted>',
       responseBody: JSON.stringify(
-        { access_token: `${accessToken.slice(0, 15)}...`, token_type: 'Bearer' },
+        {
+          access_token: `${accessToken.slice(0, 15)}...`,
+          token_type: 'Bearer',
+        },
         null,
         2
       ),
