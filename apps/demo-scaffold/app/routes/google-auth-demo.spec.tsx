@@ -1,78 +1,160 @@
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
 import { MemoryRouter } from 'react-router';
 import GoogleAuthDemo from './google-auth-demo';
-import axios from 'axios';
+import { useDispatch } from 'react-redux';
+import {
+  useGoogleAuthEmulateControllerGetStatusQuery,
+  useGoogleAuthEmulateControllerStartMutation,
+  useGoogleAuthEmulateControllerStopMutation,
+  useGoogleAuthEmulateControllerResetMutation,
+  useGoogleAuthEmulateControllerGetLoginUrlQuery,
+  useGoogleAuthEmulateControllerGetLogsQuery,
+  useGoogleAuthEmulateControllerGetLastResultQuery,
+  useGoogleAuthEmulateControllerLogoutMutation,
+} from '@open-kingdom/shared-frontend-data-access-api-client';
 
-jest.mock('axios');
-const mockedAxios = axios as jest.Mocked<typeof axios>;
+jest.mock('react-redux', () => ({
+  useDispatch: jest.fn(),
+}));
+
+jest.mock('@open-kingdom/shared-frontend-data-access-api-client', () => ({
+  useGoogleAuthEmulateControllerGetStatusQuery: jest.fn(),
+  useGoogleAuthEmulateControllerStartMutation: jest.fn(),
+  useGoogleAuthEmulateControllerStopMutation: jest.fn(),
+  useGoogleAuthEmulateControllerResetMutation: jest.fn(),
+  useGoogleAuthEmulateControllerGetLoginUrlQuery: jest.fn(),
+  useGoogleAuthEmulateControllerGetLogsQuery: jest.fn(),
+  useGoogleAuthEmulateControllerGetLastResultQuery: jest.fn(),
+  useGoogleAuthEmulateControllerLogoutMutation: jest.fn(),
+}));
+
+jest.mock('@open-kingdom/shared-frontend-data-access-notifications', () => ({
+  showErrorNotification: jest.fn((msg) => ({ type: 'ERROR', msg })),
+}));
+
+jest.mock('@open-kingdom/shared-frontend-data-access-logger', () => ({
+  logError: jest.fn((msg) => ({ type: 'LOG_ERROR', msg })),
+}));
 
 describe('GoogleAuthDemo Route Component', () => {
+  let mockDispatch: jest.Mock;
+  let mockStart: jest.Mock;
+  let mockStop: jest.Mock;
+  let mockReset: jest.Mock;
+  let mockLogout: jest.Mock;
+  let mockTriggerLoginUrl: jest.Mock;
+  let mockRefetchStatus: jest.Mock;
+  let mockRefetchLogsAndResult: jest.Mock;
+
+  const onlineStatus = {
+    running: true,
+    healthy: true,
+    port: 9015,
+    url: 'http://localhost:9015',
+  };
+  const offlineStatus = {
+    running: false,
+    healthy: false,
+    port: 9015,
+  };
+
+  const sampleLog = {
+    id: 'log_1',
+    timestamp: new Date().toISOString(),
+    method: 'POST',
+    url: 'http://localhost:9015/oauth2/token',
+    statusCode: 200,
+    requestHeaders: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    requestBody: 'code=123',
+    responseHeaders: { 'content-type': 'application/json' },
+    responseBody: '{"access_token":"abc"}',
+    latencyMs: 10,
+  };
+
+  const sampleOAuthResult = {
+    tokens: {
+      access_token: 'test_access_token',
+      id_token: 'test_id_token',
+      refresh_token: 'test_refresh_token',
+      expires_in: 3600,
+      token_type: 'Bearer',
+      scope: 'openid profile email',
+    },
+    userProfile: {
+      sub: 'user_123',
+      email: 'testuser@example.com',
+      name: 'Test User',
+      picture: 'https://example.com/pic.jpg',
+      email_verified: true,
+      hd: 'example.com',
+    },
+    apiLogs: [sampleLog],
+  };
+
   beforeEach(() => {
     jest.clearAllMocks();
 
-    mockedAxios.get.mockImplementation((url) => {
-      if (url === '/api/google-auth-emulate/status') {
-        return Promise.resolve({
-          data: {
-            running: true,
-            healthy: true,
-            port: 9015,
-            url: 'http://localhost:9015',
-          },
-        });
-      }
-      if (url === '/api/google-auth-emulate/logs') {
-        return Promise.resolve({
-          data: [
-            {
-              id: 'log_1',
-              timestamp: new Date().toISOString(),
-              method: 'POST',
-              url: 'http://localhost:9015/oauth2/token',
-              statusCode: 200,
-              requestHeaders: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-              },
-              requestBody: 'code=123',
-              responseHeaders: { 'content-type': 'application/json' },
-              responseBody: '{"access_token":"abc"}',
-              latencyMs: 10,
-            },
-          ],
-        });
-      }
-      if (url === '/api/google-auth-emulate/last-result') {
-        return Promise.resolve({
-          data: {
-            tokens: {
-              access_token: 'test_access_token',
-              id_token: 'test_id_token',
-              refresh_token: 'test_refresh_token',
-              expires_in: 3600,
-              token_type: 'Bearer',
-              scope: 'openid profile email',
-            },
-            userProfile: {
-              sub: 'user_123',
-              email: 'testuser@example.com',
-              name: 'Test User',
-              picture: 'https://example.com/pic.jpg',
-              email_verified: true,
-              hd: 'example.com',
-            },
-            apiLogs: [],
-          },
-        });
-      }
-      if (url === '/api/google-auth-emulate/login-url') {
-        return Promise.resolve({
-          data: { authUrl: 'http://localhost:9015/o/oauth2/v2/auth' },
-        });
-      }
-      return Promise.resolve({ data: {} });
+    mockDispatch = jest.fn();
+    (useDispatch as any).mockReturnValue(mockDispatch);
+
+    mockStart = jest.fn().mockReturnValue({
+      unwrap: jest.fn().mockResolvedValue({ success: true }),
+    });
+    (useGoogleAuthEmulateControllerStartMutation as any).mockReturnValue([
+      mockStart,
+      { isLoading: false },
+    ]);
+
+    mockStop = jest.fn().mockReturnValue({
+      unwrap: jest.fn().mockResolvedValue({ success: true }),
+    });
+    (useGoogleAuthEmulateControllerStopMutation as any).mockReturnValue([
+      mockStop,
+      { isLoading: false },
+    ]);
+
+    mockReset = jest.fn().mockReturnValue({
+      unwrap: jest.fn().mockResolvedValue({ success: true }),
+    });
+    (useGoogleAuthEmulateControllerResetMutation as any).mockReturnValue([
+      mockReset,
+      { isLoading: false },
+    ]);
+
+    mockLogout = jest.fn().mockReturnValue({
+      unwrap: jest.fn().mockResolvedValue({ success: true }),
+    });
+    (useGoogleAuthEmulateControllerLogoutMutation as any).mockReturnValue([
+      mockLogout,
+      { isLoading: false },
+    ]);
+
+    mockTriggerLoginUrl = jest.fn().mockReturnValue({
+      unwrap: jest.fn().mockResolvedValue({
+        authUrl: 'http://localhost:9015/o/oauth2/v2/auth',
+      }),
+    });
+    (useGoogleAuthEmulateControllerGetLoginUrlQuery as any).mockReturnValue([
+      mockTriggerLoginUrl,
+      { isFetching: false },
+    ]);
+
+    mockRefetchLogsAndResult = jest.fn();
+    (useGoogleAuthEmulateControllerGetLastResultQuery as any).mockReturnValue({
+      data: sampleOAuthResult,
+      refetch: mockRefetchLogsAndResult,
+    });
+    (useGoogleAuthEmulateControllerGetLogsQuery as any).mockReturnValue({
+      data: [sampleLog],
     });
 
-    mockedAxios.post.mockResolvedValue({ data: { success: true } });
+    mockRefetchStatus = jest.fn();
+    (useGoogleAuthEmulateControllerGetStatusQuery as any).mockReturnValue({
+      data: onlineStatus,
+      isLoading: false,
+      refetch: mockRefetchStatus,
+    });
   });
 
   const renderComponent = (initialEntries = ['/google-auth-demo']) =>
@@ -102,9 +184,7 @@ describe('GoogleAuthDemo Route Component', () => {
     fireEvent.click(screen.getByText('Stop Emulator'));
 
     await waitFor(() => {
-      expect(mockedAxios.post).toHaveBeenCalledWith(
-        '/api/google-auth-emulate/stop'
-      );
+      expect(mockStop).toHaveBeenCalled();
     });
   });
 
@@ -117,9 +197,7 @@ describe('GoogleAuthDemo Route Component', () => {
     fireEvent.click(screen.getByText('Reset'));
 
     await waitFor(() => {
-      expect(mockedAxios.post).toHaveBeenCalledWith(
-        '/api/google-auth-emulate/reset'
-      );
+      expect(mockReset).toHaveBeenCalled();
     });
   });
 
@@ -132,9 +210,7 @@ describe('GoogleAuthDemo Route Component', () => {
     fireEvent.click(screen.getByText('Sign Out (Clear Session)'));
 
     await waitFor(() => {
-      expect(mockedAxios.post).toHaveBeenCalledWith(
-        '/api/google-auth-emulate/logout'
-      );
+      expect(mockLogout).toHaveBeenCalled();
     });
   });
 
@@ -164,12 +240,11 @@ describe('GoogleAuthDemo Route Component', () => {
     expect(screen.getByText('Copy JSON')).toBeTruthy();
   });
 
-  it('should render offline status when status fetch fails or returns running=false', async () => {
-    mockedAxios.get.mockImplementation((url) => {
-      if (url === '/api/google-auth-emulate/status') {
-        return Promise.reject(new Error('Network error'));
-      }
-      return Promise.resolve({ data: [] });
+  it('should render offline status when emulator is not running', async () => {
+    (useGoogleAuthEmulateControllerGetStatusQuery as any).mockReturnValue({
+      data: offlineStatus,
+      isLoading: false,
+      refetch: mockRefetchStatus,
     });
 
     renderComponent();
@@ -184,6 +259,33 @@ describe('GoogleAuthDemo Route Component', () => {
     await waitFor(() => {
       expect(screen.getByText('OAuth Error Encountered')).toBeTruthy();
       expect(screen.getByText('FailedToAuth')).toBeTruthy();
+    });
+  });
+
+  it('should dispatch error notification when starting emulator fails', async () => {
+    mockStart.mockReturnValue({
+      unwrap: jest.fn().mockRejectedValue(new Error('Docker timeout')),
+    });
+
+    (useGoogleAuthEmulateControllerGetStatusQuery as any).mockReturnValue({
+      data: offlineStatus,
+      isLoading: false,
+      refetch: mockRefetchStatus,
+    });
+
+    renderComponent();
+    const startBtn = screen.getByText('Start Emulator');
+    await act(async () => {
+      fireEvent.click(startBtn);
+    });
+
+    await waitFor(() => {
+      expect(mockDispatch).toHaveBeenCalledWith(
+        expect.objectContaining({
+          type: 'LOG_ERROR',
+          msg: 'Failed to start Google emulator: Docker timeout',
+        })
+      );
     });
   });
 });
