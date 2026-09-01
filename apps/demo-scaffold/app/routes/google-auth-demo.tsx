@@ -79,7 +79,7 @@ export default function GoogleAuthDemo() {
         {/* Right Column: Emulator Status & User Profile */}
         <div className="space-y-6">
           <GoogleAuthEmulatorStatus
-            status={status}
+            status={status ?? null}
             loading={loadingStatus}
             starting={starting}
             stopping={stopping}
