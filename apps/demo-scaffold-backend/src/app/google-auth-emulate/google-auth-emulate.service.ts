@@ -150,6 +150,15 @@ export class GoogleAuthEmulateService implements OnModuleDestroy {
     }
   }
 
+  appendLog(entry: Omit<ApiLogEntryDto, 'id' | 'timestamp'>): void {
+    const logEntry: ApiLogEntryDto = {
+      id: `log_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`,
+      timestamp: new Date().toISOString(),
+      ...entry,
+    };
+    this.apiLogs.unshift(logEntry);
+  }
+
   setOAuthResult(
     tokens: GoogleOAuthTokensDto,
     userProfile: GoogleUserProfileDto

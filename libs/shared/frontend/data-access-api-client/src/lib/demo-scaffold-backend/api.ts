@@ -22,6 +22,7 @@ export const addTagTypes = [
   "Opportunities",
   "Twin",
   "YouTube Twin",
+  "Google Auth Emulate",
 ] as const;
 const injectedRtkApi = api
   .enhanceEndpoints({
@@ -852,6 +853,85 @@ const injectedRtkApi = api
         query: () => ({ url: `/api/youtube-twin/reset`, method: "POST" }),
         invalidatesTags: ["YouTube Twin"],
       }),
+      googleAuthEmulateControllerGetStatus: build.query<
+        GoogleAuthEmulateControllerGetStatusApiResponse,
+        GoogleAuthEmulateControllerGetStatusApiArg
+      >({
+        query: () => ({ url: `/api/google-auth-emulate/status` }),
+        providesTags: ["Google Auth Emulate"],
+      }),
+      googleAuthEmulateControllerStart: build.mutation<
+        GoogleAuthEmulateControllerStartApiResponse,
+        GoogleAuthEmulateControllerStartApiArg
+      >({
+        query: () => ({
+          url: `/api/google-auth-emulate/start`,
+          method: "POST",
+        }),
+        invalidatesTags: ["Google Auth Emulate"],
+      }),
+      googleAuthEmulateControllerStop: build.mutation<
+        GoogleAuthEmulateControllerStopApiResponse,
+        GoogleAuthEmulateControllerStopApiArg
+      >({
+        query: () => ({ url: `/api/google-auth-emulate/stop`, method: "POST" }),
+        invalidatesTags: ["Google Auth Emulate"],
+      }),
+      googleAuthEmulateControllerReset: build.mutation<
+        GoogleAuthEmulateControllerResetApiResponse,
+        GoogleAuthEmulateControllerResetApiArg
+      >({
+        query: () => ({
+          url: `/api/google-auth-emulate/reset`,
+          method: "POST",
+        }),
+        invalidatesTags: ["Google Auth Emulate"],
+      }),
+      googleAuthEmulateControllerGetLoginUrl: build.query<
+        GoogleAuthEmulateControllerGetLoginUrlApiResponse,
+        GoogleAuthEmulateControllerGetLoginUrlApiArg
+      >({
+        query: () => ({ url: `/api/google-auth-emulate/login-url` }),
+        providesTags: ["Google Auth Emulate"],
+      }),
+      googleAuthEmulateControllerLogin: build.query<
+        GoogleAuthEmulateControllerLoginApiResponse,
+        GoogleAuthEmulateControllerLoginApiArg
+      >({
+        query: () => ({ url: `/api/google-auth-emulate/login` }),
+        providesTags: ["Google Auth Emulate"],
+      }),
+      googleAuthEmulateControllerCallback: build.query<
+        GoogleAuthEmulateControllerCallbackApiResponse,
+        GoogleAuthEmulateControllerCallbackApiArg
+      >({
+        query: () => ({ url: `/api/google-auth-emulate/callback` }),
+        providesTags: ["Google Auth Emulate"],
+      }),
+      googleAuthEmulateControllerGetLastResult: build.query<
+        GoogleAuthEmulateControllerGetLastResultApiResponse,
+        GoogleAuthEmulateControllerGetLastResultApiArg
+      >({
+        query: () => ({ url: `/api/google-auth-emulate/last-result` }),
+        providesTags: ["Google Auth Emulate"],
+      }),
+      googleAuthEmulateControllerGetLogs: build.query<
+        GoogleAuthEmulateControllerGetLogsApiResponse,
+        GoogleAuthEmulateControllerGetLogsApiArg
+      >({
+        query: () => ({ url: `/api/google-auth-emulate/logs` }),
+        providesTags: ["Google Auth Emulate"],
+      }),
+      googleAuthEmulateControllerLogout: build.mutation<
+        GoogleAuthEmulateControllerLogoutApiResponse,
+        GoogleAuthEmulateControllerLogoutApiArg
+      >({
+        query: () => ({
+          url: `/api/google-auth-emulate/logout`,
+          method: "POST",
+        }),
+        invalidatesTags: ["Google Auth Emulate"],
+      }),
     }),
     overrideExisting: false,
   });
@@ -1265,6 +1345,29 @@ export type YouTubeTwinControllerStopApiResponse =
 export type YouTubeTwinControllerStopApiArg = void;
 export type YouTubeTwinControllerResetApiResponse = unknown;
 export type YouTubeTwinControllerResetApiArg = void;
+export type GoogleAuthEmulateControllerGetStatusApiResponse =
+  /** status 200  */ GoogleEmulatorStatusDto;
+export type GoogleAuthEmulateControllerGetStatusApiArg = void;
+export type GoogleAuthEmulateControllerStartApiResponse = unknown;
+export type GoogleAuthEmulateControllerStartApiArg = void;
+export type GoogleAuthEmulateControllerStopApiResponse = unknown;
+export type GoogleAuthEmulateControllerStopApiArg = void;
+export type GoogleAuthEmulateControllerResetApiResponse = unknown;
+export type GoogleAuthEmulateControllerResetApiArg = void;
+export type GoogleAuthEmulateControllerGetLoginUrlApiResponse = unknown;
+export type GoogleAuthEmulateControllerGetLoginUrlApiArg = void;
+export type GoogleAuthEmulateControllerLoginApiResponse = unknown;
+export type GoogleAuthEmulateControllerLoginApiArg = void;
+export type GoogleAuthEmulateControllerCallbackApiResponse = unknown;
+export type GoogleAuthEmulateControllerCallbackApiArg = void;
+export type GoogleAuthEmulateControllerGetLastResultApiResponse =
+  /** status 200  */ GoogleOAuthResultDto;
+export type GoogleAuthEmulateControllerGetLastResultApiArg = void;
+export type GoogleAuthEmulateControllerGetLogsApiResponse =
+  /** status 200  */ ApiLogEntryDto[];
+export type GoogleAuthEmulateControllerGetLogsApiArg = void;
+export type GoogleAuthEmulateControllerLogoutApiResponse = unknown;
+export type GoogleAuthEmulateControllerLogoutApiArg = void;
 export type LoginResponseDto = {
   /** JWT access token */
   access_token: string;
@@ -1854,6 +1957,71 @@ export type YouTubeTwinStopResponseDto = {
   success: boolean;
   message: string;
 };
+export type GoogleEmulatorStatusDto = {
+  /** Indicates whether the Google emulator server is running */
+  running: boolean;
+  /** Indicates whether the Google emulator server is healthy */
+  healthy: boolean;
+  /** Port on which the emulator is listening */
+  port: number;
+  /** Base URL of the running emulator */
+  url?: string;
+};
+export type GoogleOAuthTokensDto = {
+  /** Google OAuth Access Token */
+  access_token: string;
+  /** Google OIDC ID Token */
+  id_token: string;
+  /** Google OAuth Refresh Token */
+  refresh_token?: string;
+  /** Token expiration duration in seconds */
+  expires_in: number;
+  /** Token type */
+  token_type: string;
+  /** Granted scopes */
+  scope: string;
+};
+export type GoogleUserProfileDto = {
+  /** Subject / User ID */
+  sub: string;
+  /** User email address */
+  email: string;
+  /** Full name of the user */
+  name: string;
+  /** Profile picture URL */
+  picture: string;
+  /** Whether the email address has been verified */
+  email_verified: boolean;
+  /** Hosted domain if applicable */
+  hd?: string;
+};
+export type ApiLogEntryDto = {
+  /** Unique log ID */
+  id: string;
+  /** ISO Timestamp */
+  timestamp: string;
+  /** HTTP Method */
+  method: string;
+  /** Request URL */
+  url: string;
+  /** HTTP Response Status Code */
+  statusCode: number;
+  /** Request headers object */
+  requestHeaders: object;
+  /** Request body */
+  requestBody?: string;
+  /** Response headers object */
+  responseHeaders: object;
+  /** Response body payload */
+  responseBody: string;
+  /** Latency in milliseconds */
+  latencyMs: number;
+};
+export type GoogleOAuthResultDto = {
+  tokens: GoogleOAuthTokensDto;
+  userProfile: GoogleUserProfileDto;
+  apiLogs: ApiLogEntryDto[];
+};
 export const {
   useAuthControllerLoginMutation,
   useAuthControllerGetProfileQuery,
@@ -1939,4 +2107,14 @@ export const {
   useYouTubeTwinControllerStartMutation,
   useYouTubeTwinControllerStopMutation,
   useYouTubeTwinControllerResetMutation,
+  useGoogleAuthEmulateControllerGetStatusQuery,
+  useGoogleAuthEmulateControllerStartMutation,
+  useGoogleAuthEmulateControllerStopMutation,
+  useGoogleAuthEmulateControllerResetMutation,
+  useGoogleAuthEmulateControllerGetLoginUrlQuery,
+  useGoogleAuthEmulateControllerLoginQuery,
+  useGoogleAuthEmulateControllerCallbackQuery,
+  useGoogleAuthEmulateControllerGetLastResultQuery,
+  useGoogleAuthEmulateControllerGetLogsQuery,
+  useGoogleAuthEmulateControllerLogoutMutation,
 } = injectedRtkApi;
