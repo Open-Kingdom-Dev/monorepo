@@ -22,4 +22,14 @@ export const defaultRoutingEntries: RoutingEntry[] = [
     hostname: 'www.youtube.com',
     target: `http://localhost:${DEFAULT_PORTS.YOUTUBE}`,
   },
+  // Apple Music twin — Catalog API
+  {
+    hostname: 'api.music.apple.com',
+    target: `http://localhost:${DEFAULT_PORTS.APPLE_MUSIC}`,
+  },
+  // Apple Music twin — Web SDK (browser CDN)
+  {
+    hostname: 'js-cdn.music.apple.com',
+    target: `http://localhost:${DEFAULT_PORTS.APPLE_MUSIC}`,
+  },
 ];

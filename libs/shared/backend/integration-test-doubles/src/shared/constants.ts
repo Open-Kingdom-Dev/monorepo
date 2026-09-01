@@ -27,6 +27,8 @@ export const DEFAULT_PORTS = {
   GOOGLE_CALENDAR: 9017,
   /** Spotify twin (future) */
   SPOTIFY: 9018,
+  /** Apple Music twin */
+  APPLE_MUSIC: 9019,
 } as const;
 
 /**
@@ -43,4 +45,6 @@ export const ENV_VARS = {
   GMAIL_TWIN_PORT: 'GMAIL_TWIN_PORT',
   /** YouTube twin port override */
   YOUTUBE_TWIN_PORT: 'YOUTUBE_TWIN_PORT',
+  /** Apple Music twin port override */
+  APPLE_MUSIC_TWIN_PORT: 'APPLE_MUSIC_TWIN_PORT',
 } as const;
