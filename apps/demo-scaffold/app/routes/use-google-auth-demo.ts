@@ -12,6 +12,7 @@ import {
   useGoogleAuthEmulateControllerGetLogsQuery,
   useGoogleAuthEmulateControllerGetLastResultQuery,
   useGoogleAuthEmulateControllerLogoutMutation,
+  useGoogleAuthEmulateControllerClearLogsMutation,
   type ApiLogEntryDto,
 } from '@open-kingdom/shared-frontend-data-access-api-client';
 import type { ApiLogEntry } from '../components/google-auth-demo/google-auth-api-inspector';
@@ -50,6 +51,8 @@ export default function useGoogleAuthDemo() {
     useGoogleAuthEmulateControllerResetMutation();
   const [logout, { isLoading: loggingOut }] =
     useGoogleAuthEmulateControllerLogoutMutation();
+  const [clearLogs, { isLoading: clearingLogs }] =
+    useGoogleAuthEmulateControllerClearLogsMutation();
 
   // Fetch captured logs & last OAuth result whenever status reports healthy.
   const { data: oauthResult, refetch: refetchLogsAndResult } =
@@ -164,9 +167,15 @@ export default function useGoogleAuthDemo() {
     }
   };
 
-  const handleClearLogs = () => {
-    // Local-only: the inspector list is driven by the RTK Query cache, which
-    // is refetched on the next status poll. Persisted logs live server-side.
+  const handleClearLogs = async () => {
+    try {
+      await clearLogs().unwrap();
+      fetchStatus();
+    } catch (err) {
+      const message = err instanceof Error ? err.message : String(err);
+      dispatch(logError('Failed to clear API logs: ' + message));
+      dispatch(showErrorNotification('Failed to clear API logs'));
+    }
   };
 
   return {
@@ -176,6 +185,7 @@ export default function useGoogleAuthDemo() {
     stopping,
     resetting,
     loggingOut,
+    clearingLogs,
     oauthResult,
     authenticating,
     apiLogs: (apiLogsRaw ?? []).map(toInspectorLog),

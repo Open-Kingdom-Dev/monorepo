@@ -3780,6 +3780,22 @@
         ]
       }
     },
+    "/api/google-auth-emulate/clear-logs": {
+      "post": {
+        "description": "Clears the in-memory HTTP request/response logs captured during OAuth interactions.",
+        "operationId": "GoogleAuthEmulateController_clearLogs",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "API logs cleared"
+          }
+        },
+        "summary": "Clear captured API logs",
+        "tags": [
+          "Google Auth Emulate"
+        ]
+      }
+    },
     "/api/google-auth-emulate/logout": {
       "post": {
         "description": "Clears the active Google OAuth session result in the backend.",

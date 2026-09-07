@@ -1,4 +1,5 @@
 import axios from 'axios';
+import http from 'http';
 import { GoogleAuthEmulateStrategy } from './google-auth-emulate.strategy';
 import { GoogleAuthEmulateService } from './google-auth-emulate.service';
 
@@ -75,7 +76,7 @@ describe('GoogleAuthEmulateStrategy', () => {
   });
 
   describe('validate', () => {
-    it('logs the token exchange and stores the OAuth result', async () => {
+    it('stores the OAuth result without fabricating a token log', async () => {
       const profile = {
         id: 'user_123',
         displayName: 'Test User',
@@ -104,17 +105,142 @@ describe('GoogleAuthEmulateStrategy', () => {
         userProfile: { email: 'testuser@example.com' },
       });
 
+      // validate() itself no longer synthesizes a token POST row — the real
+      // exchange is captured by the _oauth2._request interceptor instead.
+      const logs = service.getLogs();
+      expect(logs).toHaveLength(0);
+
+      const result = service.getLastOAuthResult();
+      expect(result?.tokens?.access_token).toBe('mock-access-token');
+      expect(result?.apiLogs).toHaveLength(0);
+    });
+  });
+
+  describe('_oauth2._request interceptor', () => {
+    // Access the strategy's internal OAuth2 client, as passport-google-oauth20
+    // subclasses may (this._oauth2 is documented as protected).
+    const getOAuth2Client = (s: GoogleAuthEmulateStrategy) =>
+      (s as unknown as { _oauth2: { _request: (...a: unknown[]) => unknown } })
+        ._oauth2;
+
+    let server: http.Server;
+    let serverUrl: string;
+
+    beforeEach(async () => {
+      // Drive the interceptor against a real local HTTP server (the same
+      // transport `oauth`'s _executeRequest uses) so the log reflects an
+      // actual request/response rather than a synthesized row.
+      server = http.createServer((req, res) => {
+        let rawBody = '';
+        req.on('data', (chunk) => {
+          rawBody += chunk;
+        });
+        req.on('end', () => {
+          if (rawBody.includes('code=bad-code')) {
+            res.writeHead(400, { 'Content-Type': 'application/json' });
+            res.end(
+              JSON.stringify({
+                error: 'invalid_grant',
+                error_description: 'bad code',
+              })
+            );
+            return;
+          }
+          res.writeHead(200, { 'Content-Type': 'application/json' });
+          res.end(
+            JSON.stringify({
+              access_token: 'real-access-token',
+              refresh_token: 'real-refresh-token',
+              id_token: 'real-id-token',
+              token_type: 'Bearer',
+              expires_in: 3600,
+            })
+          );
+        });
+      });
+      await new Promise<void>((resolve) =>
+        server.listen(0, '127.0.0.1', resolve)
+      );
+      const address = server.address() as { port: number };
+      serverUrl = `http://127.0.0.1:${address.port}`;
+    });
+
+    afterEach(async () => {
+      await new Promise<void>((resolve, reject) =>
+        server.close((err) => (err ? reject(err) : resolve()))
+      );
+    });
+
+    it('logs a real token POST with measured latency on success', async () => {
+      const client = getOAuth2Client(strategy);
+      const body =
+        'grant_type=authorization_code&client_id=example-client-id.apps.googleusercontent.com&client_secret=GOCSPX-example_secret&code=abc123&redirect_uri=http%3A%2F%2Flocalhost%3A3000%2Fapi%2Fgoogle-auth-emulate%2Fcallback';
+
+      await new Promise<void>((resolve, reject) => {
+        client._request(
+          'POST',
+          `${serverUrl}/oauth2/token`,
+          { 'Content-Type': 'application/x-www-form-urlencoded' },
+          body,
+          null,
+          (err, data) => {
+            try {
+              expect(err).toBeNull();
+              // oauth's _executeRequest yields (null, result, response); data is the raw body string.
+              expect(typeof data).toBe('string');
+              resolve();
+            } catch (e) {
+              reject(e);
+            }
+          }
+        );
+      });
+
       const logs = service.getLogs();
       expect(logs).toHaveLength(1);
       expect(logs[0]).toMatchObject({
         method: 'POST',
-        url: 'http://localhost:9015/oauth2/token',
+        url: `${serverUrl}/oauth2/token`,
         statusCode: 200,
       });
+      expect(logs[0].latencyMs).toBeGreaterThanOrEqual(0);
+      // Request body is redacted of secrets, not logged raw.
+      expect(logs[0].requestBody).toBeDefined();
+      expect(logs[0].requestBody).not.toContain('client_secret=GOCSPX');
+      expect(logs[0].requestBody).not.toContain('code=abc123');
+      // Real response captured from the server, not synthesized.
+      expect(logs[0].responseBody).toContain('real-access-token');
+    });
 
-      const result = service.getLastOAuthResult();
-      expect(result?.tokens?.access_token).toBe('mock-access-token');
-      expect(result?.apiLogs).toHaveLength(1);
+    it('logs the real status code when the token exchange fails', async () => {
+      const client = getOAuth2Client(strategy);
+      const body =
+        'grant_type=authorization_code&client_id=example-client-id.apps.googleusercontent.com&client_secret=GOCSPX-example_secret&code=bad-code&redirect_uri=http%3A%2F%2Flocalhost%3A3000%2Fapi%2Fgoogle-auth-emulate%2Fcallback';
+
+      await new Promise<void>((resolve, reject) => {
+        client._request(
+          'POST',
+          `${serverUrl}/oauth2/token`,
+          { 'Content-Type': 'application/x-www-form-urlencoded' },
+          body,
+          null,
+          (err) => {
+            try {
+              expect(err).toBeTruthy();
+              expect((err as { statusCode?: number }).statusCode).toBe(400);
+              resolve();
+            } catch (e) {
+              reject(e);
+            }
+          }
+        );
+      });
+
+      const logs = service.getLogs();
+      expect(logs).toHaveLength(1);
+      // A failed exchange must log the real non-2xx status, never 200.
+      expect(logs[0].statusCode).toBe(400);
+      expect(logs[0].responseBody).toContain('invalid_grant');
     });
   });
 });

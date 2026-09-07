@@ -176,6 +176,10 @@ export class GoogleAuthEmulateService implements OnModuleDestroy {
     return this.apiLogs;
   }
 
+  clearLogs(): void {
+    this.apiLogs = [];
+  }
+
   getLastOAuthResult(): GoogleOAuthResultDto | null {
     return this.lastOAuthResult;
   }

@@ -158,6 +158,22 @@ export class GoogleAuthEmulateController {
   }
 
   @Public()
+  @Post('clear-logs')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    summary: 'Clear captured API logs',
+    description:
+      'Clears the in-memory HTTP request/response logs captured during OAuth interactions.',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'API logs cleared',
+  })
+  async clearLogs() {
+    return await this.googleAuthEmulateService.clearLogs();
+  }
+
+  @Public()
   @Post('logout')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({

@@ -18,6 +18,7 @@ import {
   useGoogleAuthEmulateControllerGetLogsQuery,
   useGoogleAuthEmulateControllerGetLastResultQuery,
   useGoogleAuthEmulateControllerLogoutMutation,
+  useGoogleAuthEmulateControllerClearLogsMutation,
 } from '@open-kingdom/shared-frontend-data-access-api-client';
 
 jest.mock('react-redux', () => ({
@@ -33,6 +34,7 @@ jest.mock('@open-kingdom/shared-frontend-data-access-api-client', () => ({
   useGoogleAuthEmulateControllerGetLogsQuery: jest.fn(),
   useGoogleAuthEmulateControllerGetLastResultQuery: jest.fn(),
   useGoogleAuthEmulateControllerLogoutMutation: jest.fn(),
+  useGoogleAuthEmulateControllerClearLogsMutation: jest.fn(),
 }));
 
 jest.mock('@open-kingdom/shared-frontend-data-access-notifications', () => ({
@@ -49,6 +51,7 @@ describe('GoogleAuthDemo Route Component', () => {
   let mockStop: jest.Mock;
   let mockReset: jest.Mock;
   let mockLogout: jest.Mock;
+  let mockClearLogs: jest.Mock;
   let mockTriggerLoginUrl: jest.Mock;
   let mockRefetchStatus: jest.Mock;
   let mockRefetchLogsAndResult: jest.Mock;
@@ -133,6 +136,14 @@ describe('GoogleAuthDemo Route Component', () => {
     });
     (useGoogleAuthEmulateControllerLogoutMutation as any).mockReturnValue([
       mockLogout,
+      { isLoading: false },
+    ]);
+
+    mockClearLogs = jest.fn().mockReturnValue({
+      unwrap: jest.fn().mockResolvedValue({ success: true }),
+    });
+    (useGoogleAuthEmulateControllerClearLogsMutation as any).mockReturnValue([
+      mockClearLogs,
       { isLoading: false },
     ]);
 
@@ -226,13 +237,10 @@ describe('GoogleAuthDemo Route Component', () => {
 
     fireEvent.click(screen.getByText('Clear Inspector'));
 
-    // Clear is a client-side no-op: logs remain in the RTK Query cache and
-    // are refetched on the next status poll; persisted logs live server-side.
     await waitFor(() => {
-      expect(screen.getByText('Clear Inspector')).toBeTruthy();
+      expect(mockClearLogs).toHaveBeenCalled();
+      expect(mockRefetchStatus).toHaveBeenCalled();
     });
-    expect(screen.queryByText('No HTTP API calls captured yet.')).toBeNull();
-    expect(screen.getByText('1 Logged Call')).toBeTruthy();
   });
 
   it('should toggle token visibility and raw JSON viewer', async () => {

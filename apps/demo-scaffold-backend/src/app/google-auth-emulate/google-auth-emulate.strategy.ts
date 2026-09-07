@@ -2,11 +2,52 @@ import { Injectable, Logger } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { Strategy, Profile, VerifyCallback } from 'passport-google-oauth20';
 import axios from 'axios';
+import { ApiLogEntryDto } from './google-auth-emulate.dto';
 import {
   GoogleAuthEmulateService,
   DEFAULT_GOOGLE_EMULATOR_PORT,
 } from './google-auth-emulate.service';
-import { ApiLogEntryDto } from './google-auth-emulate.dto';
+
+/** The `oauth` client's `_request` is `protected` in its typings but is a
+ * plain writable method at runtime, and passport-google-oauth20 documents
+ * `_oauth2` as usable by subclasses. Expose a public shape for wrapping it. */
+interface OAuth2RequestClient {
+  _request(
+    method: string,
+    url: string,
+    headers: Record<string, string> | null,
+    postBody: string,
+    accessToken: string | null,
+    callback: (err: unknown, data?: string, response?: unknown) => void
+  ): void;
+}
+
+const SENSITIVE_FORM_FIELDS = [
+  'client_secret',
+  'code',
+  'refresh_token',
+  'access_token',
+];
+
+function redactRequestBody(body: string): string {
+  try {
+    const params = new URLSearchParams(body);
+    for (const field of SENSITIVE_FORM_FIELDS) {
+      if (params.has(field)) params.set(field, '<redacted>');
+    }
+    return params.toString();
+  } catch {
+    return '<redacted>';
+  }
+}
+
+function safeJsonParse(value: string): unknown {
+  try {
+    return JSON.parse(value);
+  } catch {
+    return value;
+  }
+}
 
 @Injectable()
 export class GoogleAuthEmulateStrategy extends PassportStrategy(
@@ -15,7 +56,6 @@ export class GoogleAuthEmulateStrategy extends PassportStrategy(
 ) {
   private readonly logger = new Logger(GoogleAuthEmulateStrategy.name);
   private readonly userInfoUrl: string;
-  private readonly tokenUrl: string;
 
   constructor(
     private readonly googleAuthEmulateService: GoogleAuthEmulateService
@@ -29,9 +69,6 @@ export class GoogleAuthEmulateStrategy extends PassportStrategy(
     const userInfoUrl =
       process.env['GOOGLE_USERINFO_URL'] ||
       `${emulatorBaseUrl}/oauth2/v2/userinfo`;
-
-    const tokenUrl =
-      process.env['GOOGLE_TOKEN_URL'] || `${emulatorBaseUrl}/oauth2/token`;
 
     super({
       clientID:
@@ -54,7 +91,96 @@ export class GoogleAuthEmulateStrategy extends PassportStrategy(
 
     // Store for use in the overridden userProfile()
     this.userInfoUrl = userInfoUrl;
-    this.tokenUrl = tokenUrl;
+
+    // The token exchange is performed internally by passport-google-oauth20
+    // (oauth2.getOAuthAccessToken -> this._oauth2._request). Wrap the client's
+    // _request so the API inspector captures the real token POST alongside the
+    // userinfo GET logged in userProfile(), instead of synthesizing a fake row.
+    this.interceptOAuth2Request();
+  }
+
+  private interceptOAuth2Request(): void {
+    const oauth2 = this._oauth2 as unknown as OAuth2RequestClient;
+    const originalRequest = oauth2._request.bind(oauth2);
+
+    oauth2._request = (method, url, headers, postBody, accessToken, cb) => {
+      const startTime = Date.now();
+
+      const requestHeaders: Record<string, string> = {};
+      if (headers) {
+        for (const [key, value] of Object.entries(headers)) {
+          if (typeof value === 'string') requestHeaders[key] = value;
+        }
+      }
+      if (accessToken) {
+        requestHeaders['Authorization'] = `Bearer ${accessToken.slice(
+          0,
+          15
+        )}...`;
+      }
+
+      const wrappedCallback = (
+        err?: unknown,
+        data?: unknown,
+        response?: unknown
+      ) => {
+        const latencyMs = Date.now() - startTime;
+        if (err) {
+          const errObj = err as {
+            statusCode?: number;
+            data?: unknown;
+            message?: string;
+          };
+          this.logApiCall({
+            method: String(method),
+            url,
+            statusCode: errObj.statusCode || 500,
+            requestHeaders,
+            // Never log the raw body: it carries client_secret, code, tokens.
+            requestBody:
+              postBody && typeof postBody === 'string'
+                ? redactRequestBody(postBody)
+                : undefined,
+            responseHeaders: {},
+            responseBody: JSON.stringify(
+              errObj.data ?? { error: errObj.message || String(err) },
+              null,
+              2
+            ),
+            latencyMs,
+          });
+        } else {
+          const parsedBody =
+            typeof data === 'string' ? safeJsonParse(data) : data;
+          this.logApiCall({
+            method: String(method),
+            url,
+            statusCode: 200,
+            requestHeaders,
+            requestBody:
+              postBody && typeof postBody === 'string'
+                ? redactRequestBody(postBody)
+                : undefined,
+            responseHeaders: {},
+            responseBody: JSON.stringify(parsedBody ?? {}, null, 2),
+            latencyMs,
+          });
+        }
+        if (typeof cb === 'function') {
+          // Forward the original arguments (err, data, response) unchanged.
+          cb(err, data as string | undefined, response);
+        }
+      };
+
+      return originalRequest(
+        method,
+        url,
+        headers,
+        postBody,
+        accessToken ?? null,
+        wrappedCallback
+      );
+    };
   }
 
   private logApiCall(entry: Omit<ApiLogEntryDto, 'id' | 'timestamp'>): void {
@@ -168,28 +294,6 @@ export class GoogleAuthEmulateStrategy extends PassportStrategy(
       token_type: 'Bearer',
       scope: 'openid profile email',
     };
-
-    // The token exchange is performed internally by passport-google-oauth20
-    // (oauth2.getOAuthAccessToken). Capture it here so the API inspector sees
-    // the token POST alongside the userinfo GET logged in userProfile().
-    const tokenStartTime = Date.now();
-    this.logApiCall({
-      method: 'POST',
-      url: this.tokenUrl,
-      statusCode: 200,
-      requestHeaders: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      requestBody:
-        'grant_type=authorization_code&client_id=<redacted>&redirect_uri=<redacted>&code=<redacted>',
-      responseBody: JSON.stringify(
-        {
-          access_token: `${accessToken.slice(0, 15)}...`,
-          token_type: 'Bearer',
-        },
-        null,
-        2
-      ),
-      latencyMs: Date.now() - tokenStartTime,
-    });
 
     this.googleAuthEmulateService.setOAuthResult(tokens, userProfile);
 

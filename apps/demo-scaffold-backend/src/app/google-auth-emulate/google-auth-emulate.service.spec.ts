@@ -78,6 +78,30 @@ describe('GoogleAuthEmulateService', () => {
     expect(result?.apiLogs).toHaveLength(1);
   });
 
+  it('should clear captured API logs', () => {
+    service.appendLog({
+      method: 'POST',
+      url: 'http://localhost:9015/oauth2/token',
+      statusCode: 200,
+      requestHeaders: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      responseBody: '{"access_token":"mock"}',
+      latencyMs: 12,
+    });
+    service.appendLog({
+      method: 'GET',
+      url: 'http://localhost:9015/oauth2/v2/userinfo',
+      statusCode: 200,
+      requestHeaders: {},
+      responseBody: '{}',
+      latencyMs: 5,
+    });
+
+    expect(service.getLogs()).toHaveLength(2);
+
+    service.clearLogs();
+    expect(service.getLogs()).toEqual([]);
+  });
+
   it('should reset logs and result cleanly', async () => {
     const res = await service.reset();
     expect(res.success).toBe(true);

@@ -972,6 +972,16 @@ const injectedRtkApi = api
         query: () => ({ url: `/api/google-auth-emulate/logs` }),
         providesTags: ["Google Auth Emulate"],
       }),
+      googleAuthEmulateControllerClearLogs: build.mutation<
+        GoogleAuthEmulateControllerClearLogsApiResponse,
+        GoogleAuthEmulateControllerClearLogsApiArg
+      >({
+        query: () => ({
+          url: `/api/google-auth-emulate/clear-logs`,
+          method: "POST",
+        }),
+        invalidatesTags: ["Google Auth Emulate"],
+      }),
       googleAuthEmulateControllerLogout: build.mutation<
         GoogleAuthEmulateControllerLogoutApiResponse,
         GoogleAuthEmulateControllerLogoutApiArg
@@ -1433,6 +1443,8 @@ export type GoogleAuthEmulateControllerGetLastResultApiArg = void;
 export type GoogleAuthEmulateControllerGetLogsApiResponse =
   /** status 200  */ ApiLogEntryDto[];
 export type GoogleAuthEmulateControllerGetLogsApiArg = void;
+export type GoogleAuthEmulateControllerClearLogsApiResponse = unknown;
+export type GoogleAuthEmulateControllerClearLogsApiArg = void;
 export type GoogleAuthEmulateControllerLogoutApiResponse = unknown;
 export type GoogleAuthEmulateControllerLogoutApiArg = void;
 export type LoginResponseDto = {
@@ -2213,5 +2225,6 @@ export const {
   useGoogleAuthEmulateControllerCallbackQuery,
   useGoogleAuthEmulateControllerGetLastResultQuery,
   useGoogleAuthEmulateControllerGetLogsQuery,
+  useGoogleAuthEmulateControllerClearLogsMutation,
   useGoogleAuthEmulateControllerLogoutMutation,
 } = injectedRtkApi;

@@ -26,6 +26,7 @@ describe('GoogleAuthEmulateController', () => {
               .fn()
               .mockResolvedValue({ success: true, message: 'Reset' }),
             getLogs: jest.fn().mockReturnValue([]),
+            clearLogs: jest.fn(),
             getLastOAuthResult: jest.fn().mockReturnValue(null),
           },
         },
@@ -63,5 +64,10 @@ describe('GoogleAuthEmulateController', () => {
   it('should get logs and last result', () => {
     expect(controller.getLogs()).toEqual([]);
     expect(controller.getLastResult()).toBeNull();
+  });
+
+  it('should clear captured API logs', async () => {
+    await controller.clearLogs();
+    expect(service.clearLogs).toHaveBeenCalled();
   });
 });
