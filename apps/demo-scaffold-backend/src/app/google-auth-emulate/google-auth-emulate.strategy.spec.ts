@@ -52,6 +52,43 @@ describe('GoogleAuthEmulateStrategy', () => {
       expect(logs[0].requestHeaders?.Authorization).toContain('Bearer');
     });
 
+    it('handles a sparse userinfo payload with optional fields absent', async () => {
+      mockedAxios.get.mockResolvedValueOnce({
+        status: 200,
+        headers: { 'content-type': 'application/json' },
+        data: { sub: 'user_123' },
+      });
+
+      const profile = await new Promise((resolve, reject) => {
+        strategy.userProfile('mock-access-token', (err, p) =>
+          err ? reject(err) : resolve(p)
+        );
+      });
+
+      // Optional profile fields fall back to safe defaults when missing.
+      expect(profile).toMatchObject({
+        id: 'user_123',
+        displayName: '',
+        provider: 'google',
+        emails: undefined,
+        photos: undefined,
+      });
+    });
+
+    it('logs a fallback error body when the failure has no response payload', async () => {
+      mockedAxios.get.mockRejectedValueOnce(new Error('ECONNREFUSED'));
+
+      const err = await new Promise((resolve) => {
+        strategy.userProfile('mock-access-token', (e) => resolve(e));
+      });
+
+      expect(err).toBeInstanceOf(Error);
+      const logs = service.getLogs();
+      expect(logs).toHaveLength(1);
+      expect(logs[0].statusCode).toBe(500);
+      expect(logs[0].responseBody).toContain('ECONNREFUSED');
+    });
+
     it('logs the failed userinfo GET and calls done with the error', async () => {
       mockedAxios.get.mockRejectedValueOnce({
         response: {
@@ -136,6 +173,12 @@ describe('GoogleAuthEmulateStrategy', () => {
           rawBody += chunk;
         });
         req.on('end', () => {
+          // Serve a non-JSON 200 body for the plain-text case.
+          if (req.url?.includes('/plain')) {
+            res.writeHead(200, { 'Content-Type': 'text/plain' });
+            res.end('not-json-body');
+            return;
+          }
           if (rawBody.includes('code=bad-code')) {
             res.writeHead(400, { 'Content-Type': 'application/json' });
             res.end(
@@ -241,6 +284,76 @@ describe('GoogleAuthEmulateStrategy', () => {
       // A failed exchange must log the real non-2xx status, never 200.
       expect(logs[0].statusCode).toBe(400);
       expect(logs[0].responseBody).toContain('invalid_grant');
+    });
+
+    it('logs a GET carrying an access token and null headers', async () => {
+      const client = getOAuth2Client(strategy);
+
+      await new Promise<void>((resolve, reject) => {
+        client._request(
+          'GET',
+          `${serverUrl}/plain`,
+          null,
+          '',
+          'tok_1234567890abcdef',
+          (err) => {
+            try {
+              expect(err).toBeNull();
+              resolve();
+            } catch (e) {
+              reject(e);
+            }
+          }
+        );
+      });
+
+      const logs = service.getLogs();
+      expect(logs).toHaveLength(1);
+      expect(logs[0]).toMatchObject({
+        method: 'GET',
+        statusCode: 200,
+      });
+      // The access token is redacted in the logged Authorization header.
+      expect(logs[0].requestHeaders?.['Authorization']).toBe(
+        'Bearer tok_1234567890a...'
+      );
+      // A non-JSON body is preserved as the raw response body.
+      expect(logs[0].responseBody).toContain('not-json-body');
+    });
+
+    it('logs a transport-level failure without an HTTP status', async () => {
+      const client = getOAuth2Client(strategy);
+      // Point at a port with nothing listening -> request error (no statusCode).
+      const closedPort = await new Promise<number>((resolve) => {
+        const s = http.createServer();
+        s.listen(0, '127.0.0.1', () => {
+          const port = (s.address() as { port: number }).port;
+          s.close(() => resolve(port));
+        });
+      });
+
+      await new Promise<void>((resolve, reject) => {
+        client._request(
+          'POST',
+          `http://127.0.0.1:${closedPort}/oauth2/token`,
+          { 'Content-Type': 'application/x-www-form-urlencoded' },
+          'grant_type=authorization_code&code=abc&client_secret=secret',
+          null,
+          (err) => {
+            try {
+              expect(err).toBeTruthy();
+              resolve();
+            } catch (e) {
+              reject(e);
+            }
+          }
+        );
+      });
+
+      const logs = service.getLogs();
+      expect(logs).toHaveLength(1);
+      // No statusCode available -> falls back to 500.
+      expect(logs[0].statusCode).toBe(500);
     });
   });
 });
