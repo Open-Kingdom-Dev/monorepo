@@ -79,6 +79,41 @@ describe('AppleMusicTwin Server Lifecycle', () => {
     expect(body.results.songs.data[0].id).toBe('mock-track-001');
   });
 
+  it('should expose catalog durations that match the shipped ~15s clips', async () => {
+    await twin.start();
+
+    const response = await fetch(
+      `${TEST_URL}/v1/catalog/us/search?term=&types=songs`
+    );
+    const body: any = await response.json();
+    const durations = body.results.songs.data.map(
+      (s: any) => s.attributes.durationInMillis
+    );
+    // All fixture audio files are ~15 second MP3s; metadata must agree.
+    expect([...new Set(durations)]).toEqual([15000]);
+  });
+
+  it('should serve local SVG artwork at the placeholder URL shape', async () => {
+    await twin.start();
+
+    const search = await fetch(
+      `${TEST_URL}/v1/catalog/us/search?term=&types=songs`
+    );
+    const searchBody: any = await search.json();
+    const artworkUrl = searchBody.results.songs.data[0].attributes.artwork.url;
+    // Artwork is served by the twin itself, not a remote host.
+    expect(artworkUrl).toContain(`${TEST_URL}/v1/artwork/`);
+    expect(artworkUrl).toContain('{w}x{h}');
+    expect(artworkUrl).not.toContain('unsplash.com');
+
+    // The demo substitutes {w}x{h} before fetching; that request must resolve.
+    const resolvedUrl = artworkUrl.replace('{w}', '300').replace('{h}', '300');
+    const artwork = await fetch(resolvedUrl);
+    expect(artwork.status).toBe(200);
+    expect(artwork.headers.get('content-type')).toContain('image/svg+xml');
+    await artwork.arrayBuffer(); // consume body
+  });
+
   it('should serve single songs', async () => {
     await twin.start();
 

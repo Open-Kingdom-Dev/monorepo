@@ -4,7 +4,7 @@ export interface AppleMusicTrackFixture {
   artistName: string;
   albumName: string;
   durationMs: number;
-  artworkUrl: string | null;
+  artworkFile: string | null;
   audioFile: string;
 }
 
@@ -12,9 +12,13 @@ export interface AppleMusicPlaylistFixture {
   id: string;
   name: string;
   description: string | null;
-  artworkUrl: string | null;
+  artworkFile: string | null;
   trackIds: string[];
 }
+
+// All fixtures reference the ~15 second clips shipped under ./audio. Keep
+// durationMs in sync with those clips so catalog metadata matches playback.
+const TRACK_DURATION_MS = 15000;
 
 export const trackFixtures: AppleMusicTrackFixture[] = [
   {
@@ -22,9 +26,8 @@ export const trackFixtures: AppleMusicTrackFixture[] = [
     name: 'Morning Meditation Calm',
     artistName: 'Zen Nature Sounds',
     albumName: 'Zen Garden',
-    durationMs: 180000,
-    artworkUrl:
-      'https://images.unsplash.com/photo-1518241353330-0f7941c2d9b5?w=300&h=300&fit=crop',
+    durationMs: TRACK_DURATION_MS,
+    artworkFile: 'track-001.svg',
     audioFile: 'mock-1.mp3',
   },
   {
@@ -32,9 +35,8 @@ export const trackFixtures: AppleMusicTrackFixture[] = [
     name: 'Deep Sleep Ambient Rain',
     artistName: 'Rainstorm Ambient',
     albumName: 'Relaxing Storms',
-    durationMs: 300000,
-    artworkUrl:
-      'https://images.unsplash.com/photo-1534274988757-a28bf1a57c17?w=300&h=300&fit=crop',
+    durationMs: TRACK_DURATION_MS,
+    artworkFile: 'track-002.svg',
     audioFile: 'mock-2.mp3',
   },
   {
@@ -42,9 +44,8 @@ export const trackFixtures: AppleMusicTrackFixture[] = [
     name: 'Relaxing Acoustic Guitar',
     artistName: 'Guitar Chillout',
     albumName: 'Acoustic Sunday',
-    durationMs: 240000,
-    artworkUrl:
-      'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=300&h=300&fit=crop',
+    durationMs: TRACK_DURATION_MS,
+    artworkFile: 'track-003.svg',
     audioFile: 'mock-3.mp3',
   },
   {
@@ -52,9 +53,8 @@ export const trackFixtures: AppleMusicTrackFixture[] = [
     name: 'Lo-Fi Study Beats',
     artistName: 'Coffee Shop Chill',
     albumName: 'Late Night Chill',
-    durationMs: 150000,
-    artworkUrl:
-      'https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?w=300&h=300&fit=crop',
+    durationMs: TRACK_DURATION_MS,
+    artworkFile: 'track-004.svg',
     audioFile: 'mock-1.mp3',
   },
   {
@@ -62,9 +62,8 @@ export const trackFixtures: AppleMusicTrackFixture[] = [
     name: 'Classical Serenade',
     artistName: 'Symphony Ensemble',
     albumName: 'Baroque Classics',
-    durationMs: 320000,
-    artworkUrl:
-      'https://images.unsplash.com/photo-1507838153414-b4b713384a76?w=300&h=300&fit=crop',
+    durationMs: TRACK_DURATION_MS,
+    artworkFile: 'track-005.svg',
     audioFile: 'mock-2.mp3',
   },
   {
@@ -72,9 +71,8 @@ export const trackFixtures: AppleMusicTrackFixture[] = [
     name: 'Focus Instrumental Piano',
     artistName: 'Keyboard Maestro',
     albumName: 'Focus & Study Piano',
-    durationMs: 210000,
-    artworkUrl:
-      'https://images.unsplash.com/photo-1520523839897-bd0b52f945a0?w=300&h=300&fit=crop',
+    durationMs: TRACK_DURATION_MS,
+    artworkFile: 'track-006.svg',
     audioFile: 'mock-3.mp3',
   },
   {
@@ -82,9 +80,8 @@ export const trackFixtures: AppleMusicTrackFixture[] = [
     name: 'Birdsong Morning Woods',
     artistName: 'Nature Recording Collective',
     albumName: 'Sounds of the Forest',
-    durationMs: 270000,
-    artworkUrl:
-      'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=300&h=300&fit=crop',
+    durationMs: TRACK_DURATION_MS,
+    artworkFile: 'track-007.svg',
     audioFile: 'mock-1.mp3',
   },
 ];
@@ -95,8 +92,7 @@ export const playlistFixtures: AppleMusicPlaylistFixture[] = [
     name: 'Relaxation Essentials',
     description:
       'A curated playlist containing relaxing nature sounds and acoustic guitars.',
-    artworkUrl:
-      'https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=300&h=300&fit=crop',
+    artworkFile: 'playlist-001.svg',
     trackIds: [
       'mock-track-001',
       'mock-track-002',
@@ -109,8 +105,7 @@ export const playlistFixtures: AppleMusicPlaylistFixture[] = [
     name: 'Study Focus Beats',
     description:
       'Instrumental music and low fidelity tracks to help you concentrate.',
-    artworkUrl:
-      'https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?w=300&h=300&fit=crop',
+    artworkFile: 'playlist-002.svg',
     trackIds: ['mock-track-004', 'mock-track-006'],
   },
 ];

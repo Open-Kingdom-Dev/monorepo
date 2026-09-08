@@ -3,6 +3,21 @@ import {
   AppleMusicPlaylistFixture,
 } from './catalog-fixtures.js';
 
+function formatArtwork(
+  artworkFile: string | null,
+  baseUrl?: string
+): { url: string; width: number; height: number } | null {
+  if (!artworkFile || !baseUrl) return null;
+  // Real MusicKit artwork URLs carry {w}/{h} placeholders that clients
+  // substitute with the size they need — keep that shape so consumers (and
+  // the demo UI's .replace('{w}', ...) calls) exercise the real contract.
+  return {
+    url: `${baseUrl}/v1/artwork/{w}x{h}/${artworkFile}`,
+    width: 300,
+    height: 300,
+  };
+}
+
 export function formatTrackResource(
   track: AppleMusicTrackFixture,
   baseUrl?: string
@@ -16,13 +31,7 @@ export function formatTrackResource(
       albumName: track.albumName,
       durationInMillis: track.durationMs,
       audioUrl: baseUrl ? `${baseUrl}/v1/audio/${track.audioFile}` : null,
-      artwork: track.artworkUrl
-        ? {
-            url: track.artworkUrl,
-            width: 300,
-            height: 300,
-          }
-        : null,
+      artwork: formatArtwork(track.artworkFile, baseUrl),
     },
   };
 }
@@ -46,13 +55,7 @@ export function formatPlaylistResource(
             standard: playlist.description,
           }
         : null,
-      artwork: playlist.artworkUrl
-        ? {
-            url: playlist.artworkUrl,
-            width: 300,
-            height: 300,
-          }
-        : null,
+      artwork: formatArtwork(playlist.artworkFile, baseUrl),
       trackCount: playlistTracks.length,
     },
     relationships: {

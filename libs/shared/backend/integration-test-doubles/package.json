@@ -21,6 +21,7 @@
     "README.md",
     "dist",
     "audio",
+    "artwork",
     "test-assets",
     "!**/*.tsbuildinfo"
   ],
@@ -49,6 +50,11 @@
               "input": "libs/shared/backend/integration-test-doubles/src/apple-music/audio",
               "glob": "**/*.mp3",
               "output": "audio"
+            },
+            {
+              "input": "libs/shared/backend/integration-test-doubles/src/apple-music/artwork",
+              "glob": "**/*.svg",
+              "output": "artwork"
             }
           ]
         }

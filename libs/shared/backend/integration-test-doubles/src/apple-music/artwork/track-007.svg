@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 300">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#10b981"/>
+      <stop offset="100%" stop-color="#14532d"/>
+    </linearGradient>
+  </defs>
+  <rect width="300" height="300" fill="url(#g)"/>
+  <path d="M96 118c40-34 68 22 108-12v104c-40 34-68-22-108 12z" fill="none" stroke="#fff" stroke-width="10" stroke-linejoin="round"/>
+  <circle cx="104" cy="182" r="10" fill="#fff"/>
+  <circle cx="186" cy="150" r="10" fill="#fff"/>
+  <text x="150" y="250" font-family="sans-serif" font-size="24" font-weight="bold" fill="#fff" text-anchor="middle">Track 7</text>
+</svg>

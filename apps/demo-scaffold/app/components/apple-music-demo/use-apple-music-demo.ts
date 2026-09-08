@@ -13,6 +13,7 @@ import {
   useAppleMusicTwinControllerSetErrorModeMutation,
   useAppleMusicTwinControllerClearErrorModeMutation,
 } from '@open-kingdom/shared-frontend-data-access-api-client';
+import { loadMusicKitScript } from './music-kit-loader';
 
 export interface AppleMusicTrack {
   id: string;
@@ -323,35 +324,9 @@ export default function useAppleMusicDemo() {
     }
   };
 
-  // Load browser shim musickit.js script
-  const loadMusicKitApi = (): Promise<void> => {
-    return new Promise((resolve) => {
-      const win = window as any;
-      if (win.MusicKit) {
-        resolve();
-        return;
-      }
-
-      let script = document.getElementById(
-        'apple-music-twin-sdk'
-      ) as HTMLScriptElement;
-      if (!script) {
-        document.addEventListener('musickitloaded', () => resolve(), {
-          once: true,
-        });
-        script = document.createElement('script');
-        script.id = 'apple-music-twin-sdk';
-        script.src = `${twinUrl}/musickit.js`;
-        document.body.appendChild(script);
-      } else {
-        resolve();
-      }
-    });
-  };
-
   // Get or create a configured MusicKit instance with all listeners attached once
   const getMusicKitInstance = async () => {
-    await loadMusicKitApi();
+    await loadMusicKitScript(twinUrl);
     const win = window as any;
     const musicKit = win.MusicKit;
     let instance = musicKit.getInstance();

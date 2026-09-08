@@ -85,6 +85,33 @@ export class AppleMusicTwin {
       })
     );
 
+    // Artwork static files. Catalog URLs carry Apple-style {w}x{h} placeholders
+    // (e.g. /v1/artwork/300x300/track-001.svg) that clients substitute with the
+    // size they need; the :size segment is cosmetic, files live flat on disk.
+    let artworkPath = path.join(__dirname, 'artwork');
+    if (!fs.existsSync(artworkPath)) {
+      artworkPath = path.join(__dirname, '../artwork');
+    }
+    app.get(
+      '/v1/artwork/:size/:file',
+      (req: Request<{ size: string; file: string }>, res: Response) => {
+        const file = path.basename(req.params.file);
+        res.setHeader('Access-Control-Allow-Origin', '*');
+        res.sendFile(path.join(artworkPath, file), (err) => {
+          if (err && !res.headersSent) {
+            res.status(404).json({
+              errors: [
+                {
+                  title: 'Resource Not Found',
+                  detail: `Artwork ${file} not found.`,
+                },
+              ],
+            });
+          }
+        });
+      }
+    );
+
     // --- Apple Music Catalog API ---
 
     // Search — empty term returns all tracks/playlists
