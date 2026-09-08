@@ -65,6 +65,13 @@ describe('renderEnvFile', () => {
     expect(parseEnvFile(renderEnvFile({ env, slot: 1 }))).toEqual(env);
   });
 
+  it('keeps a literal backslash-n distinct from a newline', () => {
+    // The pair most easily mangled: unescape the `\n` first and this Windows
+    // path comes back with a real line break in the middle of it.
+    const env = { WIN_PATH: 'C:\\newbranch\\node', REAL_NEWLINE: 'a\nb' };
+    expect(parseEnvFile(renderEnvFile({ env, slot: 1 }))).toEqual(env);
+  });
+
   it('refuses a name a shell would misparse rather than writing a broken file', () => {
     expect(() => renderEnvFile({ env: { 'BAD-NAME': '1' }, slot: 1 })).toThrow(
       /not a valid environment variable name/
