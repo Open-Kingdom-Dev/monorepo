@@ -52,14 +52,15 @@ monorepo/
 
 ### Backend (NestJS)
 
-| Package                                                   | Import Token / Class                                                         | Purpose                   |
-| --------------------------------------------------------- | ---------------------------------------------------------------------------- | ------------------------- |
-| `@open-kingdom/shared-backend-data-access-database-setup` | `DatabaseSetupModule`                                                        | Drizzle + SQLite DI setup |
-| `@open-kingdom/shared-backend-data-access-users`          | `UsersService`, `users` schema                                               | User persistence + bcrypt |
-| `@open-kingdom/shared-backend-feature-authentication`     | `OpenKingdomFeatureBackendAuthModule`, `JwtAuthGuard`, `@Public()`           | JWT auth + login endpoint |
-| `@open-kingdom/shared-backend-feature-email`              | `EmailModule`, `EmailService`                                                | Email via Gmail provider  |
-| `@open-kingdom/shared-backend-feature-user-management`    | `FeatureUserManagementModule`, `UserManagementService`, `InvitationsService` | User + invitation CRUD    |
-| `@open-kingdom/shared-backend-feature-gcp-resources`      | `FeatureGcpResourcesModule`                                                  | GCP project listing       |
+| Package                                                   | Import Token / Class                                                         | Purpose                               |
+| --------------------------------------------------------- | ---------------------------------------------------------------------------- | ------------------------------------- |
+| `@open-kingdom/shared-backend-data-access-database-setup` | `DatabaseSetupModule`                                                        | Drizzle + SQLite DI setup             |
+| `@open-kingdom/shared-backend-data-access-users`          | `UsersService`, `users` schema                                               | User persistence + bcrypt             |
+| `@open-kingdom/shared-backend-feature-authentication`     | `OpenKingdomFeatureBackendAuthModule`, `JwtAuthGuard`, `@Public()`           | JWT auth + login endpoint             |
+| `@open-kingdom/shared-backend-feature-email`              | `EmailModule`, `EmailService`                                                | Email via Gmail provider              |
+| `@open-kingdom/shared-backend-feature-user-management`    | `FeatureUserManagementModule`, `UserManagementService`, `InvitationsService` | User + invitation CRUD                |
+| `@open-kingdom/shared-backend-feature-gcp-resources`      | `FeatureGcpResourcesModule`                                                  | GCP project listing                   |
+| `@open-kingdom/shared-backend-util-port-lease`            | `leaseSlot`, `portsForSlot`, `envForSlot`                                    | Per-worktree dev/test port allocation |
 
 ### Frontend (React + Redux)
 
