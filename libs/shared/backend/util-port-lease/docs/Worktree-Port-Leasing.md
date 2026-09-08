@@ -152,7 +152,7 @@ _Worktree Port Leasing — a pattern for deterministic multi-stack development o
 
 ## §8 · This workspace's implementation
 
-The mechanism above is implemented here as a publishable library, [`libs/shared/backend/util-port-lease`](../libs/shared/backend/util-port-lease/README.md) → `@open-kingdom/shared-backend-util-port-lease`, so other repositories can consume it rather than re-derive it.
+The mechanism above is implemented here as a publishable library, [`libs/shared/backend/util-port-lease`](../README.md) → `@open-kingdom/shared-backend-util-port-lease`, so other repositories can consume it rather than re-derive it.
 
 | §7 step                         | Here                                                                                                                             |
 | ------------------------------- | -------------------------------------------------------------------------------------------------------------------------------- |

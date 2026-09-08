@@ -144,11 +144,12 @@ export function parseEnvFile(contents: string): Record<string, string> {
     const name = trimmed.slice(0, eq);
     let value = trimmed.slice(eq + 1);
     if (value.startsWith('"') && value.endsWith('"') && value.length > 1) {
+      // One left-to-right pass, so an escape is never re-read as the start of
+      // another. Unescaping `\n` before `\\` would turn a literal backslash
+      // followed by `n` — a Windows path like `C:\newbranch` — into a newline.
       value = value
         .slice(1, -1)
-        .replace(/\\n/g, '\n')
-        .replace(/\\"/g, '"')
-        .replace(/\\\\/g, '\\');
+        .replace(/\\(.)/g, (_match, ch: string) => (ch === 'n' ? '\n' : ch));
     }
     out[name] = value;
   }
