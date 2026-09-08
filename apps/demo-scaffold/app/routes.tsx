@@ -9,6 +9,7 @@ import AcceptInvitationRoute from './routes/accept-invitation';
 import GcsDemo from './routes/gcs-demo';
 import GmailDemo from './routes/gmail-demo';
 import YouTubeDemo from './routes/youtube-demo';
+import AppleMusicDemo from './routes/apple-music-demo';
 
 export const router = createBrowserRouter([
   {
@@ -24,6 +25,7 @@ export const router = createBrowserRouter([
       { path: 'gcs-demo', Component: GcsDemo },
       { path: 'gmail-demo', Component: GmailDemo },
       { path: 'youtube-demo', Component: YouTubeDemo },
+      { path: 'apple-music-demo', Component: AppleMusicDemo },
     ],
   },
 ]);

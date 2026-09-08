@@ -20,6 +20,8 @@
   "files": [
     "README.md",
     "dist",
+    "audio",
+    "artwork",
     "test-assets",
     "!**/*.tsbuildinfo"
   ],
@@ -42,7 +44,19 @@
           "main": "libs/shared/backend/integration-test-doubles/src/index.ts",
           "tsConfig": "libs/shared/backend/integration-test-doubles/tsconfig.lib.json",
           "skipTypeCheck": true,
-          "stripLeadingPaths": true
+          "stripLeadingPaths": true,
+          "assets": [
+            {
+              "input": "libs/shared/backend/integration-test-doubles/src/apple-music/audio",
+              "glob": "**/*.mp3",
+              "output": "audio"
+            },
+            {
+              "input": "libs/shared/backend/integration-test-doubles/src/apple-music/artwork",
+              "glob": "**/*.svg",
+              "output": "artwork"
+            }
+          ]
         }
       },
       "start:twin": {
@@ -53,6 +67,12 @@
       },
       "start:youtube-twin": {
         "command": "npx tsx libs/shared/backend/integration-test-doubles/scripts/start-youtube-twin.ts",
+        "dependsOn": [
+          "^build"
+        ]
+      },
+      "start:apple-music-twin": {
+        "command": "npx tsx libs/shared/backend/integration-test-doubles/scripts/start-apple-music-twin.ts",
         "dependsOn": [
           "^build"
         ]

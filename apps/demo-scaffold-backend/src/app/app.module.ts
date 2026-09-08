@@ -21,6 +21,7 @@ import { FeatureYoutubeModule } from '@open-kingdom/shared-backend-feature-youtu
 import { FeatureCrmModule } from '@open-kingdom/crm-backend-feature-crm';
 import { TwinModule } from './twin/twin.module';
 import { YouTubeTwinModule } from './youtube-twin/youtube-twin.module.js';
+import { AppleMusicTwinModule } from './apple-music-twin/apple-music-twin.module.js';
 import {
   PermissionGuard,
   ROLE_RESOLVER,
@@ -88,6 +89,7 @@ function getEmailModule() {
     FeatureCrmModule.forRoot({ seedDefaults: true }),
     TwinModule,
     YouTubeTwinModule,
+    AppleMusicTwinModule,
   ],
   controllers: [],
   providers: [

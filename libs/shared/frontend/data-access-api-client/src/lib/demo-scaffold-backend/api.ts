@@ -22,6 +22,7 @@ export const addTagTypes = [
   "Opportunities",
   "Twin",
   "YouTube Twin",
+  "Apple Music Twin",
 ] as const;
 const injectedRtkApi = api
   .enhanceEndpoints({
@@ -852,6 +853,55 @@ const injectedRtkApi = api
         query: () => ({ url: `/api/youtube-twin/reset`, method: "POST" }),
         invalidatesTags: ["YouTube Twin"],
       }),
+      appleMusicTwinControllerGetStatus: build.query<
+        AppleMusicTwinControllerGetStatusApiResponse,
+        AppleMusicTwinControllerGetStatusApiArg
+      >({
+        query: () => ({ url: `/api/apple-music-twin/status` }),
+        providesTags: ["Apple Music Twin"],
+      }),
+      appleMusicTwinControllerStart: build.mutation<
+        AppleMusicTwinControllerStartApiResponse,
+        AppleMusicTwinControllerStartApiArg
+      >({
+        query: () => ({ url: `/api/apple-music-twin/start`, method: "POST" }),
+        invalidatesTags: ["Apple Music Twin"],
+      }),
+      appleMusicTwinControllerStop: build.mutation<
+        AppleMusicTwinControllerStopApiResponse,
+        AppleMusicTwinControllerStopApiArg
+      >({
+        query: () => ({ url: `/api/apple-music-twin/stop`, method: "POST" }),
+        invalidatesTags: ["Apple Music Twin"],
+      }),
+      appleMusicTwinControllerReset: build.mutation<
+        AppleMusicTwinControllerResetApiResponse,
+        AppleMusicTwinControllerResetApiArg
+      >({
+        query: () => ({ url: `/api/apple-music-twin/reset`, method: "POST" }),
+        invalidatesTags: ["Apple Music Twin"],
+      }),
+      appleMusicTwinControllerSetErrorMode: build.mutation<
+        AppleMusicTwinControllerSetErrorModeApiResponse,
+        AppleMusicTwinControllerSetErrorModeApiArg
+      >({
+        query: (queryArg) => ({
+          url: `/api/apple-music-twin/error-mode`,
+          method: "POST",
+          body: queryArg.appleMusicErrorModeStateDto,
+        }),
+        invalidatesTags: ["Apple Music Twin"],
+      }),
+      appleMusicTwinControllerClearErrorMode: build.mutation<
+        AppleMusicTwinControllerClearErrorModeApiResponse,
+        AppleMusicTwinControllerClearErrorModeApiArg
+      >({
+        query: () => ({
+          url: `/api/apple-music-twin/error-mode`,
+          method: "DELETE",
+        }),
+        invalidatesTags: ["Apple Music Twin"],
+      }),
     }),
     overrideExisting: false,
   });
@@ -1265,6 +1315,23 @@ export type YouTubeTwinControllerStopApiResponse =
 export type YouTubeTwinControllerStopApiArg = void;
 export type YouTubeTwinControllerResetApiResponse = unknown;
 export type YouTubeTwinControllerResetApiArg = void;
+export type AppleMusicTwinControllerGetStatusApiResponse =
+  /** status 200 Apple Music twin status retrieved successfully */ AppleMusicTwinStatusDto;
+export type AppleMusicTwinControllerGetStatusApiArg = void;
+export type AppleMusicTwinControllerStartApiResponse =
+  /** status 200 Apple Music twin started successfully */ AppleMusicTwinStartResponseDto;
+export type AppleMusicTwinControllerStartApiArg = void;
+export type AppleMusicTwinControllerStopApiResponse =
+  /** status 200 Apple Music twin stopped successfully */ AppleMusicTwinStopResponseDto;
+export type AppleMusicTwinControllerStopApiArg = void;
+export type AppleMusicTwinControllerResetApiResponse = unknown;
+export type AppleMusicTwinControllerResetApiArg = void;
+export type AppleMusicTwinControllerSetErrorModeApiResponse = unknown;
+export type AppleMusicTwinControllerSetErrorModeApiArg = {
+  appleMusicErrorModeStateDto: AppleMusicErrorModeStateDto;
+};
+export type AppleMusicTwinControllerClearErrorModeApiResponse = unknown;
+export type AppleMusicTwinControllerClearErrorModeApiArg = void;
 export type LoginResponseDto = {
   /** JWT access token */
   access_token: string;
@@ -1854,6 +1921,30 @@ export type YouTubeTwinStopResponseDto = {
   success: boolean;
   message: string;
 };
+export type AppleMusicTwinStatusDto = {
+  /** Whether the Apple Music twin emulator is currently running */
+  running: boolean;
+  /** Whether the Apple Music twin emulator is healthy */
+  healthy: boolean;
+  /** The port the Apple Music twin emulator is listening on */
+  port: number;
+  /** The URL of the Apple Music twin emulator */
+  url?: string;
+  /** Current Apple Music error simulation mode state */
+  errorMode: object;
+};
+export type AppleMusicTwinStartResponseDto = {
+  success: boolean;
+  message: string;
+  url?: string;
+};
+export type AppleMusicTwinStopResponseDto = {
+  success: boolean;
+  message: string;
+};
+export type AppleMusicErrorModeStateDto = {
+  mode: string;
+};
 export const {
   useAuthControllerLoginMutation,
   useAuthControllerGetProfileQuery,
@@ -1939,4 +2030,10 @@ export const {
   useYouTubeTwinControllerStartMutation,
   useYouTubeTwinControllerStopMutation,
   useYouTubeTwinControllerResetMutation,
+  useAppleMusicTwinControllerGetStatusQuery,
+  useAppleMusicTwinControllerStartMutation,
+  useAppleMusicTwinControllerStopMutation,
+  useAppleMusicTwinControllerResetMutation,
+  useAppleMusicTwinControllerSetErrorModeMutation,
+  useAppleMusicTwinControllerClearErrorModeMutation,
 } = injectedRtkApi;

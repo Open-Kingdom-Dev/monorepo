@@ -43,6 +43,7 @@ describe('AppNav Component', () => {
     expect(screen.queryByText('GCS Demo')).toBeNull();
     expect(screen.queryByText('Gmail Demo')).toBeNull();
     expect(screen.queryByText('YouTube Demo')).toBeNull();
+    expect(screen.queryByText('Apple Music Demo')).toBeNull();
 
     // 5 base links: Home, About, Profile, Users, CRM
     const links = container.querySelectorAll('a');
@@ -59,10 +60,11 @@ describe('AppNav Component', () => {
     expect(screen.getByText('GCS Demo')).toBeTruthy();
     expect(screen.getByText('Gmail Demo')).toBeTruthy();
     expect(screen.getByText('YouTube Demo')).toBeTruthy();
+    expect(screen.getByText('Apple Music Demo')).toBeTruthy();
 
-    // 5 base links + 3 dropdown links = 8 links total
+    // 5 base links + 4 dropdown links = 9 links total
     const links = container.querySelectorAll('a');
-    expect(links).toHaveLength(8);
+    expect(links).toHaveLength(9);
   });
 
   it('should close the dropdown menu when a dropdown link is clicked', () => {
@@ -78,6 +80,7 @@ describe('AppNav Component', () => {
     expect(screen.queryByText('GCS Demo')).toBeNull();
     expect(screen.queryByText('Gmail Demo')).toBeNull();
     expect(screen.queryByText('YouTube Demo')).toBeNull();
+    expect(screen.queryByText('Apple Music Demo')).toBeNull();
     expect(trigger.getAttribute('aria-expanded')).toBe('false');
   });
 
@@ -88,11 +91,13 @@ describe('AppNav Component', () => {
     fireEvent.click(trigger);
 
     expect(screen.getByText('GCS Demo')).toBeTruthy();
+    expect(screen.getByText('Apple Music Demo')).toBeTruthy();
 
     // Click outside on document body
     fireEvent.mouseDown(document.body);
 
     expect(screen.queryByText('GCS Demo')).toBeNull();
+    expect(screen.queryByText('Apple Music Demo')).toBeNull();
     expect(trigger.getAttribute('aria-expanded')).toBe('false');
   });
 

@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 300">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#8b5cf6"/>
+      <stop offset="100%" stop-color="#831843"/>
+    </linearGradient>
+  </defs>
+  <rect width="300" height="300" fill="url(#g)"/>
+  <rect x="96" y="100" width="72" height="44" rx="6" fill="none" stroke="#fff" stroke-width="8"/>
+  <path d="M168 122h28l20 22v56h-48z" fill="none" stroke="#fff" stroke-width="8" stroke-linejoin="round"/>
+  <path d="M168 122v78M196 122v78" fill="none" stroke="#fff" stroke-width="8"/>
+  <text x="150" y="250" font-family="sans-serif" font-size="24" font-weight="bold" fill="#fff" text-anchor="middle">Playlist 1</text>
+</svg>

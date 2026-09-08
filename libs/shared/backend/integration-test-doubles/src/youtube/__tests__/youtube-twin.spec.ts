@@ -48,7 +48,7 @@ describe('YoutubeTwin Configuration', () => {
 
 describe('YoutubeTwin Server Lifecycle', () => {
   let twin: YoutubeTwin;
-  const TEST_PORT = 9019;
+  const TEST_PORT = 9016;
   const TEST_URL = `http://localhost:${TEST_PORT}`;
 
   beforeEach(() => {

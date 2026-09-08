@@ -11,5 +11,8 @@ export * from './gcs/index.js';
 // YouTube twin
 export * from './youtube/index.js';
 
+// Apple Music twin
+export * from './apple-music/index.js';
+
 // Interceptor layer
 export * from './interceptor/index.js';

@@ -3486,6 +3486,131 @@
           "YouTube Twin"
         ]
       }
+    },
+    "/api/apple-music-twin/status": {
+      "get": {
+        "description": "Returns the current status of the Apple Music twin.",
+        "operationId": "AppleMusicTwinController_getStatus",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Apple Music twin status retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AppleMusicTwinStatusDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Get Apple Music twin status",
+        "tags": [
+          "Apple Music Twin"
+        ]
+      }
+    },
+    "/api/apple-music-twin/start": {
+      "post": {
+        "description": "Starts the Apple Music twin Express server.",
+        "operationId": "AppleMusicTwinController_start",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Apple Music twin started successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AppleMusicTwinStartResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Start Apple Music twin",
+        "tags": [
+          "Apple Music Twin"
+        ]
+      }
+    },
+    "/api/apple-music-twin/stop": {
+      "post": {
+        "description": "Stops the Apple Music twin Express server.",
+        "operationId": "AppleMusicTwinController_stop",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Apple Music twin stopped successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AppleMusicTwinStopResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Stop Apple Music twin",
+        "tags": [
+          "Apple Music Twin"
+        ]
+      }
+    },
+    "/api/apple-music-twin/reset": {
+      "post": {
+        "description": "Resets the Apple Music twin catalog fixtures and auth state.",
+        "operationId": "AppleMusicTwinController_reset",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Apple Music twin state reset successfully"
+          }
+        },
+        "summary": "Reset Apple Music twin",
+        "tags": [
+          "Apple Music Twin"
+        ]
+      }
+    },
+    "/api/apple-music-twin/error-mode": {
+      "post": {
+        "description": "Configures a simulated error mode (unauthorized, rate-limited, etc.).",
+        "operationId": "AppleMusicTwinController_setErrorMode",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AppleMusicErrorModeStateDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Apple Music twin error mode configured successfully"
+          }
+        },
+        "summary": "Set Apple Music twin error mode",
+        "tags": [
+          "Apple Music Twin"
+        ]
+      },
+      "delete": {
+        "description": "Clears any simulated error mode on the Apple Music twin.",
+        "operationId": "AppleMusicTwinController_clearErrorMode",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Apple Music twin error mode cleared successfully"
+          }
+        },
+        "summary": "Clear Apple Music twin error mode",
+        "tags": [
+          "Apple Music Twin"
+        ]
+      }
     }
   },
   "info": {
@@ -5532,6 +5657,91 @@
         "required": [
           "success",
           "message"
+        ]
+      },
+      "AppleMusicTwinStatusDto": {
+        "type": "object",
+        "properties": {
+          "running": {
+            "type": "boolean",
+            "description": "Whether the Apple Music twin emulator is currently running",
+            "example": true
+          },
+          "healthy": {
+            "type": "boolean",
+            "description": "Whether the Apple Music twin emulator is healthy",
+            "example": true
+          },
+          "port": {
+            "type": "number",
+            "description": "The port the Apple Music twin emulator is listening on",
+            "example": 9019
+          },
+          "url": {
+            "type": "string",
+            "description": "The URL of the Apple Music twin emulator",
+            "example": "http://localhost:9019"
+          },
+          "errorMode": {
+            "type": "object",
+            "description": "Current Apple Music error simulation mode state"
+          }
+        },
+        "required": [
+          "running",
+          "healthy",
+          "port",
+          "errorMode"
+        ]
+      },
+      "AppleMusicTwinStartResponseDto": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "example": true
+          },
+          "message": {
+            "type": "string",
+            "example": "Apple Music twin started on port 9019"
+          },
+          "url": {
+            "type": "string",
+            "example": "http://localhost:9019"
+          }
+        },
+        "required": [
+          "success",
+          "message"
+        ]
+      },
+      "AppleMusicTwinStopResponseDto": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "example": true
+          },
+          "message": {
+            "type": "string",
+            "example": "Apple Music twin stopped"
+          }
+        },
+        "required": [
+          "success",
+          "message"
+        ]
+      },
+      "AppleMusicErrorModeStateDto": {
+        "type": "object",
+        "properties": {
+          "mode": {
+            "type": "string",
+            "example": "unauthorized"
+          }
+        },
+        "required": [
+          "mode"
         ]
       }
     }

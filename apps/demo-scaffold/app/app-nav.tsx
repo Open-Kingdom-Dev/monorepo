@@ -1,7 +1,7 @@
 import { NavLink, useLocation } from 'react-router';
 import { useState, useRef, useEffect } from 'react';
 import { cn } from '@open-kingdom/shared-frontend-ui-theme';
-import { ChevronDown, Database, Video, Mail } from 'lucide-react';
+import { ChevronDown, Database, Video, Mail, Music } from 'lucide-react';
 
 export function AppNav() {
   const [isOpen, setIsOpen] = useState(false);
@@ -11,6 +11,7 @@ export function AppNav() {
   const isMockServerActive =
     location.pathname === '/gcs-demo' ||
     location.pathname === '/youtube-demo' ||
+    location.pathname === '/apple-music-demo' ||
     location.pathname === '/gmail-demo';
 
   useEffect(() => {
@@ -126,6 +127,22 @@ export function AppNav() {
             >
               <Video className="h-4 w-4" />
               YouTube Demo
+            </NavLink>
+            <NavLink
+              to="/apple-music-demo"
+              onClick={() => setIsOpen(false)}
+              role="menuitem"
+              className={({ isActive }) =>
+                cn(
+                  'flex items-center gap-2 rounded-sm px-3 py-2 text-sm transition-colors hover:bg-accent hover:text-accent-foreground',
+                  isActive
+                    ? 'bg-accent text-accent-foreground font-semibold'
+                    : 'text-muted-foreground'
+                )
+              }
+            >
+              <Music className="h-4 w-4" />
+              Apple Music Demo
             </NavLink>
           </div>
         )}
