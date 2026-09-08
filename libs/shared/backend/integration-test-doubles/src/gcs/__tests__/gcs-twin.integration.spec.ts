@@ -19,7 +19,7 @@ async function isDockerAvailable(): Promise<boolean> {
 describe('GcsTwin (integration)', () => {
   let twin: GcsTwin;
   let dockerAvailable = false;
-  const testPort = 9019; // Must be within 9010‑9020 and not collide with other tests
+  const testPort = 9013; // Canonical GCS port; must not collide with other suites
 
   beforeAll(async () => {
     dockerAvailable = await isDockerAvailable();

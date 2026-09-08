@@ -70,7 +70,10 @@ describe('AppleMusicTwin Server Lifecycle', () => {
     await twin.start();
 
     const response = await fetch(
-      `${TEST_URL}/v1/catalog/us/search?term=Meditation&types=songs`
+      `${TEST_URL}/v1/catalog/us/search?term=Meditation&types=songs`,
+      {
+        headers: { Connection: 'close' },
+      }
     );
     expect(response.status).toBe(200);
 
@@ -83,7 +86,10 @@ describe('AppleMusicTwin Server Lifecycle', () => {
     await twin.start();
 
     const response = await fetch(
-      `${TEST_URL}/v1/catalog/us/search?term=&types=songs`
+      `${TEST_URL}/v1/catalog/us/search?term=&types=songs`,
+      {
+        headers: { Connection: 'close' },
+      }
     );
     const body: any = await response.json();
     const durations = body.results.songs.data.map(
@@ -97,7 +103,10 @@ describe('AppleMusicTwin Server Lifecycle', () => {
     await twin.start();
 
     const search = await fetch(
-      `${TEST_URL}/v1/catalog/us/search?term=&types=songs`
+      `${TEST_URL}/v1/catalog/us/search?term=&types=songs`,
+      {
+        headers: { Connection: 'close' },
+      }
     );
     const searchBody: any = await search.json();
     const artworkUrl = searchBody.results.songs.data[0].attributes.artwork.url;
@@ -108,7 +117,9 @@ describe('AppleMusicTwin Server Lifecycle', () => {
 
     // The demo substitutes {w}x{h} before fetching; that request must resolve.
     const resolvedUrl = artworkUrl.replace('{w}', '300').replace('{h}', '300');
-    const artwork = await fetch(resolvedUrl);
+    const artwork = await fetch(resolvedUrl, {
+      headers: { Connection: 'close' },
+    });
     expect(artwork.status).toBe(200);
     expect(artwork.headers.get('content-type')).toContain('image/svg+xml');
     await artwork.arrayBuffer(); // consume body
@@ -118,7 +129,10 @@ describe('AppleMusicTwin Server Lifecycle', () => {
     await twin.start();
 
     const response = await fetch(
-      `${TEST_URL}/v1/catalog/us/songs/mock-track-001`
+      `${TEST_URL}/v1/catalog/us/songs/mock-track-001`,
+      {
+        headers: { Connection: 'close' },
+      }
     );
     expect(response.status).toBe(200);
 
@@ -129,7 +143,9 @@ describe('AppleMusicTwin Server Lifecycle', () => {
   it('should serve browser-side SDK musickit.js shim', async () => {
     await twin.start();
 
-    const response = await fetch(`${TEST_URL}/musickit.js`);
+    const response = await fetch(`${TEST_URL}/musickit.js`, {
+      headers: { Connection: 'close' },
+    });
     expect(response.status).toBe(200);
 
     const body = await response.text();
@@ -145,13 +161,15 @@ describe('AppleMusicTwin Server Lifecycle', () => {
     // Activate error mode
     let res = await fetch(`${TEST_URL}/test/apple-music/error-mode`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', Connection: 'close' },
       body: JSON.stringify({ mode: 'unauthorized' }),
     });
     expect(res.status).toBe(200);
 
     // Call catalog endpoint and expect 401
-    res = await fetch(`${TEST_URL}/v1/catalog/us/songs/mock-track-001`);
+    res = await fetch(`${TEST_URL}/v1/catalog/us/songs/mock-track-001`, {
+      headers: { Connection: 'close' },
+    });
     expect(res.status).toBe(401);
     const body: any = await res.json();
     expect(body.errors[0].title).toBe('Unauthorized');
@@ -159,10 +177,13 @@ describe('AppleMusicTwin Server Lifecycle', () => {
     // Deactivate error mode
     res = await fetch(`${TEST_URL}/test/apple-music/error-mode`, {
       method: 'DELETE',
+      headers: { Connection: 'close' },
     });
     expect(res.status).toBe(200);
 
-    res = await fetch(`${TEST_URL}/v1/catalog/us/songs/mock-track-001`);
+    res = await fetch(`${TEST_URL}/v1/catalog/us/songs/mock-track-001`, {
+      headers: { Connection: 'close' },
+    });
     expect(res.status).toBe(200);
   });
 });
