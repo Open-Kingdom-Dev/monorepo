@@ -22,6 +22,16 @@ interface OAuth2RequestClient {
   ): void;
 }
 
+/** Shape of the token endpoint response that passport-oauth2 forwards to the
+ * verify callback as `params` when the callback declares 5 parameters. */
+interface GoogleTokenResponseParams {
+  id_token?: string;
+  refresh_token?: string;
+  token_type?: string;
+  expires_in?: number;
+  scope?: string;
+}
+
 const SENSITIVE_FORM_FIELDS = [
   'client_secret',
   'code',
@@ -52,7 +62,11 @@ function safeJsonParse(value: string): unknown {
 @Injectable()
 export class GoogleAuthEmulateStrategy extends PassportStrategy(
   Strategy,
-  'google-emulate'
+  'google-emulate',
+  // passport-oauth2 forwards the raw token response to the verify callback
+  // only when it declares 5 parameters. The Nest mixin wraps validate() in a
+  // variadic callback (length 0), so pin the wrapper's length to 5.
+  5
 ) {
   private readonly logger = new Logger(GoogleAuthEmulateStrategy.name);
   private readonly userInfoUrl: string;
@@ -272,12 +286,10 @@ export class GoogleAuthEmulateStrategy extends PassportStrategy(
   async validate(
     accessToken: string,
     refreshToken: string,
+    params: GoogleTokenResponseParams,
     profile: Profile,
     done: VerifyCallback
   ): Promise<unknown> {
-    const rawJson = (profile as Profile & { _json?: { id_token?: string } })
-      ._json;
-
     const userProfile = {
       sub: profile.id,
       email: profile.emails?.[0]?.value || '',
@@ -288,7 +300,9 @@ export class GoogleAuthEmulateStrategy extends PassportStrategy(
 
     const tokens = {
       access_token: accessToken,
-      id_token: rawJson?.id_token || accessToken,
+      // The real signed ID token JWT arrives in the token response (params);
+      // profile._json is the userinfo payload and never carries one.
+      id_token: params.id_token || accessToken,
       refresh_token: refreshToken,
       expires_in: 3600,
       token_type: 'Bearer',

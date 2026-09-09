@@ -113,26 +113,36 @@ describe('GoogleAuthEmulateStrategy', () => {
   });
 
   describe('validate', () => {
-    it('stores the OAuth result without fabricating a token log', async () => {
-      const profile = {
+    const buildProfile = () =>
+      ({
         id: 'user_123',
         displayName: 'Test User',
         emails: [{ value: 'testuser@example.com', verified: true }],
         photos: [{ value: 'https://example.com/pic.jpg' }],
         provider: 'google',
+        // Realistic: _json is the userinfo response, which never contains an
+        // id_token — that lives in the token response params instead.
         _raw: '{}',
-        _json: { id_token: 'mock-id-token' },
+        _json: { sub: 'user_123', email: 'testuser@example.com' },
         name: { familyName: '', givenName: 'Test' },
-      } as never;
+      }) as never;
 
-      const user = await new Promise((resolve, reject) => {
+    const callValidate = (
+      params: { id_token?: string },
+      profile = buildProfile()
+    ) =>
+      new Promise((resolve, reject) => {
         strategy.validate(
           'mock-access-token',
           'mock-refresh-token',
+          params,
           profile,
           (err, u) => (err ? reject(err) : resolve(u))
         );
       });
+
+    it('stores the OAuth result using the id_token from the token response', async () => {
+      const user = await callValidate({ id_token: 'mock-id-token' });
 
       expect(user).toMatchObject({
         tokens: {
@@ -142,7 +152,7 @@ describe('GoogleAuthEmulateStrategy', () => {
         userProfile: { email: 'testuser@example.com' },
       });
 
-      // validate() itself no longer synthesizes a token POST row — the real
+      // validate() itself does not synthesize a token POST row — the real
       // exchange is captured by the _oauth2._request interceptor instead.
       const logs = service.getLogs();
       expect(logs).toHaveLength(0);
@@ -150,6 +160,17 @@ describe('GoogleAuthEmulateStrategy', () => {
       const result = service.getLastOAuthResult();
       expect(result?.tokens?.access_token).toBe('mock-access-token');
       expect(result?.apiLogs).toHaveLength(0);
+    });
+
+    it('does not read id_token from the userinfo profile payload', async () => {
+      const user = await callValidate({});
+
+      expect(user).toMatchObject({
+        tokens: {
+          access_token: 'mock-access-token',
+          id_token: 'mock-access-token',
+        },
+      });
     });
   });
 
