@@ -1,7 +1,14 @@
 import { NavLink, useLocation } from 'react-router';
 import { useState, useRef, useEffect } from 'react';
 import { cn } from '@open-kingdom/shared-frontend-ui-theme';
-import { ChevronDown, Database, Video, Mail, Music, Shield } from 'lucide-react';
+import {
+  ChevronDown,
+  Database,
+  Video,
+  Mail,
+  Music,
+  Shield,
+} from 'lucide-react';
 
 export function AppNav() {
   const [isOpen, setIsOpen] = useState(false);

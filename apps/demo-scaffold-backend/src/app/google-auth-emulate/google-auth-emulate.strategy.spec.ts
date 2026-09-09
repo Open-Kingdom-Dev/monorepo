@@ -125,7 +125,7 @@ describe('GoogleAuthEmulateStrategy', () => {
         _raw: '{}',
         _json: { sub: 'user_123', email: 'testuser@example.com' },
         name: { familyName: '', givenName: 'Test' },
-      }) as never;
+      } as never);
 
     const callValidate = (
       params: { id_token?: string },
