@@ -1,7 +1,10 @@
 import axios from 'axios';
 import http from 'http';
+import { Logger } from '@nestjs/common';
+import type { Request } from 'express';
 import { GoogleAuthEmulateStrategy } from './google-auth-emulate.strategy';
 import { GoogleAuthEmulateService } from './google-auth-emulate.service';
+import { InMemoryOAuthStateStore } from './google-auth-emulate.state-store';
 
 jest.mock('axios');
 const mockedAxios = axios as jest.Mocked<typeof axios>;
@@ -112,6 +115,21 @@ describe('GoogleAuthEmulateStrategy', () => {
     });
   });
 
+  describe('authorizationParams', () => {
+    it('adds a nonce and routes the request through the state store', () => {
+      const options: Record<string, unknown> = {};
+
+      const params = strategy.authorizationParams(options) as {
+        nonce?: string;
+      };
+
+      expect(params.nonce).toEqual(expect.any(String));
+      // An object (not a string) state is what makes passport-oauth2 hand the
+      // request to the configured state store.
+      expect(options.state).toEqual({ nonce: params.nonce });
+    });
+  });
+
   describe('validate', () => {
     const buildProfile = () =>
       ({
@@ -127,49 +145,114 @@ describe('GoogleAuthEmulateStrategy', () => {
         name: { familyName: '', givenName: 'Test' },
       } as never);
 
+    const getStateStore = () =>
+      (
+        strategy as unknown as {
+          stateStore: InMemoryOAuthStateStore;
+        }
+      ).stateStore;
+
+    /** Register a pending authorization and return its `state` handle. */
+    const seedPending = (nonce: string): string => {
+      let handle: string | undefined;
+      getStateStore().store(
+        {} as Request,
+        undefined,
+        { nonce },
+        {},
+        (_err, h) => {
+          handle = h;
+        }
+      );
+      return handle as string;
+    };
+
+    /** Build a JWT-shaped string whose payload is the given claims. */
+    const fakeJwt = (claims: Record<string, unknown>): string =>
+      [
+        Buffer.from('{}').toString('base64url'),
+        Buffer.from(JSON.stringify(claims)).toString('base64url'),
+        'signature',
+      ].join('.');
+
     const callValidate = (
       params: { id_token?: string },
-      profile = buildProfile()
+      profile = buildProfile(),
+      state?: string
     ) =>
-      new Promise((resolve, reject) => {
-        strategy.validate(
-          'mock-access-token',
-          'mock-refresh-token',
-          params,
-          profile,
-          (err, u) => (err ? reject(err) : resolve(u))
-        );
-      });
+      strategy.validate(
+        { query: { state } } as unknown as Request,
+        'mock-access-token',
+        'mock-refresh-token',
+        params,
+        profile
+      );
 
     it('stores the OAuth result using the id_token from the token response', async () => {
-      const user = await callValidate({ id_token: 'mock-id-token' });
+      const nonce = 'nonce-abc';
+      const idToken = fakeJwt({ nonce });
+      const state = seedPending(nonce);
 
-      expect(user).toMatchObject({
-        tokens: {
-          access_token: 'mock-access-token',
-          id_token: 'mock-id-token',
-        },
-        userProfile: { email: 'testuser@example.com' },
+      const user = (await callValidate({ id_token: idToken }, buildProfile(), state)) as {
+        tokens: { access_token: string; id_token: string };
+        userProfile: { email: string };
+      };
+
+      expect(user.tokens).toMatchObject({
+        access_token: 'mock-access-token',
+        id_token: idToken,
       });
+      expect(user.userProfile).toMatchObject({ email: 'testuser@example.com' });
 
       // validate() itself does not synthesize a token POST row — the real
       // exchange is captured by the _oauth2._request interceptor instead.
-      const logs = service.getLogs();
-      expect(logs).toHaveLength(0);
+      expect(service.getLogs()).toHaveLength(0);
 
       const result = service.getLastOAuthResult();
       expect(result?.tokens?.access_token).toBe('mock-access-token');
       expect(result?.apiLogs).toHaveLength(0);
     });
 
-    it('does not read id_token from the userinfo profile payload', async () => {
-      const user = await callValidate({});
+    it('falls back to the access token when the token response has no id_token', async () => {
+      const state = seedPending('nonce-abc');
+      const warnSpy = jest
+        .spyOn(Logger.prototype, 'warn')
+        .mockImplementation(() => undefined);
 
-      expect(user).toMatchObject({
-        tokens: {
-          access_token: 'mock-access-token',
-          id_token: 'mock-access-token',
-        },
+      const user = (await callValidate({}, buildProfile(), state)) as {
+        tokens: { access_token: string; id_token: string };
+      };
+
+      expect(user.tokens).toMatchObject({
+        access_token: 'mock-access-token',
+        id_token: 'mock-access-token',
+      });
+      // Tolerated, but the missing nonce claim is surfaced.
+      expect(warnSpy).toHaveBeenCalled();
+      warnSpy.mockRestore();
+    });
+
+    it('rejects a callback whose ID token nonce does not match the request', async () => {
+      const state = seedPending('expected-nonce');
+
+      await expect(
+        callValidate({ id_token: fakeJwt({ nonce: 'other-nonce' }) }, buildProfile(), state)
+      ).rejects.toThrow(/nonce mismatch/);
+    });
+
+    it('consumes the pending state so the callback cannot be replayed', async () => {
+      const nonce = 'nonce-abc';
+      const idToken = fakeJwt({ nonce });
+      const state = seedPending(nonce);
+
+      await callValidate({ id_token: idToken }, buildProfile(), state);
+
+      expect(getStateStore().consume(state)).toBeUndefined();
+
+      const storeVerify = jest.fn();
+      getStateStore().verify({} as Request, state, storeVerify);
+      expect(storeVerify).toHaveBeenCalledWith(null, false, {
+        message: 'Invalid or expired OAuth state parameter',
       });
     });
   });

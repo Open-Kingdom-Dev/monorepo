@@ -11,6 +11,13 @@ import {
 
 export const DEFAULT_GOOGLE_EMULATOR_PORT = 9015;
 
+export const DEFAULT_FRONTEND_URL = 'http://localhost:4200';
+
+/** Frontend base URL the OAuth flow redirects back to (success and failure). */
+export function getFrontendBaseUrl(): string {
+  return process.env['BASE_URL'] || DEFAULT_FRONTEND_URL;
+}
+
 export const DEFAULT_GOOGLE_SEED_CONFIG = {
   google: {
     users: [

@@ -1,12 +1,16 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, UnauthorizedException } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
-import { Strategy, Profile, VerifyCallback } from 'passport-google-oauth20';
+import { Strategy, Profile } from 'passport-google-oauth20';
+import type OAuth2 = require('passport-oauth2');
+import { randomUUID } from 'crypto';
+import type { Request } from 'express';
 import axios from 'axios';
 import { ApiLogEntryDto } from './google-auth-emulate.dto';
 import {
   GoogleAuthEmulateService,
   DEFAULT_GOOGLE_EMULATOR_PORT,
 } from './google-auth-emulate.service';
+import { InMemoryOAuthStateStore } from './google-auth-emulate.state-store';
 
 /** The `oauth` client's `_request` is `protected` in its typings but is a
  * plain writable method at runtime, and passport-google-oauth20 documents
@@ -59,17 +63,36 @@ function safeJsonParse(value: string): unknown {
   }
 }
 
+/** Decode a JWT payload without verifying its signature.
+ *
+ * Enough to read the `nonce` claim for replay binding. This intentionally does
+ * not validate the signature or any registered claim — the demo runs against a
+ * local emulator with fake credentials. */
+function decodeJwtPayload(token: string): Record<string, unknown> | undefined {
+  const segment = token.split('.')[1];
+  if (!segment) return undefined;
+
+  try {
+    const json = Buffer.from(segment, 'base64url').toString('utf8');
+    return JSON.parse(json) as Record<string, unknown>;
+  } catch {
+    return undefined;
+  }
+}
+
 @Injectable()
 export class GoogleAuthEmulateStrategy extends PassportStrategy(
   Strategy,
   'google-emulate',
-  // passport-oauth2 forwards the raw token response to the verify callback
-  // only when it declares 5 parameters. The Nest mixin wraps validate() in a
-  // variadic callback (length 0), so pin the wrapper's length to 5.
-  5
+  // passport-oauth2 forwards the raw token response to the verify callback only
+  // when it declares 5 parameters, and additionally prepends `req` (arity 6) when
+  // `passReqToCallback` is set. The Nest mixin wraps validate() in a variadic
+  // callback (length 0), so pin the wrapper's length to 6 to reach that branch.
+  6
 ) {
   private readonly logger = new Logger(GoogleAuthEmulateStrategy.name);
   private readonly userInfoUrl: string;
+  private readonly stateStore: InMemoryOAuthStateStore;
 
   constructor(
     private readonly googleAuthEmulateService: GoogleAuthEmulateService
@@ -83,6 +106,11 @@ export class GoogleAuthEmulateStrategy extends PassportStrategy(
     const userInfoUrl =
       process.env['GOOGLE_USERINFO_URL'] ||
       `${emulatorBaseUrl}/oauth2/v2/userinfo`;
+
+    // Created before super() because class field initializers run after it, so
+    // the same instance can be both handed to passport-oauth2 and kept for the
+    // nonce lookup in validate().
+    const stateStore = new InMemoryOAuthStateStore();
 
     super({
       clientID:
@@ -101,16 +129,40 @@ export class GoogleAuthEmulateStrategy extends PassportStrategy(
       // Pass userProfileURL to satisfy the strategy config, but we override
       // the userProfile() method below to fetch with a proper Bearer header.
       userProfileURL: userInfoUrl,
+      // Without a `store`/`state`/`pkce` option passport-oauth2 uses a NullStore,
+      // which sends no `state` and correlates nothing on the callback. The cast
+      // is needed because @types/passport-oauth2 only declares the 2-/3-arity
+      // StateStore overloads, while the runtime dispatches on Function.length.
+      store: stateStore as unknown as OAuth2.StateStore,
+      passReqToCallback: true,
     });
 
     // Store for use in the overridden userProfile()
     this.userInfoUrl = userInfoUrl;
+    this.stateStore = stateStore;
 
     // The token exchange is performed internally by passport-google-oauth20
     // (oauth2.getOAuthAccessToken -> this._oauth2._request). Wrap the client's
     // _request so the API inspector captures the real token POST alongside the
     // userinfo GET logged in userProfile(), instead of synthesizing a fake row.
     this.interceptOAuth2Request();
+  }
+
+  /**
+   * Add a per-request OIDC `nonce` to the authorization URL and hand the same
+   * value to the state store.
+   *
+   * passport-oauth2 calls authorizationParams() *before* it reads
+   * `options.state`, so setting `options.state` to an object here routes the
+   * request through the state store (a string state would bypass it), and the
+   * nonce returned in the params rides along as a query parameter. The store
+   * then persists `{ nonce }` under the generated `state` handle.
+   */
+  override authorizationParams(options: Record<string, unknown>): object {
+    const nonce = randomUUID();
+    options.state = { nonce };
+
+    return { ...super.authorizationParams(options), nonce };
   }
 
   private interceptOAuth2Request(): void {
@@ -284,12 +336,42 @@ export class GoogleAuthEmulateStrategy extends PassportStrategy(
   }
 
   async validate(
+    req: Request,
     accessToken: string,
     refreshToken: string,
     params: GoogleTokenResponseParams,
-    profile: Profile,
-    done: VerifyCallback
+    profile: Profile
   ): Promise<unknown> {
+    // Consume the pending authorization registered for this request. The state
+    // store already rejected a missing/unknown `state` before we get here; this
+    // is what makes it single-use and supplies the nonce to compare against.
+    const state = req.query?.['state'];
+    const pending = this.stateStore.consume(
+      typeof state === 'string' ? state : undefined
+    );
+
+    const issuedNonce = params.id_token
+      ? decodeJwtPayload(params.id_token)?.['nonce']
+      : undefined;
+
+    if (
+      pending?.nonce &&
+      typeof issuedNonce === 'string' &&
+      issuedNonce !== pending.nonce
+    ) {
+      throw new UnauthorizedException(
+        'OAuth nonce mismatch - possible replay attack'
+      );
+    }
+
+    if (pending?.nonce && typeof issuedNonce !== 'string') {
+      // The emulator is a pre-1.0 dependency; tolerate an ID token without a
+      // nonce claim rather than breaking sign-in, but make the gap visible.
+      this.logger.warn(
+        'ID token did not include a nonce claim; skipping nonce validation'
+      );
+    }
+
     const userProfile = {
       sub: profile.id,
       email: profile.emails?.[0]?.value || '',
@@ -311,8 +393,9 @@ export class GoogleAuthEmulateStrategy extends PassportStrategy(
 
     this.googleAuthEmulateService.setOAuthResult(tokens, userProfile);
 
-    const user = { tokens, userProfile };
-    done(null, user);
-    return user;
+    // Return the user rather than calling done(): the Nest wrapper invokes the
+    // verify callback itself once validate() resolves, so calling done() here
+    // would run the passport success path twice.
+    return { tokens, userProfile };
   }
 }

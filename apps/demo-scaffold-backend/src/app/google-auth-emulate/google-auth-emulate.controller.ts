@@ -7,12 +7,17 @@ import {
   HttpCode,
   HttpStatus,
   UseGuards,
+  UseFilters,
 } from '@nestjs/common';
 import type { Request, Response } from 'express';
-import { AuthGuard } from '@nestjs/passport';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { Public } from '@open-kingdom/shared-backend-util-rbac';
-import { GoogleAuthEmulateService } from './google-auth-emulate.service';
+import {
+  GoogleAuthEmulateService,
+  getFrontendBaseUrl,
+} from './google-auth-emulate.service';
+import { GoogleAuthEmulateGuard } from './google-auth-emulate.guard';
+import { GoogleAuthFailureRedirectFilter } from './google-auth-emulate.failure.filter';
 import {
   GoogleEmulatorStatusDto,
   GoogleOAuthResultDto,
@@ -104,11 +109,12 @@ export class GoogleAuthEmulateController {
 
   @Public()
   @Get('login')
-  @UseGuards(AuthGuard('google-emulate'))
+  @UseGuards(GoogleAuthEmulateGuard)
+  @UseFilters(GoogleAuthFailureRedirectFilter)
   @ApiOperation({
     summary: 'Initiate Google OAuth login via Passport',
     description:
-      'Redirects user to local Google emulator OAuth authorization page.',
+      'Redirects user to local Google emulator OAuth authorization page. Sends a single-use state parameter and an OIDC nonce.',
   })
   login(): void {
     // Handled automatically by Passport AuthGuard redirect
@@ -116,15 +122,15 @@ export class GoogleAuthEmulateController {
 
   @Public()
   @Get('callback')
-  @UseGuards(AuthGuard('google-emulate'))
+  @UseGuards(GoogleAuthEmulateGuard)
+  @UseFilters(GoogleAuthFailureRedirectFilter)
   @ApiOperation({
     summary: 'Google OAuth callback handler',
     description:
-      'Passport receives authorization code from Google emulator, performs token exchange and userinfo fetch, and redirects back to frontend demo app.',
+      'Passport verifies the state parameter, performs token exchange and userinfo fetch, validates the ID token nonce, and redirects back to the frontend demo app.',
   })
   async callback(@Req() _req: Request, @Res() res: Response): Promise<void> {
-    const frontendUrl = process.env['BASE_URL'] || 'http://localhost:4200';
-    return res.redirect(`${frontendUrl}/google-auth-demo?auth=success`);
+    return res.redirect(`${getFrontendBaseUrl()}/google-auth-demo?auth=success`);
   }
 
   @Public()
