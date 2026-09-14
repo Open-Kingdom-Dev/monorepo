@@ -17,13 +17,13 @@ It allows developers and CI automated pipelines to run the full Google OAuth sig
 
 ## Configuration & Environment Variables
 
-| Environment Variable   | Description                          | Default / Emulator Value                                 |
-| ---------------------- | ------------------------------------ | -------------------------------------------------------- |
-| `GOOGLE_EMULATOR_PORT` | Port for the emulate server          | `9015`                                                   |
-| `GOOGLE_EMULATOR_URL`  | Base URL of the emulate server       | `http://localhost:9015`                                  |
-| `GOOGLE_CLIENT_ID`     | OAuth Client ID                      | `example-client-id.apps.googleusercontent.com`           |
-| `GOOGLE_CLIENT_SECRET` | OAuth Client Secret                  | `GOCSPX-example_secret`                                  |
-| `GOOGLE_CALLBACK_URL`  | OAuth Callback URL                   | `http://localhost:3000/api/google-auth-emulate/callback` |
+| Environment Variable   | Description                           | Default / Emulator Value                                 |
+| ---------------------- | ------------------------------------- | -------------------------------------------------------- |
+| `GOOGLE_EMULATOR_PORT` | Port for the emulate server           | `9015`                                                   |
+| `GOOGLE_EMULATOR_URL`  | Base URL of the emulate server        | `http://localhost:9015`                                  |
+| `GOOGLE_CLIENT_ID`     | OAuth Client ID                       | `example-client-id.apps.googleusercontent.com`           |
+| `GOOGLE_CLIENT_SECRET` | OAuth Client Secret                   | `GOCSPX-example_secret`                                  |
+| `GOOGLE_CALLBACK_URL`  | OAuth Callback URL                    | `http://localhost:3000/api/google-auth-emulate/callback` |
 | `BASE_URL`             | Frontend base URL to redirect back to | `http://localhost:4200`                                  |
 
 ## CSRF (`state`) and replay (`nonce`) protection

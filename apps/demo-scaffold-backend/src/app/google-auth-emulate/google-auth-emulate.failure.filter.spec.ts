@@ -1,7 +1,4 @@
-import {
-  ArgumentsHost,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { ArgumentsHost, UnauthorizedException } from '@nestjs/common';
 import { GoogleAuthFailureRedirectFilter } from './google-auth-emulate.failure.filter';
 
 describe('GoogleAuthFailureRedirectFilter', () => {
@@ -55,10 +52,7 @@ describe('GoogleAuthFailureRedirectFilter', () => {
   it('falls back to a generic message when the exception has none', () => {
     const redirect = jest.fn();
 
-    filter.catch(
-      { message: '' } as UnauthorizedException,
-      hostFor(redirect)
-    );
+    filter.catch({ message: '' } as UnauthorizedException, hostFor(redirect));
 
     expect(redirect).toHaveBeenCalledWith(
       'http://localhost:4200/google-auth-demo?auth=error&message=Google%20authentication%20failed'

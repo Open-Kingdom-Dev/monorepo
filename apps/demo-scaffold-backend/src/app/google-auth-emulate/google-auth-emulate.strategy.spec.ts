@@ -193,7 +193,11 @@ describe('GoogleAuthEmulateStrategy', () => {
       const idToken = fakeJwt({ nonce });
       const state = seedPending(nonce);
 
-      const user = (await callValidate({ id_token: idToken }, buildProfile(), state)) as {
+      const user = (await callValidate(
+        { id_token: idToken },
+        buildProfile(),
+        state
+      )) as {
         tokens: { access_token: string; id_token: string };
         userProfile: { email: string };
       };
@@ -236,7 +240,11 @@ describe('GoogleAuthEmulateStrategy', () => {
       const state = seedPending('expected-nonce');
 
       await expect(
-        callValidate({ id_token: fakeJwt({ nonce: 'other-nonce' }) }, buildProfile(), state)
+        callValidate(
+          { id_token: fakeJwt({ nonce: 'other-nonce' }) },
+          buildProfile(),
+          state
+        )
       ).rejects.toThrow(/nonce mismatch/);
     });
 

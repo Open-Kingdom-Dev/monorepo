@@ -130,7 +130,9 @@ export class GoogleAuthEmulateController {
       'Passport verifies the state parameter, performs token exchange and userinfo fetch, validates the ID token nonce, and redirects back to the frontend demo app.',
   })
   async callback(@Req() _req: Request, @Res() res: Response): Promise<void> {
-    return res.redirect(`${getFrontendBaseUrl()}/google-auth-demo?auth=success`);
+    return res.redirect(
+      `${getFrontendBaseUrl()}/google-auth-demo?auth=success`
+    );
   }
 
   @Public()
