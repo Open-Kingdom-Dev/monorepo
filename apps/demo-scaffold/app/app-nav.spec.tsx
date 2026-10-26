@@ -30,6 +30,7 @@ describe('AppNav Component', () => {
     expect(screen.getByText('Profile')).toBeTruthy();
     expect(screen.getByText('Users')).toBeTruthy();
     expect(screen.getByText('CRM')).toBeTruthy();
+    expect(screen.getByText('Port Lease')).toBeTruthy();
   });
 
   it('should render dropdown trigger and hide dropdown links initially', () => {
@@ -46,9 +47,9 @@ describe('AppNav Component', () => {
     expect(screen.queryByText('Apple Music Demo')).toBeNull();
     expect(screen.queryByText('Google Auth Demo')).toBeNull();
 
-    // 5 base links: Home, About, Profile, Users, CRM
+    // 6 base links: Home, About, Profile, Users, CRM, Port Lease
     const links = container.querySelectorAll('a');
-    expect(links).toHaveLength(5);
+    expect(links).toHaveLength(6);
   });
 
   it('should open the dropdown menu on trigger click and show dropdown links', () => {
@@ -64,9 +65,9 @@ describe('AppNav Component', () => {
     expect(screen.getByText('Apple Music Demo')).toBeTruthy();
     expect(screen.getByText('Google Auth Demo')).toBeTruthy();
 
-    // 5 base links + 5 dropdown links = 10 links total
+    // 6 base links + 5 dropdown links = 11 links total
     const links = container.querySelectorAll('a');
-    expect(links).toHaveLength(10);
+    expect(links).toHaveLength(11);
   });
 
   it('should close the dropdown menu when a dropdown link is clicked', () => {

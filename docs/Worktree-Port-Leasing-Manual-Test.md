@@ -157,10 +157,10 @@ node "$DEMO" | grep -E 'SLOT|bound'
 
 ## 7 · Graceful degradation
 
-The demo script locates the library through git too, so outside a repo it needs `OK_ROOT` to find the build:
+Run the demo from outside any repo:
 
 ```bash
-(cd /tmp && OK_ROOT="$(git -C ~/IdeaProjects/ok-monorepo rev-parse --show-toplevel)" node "$DEMO")
+(cd /tmp && node "$DEMO")
 ```
 
 ```
