@@ -20,3 +20,8 @@ per its slot ≠ 0 warning in §5.
 
 The demo app shows what a lease would hand the current worktree at
 `/port-lease-demo` (backend: `GET /api/port-lease/status`).
+
+The one consumer already wired is the e2e suite: `playwright.config.ts` leases
+the port of the backend it starts for `apps/demo-scaffold-e2e/src/port-lease.spec.ts`,
+so e2e runs in different worktrees never share a backend. The preview server
+(4300) is still fixed.

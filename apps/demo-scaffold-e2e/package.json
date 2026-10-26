@@ -3,8 +3,31 @@
   "version": "0.0.1",
   "private": true,
   "nx": {
+    "tags": [
+      "scope:demo-scaffold",
+      "type:e2e"
+    ],
     "implicitDependencies": [
-      "@open-kingdom/demo-scaffold"
-    ]
+      "@open-kingdom/demo-scaffold",
+      "@open-kingdom/shared-backend-util-port-lease"
+    ],
+    "targets": {
+      "e2e": {
+        "dependsOn": [
+          {
+            "projects": [
+              "@open-kingdom/demo-scaffold"
+            ],
+            "target": "preview"
+          },
+          {
+            "projects": [
+              "@open-kingdom/shared-backend-util-port-lease"
+            ],
+            "target": "build"
+          }
+        ]
+      }
+    }
   }
 }

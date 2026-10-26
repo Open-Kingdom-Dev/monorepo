@@ -21,9 +21,13 @@ export default function PortLeaseDemo() {
 
   if (error || !lease) {
     return (
-      <div className="p-8 space-y-2">
+      <div className="p-8 space-y-2" data-testid="port-lease-error">
         <p className="text-destructive">Could not load the port lease.</p>
-        <button onClick={() => refetch()} className="text-sm underline">
+        <button
+          onClick={() => refetch()}
+          className="text-sm underline"
+          data-testid="port-lease-retry"
+        >
           Retry
         </button>
       </div>
@@ -47,13 +51,20 @@ export default function PortLeaseDemo() {
       </header>
 
       <section className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-        <Stat label="Slot" value={String(lease.slot)} />
-        <Stat label="Width" value={String(lease.width)} />
-        <Stat label="Primary" value={lease.isPrimary ? 'yes' : 'no'} />
-        <Stat label="Branch" value={lease.branch ?? '—'} />
+        <Stat id="slot" label="Slot" value={String(lease.slot)} />
+        <Stat id="width" label="Width" value={String(lease.width)} />
+        <Stat
+          id="primary"
+          label="Primary"
+          value={lease.isPrimary ? 'yes' : 'no'}
+        />
+        <Stat id="branch" label="Branch" value={lease.branch ?? '—'} />
       </section>
 
-      <p className="text-sm text-muted-foreground">
+      <p
+        className="text-sm text-muted-foreground"
+        data-testid="port-lease-source"
+      >
         Slot {lease.slot}, {SOURCE_LABEL[lease.source]}
         {lease.worktreePath && (
           <>
@@ -64,7 +75,10 @@ export default function PortLeaseDemo() {
       </p>
 
       {!backendOnLease && backend && (
-        <p className="rounded-md border border-border bg-muted p-3 text-sm">
+        <p
+          className="rounded-md border border-border bg-muted p-3 text-sm"
+          data-testid="port-lease-mismatch"
+        >
           This backend is listening on {lease.backendPort}; the lease would give
           it {backend.leased}. The demo stack is not wired to the lease yet, so
           it still uses its fixed ports.
@@ -84,11 +98,20 @@ export default function PortLeaseDemo() {
           </thead>
           <tbody>
             {lease.ports.map((port) => (
-              <tr key={port.name} className="border-t border-border">
+              <tr
+                key={port.name}
+                className="border-t border-border"
+                data-testid={`port-lease-row-${port.name}`}
+              >
                 <td className="p-2 font-mono">{port.name}</td>
-                <td className="p-2 font-mono">{port.base}</td>
-                <td className="p-2 font-mono">{port.leased}</td>
+                <td className="p-2 font-mono" data-testid="base">
+                  {port.base}
+                </td>
+                <td className="p-2 font-mono" data-testid="leased">
+                  {port.leased}
+                </td>
                 <td
+                  data-testid="busy"
                   className={
                     port.busy ? 'p-2 text-success' : 'p-2 text-muted-foreground'
                   }
@@ -110,7 +133,11 @@ export default function PortLeaseDemo() {
         ) : (
           <ul className="text-sm space-y-1">
             {lease.registry.map((entry) => (
-              <li key={entry.slot} className="font-mono">
+              <li
+                key={entry.slot}
+                className="font-mono"
+                data-testid={`port-lease-registry-${entry.slot}`}
+              >
                 {entry.slot} · {entry.branch || '(detached)'} · {entry.path}
                 {entry.current && (
                   <span className="ml-2 font-sans font-semibold">← this</span>
@@ -122,7 +149,10 @@ export default function PortLeaseDemo() {
       </section>
 
       {lease.warnings.length > 0 && (
-        <ul className="text-sm text-destructive list-disc pl-5">
+        <ul
+          className="text-sm text-destructive list-disc pl-5"
+          data-testid="port-lease-warnings"
+        >
           {lease.warnings.map((w) => (
             <li key={w}>{w}</li>
           ))}
@@ -132,6 +162,7 @@ export default function PortLeaseDemo() {
       <button
         onClick={() => refetch()}
         disabled={isFetching}
+        data-testid="port-lease-refresh"
         className="rounded-md border border-border px-3 py-1.5 text-sm disabled:opacity-50"
       >
         {isFetching ? 'Refreshing…' : 'Refresh'}
@@ -140,11 +171,22 @@ export default function PortLeaseDemo() {
   );
 }
 
-function Stat({ label, value }: { label: string; value: string }) {
+function Stat({
+  id,
+  label,
+  value,
+}: {
+  id: string;
+  label: string;
+  value: string;
+}) {
   return (
     <div className="rounded-md border border-border bg-card p-3">
       <div className="text-xs text-muted-foreground">{label}</div>
-      <div className="text-lg font-semibold text-foreground truncate">
+      <div
+        className="text-lg font-semibold text-foreground truncate"
+        data-testid={`port-lease-${id}`}
+      >
         {value}
       </div>
     </div>
