@@ -37,7 +37,7 @@
     "@open-kingdom/shared-backend-feature-email": "0.0.2-19",
     "@open-kingdom/shared-backend-util-rbac": "0.0.2-19",
     "@open-kingdom/shared-poly-util-constants": "0.0.2-19",
-    "drizzle-orm": "^0.44.5",
+    "drizzle-orm": "^0.45.4",
     "express": "5.2.1"
   }
 }
