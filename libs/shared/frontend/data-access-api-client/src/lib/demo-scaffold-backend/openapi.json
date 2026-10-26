@@ -3701,7 +3701,7 @@
     },
     "/api/google-auth-emulate/login": {
       "get": {
-        "description": "Redirects user to local Google emulator OAuth authorization page.",
+        "description": "Redirects user to local Google emulator OAuth authorization page. Sends a single-use state parameter and an OIDC nonce.",
         "operationId": "GoogleAuthEmulateController_login",
         "parameters": [],
         "responses": {
@@ -3717,7 +3717,7 @@
     },
     "/api/google-auth-emulate/callback": {
       "get": {
-        "description": "Passport receives authorization code from Google emulator, performs token exchange and userinfo fetch, and redirects back to frontend demo app.",
+        "description": "Passport verifies the state parameter, performs token exchange and userinfo fetch, validates the ID token nonce, and redirects back to the frontend demo app.",
         "operationId": "GoogleAuthEmulateController_callback",
         "parameters": [],
         "responses": {
@@ -3809,6 +3809,29 @@
         "summary": "Sign out / Clear Google OAuth session",
         "tags": [
           "Google Auth Emulate"
+        ]
+      }
+    },
+    "/api/port-lease/status": {
+      "get": {
+        "description": "Leases this checkout’s slot and returns the ports the demo stack would use in it, whether each is already bound, and every slot leased in this clone.",
+        "operationId": "PortLeaseController_getStatus",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Lease resolved",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PortLeaseStatusDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Get worktree port lease",
+        "tags": [
+          "Port Lease"
         ]
       }
     }
@@ -6140,6 +6163,142 @@
           "tokens",
           "userProfile",
           "apiLogs"
+        ]
+      },
+      "LeasedPortDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Env var the service reads",
+            "example": "PORT"
+          },
+          "base": {
+            "type": "number",
+            "description": "Slot-0 (historical) port",
+            "example": 3000
+          },
+          "leased": {
+            "type": "number",
+            "description": "Port this worktree would get",
+            "example": 3065
+          },
+          "busy": {
+            "type": "boolean",
+            "description": "Whether something is listening on the leased port",
+            "example": false
+          }
+        },
+        "required": [
+          "name",
+          "base",
+          "leased",
+          "busy"
+        ]
+      },
+      "LeasedSlotDto": {
+        "type": "object",
+        "properties": {
+          "slot": {
+            "type": "number",
+            "example": 1
+          },
+          "path": {
+            "type": "string",
+            "example": "/Users/me/code/ok-monorepo-feature"
+          },
+          "branch": {
+            "type": "string",
+            "example": "feature-branch"
+          },
+          "current": {
+            "type": "boolean",
+            "description": "Whether this is the worktree serving the API"
+          }
+        },
+        "required": [
+          "slot",
+          "path",
+          "branch",
+          "current"
+        ]
+      },
+      "PortLeaseStatusDto": {
+        "type": "object",
+        "properties": {
+          "slot": {
+            "type": "number",
+            "example": 0
+          },
+          "source": {
+            "type": "string",
+            "enum": [
+              "registry",
+              "cache",
+              "degraded"
+            ],
+            "example": "registry"
+          },
+          "isPrimary": {
+            "type": "boolean",
+            "description": "True for the clone’s primary worktree"
+          },
+          "worktreePath": {
+            "type": "string",
+            "nullable": true
+          },
+          "branch": {
+            "type": "string",
+            "nullable": true
+          },
+          "registryPath": {
+            "type": "string",
+            "nullable": true
+          },
+          "width": {
+            "type": "number",
+            "description": "Stride between slots",
+            "example": 65
+          },
+          "maxSlots": {
+            "type": "number",
+            "description": "Slots the width is collision-free across"
+          },
+          "backendPort": {
+            "type": "number",
+            "description": "Port this backend is actually listening on",
+            "example": 3000
+          },
+          "ports": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/LeasedPortDto"
+            }
+          },
+          "registry": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/LeasedSlotDto"
+            }
+          },
+          "warnings": {
+            "description": "Non-fatal lease diagnostics",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "slot",
+          "source",
+          "isPrimary",
+          "width",
+          "maxSlots",
+          "backendPort",
+          "ports",
+          "registry",
+          "warnings"
         ]
       }
     }

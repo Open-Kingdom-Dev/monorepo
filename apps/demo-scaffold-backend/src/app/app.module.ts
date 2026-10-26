@@ -23,6 +23,7 @@ import { TwinModule } from './twin/twin.module';
 import { YouTubeTwinModule } from './youtube-twin/youtube-twin.module.js';
 import { AppleMusicTwinModule } from './apple-music-twin/apple-music-twin.module.js';
 import { GoogleAuthEmulateModule } from './google-auth-emulate/google-auth-emulate.module';
+import { PortLeaseModule } from './port-lease/port-lease.module';
 import {
   PermissionGuard,
   ROLE_RESOLVER,
@@ -92,6 +93,7 @@ function getEmailModule() {
     YouTubeTwinModule,
     AppleMusicTwinModule,
     GoogleAuthEmulateModule,
+    PortLeaseModule,
   ],
   controllers: [],
   providers: [
