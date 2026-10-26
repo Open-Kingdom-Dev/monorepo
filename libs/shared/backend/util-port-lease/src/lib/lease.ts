@@ -16,6 +16,7 @@ import {
 import { isAbsolute, join, resolve } from 'node:path';
 
 import {
+  normalizeWorktreePath,
   parseRegistry,
   parseWorktreePorcelain,
   pruneRegistry,
@@ -159,7 +160,7 @@ function gatherGitFacts(cwd: string): GitFacts | null {
     commonDir: isAbsolute(commonDirRaw)
       ? commonDirRaw
       : resolve(cwd, commonDirRaw),
-    worktreePath,
+    worktreePath: normalizeWorktreePath(worktreePath),
     // git always lists the primary worktree first.
     primaryWorktreePath: livePaths[0],
     branch: git(['rev-parse', '--abbrev-ref', 'HEAD'], cwd) ?? '',
