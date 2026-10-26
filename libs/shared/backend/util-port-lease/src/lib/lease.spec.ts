@@ -1,6 +1,7 @@
 import { execFileSync } from 'node:child_process';
 import {
   existsSync,
+  mkdirSync,
   mkdtempSync,
   readFileSync,
   realpathSync,
@@ -44,7 +45,7 @@ describe('leaseSlot', () => {
   const lease = (cwd: string) => leaseSlot({ cwd, env: {} });
 
   beforeEach(() => {
-    root = realpathSync(mkdtempSync(join(tmpdir(), 'port-lease-')));
+    root = realpathSync.native(mkdtempSync(join(tmpdir(), 'port-lease-')));
     primary = join(root, 'project');
     execFileSync('git', ['init', '-b', 'main', primary], { stdio: 'ignore' });
     run(['config', 'user.email', 'test@example.com'], primary);
@@ -99,7 +100,7 @@ describe('leaseSlot', () => {
   it('leases from a subdirectory of a worktree', () => {
     const a = addWorktree('wt-a', 'feature-a');
     const nested = join(a, 'src', 'deep');
-    execFileSync('mkdir', ['-p', nested]);
+    mkdirSync(nested, { recursive: true });
     expect(lease(nested).slot).toBe(lease(a).slot);
   });
 
@@ -139,7 +140,9 @@ describe('leaseSlot', () => {
   });
 
   it('degrades to slot 0 outside a git repo instead of throwing', () => {
-    const outside = realpathSync(mkdtempSync(join(tmpdir(), 'not-git-')));
+    const outside = realpathSync.native(
+      mkdtempSync(join(tmpdir(), 'not-git-'))
+    );
     const warnings: string[] = [];
     try {
       expect(
@@ -162,7 +165,7 @@ describe('leaseSlot', () => {
   });
 
   it('steals a stale lock and warns, so a crashed process cannot wedge startup', () => {
-    execFileSync('mkdir', ['-p', `${registryPath()}.lock`]);
+    mkdirSync(`${registryPath()}.lock`, { recursive: true });
     const warnings: string[] = [];
 
     const result = leaseSlot({

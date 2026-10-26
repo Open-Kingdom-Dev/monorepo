@@ -13,8 +13,9 @@ const FEATURE = '/work/project-feature-x';
 
 describe('normalizeWorktreePath', () => {
   it.each([
-    ['backslashes', 'C:\\work\\project', 'C:/work/project'],
-    ['drive-letter case', 'c:/work/project', 'C:/work/project'],
+    ['backslashes', 'C:\\work\\project', 'c:/work/project'],
+    ['Windows case', 'C:/Work/Project', 'c:/work/project'],
+    ['POSIX case kept', '/Work/Project', '/Work/Project'],
     ['trailing slash', '/work/project/', '/work/project'],
     ['duplicate separators', '/work//project', '/work/project'],
     ['surrounding space', '  /work/project  ', '/work/project'],
@@ -23,7 +24,7 @@ describe('normalizeWorktreePath', () => {
   });
 
   it('keeps a UNC prefix intact', () => {
-    expect(normalizeWorktreePath('\\\\host\\share\\project')).toBe(
+    expect(normalizeWorktreePath('\\\\Host\\Share\\project')).toBe(
       '//host/share/project'
     );
   });
@@ -57,7 +58,7 @@ describe('parseWorktreePorcelain', () => {
 
   it('normalizes as it parses and tolerates CRLF', () => {
     expect(parseWorktreePorcelain('worktree c:\\work\\project\r\n')).toEqual([
-      'C:/work/project',
+      'c:/work/project',
     ]);
   });
 
@@ -112,7 +113,7 @@ describe('parseRegistry', () => {
     expect(parseRegistry(raw)).toEqual({
       slots: {
         '0': { path: PRIMARY, branch: 'main' },
-        '4': { path: 'C:/w/d', branch: '' },
+        '4': { path: 'c:/w/d', branch: '' },
       },
     });
   });

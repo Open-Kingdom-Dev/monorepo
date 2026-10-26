@@ -150,22 +150,20 @@ _Worktree Port Leasing — a pattern for deterministic multi-stack development o
 
 ---
 
-## §8 · This workspace's implementation
+## §8 · Implementation map
 
-The mechanism above is implemented here as a publishable library, [`libs/shared/backend/util-port-lease`](../README.md) → `@open-kingdom/shared-backend-util-port-lease`, so other repositories can consume it rather than re-derive it.
+This package implements the mechanism above, so a repository can consume it rather than re-derive it. See the [README](../README.md) for the API.
 
-| §7 step                         | Here                                                                                                                             |
+| §7 step                         | In this package                                                                                                                  |
 | ------------------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
 | Write the lease module          | `port-math.ts` + `registry.ts` (pure) behind `lease.ts` (git, `mkdir` lock, atomic write); `bind-check.ts` for the §5 diagnostic |
 | Unit-test the pure parts        | `*.spec.ts` — pure functions directly, plus `leaseSlot` against real `git worktree` checkouts in a temp dir                      |
 | Keep well-known ports at slot 0 | `leaseSlot` pins the primary worktree to slot 0, so the main checkout is unaffected and needs no env file                        |
-| Enumerate every port            | **Not done** — deliberately left to the consumer as a `PortMap` argument, since the library ships to other repos                 |
-| Pick a `WIDTH`                  | **Not done** — a consumer argument; `recommendWidth()` computes it and `findPortCollisions()` asserts it in a unit test          |
-| Choose base blocks              | **Not done** — a consumer argument; `BandOptions.bandOffset` carries the second band when one is needed                          |
-| Integrate the consumers         | **Not done** — this workspace's own dev launcher and Nx env files are not yet wired to the lease                                 |
+| Enumerate every port            | **Yours** — pass your stack's ports as a `PortMap`                                                                               |
+| Pick a `WIDTH`                  | **Yours** — `recommendWidth()` computes one and `findPortCollisions()` asserts it in a unit test                                 |
+| Choose base blocks              | **Yours** — `BandOptions.bandOffset` carries a second band when one is needed                                                    |
+| Integrate the consumers         | **Yours** — wire your dev launcher, env files, and e2e configs to `leaseSlot()`, auditing every derived URL per §5               |
 
-The library is the mechanism only. Adopting it _in this workspace_ is still §7 steps 1-3 and 6: enumerate the ports the monorepo's stack binds, pick a width, and wire `npm run dev`, the Nx target env files, and the Playwright/Jest e2e configs to `leaseSlot()` — auditing every derived URL on the way, per the slot ≠ 0 warning in §5.
-
-One design note worth naming for whoever does that wiring:
+One design note for whoever does that wiring:
 
 - **`PORT` is the awkward one.** §5 says export the ports as environment variables every service reads. A bare `PORT` is the exception when several apps read it without sharing a base — a single global value can only ever be right for one of them. Scope it per child process instead of exporting it globally.

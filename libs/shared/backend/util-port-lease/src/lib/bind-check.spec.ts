@@ -35,6 +35,28 @@ describe('bind check', () => {
     await expect(findBusyPorts([0, busyPort, 0])).resolves.toEqual([busyPort]);
   });
 
+  // Off Linux a bind on 127.0.0.1 succeeds beside these, so only the connect
+  // probe catches them. A host the machine lacks (no IPv6) is skipped.
+  it.each(['::', '0.0.0.0', '::1'])(
+    'reports a port busy when the listener is on %s',
+    async (host) => {
+      const other = createServer();
+      const port = await new Promise<number | null>((resolve) => {
+        other.once('error', () => resolve(null));
+        other.listen({ port: 0, host }, () => {
+          const address = other.address();
+          resolve(typeof address === 'object' && address ? address.port : null);
+        });
+      });
+      if (port === null) return;
+      try {
+        await expect(isPortFree(port)).resolves.toBe(false);
+      } finally {
+        await new Promise<void>((resolve) => other.close(() => resolve()));
+      }
+    }
+  );
+
   it('reports nothing busy for an empty list', async () => {
     await expect(findBusyPorts([])).resolves.toEqual([]);
   });

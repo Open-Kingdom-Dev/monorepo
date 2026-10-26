@@ -21,9 +21,11 @@ export const EMPTY_REGISTRY: Registry = { slots: {} };
 /**
  * Canonicalizes a worktree path so the same directory always compares equal.
  *
- * Git and the Node runtime disagree about separators and drive-letter case on
+ * Git and the Node runtime disagree about separators and letter case on
  * Windows; routing every comparison through here is what stops one worktree
- * from leaking duplicate slots.
+ * from leaking duplicate slots. Windows paths (drive letter or UNC) are
+ * case-folded because that filesystem is case-insensitive; POSIX paths keep
+ * their case, since Linux is not.
  */
 export function normalizeWorktreePath(input: string): string {
   if (!input) return '';
@@ -32,7 +34,7 @@ export function normalizeWorktreePath(input: string): string {
   const uncPrefix = out.startsWith('//') ? '//' : '';
   out = uncPrefix + out.slice(uncPrefix.length).replace(/\/{2,}/g, '/');
   if (out.length > 1) out = out.replace(/\/+$/, '');
-  if (/^[a-z]:/.test(out)) out = out[0].toUpperCase() + out.slice(1);
+  if (uncPrefix || /^[A-Za-z]:/.test(out)) out = out.toLowerCase();
   return out || '/';
 }
 
@@ -103,7 +105,7 @@ export function pruneRegistry(
   const live = new Set(livePaths.map(normalizeWorktreePath));
   const slots: Record<string, SlotRecord> = {};
   for (const [key, record] of Object.entries(registry.slots)) {
-    if (live.has(record.path)) slots[key] = record;
+    if (live.has(normalizeWorktreePath(record.path))) slots[key] = record;
   }
   return { slots };
 }
@@ -145,7 +147,7 @@ export function selectSlot(
 
   const slots: Record<string, SlotRecord> = { ...registry.slots };
   const existing = Object.entries(slots).find(
-    ([, record]) => record.path === path
+    ([, record]) => normalizeWorktreePath(record.path) === path
   );
 
   if (isPrimary) {

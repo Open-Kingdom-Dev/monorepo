@@ -8,6 +8,9 @@
   "main": "./dist/index.js",
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
+  "engines": {
+    "node": ">=20.19.0"
+  },
   "exports": {
     "./package.json": "./package.json",
     ".": {
@@ -30,8 +33,5 @@
       "type:util",
       "environment:backend"
     ]
-  },
-  "dependencies": {
-    "tslib": "^2.3.0"
   }
 }

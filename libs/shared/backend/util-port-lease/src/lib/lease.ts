@@ -228,10 +228,29 @@ function writeAtomic(path: string, contents: string): void {
   const tmp = `${path}.${process.pid}.tmp`;
   try {
     writeFileSync(tmp, contents, 'utf8');
-    renameSync(tmp, path);
+    renameWithRetry(tmp, path);
   } catch (error) {
     rmSync(tmp, { force: true });
     throw error;
+  }
+}
+
+/**
+ * On Windows a rename onto a file another process has open (an antivirus scan,
+ * an editor) fails transiently with EPERM/EACCES/EBUSY; retry briefly instead
+ * of degrading the lease to slot 0.
+ */
+function renameWithRetry(from: string, to: string, attempts = 10): void {
+  for (let attempt = 1; ; attempt += 1) {
+    try {
+      renameSync(from, to);
+      return;
+    } catch (error) {
+      const code = (error as NodeJS.ErrnoException).code ?? '';
+      if (attempt >= attempts || !['EPERM', 'EACCES', 'EBUSY'].includes(code))
+        throw error;
+      sleepSync(25);
+    }
   }
 }
 
