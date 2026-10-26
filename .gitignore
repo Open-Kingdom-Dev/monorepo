@@ -71,3 +71,7 @@ vendor/
 coverage/
 .cache/
 tmp/
+
+.claude/worktrees
+.nx/polygraph
+.nx/self-healing

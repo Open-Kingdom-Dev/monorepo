@@ -1,5 +1,6 @@
 const { createGlobPatternsForDependencies } = require('@nx/react/tailwind');
 const { join } = require('path');
+// eslint-disable-next-line @nx/enforce-module-boundaries -- package export points at gitignored dist/; src path works before ui-theme is built
 const baseConfig = require('../../libs/shared/frontend/ui-theme/src/tailwind.config.js');
 
 /** @type {import('tailwindcss').Config} */

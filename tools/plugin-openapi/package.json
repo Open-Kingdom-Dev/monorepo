@@ -53,9 +53,8 @@
     }
   },
   "dependencies": {
-    "@nx/devkit": "22.0.3",
     "@nestjs/swagger": "^11.0.0",
-    "@nx/devkit": "22.0.3",
+    "@nx/devkit": "22.7.12",
     "openapi-typescript": "^7.5.0",
     "tslib": "^2.3.0"
   },
