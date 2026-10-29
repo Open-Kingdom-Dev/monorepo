@@ -38,6 +38,6 @@
     "@open-kingdom/crm-backend-data-access-contacts": "0.0.2-19",
     "@nestjs/common": "^11.0.0",
     "@nestjs/swagger": "^11.0.0",
-    "drizzle-orm": "^0.44.5"
+    "drizzle-orm": "^0.45.4"
   }
 }
