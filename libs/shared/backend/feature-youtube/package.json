@@ -26,7 +26,7 @@
     "tslib": "^2.3.0",
     "@nestjs/common": "^11.0.0",
     "@nestjs/swagger": "^11.0.0",
-    "axios": "^1.6.0",
+    "axios": "^1.21.0",
     "@open-kingdom/shared-backend-util-rbac": "0.0.2-19",
     "@open-kingdom/shared-backend-integration-test-doubles": "0.0.2-19"
   },
