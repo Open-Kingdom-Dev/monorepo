@@ -10,7 +10,13 @@ import {
   createConfigService,
   nodeEnvAdapter,
 } from '@open-kingdom/shared-poly-util-env-config';
+import {
+  createBootLogger,
+  installCrashLogging,
+  useLogging,
+} from '@open-kingdom/shared-backend-util-logging';
 import { createSwaggerConfig, globalPrefix } from './config/swagger.config';
+import { loggingConfig } from './config/logging.config';
 import { json, urlencoded } from 'express';
 
 import { AppModule } from './app/app.module';
@@ -18,8 +24,14 @@ import { AppModule } from './app/app.module';
 const envKeys = ['PORT'] as const;
 const configService = createConfigService(envKeys, nodeEnvAdapter);
 
+const bootLogger = createBootLogger(loggingConfig);
+installCrashLogging(bootLogger);
+
 export async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  bootLogger.info('Starting');
+  const app = await NestFactory.create(AppModule, { bufferLogs: true });
+  // Before the body parsers below, so requests they reject still get an access line.
+  useLogging(app);
   app.setGlobalPrefix(globalPrefix);
 
   // Increase body size limits for file uploads (base64-encoded content)

@@ -1,6 +1,6 @@
 /* eslint-disable @nx/enforce-module-boundaries -- static imports for app module */
 import { Module } from '@nestjs/common';
-import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
+import { APP_FILTER, APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 import {
   createConfigService,
   nodeEnvAdapter,
@@ -28,6 +28,11 @@ import {
   ROLE_RESOLVER,
 } from '@open-kingdom/shared-backend-util-rbac';
 import { GcsErrorSimulationInterceptor } from '@open-kingdom/shared-backend-integration-test-doubles';
+import {
+  LoggingModule,
+  UnexpectedErrorFilter,
+} from '@open-kingdom/shared-backend-util-logging';
+import { loggingConfig } from '../config/logging.config';
 
 // Define the environment keys that this app uses
 const envKeys = [
@@ -92,9 +97,11 @@ function getEmailModule() {
     YouTubeTwinModule,
     AppleMusicTwinModule,
     GoogleAuthEmulateModule,
+    LoggingModule.forRoot({ ...loggingConfig, domainFields: [] }),
   ],
   controllers: [],
   providers: [
+    { provide: APP_FILTER, useClass: UnexpectedErrorFilter },
     { provide: ROLE_RESOLVER, useExisting: UserRolesService },
     { provide: APP_GUARD, useClass: JwtAuthGuard },
     { provide: APP_GUARD, useClass: PermissionGuard },
