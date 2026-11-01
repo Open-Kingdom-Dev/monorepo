@@ -108,13 +108,15 @@ describe('access line', () => {
 
     const response = await fetch(`${t.url}/quoting`);
 
-    expect(((await response.json()) as { message: string }).message).toContain('Jane Doe');
+    expect(((await response.json()) as { message: string }).message).toContain(
+      'Jane Doe'
+    );
     const line = await t.captured.waitFor((l) => l['path'] === '/quoting');
     expect(line['reason']).toBe('Malformed request body');
     expect(JSON.stringify(t.captured.lines)).not.toContain('Jane Doe');
   });
 
-  it("keeps the query string out of the reason Nest gives for an unknown route", async () => {
+  it('keeps the query string out of the reason Nest gives for an unknown route', async () => {
     t = await startTestApp();
 
     await fetch(`${t.url}/missing?token=secret`);

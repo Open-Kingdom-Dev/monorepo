@@ -5,7 +5,11 @@ import {
   serializeError,
 } from './safe-error';
 
-import type { LevelWithSilent, LoggerOptions, TransportSingleOptions } from 'pino';
+import type {
+  LevelWithSilent,
+  LoggerOptions,
+  TransportSingleOptions,
+} from 'pino';
 
 /** What every log line, at runtime or during boot, is built from. */
 export interface LineOptions {

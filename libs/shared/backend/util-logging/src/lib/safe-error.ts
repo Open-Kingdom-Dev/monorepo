@@ -22,7 +22,9 @@ export type ErrorSummaryHook = (error: Error) => string | undefined;
 let errorSummary: ErrorSummaryHook | undefined;
 
 /** Set once by `LoggingModule.forRoot`: the host's error summary hook, if any. */
-export function configureErrorSummary(hook: ErrorSummaryHook | undefined): void {
+export function configureErrorSummary(
+  hook: ErrorSummaryHook | undefined
+): void {
   errorSummary = hook;
 }
 

@@ -32,7 +32,8 @@ function trimAtStartup(file: string, maxBytes: number): void {
  * JSON shape as runtime lines, so a crash during startup still leaves its last line.
  */
 export function createBootLogger(options: BootLogOptions): Logger {
-  if (options.file) trimAtStartup(options.file, options.maxBytes ?? 1024 * 1024);
+  if (options.file)
+    trimAtStartup(options.file, options.maxBytes ?? 1024 * 1024);
   return pino(
     lineOptions(options),
     pino.destination({ dest: options.file ?? 1, sync: true, mkdir: true })

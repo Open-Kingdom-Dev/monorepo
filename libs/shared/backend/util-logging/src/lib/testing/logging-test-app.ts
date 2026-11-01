@@ -1,7 +1,6 @@
 import { Controller, Get, INestApplication, Type } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 
-
 import {
   LoggingModule,
   LoggingModuleOptions,
