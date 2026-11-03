@@ -126,5 +126,8 @@
     {
       "path": "./libs/shared/frontend/ui-data-table"
     }
-  ]
+  ],
+  "compilerOptions": {
+    "ignoreDeprecations": "6.0"
+  }
 }

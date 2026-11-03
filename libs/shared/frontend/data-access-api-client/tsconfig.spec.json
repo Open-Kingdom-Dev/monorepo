@@ -5,7 +5,8 @@
     "jsx": "react-jsx",
     "types": ["jest", "node"],
     "module": "esnext",
-    "moduleResolution": "bundler"
+    "moduleResolution": "bundler",
+    "ignoreDeprecations": "6.0"
   },
   "include": [
     "jest.config.ts",

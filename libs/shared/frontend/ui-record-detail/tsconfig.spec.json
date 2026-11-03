@@ -9,7 +9,8 @@
       "node",
       "vitest"
     ],
-    "jsx": "react-jsx"
+    "jsx": "react-jsx",
+    "ignoreDeprecations": "6.0"
   },
   "include": [
     "vite.config.ts",
