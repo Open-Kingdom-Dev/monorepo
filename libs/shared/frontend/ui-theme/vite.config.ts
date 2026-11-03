@@ -5,24 +5,26 @@ import * as path from 'path';
 import { copyFileSync, mkdirSync } from 'fs';
 
 export default defineConfig(() => ({
-  root: __dirname,
+  root: import.meta.dirname,
   cacheDir: '../../../../node_modules/.vite/libs/shared/frontend/ui-theme',
   plugins: [
     dts({
       entryRoot: 'src',
-      tsconfigPath: path.join(__dirname, 'tsconfig.lib.json'),
+      tsconfigPath: path.join(import.meta.dirname, 'tsconfig.lib.json'),
     }),
     {
       name: 'copy-static-assets',
       closeBundle() {
         copyFileSync(
-          path.join(__dirname, 'src/tailwind.config.js'),
-          path.join(__dirname, 'dist/tailwind.config.js')
+          path.join(import.meta.dirname, 'src/tailwind.config.js'),
+          path.join(import.meta.dirname, 'dist/tailwind.config.js')
         );
-        mkdirSync(path.join(__dirname, 'dist/styles'), { recursive: true });
+        mkdirSync(path.join(import.meta.dirname, 'dist/styles'), {
+          recursive: true,
+        });
         copyFileSync(
-          path.join(__dirname, 'src/styles/tokens.css'),
-          path.join(__dirname, 'dist/styles/tokens.css')
+          path.join(import.meta.dirname, 'src/styles/tokens.css'),
+          path.join(import.meta.dirname, 'dist/styles/tokens.css')
         );
       },
     },

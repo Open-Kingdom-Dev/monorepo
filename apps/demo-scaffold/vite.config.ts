@@ -5,7 +5,7 @@ import * as path from 'path';
 import { nxReadySignal } from '@nx/vite/plugins/nx-ready-signal.plugin';
 
 export default defineConfig(() => ({
-  root: __dirname,
+  root: import.meta.dirname,
   cacheDir: '../../node_modules/.vite/apps/demo-scaffold',
   resolve: {
     tsconfigPaths: true,
@@ -18,7 +18,7 @@ export default defineConfig(() => ({
     ],
     alias: {
       '@open-kingdom/demo-scaffold-frontend-feature-root-store': path.resolve(
-        __dirname,
+        import.meta.dirname,
         '../../libs/demo-scaffold/frontend/feature-root-store/src/index.ts'
       ),
     },

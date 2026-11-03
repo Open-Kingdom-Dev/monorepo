@@ -8,14 +8,14 @@ export default defineConfig(() => ({
   resolve: {
     tsconfigPaths: true,
   },
-  root: __dirname,
+  root: import.meta.dirname,
   cacheDir:
     '../../../../node_modules/.vite/libs/shared/frontend/data-access-external-api',
   plugins: [
     react(),
     dts({
       entryRoot: 'src',
-      tsconfigPath: path.join(__dirname, 'tsconfig.lib.json'),
+      tsconfigPath: path.join(import.meta.dirname, 'tsconfig.lib.json'),
     }),
   ],
   // Uncomment this if you are using workers.

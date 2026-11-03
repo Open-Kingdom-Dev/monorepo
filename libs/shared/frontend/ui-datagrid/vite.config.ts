@@ -5,13 +5,13 @@ import dts from 'vite-plugin-dts';
 import * as path from 'path';
 
 export default defineConfig(() => ({
-  root: __dirname,
+  root: import.meta.dirname,
   cacheDir: '../../../../node_modules/.vite/libs/shared/frontend/ui-datagrid',
   plugins: [
     react(),
     dts({
       entryRoot: 'src',
-      tsconfigPath: path.join(__dirname, 'tsconfig.lib.json'),
+      tsconfigPath: path.join(import.meta.dirname, 'tsconfig.lib.json'),
     }),
   ],
   // Uncomment this if you are using workers.
