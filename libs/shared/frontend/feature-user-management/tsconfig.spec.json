@@ -5,7 +5,8 @@
     "lib": ["es2022", "dom"],
     "jsx": "react-jsx",
     "types": ["jest", "node"],
-    "ignoreDeprecations": "6.0"
+    "ignoreDeprecations": "6.0",
+    "rootDir": "."
   },
   "include": [
     "jest.config.ts",

@@ -4,7 +4,8 @@
     "allowJs": true,
     "outDir": "out-tsc/playwright",
     "sourceMap": false,
-    "ignoreDeprecations": "6.0"
+    "ignoreDeprecations": "6.0",
+    "rootDir": "."
   },
   "include": [
     "**/*.ts",

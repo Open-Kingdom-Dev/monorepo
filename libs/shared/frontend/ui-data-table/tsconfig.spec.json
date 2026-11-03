@@ -11,7 +11,8 @@
     ],
     "jsx": "react-jsx",
     "lib": ["dom", "dom.iterable", "es2022"],
-    "ignoreDeprecations": "6.0"
+    "ignoreDeprecations": "6.0",
+    "rootDir": "."
   },
   "include": [
     "vite.config.ts",
