@@ -159,5 +159,8 @@
         "style": "tailwind"
       }
     }
+  },
+  "affected": {
+    "legacy": true
   }
 }
