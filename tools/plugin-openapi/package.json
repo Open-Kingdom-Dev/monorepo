@@ -54,13 +54,13 @@
   },
   "dependencies": {
     "@nestjs/swagger": "^11.0.0",
-    "@nx/devkit": "22.7.12",
+    "@nx/devkit": "24.0.3",
     "openapi-typescript": "^7.5.0",
     "tslib": "^2.3.0"
   },
   "devDependencies": {
     "ts-node": "^10.9.2",
-    "typescript": "^5.6.0"
+    "typescript": "^6.0.3"
   },
   "executors": "./executors.json",
   "files": [
