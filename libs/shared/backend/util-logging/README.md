@@ -68,24 +68,25 @@ declare module '@open-kingdom/shared-backend-util-logging' {
 
 ### `LoggingModuleOptions`
 
-| Property         | Type                | Required | Default                     | Description                                                                                                            |
-| ---------------- | ------------------- | -------- | --------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
-| `app`            | `string`            | Yes      | —                           | Written as `app` on every line.                                                                                        |
-| `project`        | `string`            | Yes      | —                           | Written as `project` on every line.                                                                                    |
-| `env`            | `string`            | Yes      | —                           | Written as `env` on every line.                                                                                        |
-| `redact`         | `string[]`          | Yes      | —                           | pino redact paths, removed from every line. Nothing is redacted unless listed here.                                    |
-| `domainFields`   | `string[]`          | Yes      | —                           | Names of the fields declared in `LogDomainFields`. Any other field is dropped.                                         |
-| `level`          | `LevelWithSilent`   | No       | `'info'`                    | Default level. The `LOG_LEVEL` environment variable overrides it.                                                      |
-| `file`           | `LogFileOptions`    | No       | —                           | Write rotating JSON files (pino-roll) instead of stdout. `{ path, maxBytes = 5 MB, maxFiles = 5 }`.                    |
-| `pretty`         | `boolean`           | No       | `NODE_ENV !== 'production'` | Human-readable stdout (pino-pretty). Ignored when `file` is set.                                                       |
-| `summarizeError` | `ErrorSummaryHook`  | No       | —                           | Adds one safe line to an error's description, such as the argument a validation error names. Must never return values. |
-| `stream`         | `DestinationStream` | No       | —                           | Write to this stream instead of a transport, for example to capture lines in tests.                                    |
+| Property           | Type                | Required | Default                     | Description                                                                                                            |
+| ------------------ | ------------------- | -------- | --------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
+| `app`              | `string`            | Yes      | —                           | Written as `app` on every line.                                                                                        |
+| `project`          | `string`            | Yes      | —                           | Written as `project` on every line.                                                                                    |
+| `env`              | `string`            | Yes      | —                           | Written as `env` on every line.                                                                                        |
+| `redact`           | `string[]`          | Yes      | —                           | pino redact paths, removed from every line. Nothing is redacted unless listed here.                                    |
+| `domainFields`     | `string[]`          | Yes      | —                           | Names of the fields declared in `LogDomainFields`. Any other field is dropped.                                         |
+| `level`            | `LevelWithSilent`   | No       | `'info'`                    | Default level. The `LOG_LEVEL` environment variable overrides it.                                                      |
+| `file`             | `LogFileOptions`    | No       | —                           | Write rotating JSON files (pino-roll) instead of stdout. `{ path, maxBytes = 5 MB, maxFiles = 5 }`.                    |
+| `pretty`           | `boolean`           | No       | `NODE_ENV !== 'production'` | Human-readable stdout (pino-pretty). Ignored when `file` is set.                                                       |
+| `summarizeError`   | `ErrorSummaryHook`  | No       | —                           | Adds one safe line to an error's description, such as the argument a validation error names. Must never return values. |
+| `stream`           | `DestinationStream` | No       | —                           | Write to this stream instead of a transport, for example to capture lines in tests.                                    |
+| `healthCheckPaths` | `string[]`          | No       | `['/api/health']`           | Exact paths (no query string) whose passing requests get no access line. Failing or timed-out ones are still logged.   |
 
 ---
 
 ## The access line
 
-One line per request, written when its response closes. It contains `method`, `path` (no query string), `status`, `durationMs`, `reason` (the error body's `message`, or the replacement text), and `clientClosed` when the client gave up. The level is `info` for 2xx and 3xx, `warn` for 4xx, and `error` for 5xx. Paths ending in `/health` are skipped. Headers and bodies are never logged.
+One line per request, written when its response closes. It contains `method`, `path` (no query string), `status`, `durationMs`, `reason` (the error body's `message`, or the replacement text), and `clientClosed` when the client gave up. The level is `info` for 2xx and 3xx, `warn` for 4xx, and `error` for 5xx. A health check (a path in `healthCheckPaths`, matched exactly) gets no line when it passes; a failing or timed-out one is logged like any other request. Headers and bodies are never logged.
 
 ---
 

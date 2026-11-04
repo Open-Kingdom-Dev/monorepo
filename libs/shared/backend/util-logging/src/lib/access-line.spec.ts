@@ -5,6 +5,7 @@ import {
   ForbiddenException,
   Get,
   Res,
+  ServiceUnavailableException,
   UseGuards,
 } from '@nestjs/common';
 
@@ -56,6 +57,24 @@ class HealthController {
   @Get('api/ready')
   ready() {
     return { status: 'ok' };
+  }
+
+  @Get('api/tunnel-relay/health')
+  relayHealth() {
+    return { status: 'ok' };
+  }
+
+  @Get('api/walls/:id/health')
+  wallHealth() {
+    return { status: 'online' };
+  }
+}
+
+@Controller()
+class FailingHealthController {
+  @Get('api/health')
+  health() {
+    throw new ServiceUnavailableException('Database unreachable');
   }
 }
 
@@ -137,7 +156,7 @@ describe('access line', () => {
     expect(line['clientClosed']).toBe(true);
   });
 
-  it('writes no access line for health checks', async () => {
+  it('writes no access line for a passing health check', async () => {
     t = await startTestApp({}, [HealthController]);
 
     await fetch(`${t.url}/api/health`);
@@ -147,5 +166,41 @@ describe('access line', () => {
     expect(t.captured.lines.some((l) => l['path'] === '/api/health')).toBe(
       false
     );
+  });
+
+  it('logs a failing health check like any other request', async () => {
+    t = await startTestApp({}, [FailingHealthController]);
+
+    await fetch(`${t.url}/api/health`);
+
+    const line = await t.captured.waitFor((l) => l['path'] === '/api/health');
+    expect(line).toMatchObject({
+      level: 'error',
+      status: 503,
+      reason: 'Database unreachable',
+    });
+  });
+
+  it('logs a route that only happens to end in /health', async () => {
+    t = await startTestApp({}, [HealthController]);
+
+    await fetch(`${t.url}/api/walls/7/health`);
+
+    await t.captured.waitFor((l) => l['path'] === '/api/walls/7/health');
+  });
+
+  it("keeps the host's own health check paths quiet when they pass", async () => {
+    t = await startTestApp(
+      { healthCheckPaths: ['/api/health', '/api/tunnel-relay/health'] },
+      [HealthController]
+    );
+
+    await fetch(`${t.url}/api/tunnel-relay/health`);
+    await fetch(`${t.url}/api/ready`);
+
+    await t.captured.waitFor((l) => l['path'] === '/api/ready');
+    expect(
+      t.captured.lines.some((l) => l['path'] === '/api/tunnel-relay/health')
+    ).toBe(false);
   });
 });

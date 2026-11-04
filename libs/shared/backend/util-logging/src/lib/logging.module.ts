@@ -1,7 +1,11 @@
 import { DynamicModule, INestApplication, Module } from '@nestjs/common';
 import { Logger, LoggerModule } from 'nestjs-pino';
 
-import { requestLogging } from './access-line';
+import {
+  configureHealthCheckPaths,
+  DEFAULT_HEALTH_CHECK_PATHS,
+  requestLogging,
+} from './access-line';
 import {
   LineOptions,
   LogFileOptions,
@@ -23,6 +27,11 @@ export interface LoggingModuleOptions extends LineOptions {
   pretty?: boolean;
   /** Write to this stream instead of a transport, e.g. to capture lines in tests. */
   stream?: DestinationStream;
+  /**
+   * Exact paths (no query string) whose passing requests get no access line; failures are
+   * still logged. Defaults to `['/api/health']`.
+   */
+  healthCheckPaths?: string[];
 }
 
 @Module({})
@@ -30,6 +39,9 @@ export class LoggingModule {
   static forRoot(options: LoggingModuleOptions): DynamicModule {
     declareDomainFields(options.domainFields);
     configureErrorSummary(options.summarizeError);
+    configureHealthCheckPaths(
+      options.healthCheckPaths ?? DEFAULT_HEALTH_CHECK_PATHS
+    );
     const pinoOptions: Options = {
       ...lineOptions(options),
       // The access line is written by `requestLogging`, inside the request's scope.

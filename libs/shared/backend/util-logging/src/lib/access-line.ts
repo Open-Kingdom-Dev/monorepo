@@ -52,6 +52,15 @@ function captureReason(res: JsonResponse): void {
   };
 }
 
+export const DEFAULT_HEALTH_CHECK_PATHS = ['/api/health'];
+
+let healthCheckPaths = new Set(DEFAULT_HEALTH_CHECK_PATHS);
+
+/** Set once by `LoggingModule.forRoot`: the exact paths whose passing requests aren't logged. */
+export function configureHealthCheckPaths(paths: string[]): void {
+  healthCheckPaths = new Set(paths);
+}
+
 function levelOf(status: number): 'info' | 'warn' | 'error' {
   if (status >= 500) return 'error';
   if (status >= 400) return 'warn';
@@ -71,12 +80,7 @@ export function requestLogging(
 ): void {
   const requestId = resolveRequestId(req, res);
   const path = pathOf(req);
-  // Health checks run every few seconds and would drown the requests worth reading.
-  if (path.endsWith('/health')) {
-    startRequestScope(req, requestId, next);
-    return;
-  }
-
+  const healthCheck = healthCheckPaths.has(path);
   const startedAt = Date.now();
   const url = req.url ?? '';
   captureReason(res as JsonResponse);
@@ -90,6 +94,9 @@ export function requestLogging(
         reason = reason.split(url).join(path);
       }
       const status = res.statusCode;
+      // Passing health checks run every few seconds and would drown the requests worth
+      // reading; a failing or timed-out one is what an orchestrator restarts on, so it's kept.
+      if (healthCheck && status < 400 && res.writableFinished) return;
       // Written inside the request's scope, so it carries the same requestId and fields.
       logScopeStore.run(scope ?? { requestId, fields: {} }, () => {
         PinoLogger.root[levelOf(status)](
