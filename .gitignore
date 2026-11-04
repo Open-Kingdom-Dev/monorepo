@@ -79,5 +79,6 @@ coverage/
 tmp/
 
 .nx/polygraph
+.nx/self-healing
 .claude/worktrees
 .claude/settings.local.json
