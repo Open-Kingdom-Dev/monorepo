@@ -12,6 +12,7 @@
     "start:twin": "nx run integration-test-doubles:start:twin",
     "test": "nx run-many --target=test --all --coverage",
     "test:affected": "nx affected --target=test --coverage",
+    "test:port-lease": "nx test shared-backend-util-port-lease",
     "typecheck": "nx run-many --target=typecheck --all",
     "typecheck:affected": "nx affected --target=typecheck",
     "e2e": "nx run demo-scaffold-e2e:e2e",

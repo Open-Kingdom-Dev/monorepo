@@ -60,6 +60,9 @@ export function AppNav() {
       <NavLink to="/crm" className={linkClass}>
         CRM
       </NavLink>
+      <NavLink to="/port-lease-demo" className={linkClass}>
+        Port Lease
+      </NavLink>
 
       {/* Mock Server Dropdown */}
       <div className="relative" ref={dropdownRef}>

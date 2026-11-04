@@ -24,6 +24,7 @@ export const addTagTypes = [
   "YouTube Twin",
   "Apple Music Twin",
   "Google Auth Emulate",
+  "Port Lease",
 ] as const;
 const injectedRtkApi = api
   .enhanceEndpoints({
@@ -992,6 +993,13 @@ const injectedRtkApi = api
         }),
         invalidatesTags: ["Google Auth Emulate"],
       }),
+      portLeaseControllerGetStatus: build.query<
+        PortLeaseControllerGetStatusApiResponse,
+        PortLeaseControllerGetStatusApiArg
+      >({
+        query: () => ({ url: `/api/port-lease/status` }),
+        providesTags: ["Port Lease"],
+      }),
     }),
     overrideExisting: false,
   });
@@ -1447,6 +1455,9 @@ export type GoogleAuthEmulateControllerClearLogsApiResponse = unknown;
 export type GoogleAuthEmulateControllerClearLogsApiArg = void;
 export type GoogleAuthEmulateControllerLogoutApiResponse = unknown;
 export type GoogleAuthEmulateControllerLogoutApiArg = void;
+export type PortLeaseControllerGetStatusApiResponse =
+  /** status 200 Lease resolved */ PortLeaseStatusDto;
+export type PortLeaseControllerGetStatusApiArg = void;
 export type LoginResponseDto = {
   /** JWT access token */
   access_token: string;
@@ -2125,6 +2136,42 @@ export type GoogleOAuthResultDto = {
   userProfile: GoogleUserProfileDto;
   apiLogs: ApiLogEntryDto[];
 };
+export type LeasedPortDto = {
+  /** Env var the service reads */
+  name: string;
+  /** Slot-0 (historical) port */
+  base: number;
+  /** Port this worktree would get */
+  leased: number;
+  /** Whether something is listening on the leased port */
+  busy: boolean;
+};
+export type LeasedSlotDto = {
+  slot: number;
+  path: string;
+  branch: string;
+  /** Whether this is the worktree serving the API */
+  current: boolean;
+};
+export type PortLeaseStatusDto = {
+  slot: number;
+  source: "registry" | "cache" | "degraded";
+  /** True for the clone’s primary worktree */
+  isPrimary: boolean;
+  worktreePath?: string | null;
+  branch?: string | null;
+  registryPath?: string | null;
+  /** Stride between slots */
+  width: number;
+  /** Slots the width is collision-free across */
+  maxSlots: number;
+  /** Port this backend is actually listening on */
+  backendPort: number;
+  ports: LeasedPortDto[];
+  registry: LeasedSlotDto[];
+  /** Non-fatal lease diagnostics */
+  warnings: string[];
+};
 export const {
   useAuthControllerLoginMutation,
   useAuthControllerGetProfileQuery,
@@ -2227,4 +2274,5 @@ export const {
   useGoogleAuthEmulateControllerGetLogsQuery,
   useGoogleAuthEmulateControllerClearLogsMutation,
   useGoogleAuthEmulateControllerLogoutMutation,
+  usePortLeaseControllerGetStatusQuery,
 } = injectedRtkApi;
