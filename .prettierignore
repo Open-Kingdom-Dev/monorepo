@@ -16,3 +16,4 @@ libs/shared/frontend/data-access-api-client/src/lib/demo-scaffold-backend/api.ts
 .nx/self-healing
 /.nx/migrate-runs
 .claude/settings.local.json
+.claude/worktrees
