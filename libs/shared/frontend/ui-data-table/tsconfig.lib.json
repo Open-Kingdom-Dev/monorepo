@@ -11,7 +11,8 @@
     "rootDir": "src",
     "jsx": "react-jsx",
     "tsBuildInfoFile": "dist/tsconfig.lib.tsbuildinfo",
-    "lib": ["dom", "dom.iterable", "es2022"]
+    "lib": ["dom", "dom.iterable", "es2022"],
+    "ignoreDeprecations": "6.0"
   },
   "exclude": [
     "out-tsc",
@@ -38,7 +39,8 @@
     "src/**/*.spec.jsx",
     "eslint.config.js",
     "eslint.config.cjs",
-    "eslint.config.mjs"
+    "eslint.config.mjs",
+    "src/test-setup.ts"
   ],
   "include": ["src/**/*.js", "src/**/*.jsx", "src/**/*.ts", "src/**/*.tsx"],
   "references": [

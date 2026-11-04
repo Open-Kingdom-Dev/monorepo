@@ -129,5 +129,8 @@
     {
       "path": "./libs/shared/backend/util-port-lease"
     }
-  ]
+  ],
+  "compilerOptions": {
+    "ignoreDeprecations": "6.0"
+  }
 }

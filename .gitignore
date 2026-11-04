@@ -82,3 +82,5 @@ tmp/
 .nx/self-healing
 .claude/worktrees
 .claude/settings.local.json
+.nx/migrate-runs
+.vitest
