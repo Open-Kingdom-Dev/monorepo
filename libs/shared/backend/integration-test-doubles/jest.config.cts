@@ -12,6 +12,7 @@ module.exports = {
   displayName: 'integration-test-doubles',
   preset: '../../../../jest.preset.js',
   testEnvironment: 'node',
+  setupFilesAfterEnv: ['<rootDir>/src/jest-setup.ts'],
   transform: {
     '^.+\\.[tj]s$': ['@swc/jest', swcJestConfig],
   },
