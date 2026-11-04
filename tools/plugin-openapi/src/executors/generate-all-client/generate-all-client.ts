@@ -1,4 +1,4 @@
-import { logger, PromiseExecutor } from '@nx/devkit';
+import { logger, type PromiseExecutor } from '@nx/devkit';
 import {
   existsSync,
   mkdirSync,
@@ -8,7 +8,7 @@ import {
 } from 'fs';
 import { join, relative } from 'path';
 import { generateEndpoints } from '@rtk-query/codegen-openapi';
-import { GenerateAllClientExecutorSchema } from './schema';
+import type { GenerateAllClientExecutorSchema } from './schema';
 
 interface BackendProject {
   name: string;

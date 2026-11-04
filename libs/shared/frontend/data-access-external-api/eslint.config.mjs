@@ -8,7 +8,13 @@ export default [
       '@nx/dependency-checks': [
         'error',
         {
-          ignoredFiles: ['{projectRoot}/eslint.config.{js,cjs,mjs,ts,cts,mts}'],
+          // Build/test tooling configs import devDependencies (vite & friends)
+          // — they are not part of the published package's runtime surface.
+          ignoredFiles: [
+            '{projectRoot}/eslint.config.{js,cjs,mjs,ts,cts,mts}',
+            '{projectRoot}/vite.config.{js,cjs,mjs,ts,cts,mts}',
+            '{projectRoot}/jest.config.{js,cjs,mjs,ts,cts,mts}',
+          ],
         },
       ],
     },
