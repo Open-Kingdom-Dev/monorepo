@@ -16,12 +16,6 @@
         "dependsOn": [
           {
             "projects": [
-              "@open-kingdom/demo-scaffold"
-            ],
-            "target": "preview"
-          },
-          {
-            "projects": [
               "@open-kingdom/shared-backend-util-port-lease"
             ],
             "target": "build"
