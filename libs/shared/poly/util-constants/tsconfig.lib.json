@@ -9,7 +9,8 @@
     "forceConsistentCasingInFileNames": true,
     "types": ["node"],
     "module": "nodenext",
-    "moduleResolution": "nodenext"
+    "moduleResolution": "nodenext",
+    "ignoreDeprecations": "6.0"
   },
   "include": ["src/**/*.ts"],
   "references": [],

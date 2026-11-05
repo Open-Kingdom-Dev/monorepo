@@ -60,6 +60,7 @@ monorepo/
 | `@open-kingdom/shared-backend-feature-email`              | `EmailModule`, `EmailService`                                                | Email via Gmail provider                    |
 | `@open-kingdom/shared-backend-feature-user-management`    | `FeatureUserManagementModule`, `UserManagementService`, `InvitationsService` | User + invitation CRUD                      |
 | `@open-kingdom/shared-backend-feature-gcp-resources`      | `FeatureGcpResourcesModule`                                                  | GCP project listing                         |
+| `@open-kingdom/shared-backend-util-port-lease`            | `leaseSlot`, `portsForSlot`, `envForSlot`                                    | Per-worktree dev/test port allocation       |
 | `@open-kingdom/shared-backend-util-logging`               | `LoggingModule`, `useLogging`, `bindLogFields`, `UnexpectedErrorFilter`      | Structured JSON logging (own release group) |
 
 ### Frontend (React + Redux)

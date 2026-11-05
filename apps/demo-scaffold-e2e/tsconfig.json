@@ -3,7 +3,9 @@
   "compilerOptions": {
     "allowJs": true,
     "outDir": "out-tsc/playwright",
-    "sourceMap": false
+    "sourceMap": false,
+    "ignoreDeprecations": "6.0",
+    "rootDir": "."
   },
   "include": [
     "**/*.ts",
@@ -15,5 +17,10 @@
     "src/**/*.test.js",
     "src/**/*.d.ts"
   ],
-  "exclude": ["out-tsc", "test-output"]
+  "exclude": ["out-tsc", "test-output"],
+  "references": [
+    {
+      "path": "../../libs/shared/backend/util-port-lease"
+    }
+  ]
 }

@@ -33,7 +33,7 @@
   "peerDependencies": {
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "react-router": "^7.2.0",
+    "react-router": "^7.18.2",
     "react-redux": "^9.2.0",
     "lucide-react": ">=0.400.0",
     "@open-kingdom/shared-frontend-ui-theme": "0.0.2-19",

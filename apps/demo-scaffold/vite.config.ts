@@ -1,13 +1,14 @@
 /// <reference types='vitest' />
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
-import { nxViteTsPaths } from '@nx/vite/plugins/nx-tsconfig-paths.plugin';
 import * as path from 'path';
+import { nxReadySignal } from '@nx/vite/plugins/nx-ready-signal.plugin';
 
 export default defineConfig(() => ({
-  root: __dirname,
+  root: import.meta.dirname,
   cacheDir: '../../node_modules/.vite/apps/demo-scaffold',
   resolve: {
+    tsconfigPaths: true,
     conditions: [
       '@open-kingdom/source',
       'browser',
@@ -17,7 +18,7 @@ export default defineConfig(() => ({
     ],
     alias: {
       '@open-kingdom/demo-scaffold-frontend-feature-root-store': path.resolve(
-        __dirname,
+        import.meta.dirname,
         '../../libs/demo-scaffold/frontend/feature-root-store/src/index.ts'
       ),
     },
@@ -41,7 +42,7 @@ export default defineConfig(() => ({
     port: 4300,
     host: 'localhost',
   },
-  plugins: [react(), nxViteTsPaths()],
+  plugins: [react(), nxReadySignal()],
   // Uncomment this if you are using workers.
   // worker: {
   //  plugins: [ nxViteTsPaths() ],
