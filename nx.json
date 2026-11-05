@@ -116,14 +116,26 @@
     }
   },
   "release": {
-    "projects": [
-      "libs/shared/frontend/*",
-      "libs/shared/backend/*",
-      "libs/shared/poly/*",
-      "libs/crm/frontend/*",
-      "libs/crm/backend/*",
-      "libs/crm/poly/*"
-    ],
+    "groups": {
+      "platform": {
+        "projects": [
+          "libs/shared/frontend/*",
+          "libs/shared/backend/*",
+          "libs/shared/poly/*",
+          "libs/crm/frontend/*",
+          "libs/crm/backend/*",
+          "libs/crm/poly/*",
+          "!libs/shared/backend/util-logging"
+        ],
+        "projectsRelationship": "fixed",
+        "releaseTagPattern": "v{version}"
+      },
+      "logging": {
+        "projects": ["libs/shared/backend/util-logging"],
+        "projectsRelationship": "independent",
+        "releaseTagPattern": "{projectName}@{version}"
+      }
+    },
     "version": {
       "preVersionCommand": "npx nx run-many -t build",
       "conventionalCommits": true,
@@ -133,8 +145,8 @@
     "versionPlans": false,
     "changelog": {
       "automaticFromRef": true,
-      "workspaceChangelog": true,
-      "projectChangelogs": false
+      "workspaceChangelog": false,
+      "projectChangelogs": true
     },
     "git": {
       "commit": true,
