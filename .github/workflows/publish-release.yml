@@ -98,7 +98,7 @@ jobs:
         if: steps.tag_check.outputs.exists == 'false'
         run: |
           VERSION="${{ steps.version.outputs.version }}"
-          NOTES=$(sed -n "/^## ${VERSION}/,/^## [0-9]/p" "${{ steps.version.outputs.changelog }}" | sed '$d')
+          NOTES=$(bash tools/release/release-notes.sh "${{ steps.version.outputs.group }}" "$VERSION")
 
           gh release create "${{ steps.version.outputs.tag }}" \
             --title "${{ steps.version.outputs.tag }}" \

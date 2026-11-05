@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Prints the version, git tag and changelog of an Nx release group, as GitHub Actions outputs
+# Prints the version and git tag of an Nx release group, as GitHub Actions outputs
 # (key=value lines), read from the manifest the group's version is written to.
 #
 #   tools/release/release-info.sh <platform|logging>
@@ -37,5 +37,4 @@ fi
 
 echo "version=${version}"
 echo "tag=${tag}"
-echo "changelog=$(dirname "$manifest")/CHANGELOG.md"
 echo "first_release=${first_release}"
