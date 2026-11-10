@@ -1,3 +1,20 @@
+## 0.0.2-20 (2026-11-10)
+
+### 🚀 Features
+
+- worktree port leasing — new util-port-lease library ([#177](https://github.com/Open-Kingdom-Dev/monorepo/pull/177))
+- implement apple music mocking including sample audio files ([#172](https://github.com/Open-Kingdom-Dev/monorepo/pull/172))
+- introducing emulate on google auth mock server ([#171](https://github.com/Open-Kingdom-Dev/monorepo/pull/171))
+
+### 🩹 Fixes
+
+- jsdom TextDecoder setup and keep test-setup out of published libs ([#209](https://github.com/Open-Kingdom-Dev/monorepo/pull/209))
+
+### ❤️ Thank You
+
+- David Moore @vandermore
+- Rifqi Oktario @rifqioktario-openkingdom
+
 ## 0.0.2-19 (2026-07-17)
 
 ### 🚀 Features
