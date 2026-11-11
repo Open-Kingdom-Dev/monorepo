@@ -111,6 +111,15 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+      # nx release can exit 0 without committing (nothing to release, or an unanswerable prompt in CI)
+      - name: Check a release commit was made
+        if: ${{ inputs.dry_run == false }}
+        run: |
+          if [ "$(git rev-list --count origin/master..HEAD)" = "0" ]; then
+            echo "::error::nx release made no release commit. Check the Version and Changelog step output."
+            exit 1
+          fi
+
       - name: Push release branch
         if: ${{ inputs.dry_run == false }}
         run: git push -u origin "$RELEASE_BRANCH"
