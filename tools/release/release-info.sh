@@ -2,22 +2,18 @@
 # Prints the version and git tag of an Nx release group, as GitHub Actions outputs
 # (key=value lines), read from the manifest the group's version is written to.
 #
-#   tools/release/release-info.sh <platform|logging>
+#   tools/release/release-info.sh <platform>
 #
 # Keep in sync with "release.groups" in nx.json.
 set -euo pipefail
 
-group="${1:?usage: release-info.sh <platform|logging>}"
+group="${1:?usage: release-info.sh <platform>}"
 
 case "$group" in
   platform)
     # Fixed group: every package shares one version; util-constants stands in for all of them.
     manifest="libs/shared/poly/util-constants/package.json"
     tag_prefix="v"
-    ;;
-  logging)
-    manifest="libs/shared/backend/util-logging/package.json"
-    tag_prefix="@open-kingdom/shared-backend-util-logging@"
     ;;
   *)
     echo "Unknown release group: $group" >&2
