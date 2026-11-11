@@ -10,7 +10,6 @@ on:
         type: choice
         options:
           - platform
-          - logging
       dry_run:
         description: 'Dry run (preview what Nx will release based on conventional commits)'
         required: false

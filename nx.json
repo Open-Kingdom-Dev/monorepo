@@ -124,16 +124,10 @@
           "libs/shared/poly/*",
           "libs/crm/frontend/*",
           "libs/crm/backend/*",
-          "libs/crm/poly/*",
-          "!libs/shared/backend/util-logging"
+          "libs/crm/poly/*"
         ],
         "projectsRelationship": "fixed",
         "releaseTagPattern": "v{version}"
-      },
-      "logging": {
-        "projects": ["libs/shared/backend/util-logging"],
-        "projectsRelationship": "independent",
-        "releaseTagPattern": "{projectName}@{version}"
       }
     },
     "version": {
