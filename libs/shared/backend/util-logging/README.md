@@ -86,7 +86,7 @@ declare module '@open-kingdom/shared-backend-util-logging' {
 
 ## The access line
 
-One line per request, written when its response closes. It contains `method`, `path` (no query string), `status`, `durationMs`, `reason` (the error body's `message`, or the replacement text), and `clientClosed` when the client gave up. The level is `info` for 2xx and 3xx, `warn` for 4xx, and `error` for 5xx. A health check (a path in `healthCheckPaths`, matched exactly) gets no line when it passes; a failing or timed-out one is logged like any other request. Headers and bodies are never logged.
+One line per request, written when its response closes. It contains `method`, `path` (the matched route pattern, such as `/api/invitations/validate/:token`, so tokens and IDs in the URL never reach the line; only an unmatched request shows its real path, never with a query string), `status`, `durationMs`, `reason` (the error body's `message`, or the replacement text), and `clientClosed` when the client gave up. The level is `info` for 2xx and 3xx, `warn` for 4xx, and `error` for 5xx. A health check (a path in `healthCheckPaths`, matched exactly) gets no line when it passes; a failing or timed-out one is logged like any other request. Headers and bodies are never logged.
 
 ---
 

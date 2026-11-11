@@ -4,6 +4,8 @@ import {
   Controller,
   ForbiddenException,
   Get,
+  NotFoundException,
+  Param,
   Res,
   ServiceUnavailableException,
   UseGuards,
@@ -67,6 +69,18 @@ class HealthController {
   @Get('api/walls/:id/health')
   wallHealth() {
     return { status: 'online' };
+  }
+}
+
+@Controller('invitations')
+class InvitationsController {
+  @Get('validate/:token')
+  async validate(@Param('token') token: string) {
+    await new Promise((resolve) => setTimeout(resolve, 5));
+    if (token === 'expired-token') {
+      throw new NotFoundException('Invitation not found');
+    }
+    return { valid: true };
   }
 }
 
@@ -135,6 +149,24 @@ describe('access line', () => {
     expect(JSON.stringify(t.captured.lines)).not.toContain('Jane Doe');
   });
 
+  it('logs the route pattern, not the values in the path', async () => {
+    t = await startTestApp({}, [InvitationsController]);
+
+    await fetch(`${t.url}/invitations/validate/secret-invite-token`);
+    await fetch(`${t.url}/invitations/validate/expired-token`);
+
+    const ok = await t.captured.waitFor(
+      (l) => l['path'] === '/invitations/validate/:token' && l['status'] === 200
+    );
+    expect(ok['msg']).toBe('GET /invitations/validate/:token 200');
+    await t.captured.waitFor(
+      (l) => l['path'] === '/invitations/validate/:token' && l['status'] === 404
+    );
+    const all = JSON.stringify(t.captured.lines);
+    expect(all).not.toContain('secret-invite-token');
+    expect(all).not.toContain('expired-token');
+  });
+
   it('keeps the query string out of the reason Nest gives for an unknown route', async () => {
     t = await startTestApp();
 
@@ -186,7 +218,7 @@ describe('access line', () => {
 
     await fetch(`${t.url}/api/walls/7/health`);
 
-    await t.captured.waitFor((l) => l['path'] === '/api/walls/7/health');
+    await t.captured.waitFor((l) => l['path'] === '/api/walls/:id/health');
   });
 
   it("keeps the host's own health check paths quiet when they pass", async () => {

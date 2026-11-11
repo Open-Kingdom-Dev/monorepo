@@ -14,6 +14,21 @@ function pathOf(req: IncomingMessage): string {
   return url.split('?')[0];
 }
 
+/**
+ * The matched route's pattern (`/api/invitations/validate/:token`), so values carried in the
+ * path, such as tokens and IDs, never reach the line. Only an unmatched request (a 404 from no
+ * route) falls back to its real path, which then holds no route parameters.
+ */
+function routeOf(req: IncomingMessage, path: string): string {
+  const { route, baseUrl } = req as IncomingMessage & {
+    route?: { path?: unknown };
+    baseUrl?: string;
+  };
+  return typeof route?.path === 'string'
+    ? `${baseUrl ?? ''}${route.path}`
+    : path;
+}
+
 const REASON = Symbol('loggedErrorReason');
 const REPLACED_REASON = Symbol('replacedErrorReason');
 
@@ -97,19 +112,20 @@ export function requestLogging(
       // Passing health checks run every few seconds and would drown the requests worth
       // reading; a failing or timed-out one is what an orchestrator restarts on, so it's kept.
       if (healthCheck && status < 400 && res.writableFinished) return;
+      const route = routeOf(req, path);
       // Written inside the request's scope, so it carries the same requestId and fields.
       logScopeStore.run(scope ?? { requestId, fields: {} }, () => {
         PinoLogger.root[levelOf(status)](
           {
             method: req.method,
-            path,
+            path: route,
             status,
             durationMs: Date.now() - startedAt,
             ...(reason === undefined ? {} : { reason }),
             // A response that hasn't finished by close lost its client.
             ...(res.writableFinished ? {} : { clientClosed: true }),
           },
-          `${req.method} ${path} ${status}`
+          `${req.method} ${route} ${status}`
         );
       });
     });
