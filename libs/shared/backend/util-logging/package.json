@@ -1,0 +1,43 @@
+{
+  "name": "@open-kingdom/shared-backend-util-logging",
+  "version": "0.0.0",
+  "publishConfig": {
+    "access": "public"
+  },
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    "./package.json": "./package.json",
+    ".": {
+      "@open-kingdom/source": "./src/index.ts",
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "README.md",
+    "dist",
+    "!**/*.tsbuildinfo"
+  ],
+  "nx": {
+    "tags": [
+      "scope:shared",
+      "type:util",
+      "environment:backend"
+    ]
+  },
+  "dependencies": {
+    "tslib": "^2.3.0",
+    "nestjs-pino": "^5.3.1",
+    "pino": "^10.4.0",
+    "pino-http": "^11.0.0",
+    "pino-pretty": "^13.2.0",
+    "pino-roll": "^4.0.0"
+  },
+  "peerDependencies": {
+    "@nestjs/common": "^11.0.8 || ^12.0.2",
+    "@nestjs/core": "^11.0.8 || ^12.0.2"
+  }
+}

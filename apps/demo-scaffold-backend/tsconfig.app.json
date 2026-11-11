@@ -40,6 +40,9 @@
       "path": "../../libs/shared/backend/data-access-users/tsconfig.lib.json"
     },
     {
+      "path": "../../libs/shared/backend/util-logging/tsconfig.lib.json"
+    },
+    {
       "path": "../../libs/shared/backend/util-port-lease/tsconfig.lib.json"
     },
     {

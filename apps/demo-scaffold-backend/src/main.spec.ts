@@ -33,6 +33,14 @@ jest.mock('./app/app.module', () => ({
   AppModule: class MockAppModule {},
 }));
 
+const mockUseLogging = jest.fn();
+
+jest.mock('@open-kingdom/shared-backend-util-logging', () => ({
+  createBootLogger: jest.fn(() => ({ info: jest.fn() })),
+  installCrashLogging: jest.fn(),
+  useLogging: mockUseLogging,
+}));
+
 describe('Main Module', () => {
   let mockApp: {
     setGlobalPrefix: jest.Mock;
@@ -75,6 +83,7 @@ describe('Main Module', () => {
     await bootstrap();
 
     expect(NestFactory.create).toHaveBeenCalledTimes(1);
+    expect(mockUseLogging).toHaveBeenCalledWith(mockApp);
     expect(mockApp.setGlobalPrefix).toHaveBeenCalledWith('api');
     expect(mockDocumentBuilderInstance.build).toHaveBeenCalledTimes(1);
     expect(mockSwaggerModule.setup).toHaveBeenCalledWith(

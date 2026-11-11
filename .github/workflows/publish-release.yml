@@ -6,20 +6,23 @@ on:
     branches: [master]
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
+  group: ${{ github.workflow }}-${{ github.event.pull_request.head.ref }}
   cancel-in-progress: false
 
 jobs:
   publish:
     name: Tag, Release & Publish
+    # Release branches are release/<group>, one per Nx release group (see nx.json).
     if: >-
       github.event.pull_request.merged == true &&
-      github.event.pull_request.head.ref == 'release'
+      startsWith(github.event.pull_request.head.ref, 'release/')
     runs-on: ubuntu-latest
     permissions:
       contents: write
       id-token: write
     timeout-minutes: 30
+    env:
+      RELEASE_BRANCH: ${{ github.event.pull_request.head.ref }}
 
     steps:
       - name: Checkout master
@@ -64,20 +67,19 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Extract version from CHANGELOG
+      - name: Release info
         id: version
         run: |
-          VERSION=$(sed -n 's/^## \([^ ]*\).*/\1/p' CHANGELOG.md | head -1)
-          echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
-          echo "tag=v${VERSION}" >> "$GITHUB_OUTPUT"
-          echo "Detected version: ${VERSION}"
+          GROUP="${RELEASE_BRANCH#release/}"
+          echo "group=${GROUP}" >> "$GITHUB_OUTPUT"
+          bash tools/release/release-info.sh "$GROUP" >> "$GITHUB_OUTPUT"
 
       - name: Check if tag already exists
         id: tag_check
         run: |
-          if git rev-parse "v${{ steps.version.outputs.version }}" >/dev/null 2>&1; then
+          if git rev-parse "${{ steps.version.outputs.tag }}" >/dev/null 2>&1; then
             echo "exists=true" >> "$GITHUB_OUTPUT"
-            echo "Tag v${{ steps.version.outputs.version }} already exists — skipping."
+            echo "Tag ${{ steps.version.outputs.tag }} already exists — skipping."
           else
             echo "exists=false" >> "$GITHUB_OUTPUT"
           fi
@@ -96,7 +98,7 @@ jobs:
         if: steps.tag_check.outputs.exists == 'false'
         run: |
           VERSION="${{ steps.version.outputs.version }}"
-          NOTES=$(sed -n "/^## ${VERSION}/,/^## [0-9]/p" CHANGELOG.md | sed '$d')
+          NOTES=$(bash tools/release/release-notes.sh "${{ steps.version.outputs.group }}" "$VERSION")
 
           gh release create "${{ steps.version.outputs.tag }}" \
             --title "${{ steps.version.outputs.tag }}" \
@@ -106,9 +108,12 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Publish to NPM
-        run: npx nx release publish
+        # Info was read before this run's tag existed, so first_release marks a never-published group.
+        run: >-
+          npx nx release publish --groups=${{ steps.version.outputs.group }}
+          ${{ steps.version.outputs.first_release == 'true' && '--first-release' || '' }}
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_ACCESS_TOKEN }}
 
       - name: Clean up release branch
-        run: git push origin --delete release 2>/dev/null || true
+        run: git push origin --delete "$RELEASE_BRANCH" 2>/dev/null || true
