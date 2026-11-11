@@ -127,7 +127,7 @@
           "libs/crm/poly/*"
         ],
         "projectsRelationship": "fixed",
-        "releaseTag": { "pattern": "v{version}" }
+        "releaseTag": { "pattern": "v{version}", "strictPreid": false }
       }
     },
     "version": {
@@ -136,7 +136,6 @@
       "fallbackCurrentVersionResolver": "disk",
       "preserveMatchingDependencyRanges": false
     },
-    "versionPlans": false,
     "changelog": {
       "automaticFromRef": true,
       "workspaceChangelog": false,
