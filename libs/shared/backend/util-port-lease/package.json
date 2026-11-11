@@ -1,6 +1,6 @@
 {
   "name": "@open-kingdom/shared-backend-util-port-lease",
-  "version": "0.0.2-20",
+  "version": "0.0.2-21",
   "publishConfig": {
     "access": "public"
   },
