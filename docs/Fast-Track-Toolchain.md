@@ -25,6 +25,21 @@ The harness is **opinionated**. It doesn't offer menus of choices; it applies th
 - Frontend-only or backend-only apps.
 - Multi-tenancy, SSO/SAML, MFA, realtime, Postgres, CI/deploy, i18n.
 
+### 2.1 Success measures
+
+How we'll know it's working. Targets are proposals. Calibrate them after the pilot, then lock them in the decision log.
+
+| Measure               | What we track                                                              | Proposed v1 target              |
+| --------------------- | -------------------------------------------------------------------------- | ------------------------------- |
+| Time to green         | Intake → running app, all v1 items wired, `check-all` green                | Under 1 hour, unattended        |
+| Manual interventions  | Times a human had to fix or unblock a run                                  | 0 per run on a clean machine    |
+| Reuse ratio           | Share of building blocks from ok-monorepo vs. built locally or third-party | Rising run over run             |
+| Gap closure           | Upstream `toolchain-gap` issues opened vs. closed per quarter              | Closed ≥ opened                 |
+| Repeat gaps           | Same gap hit by two different runs                                         | Trending to 0                   |
+| Time to first feature | Green scaffold → first real feature merged                                 | Track a baseline from the pilot |
+| Scaffold defects      | Auth/RBAC/nav bugs found in generated apps that trace back to the scaffold | 0 security-relevant             |
+| Portability           | A non-Claude LLM following `tools/fast-track/README.md` completes a run    | Works, with manual steps listed |
+
 ## 3. Principles
 
 1. **Resolution order for any building block:** (a) existing ok-monorepo library → (b) third-party package, human-approved → (c) write it in the app and file an upstream issue. Never skip (a).
@@ -131,7 +146,11 @@ Each section: what exists in ok-monorepo today, v1 scope, prerequisites, and the
 
 - **Exists:** Nx conventions (`.claude/rules/nx-conventions.md`), `demo-scaffold` + `demo-scaffold-backend` + `demo-scaffold-e2e` as reference apps, `util-port-lease`, `util-env-config`, `util-logging`.
 - **v1:** new Nx workspace, frontend app (React 19 + Vite), backend app (NestJS 11), e2e app, root npm scripts mirroring ok-monorepo (`dev`, `check-all`, `db:*`, `swagger:*`, `client:*`), `.claude/` rules carried over, logging + env config wired.
-- **Prereq:** confirm every library the harness needs is actually **published to npm** (standalone repos can't use workspace paths).
+- **Publish check (done 2026-11-12):** every shared library the harness needs is on npm at `0.0.2-21`. Remaining prereqs:
+  - **Blocker:** the OpenAPI → RTK Query codegen plugin `@open-kingdom/plugin-openapi` (`tools/plugin-openapi`) is `private` and not on npm. Standalone repos can't use codegen until it's published (executors only, no generators today).
+  - `feature-notifications` is published as `@open-kingdom/shared-feature-notifications` (no `-frontend-`). Either rename it with a deprecation path, or have item files use the real name.
+  - The root store (`demo-scaffold-frontend-feature-root-store`) is app-specific and unpublished (and it's missing `"private": true`). The harness generates the store in the app instead (see the RTK brief, Q1).
+  - Not yet checked: whether the published tarballs contain built output, and whether their internal dependency ranges resolve from npm. Verify with a throwaway install.
 
 ### 6.1 API layer
 
@@ -150,8 +169,12 @@ Each section: what exists in ok-monorepo today, v1 scope, prerequisites, and the
 
 - **Exists:** `feature-authentication` (JWT, `@Public()`, `JwtAuthGuard`), `data-access-users`, `feature-user-management` (backend + frontend, invitations), `util-rbac`, `data-access-activity-log`, Google auth emulator (twin).
 - **v1:** login/logout, Google login, invite → accept, password reset, `admin`/`user` roles with permissions, admin panel (D12), seed first admin.
-- **Prereqs in ok-monorepo:** hybrid session (D13) — refresh endpoint, refresh-token storage/rotation, httpOnly cookie + CSRF protection, `baseApi` refresh-on-401; password reset if not already present; verify whether login currently survives a page refresh.
-- **e2e:** login/logout; invite → accept → first login; admin assigns role; deactivated user is blocked; non-admin redirected from admin pages; password reset.
+- **Today (checked 2026-11-12):** login survives a refresh only because the JWT is stored in `localStorage` (`storagePersistence(localStorage)`) and loaded back without checking it. When the access token expires (1h in the demo app, 60s library default), the user is effectively logged out. There's no refresh endpoint and no cookie, and `baseApi` doesn't handle a 401. No e2e test reloads the page. Any XSS can read the token.
+- **Prereqs in ok-monorepo:** the hybrid session (D13).
+  - Backend: rotating refresh token in an httpOnly/Secure/SameSite cookie, `/auth/refresh` with reuse detection (hashed and stored server-side), logout revokes it, short access-token lifetime, CORS credentials if the frontend is on another origin.
+  - Frontend: drop `localStorage` persistence. On startup, call refresh and keep the token in memory. Wrap `baseApi` to refresh and retry once on a 401 (`credentials: 'include'`).
+  - Password reset, if it isn't already present.
+- **e2e:** login/logout; login → reload → still logged in; invite → accept → first login; admin assigns role; deactivated user is blocked; non-admin redirected from admin pages; password reset.
 
 ### 6.4 Theming
 
@@ -204,10 +227,12 @@ Brownfield mode · multi-tenancy · SSO/SAML, MFA, magic links, self-registratio
 ## 10. Getting started (suggested order)
 
 1. Do research task 1 (requirements) — lightweight; it validates §4.
-2. Land the ok-monorepo prerequisites: publish check (6.0), Tailwind 4 (D15), hybrid session (D13), app-shell/route-config library (6.5). Each is a normal ok-monorepo PR.
+2. Land the ok-monorepo prerequisites: publish the codegen plugin and resolve the remaining publish items (6.0), Tailwind 4 (D15), hybrid session (D13), app-shell/route-config library (6.5). Each is a normal ok-monorepo PR.
 3. Write `items/00-bootstrap.md` and the orchestrator skill; get bootstrap alone producing a green repo.
 4. Add items one at a time in §6 order, running the harness end-to-end after each.
-5. Hold the RTK discussion before 6.2; hold the auth discussion before post-v1 auth work.
+5. Hold the RTK discussion before 6.2 (prep: [Fast-Track-RTK-Discussion.md](Fast-Track-RTK-Discussion.md)); hold the auth discussion before post-v1 auth work.
+6. **After the developer review:** file the ok-monorepo prerequisites from step 2 as GitHub issues using `.github/ISSUE_TEMPLATE/toolchain-gap.md`. Hold until the review conversation has happened, since scope may change.
+7. **Once `tools/fast-track/` exists:** add a pointer to this brief (and the harness entry point) in `.claude/CLAUDE.md`, so every Claude session in ok-monorepo finds it.
 
 ### Starter prompts
 
