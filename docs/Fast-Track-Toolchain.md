@@ -123,6 +123,7 @@ Every `items/*.md` uses the same sections so any LLM can execute it:
 6. **Done when** — checks that must pass, e2e happy paths that must exist.
 7. **Gap handling** — known gaps and what to do (build locally + issue).
 8. **Depends on / parallel-safe with** — for the orchestrator's scheduling.
+9. **Reference code** — which `demo-scaffold` files are **patterns to follow** and which are **showcase-only, never copy** (e.g. `localStorage` token persistence, `catFactsApi`, routes for the external-service stand-ins, the hand-written route list). If a file isn't listed, the agent asks the item's spec rather than copying it from the demo.
 
 ### 5.4 Orchestration rules
 
@@ -223,7 +224,7 @@ Each section: what exists in ok-monorepo today, v1 scope, prerequisites, and the
 
 ## 9. Post-v1 roadmap (known)
 
-Brownfield mode · multi-tenancy · SSO/SAML, MFA, magic links, self-registration · hosted IdP support · realtime · Postgres · CI pipeline · Docker/deploy (GCP?) · i18n · forms library · feature flags · analytics · framework mode/SSR + top-nav shell for customer-facing apps · frontend-only/backend-only modes · Angular evaluation.
+Brownfield mode · multi-tenancy · SSO/SAML, MFA, magic links, self-registration · hosted IdP support · realtime · Postgres · CI pipeline · Docker/deploy (GCP?) · i18n · forms library · feature flags · analytics · framework mode/SSR + top-nav shell for customer-facing apps · frontend-only/backend-only modes · Angular evaluation · **align `demo-scaffold` with the toolchain**: move the reference app onto the same solutions a generated app uses (hybrid session, route config/app shell, store composition), so it becomes a faithful reference and the showcase-only lists in item files shrink.
 
 ## 10. Getting started (suggested order)
 
