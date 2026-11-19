@@ -97,6 +97,18 @@ Pushed updates should write into the RTK Query cache (`onCacheEntryAdded` / `upd
 
 **Lean:** skip MSW in v1. e2e covers the API paths.
 
+### 10. RTK Query vs. openapi-react-query (raised by Mubarek)
+
+Proposal: use openapi-react-query (a thin wrapper over TanStack Query + `openapi-fetch`) so a future framework move is cheaper.
+
+- **Portability is roughly a wash.** openapi-react-query is React-only; openapi-ts has no Vue/Angular/Svelte wrapper. RTK Query's core (`@reduxjs/toolkit/query`) is UI-agnostic too, with an Angular binding (`ngrx-rtk-query`, community). Either way a framework move rewrites the call sites and keeps the generated types.
+- **The realistic move is Angular** (post-v1 evaluation, D2), and that would likely apply to new apps, not migrate existing ones.
+- **Switching cost:** replace the codegen plugin (built on `@rtk-query/codegen-openapi`), `baseApi`, auth hydration, error autologger, and the planned 401 → refresh → retry and realtime-into-cache paths.
+- **Two libraries anyway:** Redux stays for auth, notifications and logs (D19), so we'd run two caches — the "accidentally use both" risk, built in.
+- **Fair points:** TanStack Query is more widely used and its devtools are good; keeping generated API types framework-agnostic is worth doing (RTK codegen already emits plain TS types).
+
+**Lean:** keep RTK Query (D18). Enforce one library with an ESLint `no-restricted-imports` rule (§6.1).
+
 ## Outcome checklist
 
 - [ ] D19 confirmed or amended
@@ -109,3 +121,4 @@ Pushed updates should write into the RTK Query cache (`onCacheEntryAdded` / `upd
 - [ ] RTK Query conventions (Q7)
 - [ ] Realtime rule (Q8)
 - [ ] MSW yes/no (Q9)
+- [ ] Data-fetching library confirmed (Q10)
