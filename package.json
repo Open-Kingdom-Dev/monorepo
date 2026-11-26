@@ -29,7 +29,9 @@
     "db:studio": "drizzle-kit studio --config=apps/demo-scaffold-backend/drizzle.config.ts",
     "swagger:generate-all": "npm run build-all && nx run @open-kingdom/plugin-openapi:generate-openapi-all",
     "client:generate-all": "npm run swagger:generate-all && nx run @open-kingdom/plugin-openapi:generate-client-all",
-    "test:logging": "nx test @open-kingdom/shared-backend-util-logging"
+    "test:logging": "nx test @open-kingdom/shared-backend-util-logging",
+    "check:openapi": "nx run-many -t build lint typecheck -p @open-kingdom/plugin-openapi",
+    "test:openapi-package": "nx run @open-kingdom/plugin-openapi:smoke-test"
   },
   "devDependencies": {
     "@babel/core": "^7.29.7",
