@@ -1,7 +1,6 @@
 {
   "name": "@open-kingdom/plugin-openapi",
-  "version": "0.0.1",
-  "private": true,
+  "version": "0.0.2-21",
   "main": "./dist/index.js",
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -49,17 +48,30 @@
         "dependsOn": [
           "generate-openapi-all"
         ]
+      },
+      "smoke-test": {
+        "executor": "nx:run-commands",
+        "dependsOn": [
+          "build"
+        ],
+        "cache": false,
+        "options": {
+          "command": "node tools/plugin-openapi/scripts/smoke-test.mjs"
+        }
       }
     }
   },
   "dependencies": {
+    "@nestjs/common": "^11.0.0",
+    "@nestjs/core": "^11.0.0",
     "@nestjs/swagger": "^11.0.0",
     "@nx/devkit": "24.0.3",
-    "openapi-typescript": "^7.5.0",
+    "@rtk-query/codegen-openapi": "^2.2.0",
+    "jiti": "2.4.2",
+    "reflect-metadata": "^0.1.13",
     "tslib": "^2.3.0"
   },
   "devDependencies": {
-    "ts-node": "^10.9.2",
     "typescript": "^6.0.3"
   },
   "executors": "./executors.json",
@@ -67,5 +79,10 @@
     "dist",
     "!**/*.tsbuildinfo",
     "executors.json"
-  ]
+  ],
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  },
+  "type": "commonjs"
 }
