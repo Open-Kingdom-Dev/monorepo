@@ -1,19 +1,13 @@
 import { PromiseExecutor, logger } from '@nx/devkit';
-import { execSync } from 'child_process';
-import { join } from 'path';
+import { generateAllBackends } from './generate-backends';
 import { SwaggerGenerateAllExecutorSchema } from './schema';
 
 const runExecutor: PromiseExecutor<SwaggerGenerateAllExecutorSchema> = async (
   _options,
   context
 ) => {
-  const scriptPath = join(__dirname, 'generate-backends.ts');
-
   try {
-    execSync(`npx jiti "${scriptPath}" "${context.root}"`, {
-      cwd: context.root,
-      stdio: 'inherit',
-    });
+    await generateAllBackends(context.root);
     return { success: true };
   } catch (error) {
     logger.error('Failed to generate OpenAPI documentation');
