@@ -16,13 +16,19 @@ export async function generateOpenApi(
 ): Promise<void> {
   const { appModule, globalPrefix, documentBuilder, outputPath } = options;
 
-  const app = await NestFactory.create(appModule);
-  if (globalPrefix) app.setGlobalPrefix(globalPrefix);
+  const app = await NestFactory.create(appModule, { abortOnError: false });
+  try {
+    if (globalPrefix) app.setGlobalPrefix(globalPrefix);
 
-  const document = SwaggerModule.createDocument(app, documentBuilder().build());
-  mkdirSync(dirname(outputPath), { recursive: true });
-  writeFileSync(outputPath, JSON.stringify(document, null, 2));
+    const document = SwaggerModule.createDocument(
+      app,
+      documentBuilder().build()
+    );
+    mkdirSync(dirname(outputPath), { recursive: true });
+    writeFileSync(outputPath, JSON.stringify(document, null, 2));
 
-  console.log(`Generated: ${outputPath}`);
-  await app.close();
+    console.log(`Generated: ${outputPath}`);
+  } finally {
+    await app.close();
+  }
 }

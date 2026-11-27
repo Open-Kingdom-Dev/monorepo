@@ -1,9 +1,14 @@
 import 'reflect-metadata';
 import { join } from 'path';
-import { pathToFileURL } from 'node:url';
 import { readdirSync, existsSync, readFileSync } from 'fs';
 import { DocumentBuilder } from '@nestjs/swagger';
+import { createJiti } from 'jiti';
 import { generateOpenApi } from './openapi-generator';
+import type { OpenApiGeneratorOptions } from './openapi-generator';
+
+interface BackendModule {
+  AppModule: OpenApiGeneratorOptions['appModule'];
+}
 
 interface OpenApiConfig {
   enabled?: boolean;
@@ -17,8 +22,6 @@ interface Backend {
   openApiConfig?: OpenApiConfig;
 }
 
-const workspaceRoot = process.argv[2] || process.cwd();
-
 function nameToSlug(name: string): string {
   return (name.startsWith('@') ? name.split('/').pop() ?? name : name)
     .toLowerCase()
@@ -26,7 +29,7 @@ function nameToSlug(name: string): string {
     .replace(/^-+|-+$/g, '');
 }
 
-function findBackends(): Backend[] {
+function findBackends(workspaceRoot: string): Backend[] {
   const backends: Backend[] = [];
   const appsDir = join(workspaceRoot, 'apps');
 
@@ -79,8 +82,10 @@ function findBackends(): Backend[] {
   return backends;
 }
 
-async function generateAllBackends() {
-  const backends = findBackends();
+export async function generateAllBackends(workspaceRoot: string) {
+  const backends = findBackends(workspaceRoot);
+  const loader = createJiti(join(workspaceRoot, 'package.json'));
+  let hasErrors = false;
 
   if (backends.length === 0) {
     console.log('No backends found');
@@ -98,16 +103,16 @@ async function generateAllBackends() {
 
       let mod;
       try {
-        mod = await import(pathToFileURL(distPath).href);
+        mod = await loader.import<BackendModule>(distPath);
       } catch {
-        mod = await import(pathToFileURL(srcPath).href);
+        mod = await loader.import<BackendModule>(srcPath);
       }
 
       if (!mod?.AppModule) {
         throw new Error('AppModule not found');
       }
 
-      // Import swagger config from the standard location: {backend}/src/lib/swagger.config.ts
+      // Import swagger config from {backend}/src/config/swagger.config.ts.
       let globalPrefix = 'api';
       let createSwaggerConfig: () => DocumentBuilder;
 
@@ -116,9 +121,10 @@ async function generateAllBackends() {
           backend.root,
           'src/config/swagger.config'
         );
-        const swaggerModule = await import(
-          pathToFileURL(swaggerConfigPath).href
-        );
+        const swaggerModule = await loader.import<{
+          globalPrefix?: string;
+          createSwaggerConfig?: () => DocumentBuilder;
+        }>(swaggerConfigPath);
 
         if (swaggerModule.globalPrefix && swaggerModule.createSwaggerConfig) {
           globalPrefix = swaggerModule.globalPrefix || 'api';
@@ -163,16 +169,12 @@ async function generateAllBackends() {
         outputPath,
       });
     } catch (error) {
+      hasErrors = true;
       console.error(`✗ Error generating ${backend.name}:`);
       console.error(error instanceof Error ? error.message : String(error));
       console.log('');
     }
   }
+  if (hasErrors)
+    throw new Error('OpenAPI generation failed for one or more backends');
 }
-
-generateAllBackends()
-  .then(() => process.exit(0))
-  .catch((error) => {
-    console.error('Error:', error);
-    process.exit(1);
-  });

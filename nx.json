@@ -124,7 +124,8 @@
           "libs/shared/poly/*",
           "libs/crm/frontend/*",
           "libs/crm/backend/*",
-          "libs/crm/poly/*"
+          "libs/crm/poly/*",
+          "tools/plugin-openapi"
         ],
         "projectsRelationship": "fixed",
         "releaseTag": { "pattern": "v{version}", "strictPreid": false }
